@@ -26,14 +26,6 @@ lazy val logParser =
       version := "4.0",
       rpmLicense := Some("BSD")
     )
-    .settings(
-      libraryDependencies ++= Seq(
-        "org.scalatest" %% "scalatest" % "2.2.5" % "test",
-        "com.typesafe" % "config" % "1.3.0",
-        "joda-time" % "joda-time" % "2.9",
-        "org.joda" % "joda-convert" % "1.8.1"
-      )
-    )
 
 lazy val achievements =
   Project(

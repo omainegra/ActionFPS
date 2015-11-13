@@ -19,12 +19,9 @@ object CommonSettingsPlugin extends AutoPlugin {
       "org.scalatest" %% "scalatest" % "2.2.5" % "test",
       "org.scala-lang.modules" %% "scala-async" % "0.9.5",
       "org.scalactic" %% "scalactic" % "2.2.5",
-      "com.hazelcast" % "hazelcast" % "3.4.6",
-      "joda-time" % "joda-time" % "2.9",
-      "org.scalatest" %% "scalatest" % "2.2.5" % "test",
+      "joda-time" % "joda-time" % "2.9.1",
       "org.joda" % "joda-convert" % "1.8.1",
-      "org.json4s" %% "json4s-jackson" % "3.3.0",
-      "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
+      "org.json4s" %% "json4s-jackson" % "3.3.0"
     )
   )
 
