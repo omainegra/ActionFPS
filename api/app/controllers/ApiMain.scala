@@ -17,7 +17,10 @@ class ApiMain @Inject()(configuration: Configuration)
 
   val file = new File(configuration.underlying.getString("af.games.path"))
 
-  val games = scala.io.Source.fromFile(file).getLines.map(_.split("\t").toList).collect {
+  val allLines = scala.io.Source.fromFile(file).getLines.toList
+  val allReverseLines = allLines.reverse
+
+  def recentGames = allReverseLines.toIterator.map(_.split("\t").toList).collect {
     case List(id, "GOOD", "", json) => id -> Json.parse(json)
   }.take(10).toList
 
@@ -26,7 +29,7 @@ class ApiMain @Inject()(configuration: Configuration)
   }.take(10).toList
 
   def recent = Action {
-    Ok(JsArray(games.map { case (_, json) => json }))
+    Ok(JsArray(recentGames.map { case (_, json) => json }))
   }
 
   def raw = Action {
