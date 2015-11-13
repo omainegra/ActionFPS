@@ -1,4 +1,4 @@
-name := "woopac"
+name := "actionfps"
 
 lazy val root = (project in file(".")).aggregate(
   logParser,
