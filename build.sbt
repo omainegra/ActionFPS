@@ -39,10 +39,7 @@ lazy val api =
   project
     .enablePlugins(PlayScala)
     .dependsOn(achievements)
+    .settings(dontDocument)
     .settings(
-      libraryDependencies ++= Seq(
-        "com.typesafe.akka" %% "akka-actor" % "2.4.0",
-        "com.typesafe.akka" %% "akka-agent" % "2.4.0",
-        "com.typesafe.akka" %% "akka-slf4j" % "2.4.0"
-      )
+      libraryDependencies ++= akka("actor", "agent", "slf4j")
     )

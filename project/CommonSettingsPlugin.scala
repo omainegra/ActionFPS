@@ -32,6 +32,9 @@ object CommonSettingsPlugin extends AutoPlugin {
       publishArtifact in packageDoc := false,
       sources in(Compile, doc) := Seq.empty
     )
+    def akka(stuff: String*) = stuff.map { k =>
+      "com.typesafe.akka" %% s"akka-$k" % "2.4.0"
+    }
   }
 
 }
