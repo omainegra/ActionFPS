@@ -46,7 +46,7 @@ trait Incremental { inc =>
     }
 
     override def progress: Int = {
-      val previousLevel = levels.takeWhile(_ < level).headOption.getOrElse(0)
+      val previousLevel = levels.takeWhile(_ < level).lastOption.getOrElse(0)
       if ( (level - previousLevel) == 0 ) 0
       else 100 * (counter - previousLevel) / (level - previousLevel)
     }

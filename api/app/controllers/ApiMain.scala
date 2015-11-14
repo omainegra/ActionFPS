@@ -5,12 +5,12 @@ import javax.inject._
 
 import acleague.enrichers.JsonGame
 import acleague.ranker.achievements.{Jsons, PlayerState}
-import acleague.ranker.achievements.immutable.NotAchievedAchievements$
+import acleague.ranker.achievements.immutable.{PlayerStatistics, NotAchievedAchievements$}
 import lib.clans.{Clan, ResourceClans}
 import lib.users.{User, BasexUsers}
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
-import play.api.libs.json.{JsArray, Json}
+import play.api.libs.json.{JsObject, JsArray, Json}
 import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext
@@ -22,7 +22,7 @@ class ApiMain @Inject()(configuration: Configuration)
 
   val file = new File(configuration.underlying.getString("af.games.path"))
 
-  val allLines = scala.io.Source.fromFile(file).getLines.toList
+  val allLines = scala.io.Source.fromFile(file).getLines.toList //.take(500)
   val allReverseLines = allLines.reverse
 
   def recentGames = allReverseLines.toIterator.map(_.split("\t").toList).collect {
@@ -42,7 +42,18 @@ class ApiMain @Inject()(configuration: Configuration)
     Ok(Json.toJson(BasexUsers.users))
   }
 
+  def userJson(id: String) = Action {
+    BasexUsers.users.find(_.id == id) match {
+      case Some(user) =>
+        import User.WithoutEmailFormat.noEmailUserWrite
+        Ok(Json.toJson(user))
+      case None =>
+        NotFound("User not found")
+    }
+  }
+
   implicit val fmtClan = Json.format[Clan]
+
   def clansJson = Action {
 
     Ok(Json.toJson(ResourceClans.clans))
@@ -67,7 +78,7 @@ class ApiMain @Inject()(configuration: Configuration)
         user <- BasexUsers.users.find(_.nickname.nickname == player.name)
         (newPs, newEvents) <- combined.getOrElse(user.id, PlayerState.empty).includeGame(jsonGame, team, player)(p => BasexUsers.users.exists(_.nickname.nickname == p.name))
       } {
-        oEvents ++= newEvents.map{case (date, text) => Map("user"-> user.id, "date" -> date, "text" -> s"${user.name} $text")}
+        oEvents ++= newEvents.map { case (date, text) => Map("user" -> user.id, "date" -> date, "text" -> s"${user.name} $text") }
         nComb = nComb.updated(user.id, newPs)
       }
       (nComb, oEvents.toList ++ sofar)
@@ -78,15 +89,39 @@ class ApiMain @Inject()(configuration: Configuration)
   lazy val cavs = cevs
 
   def listEvents = Action {
-//    Ok(s"$combs")
+    //    Ok(s"$combs")
     cavs match {
       case (ss, events) =>
         Ok(Json.toJson(events.take(10)))
-//        ss("drakas").achieved.foreach(println)
-//        ss("drakas").combined.combined.foreach(println)
-//        import Jsons._
-//        Ok(Json.toJson(ss("drakas").buildAchievements))
-//        Ok(Json.toJson(events))
+      //        ss("drakas").achieved.foreach(println)
+      //        ss("drakas").combined.combined.foreach(println)
+      //        import Jsons._
+      //        Ok(Json.toJson(ss("drakas").buildAchievements))
+      //        Ok(Json.toJson(events))
+    }
+  }
+
+  def fullUser(id: String) = Action {
+    val fullOption = for {
+      user <- BasexUsers.users.find(_.id == id)
+      playerState <- cavs._1.get(user.id)
+    } yield {
+      import User.WithoutEmailFormat.noEmailUserWrite
+      import Jsons._
+      import PlayerStatistics.fmts
+      Json.toJson(user).asInstanceOf[JsObject].deepMerge(
+        JsObject(
+          Map(
+            "stats" -> Json.toJson(playerState.playerStatistics),
+            "achievements" -> Json.toJson(playerState.buildAchievements)
+          )
+        )
+      )
+    }
+    fullOption match {
+      case Some(json) => Ok(json)
+
+      case None => NotFound("User not found")
     }
   }
 
@@ -101,8 +136,5 @@ class ApiMain @Inject()(configuration: Configuration)
         }
     }
   }
-
-
-
 
 }

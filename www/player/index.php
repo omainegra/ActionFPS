@@ -3,7 +3,8 @@ if (!ctype_alnum($_GET['id'])) die("id invalid");
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$achievements = json_decode(file_get_contents("http://api.actionfps.com/achievements/" . $_GET['id'] . "/"), true);
+$user = json_decode(file_get_contents("http://api.actionfps.com/user/" . $_GET['id'] . "/full/"), true);
+$achievements = $user['achievements'];
 
 function capture_master($maps) {
     ?><section class="content">
@@ -122,6 +123,33 @@ function none_achievement($achievement)
 
     <article id="profile">
     <div class="profile">
+        <h1><?php echo htmlspecialchars($user['nickname']['nickname']); ?></h1>
+        <div class="main-info">
+            <div class="basics">
+                <table class="basic-counts">
+                    <tr>
+                        <th>Time played</th><td><?php
+                            $tp = $user['stats']['timePlayed'];
+                            $tp = floor($tp / 60);
+                            if ( $tp == 0 ) {
+                                echo "not enough";
+                            } else if ( $tp > 24 ) {
+                                $days = floor($tp / 24);
+                                $hours = $tp - $days * 24;
+                                echo "$days days, $hours hours";
+                            } else {
+                                echo "$tp hours";
+                            }
+                            ?></td>
+                        <th>Flags</th><td><?php echo $user['stats']['flags']; ?></td>
+
+                    </tr>
+                    <tr>
+                        <th>Games played</th><td><?php echo $user['stats']['gamesPlayed']; ?></td>
+                        <th>Frags</th><td><?php echo $user['stats']['frags']; ?></td>
+                    </tr>
+                </table>
+            </div>
         <div class="achievements">
             <h3>Achievements</h3>
 
@@ -136,6 +164,7 @@ function none_achievement($achievement)
                     none_achievement($achievement);
                 } ?>
             </div>
+        </div>
         </div>
     </div>
 

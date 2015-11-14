@@ -9,6 +9,7 @@ import play.api.libs.json.{Json, JsObject}
 case class PlayerState(combined: NotAchievedAchievements,
                        playerStatistics: PlayerStatistics, events: Vector[(String, String)], achieved: Vector[(String, immutable.CompletedAchievement)]) {
   def includeGame(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer)(isRegisteredPlayer: JsonGamePlayer => Boolean): Option[(PlayerState, Vector[(String, String)])] = {
+    val nps = playerStatistics.processGame(jsonGame, jsonGamePlayer)
     combined.include(jsonGame, jsonGameTeam, jsonGamePlayer)(isRegisteredPlayer).map {
       case (newCombined, newEvents, newAchievements) =>
         val newEventsT = newEvents.map(a => jsonGame.id -> a)
@@ -18,6 +19,10 @@ case class PlayerState(combined: NotAchievedAchievements,
           events = events ++ newEventsT
         )
         (newMe, newEventsT.toVector)
+    } match {
+      case Some((m, e)) => Option((m.copy(playerStatistics = nps), e))
+      case None if nps != playerStatistics => Option(copy(playerStatistics = nps) -> Vector.empty)
+      case None => None
     }
   }
 
