@@ -3,7 +3,7 @@ require_once("render.inc.php");
 require("render_game.inc.php");
 
 $games = json_decode(file_get_contents("http://api.actionfps.com/recent/"), true);
-$events = json_decode(file_get_contents("http://localhost:9000/events/"), true);
+$events = json_decode(file_get_contents("http://api.actionfps.com/events/"), true);
 ?><div id="live-events">
     <ol class="LiveEvents live-events">
         <?php foreach($events as $i => $event) {
