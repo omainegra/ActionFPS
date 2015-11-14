@@ -3,8 +3,9 @@ package ac.woop.client
 import ac.woop.MasterServer.Repository._
 import akka.actor.{Terminated, ActorRef, ActorLogging}
 import akka.util.ByteString
+import io.enet.akka.Compressor
 import io.enet.akka.ENetService._
-import io.enet.akka.Compressor._
+import Compressor._
 import io.enet.akka.Shapper.packetFromPeerExtra
 import akka.actor.ActorDSL._
 

@@ -15,7 +15,7 @@ import io.enet.akka.ENetService._
 import org.apache.commons.codec.binary.Hex
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import akka.actor.ActorDSL._
-import io.enet.akka.Compressor._
+import Compressor._
 import io.enet.akka.Shapper.packetFromPeerExtra
 import org.h2.mvstore.MVStore
 import scala.annotation.tailrec

@@ -6,7 +6,7 @@ import akka.actor.{Terminated, ActorRef, ActorLogging}
 import akka.util.ByteString
 import io.enet.akka.{Compressor, ENetService}
 import io.enet.akka.ENetService._
-import io.enet.akka.Compressor._
+import Compressor._
 import io.enet.akka.Shapper.packetFromPeerExtra
 import akka.actor.ActorDSL._
 
