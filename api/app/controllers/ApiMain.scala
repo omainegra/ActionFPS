@@ -56,7 +56,7 @@ class ApiMain @Inject()(configuration: Configuration)
     Ok.chunked(Enumerator.enumerate(lines).map(l => s"$l\n")).as("text/tab-separated-values")
   }
 
-  def cevs = allLines.take(250).map(_.split("\t").toList).foldLeft((Map.empty[String, PlayerState], List.empty[String])) {
+  def cevs = allLines.map(_.split("\t").toList).foldLeft((Map.empty[String, PlayerState], List.empty[String])) {
     case ((combined, sofar), List(_, "GOOD", _, json)) =>
       val jsonGame = JsonGame.fromJson(json)
       val oEvents = scala.collection.mutable.Buffer.empty[String]
@@ -79,8 +79,8 @@ class ApiMain @Inject()(configuration: Configuration)
 //    Ok(s"$combs")
     cevs match {
       case (ss, events) =>
-        ss("ven50").achieved.foreach(println)
-        ss("ven50").combined.combined.foreach(println)
+        ss("drakas").achieved.foreach(println)
+        ss("drakas").combined.combined.foreach(println)
         Ok(Json.toJson(events))
     }
   }

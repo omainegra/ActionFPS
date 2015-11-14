@@ -17,7 +17,7 @@ object CaptureMaster {
       val withIncluded = achieving.map(a => a.include(jsonGame, jsonGameTeam, jsonGamePlayer).getOrElse(Left(a)))
       val nextMe = copy(
         achieving = withIncluded.flatMap(_.left.toSeq),
-        achieved = withIncluded.flatMap(_.right.toSeq)
+        achieved = achieved ++ withIncluded.flatMap(_.right.toSeq)
       )
       if ( nextMe == this ) Option.empty else Option {
         val newlyCompleted = (nextMe.achieved.toSet -- achieved.toSet).headOption
