@@ -8,8 +8,8 @@ case class CurrentNickname(nickname: String, countryCode: Option[String], from: 
 
 case class PreviousNickname(nickname: String, countryCode: Option[String], from: ZonedDateTime, to: ZonedDateTime)
 
-case class User(id: String, gameNickname: String, name: String, countryCode: Option[String], email: String,
-                registrationDate: ZonedDateTime, currentNickname: CurrentNickname)
+case class User(id: String, name: String, countryCode: Option[String], email: String,
+                registrationDate: ZonedDateTime, nickname: CurrentNickname, previousNicknames: Option[List[PreviousNickname]])
 object User {
   implicit val pnFormat = Json.format[PreviousNickname]
   implicit val cnFormat = Json.format[CurrentNickname]

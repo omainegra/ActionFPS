@@ -11,11 +11,11 @@ let $json :=
                 <email>{data($user/@email)}</email>
                 <registrationIp>{data($user/@registration-ip)}</registrationIp>
                 <registrationDate>{data($user/@registration-date)}</registrationDate>
-                <currentNickname type="object">
+                <nickname type="object">
                     <nickname>{data($current-nickname/text())}</nickname>
                     <countryCode>{data($current-nickname/@country-code)}</countryCode>
                     <from>{data($current-nickname/@from)}</from>
-                </currentNickname>
+                </nickname>
                 {if ( not(empty($user/nickname[@to]))) then (
                     <previousNicknames type="array">
                         {
