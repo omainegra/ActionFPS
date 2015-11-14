@@ -35,7 +35,7 @@ object Maverick {
     }.headOption
   }
 
-  case class Achieved(flags: Int) extends Maverick
+  case class Achieved(flags: Int) extends Maverick with AchievedAchievement
 
 }
 

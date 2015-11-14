@@ -11,7 +11,7 @@ trait Incremental {
   def levels: List[Int]
   def eventLevelTitle(level: Int): String
   def levelTitle(level: Int): String
-  sealed trait Achieved extends CoreType
+  sealed trait Achieved extends CoreType with AchievedAchievement
   case object Completed extends Achieved
   case class AchievedLevel(level: Int) extends Achieved
   def filter(inputType: InputType): Option[Int]

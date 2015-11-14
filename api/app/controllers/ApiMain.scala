@@ -55,7 +55,7 @@ class ApiMain @Inject()(configuration: Configuration)
     Ok.chunked(Enumerator.enumerate(lines).map(l => s"$l\n")).as("text/tab-separated-values")
   }
 
-  def cevs = allLines.map(_.split("\t").toList).foldLeft((Map.empty[String, Combined], List.empty[String])){
+  def cevs = allLines.take(250).map(_.split("\t").toList).foldLeft((Map.empty[String, Combined], List.empty[String])){
     case ((combined, sofar), List(_, "GOOD", _, json)) =>
       val jsonGame = JsonGame.fromJson(json)
       val oEvents = scala.collection.mutable.Buffer.empty[String]

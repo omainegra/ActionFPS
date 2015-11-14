@@ -34,7 +34,7 @@ case class Combined
   def include(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer) = {
     var me = this
     val newEvents = scala.collection.mutable.ListBuffer.empty[String]
-    val achievedLevels = scala.collection.mutable.ListBuffer.empty[Incremental#AchievedLevel]
+    val achievedAchievements = scala.collection.mutable.ListBuffer.empty[AchievedAchievement]
     captureMaster match {
       case a: CaptureMaster.Achieving =>
         a.includeGame(jsonGame, jsonGameTeam, jsonGamePlayer).foreach {
@@ -45,6 +45,7 @@ case class Combined
             me = me.copy(captureMaster = cm.fold(identity, identity))
             cm match {
               case Right(achieved) =>
+                achievedAchievements += achieved
                 newEvents += "became Capture Master"
               case _ =>
             }
@@ -59,9 +60,11 @@ case class Combined
             me = me.copy(cubeAddict = achieving)
             achievedO.foreach { achieved =>
               newEvents += CubeAddict.eventLevelTitle(achieved.level)
+              achievedAchievements += achieved
             }
           case Right(completed) =>
             me = me.copy(cubeAddict = completed)
+            achievedAchievements += completed
             newEvents += "became Cube Addict"
         }
       case _ =>
@@ -73,9 +76,11 @@ case class Combined
           case Left((achieving, achievedO)) =>
             me = me.copy(flagMaster = achieving)
             achievedO.foreach { achieved =>
+              achievedAchievements += achieved
               newEvents += FlagMaster.eventLevelTitle(achieved.level)
             }
           case Right(completed) =>
+            achievedAchievements += completed
             me = me.copy(flagMaster = completed)
             newEvents += "became Flag Master"
         }
@@ -89,9 +94,11 @@ case class Combined
           case Left((achieving, achievedO)) =>
             me = me.copy(fragMaster = achieving)
             achievedO.foreach { achieved =>
+              achievedAchievements += achieved
               newEvents += FragMaster.eventLevelTitle(achieved.level)
             }
           case Right(completed) =>
+            achievedAchievements += completed
             me = me.copy(fragMaster = completed)
             newEvents += "became Flag Master"
         }
@@ -102,6 +109,7 @@ case class Combined
       case a: DDay.Achieving =>
         a.includeGame(jsonGame) match {
           case Right(achieved) =>
+            achievedAchievements += achieved
             newEvents += "had a D-Day"
             me = me.copy(dDay = achieved)
           case Left(achieving) =>
@@ -114,6 +122,7 @@ case class Combined
       case a@Maverick.NotAchieved =>
         a.processGame(jsonGame, jsonGamePlayer, _ => false).foreach {
           achieved =>
+            achievedAchievements += achieved
             me = me.copy(maverick = achieved)
             newEvents += "became Maverick"
         }
@@ -124,6 +133,7 @@ case class Combined
       case a@Slaughterer.NotAchieved =>
         a.processGame(jsonGame, jsonGamePlayer, _ => false).foreach {
           achieved =>
+            achievedAchievements += achieved
             me = me.copy(slaughterer = achieved)
             newEvents += "became Maverick"
         }
@@ -136,6 +146,7 @@ case class Combined
           case Left(achieving) =>
             me = me.copy(tdmLover = achieving)
           case Right(achieved) =>
+            achievedAchievements += achieved
             newEvents += "became TDM Lover"
             me = me.copy(tdmLover = achieved)
         }
@@ -148,6 +159,7 @@ case class Combined
           case Left(achieving) =>
             me = me.copy(tosokLover = achieving)
           case Right(achieved) =>
+            achievedAchievements += achieved
             newEvents += "became Lucky Luke"
             me = me.copy(tosokLover = achieved)
         }
@@ -158,15 +170,16 @@ case class Combined
       case a@TerribleGame.NotAchieved =>
         a.processGame(jsonGamePlayer).foreach {
           achieved =>
+            achievedAchievements += achieved
             me = me.copy(terribleGame = achieved)
             newEvents += "had a terrible game"
         }
       case _ =>
     }
 
-    if (me == this && newEvents.isEmpty && achievedLevels.isEmpty) None
+    if (me == this && newEvents.isEmpty && achievedAchievements.isEmpty) None
     else Option {
-      (me, newEvents.toList, achievedLevels.toList)
+      (me, newEvents.toList, achievedAchievements.toList)
     }
   }
 }

@@ -8,7 +8,7 @@ import acleague.enrichers.JsonGame
 sealed trait TosokLover
 object TosokLover {
   val target = 25
-  case object Achieved extends TosokLover
+  case object Achieved extends TosokLover with AchievedAchievement
   def empty = Achieving(counter = 0)
   case class Achieving(counter: Int) extends TosokLover {
     def processGame(jsonGame: JsonGame): Option[Either[Achieving, Achieved.type]] = {
