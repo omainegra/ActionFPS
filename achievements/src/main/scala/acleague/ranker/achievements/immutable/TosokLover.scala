@@ -5,7 +5,9 @@ import acleague.enrichers.JsonGame
 /**
   * Created by William on 11/11/2015.
   */
-sealed trait TosokLover
+sealed trait TosokLover {
+  def title: String = "Lucky Luke"
+}
 object TosokLover {
   val target = 25
   case object Achieved extends TosokLover  with CompletedAchievement

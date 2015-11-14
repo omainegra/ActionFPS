@@ -5,7 +5,9 @@ import acleague.enrichers.JsonGamePlayer
 /**
   * Created by William on 11/11/2015.
   */
-sealed trait TerribleGame
+sealed trait TerribleGame {
+  def title = "Terrible Game"
+}
 object TerribleGame {
   def begin = NotAchieved
   case class Achieved(frags: Int) extends TerribleGame with CompletedAchievement

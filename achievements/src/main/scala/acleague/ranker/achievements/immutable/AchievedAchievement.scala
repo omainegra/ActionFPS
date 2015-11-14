@@ -1,6 +1,8 @@
 package acleague.ranker.achievements.immutable
 
-trait Achievement[AS <: AchievementState]
+trait Achievement[AS <: AchievementState] {
+  def title: String
+}
 trait IncompleteAchievement[AS <: IncompleteAchievementState] extends Achievement[AS]
 trait CompletedAchievement extends Achievement[AchievedState.type]
 sealed trait AchievementState

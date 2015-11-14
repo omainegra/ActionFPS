@@ -5,7 +5,9 @@ import acleague.enrichers.{JsonGame, JsonGamePlayer}
 /**
   * Created by William on 11/11/2015.
   */
-sealed trait Slaughterer
+sealed trait Slaughterer {
+  def title = "Butcher"
+}
 
 object Slaughterer {
 

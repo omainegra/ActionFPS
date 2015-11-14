@@ -16,7 +16,7 @@ object FragMaster extends Incremental {
     Option(inputType.frags)
   }
 
-  override def levelTitle(level: Int): String = Map(
+  override def levelDescription(level: Int): String = Map(
     500 -> "Well, that's a start.",
     1000 -> "Already lost count.",
     2000 -> "I'm quite good at this!",
@@ -25,4 +25,9 @@ object FragMaster extends Incremental {
   ).getOrElse(level, s"Achieve $level frags")
 
   override def eventLevelTitle(level: Int): String = s"achieved Frag Master level $level"
+
+  override def title: String = "Frag Master"
+
+  override def levelTitle(level: Int): String = s"$title: $level"
+
 }

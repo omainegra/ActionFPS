@@ -5,7 +5,9 @@ import acleague.enrichers.JsonGame
 /**
   * Created by William on 11/11/2015.
   */
-sealed trait TdmLover
+sealed trait TdmLover {
+  def title = "TDM Lover"
+}
 object TdmLover {
   val target = 25
   case object Achieved extends TdmLover with CompletedAchievement

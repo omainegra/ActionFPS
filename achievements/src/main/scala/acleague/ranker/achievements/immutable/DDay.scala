@@ -5,7 +5,9 @@ import acleague.enrichers.JsonGame
 /**
   * Created by William on 11/11/2015.
   */
-sealed trait DDay
+sealed trait DDay {
+  def title = "D-Day"
+}
 
 object DDay {
 

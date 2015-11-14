@@ -2,7 +2,9 @@ package acleague.ranker.achievements.immutable
 
 import acleague.enrichers.{JsonGamePlayer, JsonGameTeam, JsonGame}
 
-sealed trait CaptureMaster
+sealed trait CaptureMaster {
+  def title = "Capture Master"
+}
 
 object CaptureMaster {
 
