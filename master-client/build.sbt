@@ -20,6 +20,5 @@ libraryDependencies ++= {
     "com.h2database" % "h2-mvstore" % "1.4.185",
     "org.json4s" %% "json4s-jackson" % "3.2.10",
     "commons-io" % "commons-io" % "2.4"
-
   )
 }

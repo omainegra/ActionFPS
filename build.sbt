@@ -6,7 +6,6 @@ lazy val root =
       logParser,
       achievements,
       api,
-      acm,
       akkaEnet,
       demoParser,
       cubeProtocol,
@@ -16,7 +15,6 @@ lazy val root =
     achievements,
     logParser,
     api,
-    acm,
     akkaEnet,
     demoParser,
     cubeProtocol,
@@ -58,9 +56,6 @@ lazy val api =
       "org.apache.httpcomponents" % "fluent-hc" % "4.5.1"
     ))
 
-lazy val acm =
-  project
-    .dependsOn(akkaEnet, demoParser, cubeProtocol)
 
 lazy val akkaEnet =
   Project(
@@ -87,7 +82,7 @@ lazy val masterClient =
   Project(
     id = "master-client",
     base = file("master-client")
-  ).dependsOn(acm)
+  ).dependsOn(akkaEnet, demoParser, cubeProtocol)
 
 lazy val masterServer =
   Project(
