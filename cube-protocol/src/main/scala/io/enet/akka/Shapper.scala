@@ -5,7 +5,7 @@ import io.enet.akka.ENetService.{PacketFromPeer, PeerId, SendMessage}
 import shapeless.ops.hlist.LeftFolder
 import shapeless._
 
-object Shapper extends App {
+object Shapper {
   object SendMessageAddition {
     //    def apply[P <: Product](peer: PeerId, channelID: Byte)(p: P):SendMessage  = {
     //      SendMessage(peer, channelID, Shapper.productToByteString(p))

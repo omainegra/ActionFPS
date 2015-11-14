@@ -27,7 +27,9 @@ object ENetService {
   case class ConnectPeer(peer: PeerId, channels: Byte) extends ScalaENetCommand
   case class DisconnectPeer(peer: PeerId) extends ScalaENetCommand
   // default reliable
-  case class SendMessage(peer: PeerId, channelID: Byte, data: ByteString, flags: Int = 1) extends ScalaENetCommand
+  case class SendMessage(peer: PeerId, channelID: Byte, data: ByteString, flags: Int = 1) extends ScalaENetCommand {
+    def reverse(myPeer: PeerId): PacketFromPeer = PacketFromPeer(myPeer, channelID, data)
+  }
 
 
   case class ENetServiceParameters

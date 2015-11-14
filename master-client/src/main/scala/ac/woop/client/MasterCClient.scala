@@ -1,94 +1,74 @@
 package ac.woop.client
 
-import ac.woop.client.Authenticator.{AuthenticationFailed, Authenticated}
-import ac.woop.client.KeyExchanger.ExchangeComplete
-import ac.woop.client.MasterCClient.PushServerUsers
-import ac.woop.client.MasterClient.Repository
-import ac.woop.client.MasterClient.Repository.{ServerId, UserId, UserServer, Server}
 import akka.actor.ActorDSL._
-import akka.actor.{ActorLogging, ActorRef, Terminated}
+import akka.actor.{Props, ActorRef, ActorLogging}
 import io.enet.akka.ENetService
 import io.enet.akka.ENetService._
 object MasterCClient {
-  case class PushServerUsers(serverUsers: Map[UserId, UserServer])
+  case class MyProps(remote: PeerId, serverKey: String, exchangeKeysImmediately: Option[List[ServerUser]]) {
+    def defaultEnetService(to: ActorRef) = {
+      val enetParams = ENetServiceParameters(
+        listen = None,
+        maxConnections = 1,
+        channelCount = 4
+      )
+      Props(new ENetService(to, enetParams))
+    }
+    def apply(enetService: ActorRef => Props):Props = Props(new MasterCClient(
+        enetService = enetService, remote = remote, serverKey = serverKey, exchangeKeysImmediately = exchangeKeysImmediately
+      ))
+    def apply(): Props = apply(defaultEnetService)
+  }
 }
-class MasterCClient(remote: PeerId, initialServerUsers: Map[UserId, UserServer], server: Server) extends Act with ActorLogging {
+class MasterCClient(enetService: ActorRef => Props, val remote: PeerId, val serverKey: String, exchangeKeysImmediately: Option[List[ServerUser]]) extends Act with ActorLogging with AuthenticatorTrait {
 
-  implicit class addServerId(peerId: PeerId) {
-    def serverId = ServerId(peerId.host, peerId.port)
+  val logReceiver = LogReceiverParser(remote)
+  val demoReceiver = DemoReceiverParser(remote)
+
+  val service = context.actorOf(enetService(self))
+
+  service ! ConnectPeer(remote, 4)
+
+  var keyExchanger = KeyExchanger(remote, exchangeKeysImmediately.toList.flatten)
+
+  def exchangeKeys(): Unit = {
+    service ! keyExchanger.beginSending
+    keyExchanger.pushOutMessages.foreach(service ! _)
+    service ! keyExchanger.finishSending
   }
 
-  def this(serverId: ServerId, repository: Repository) = {
-    this(serverId.asPeerId, repository.serverUsers(serverId), repository.servers(serverId))
-  }
-
-  val service = actor(context)(new ENetService(self, ENetServiceParameters(listen = None, maxConnections = 1, channelCount = 4)))
-
-  def authenticating(authenticator: ActorRef): Receive = {
-    case packet: PacketFromPeer =>
-      authenticator ! packet
-    case d: DisconnectedPeer =>
-      authenticator ! d
-      context.parent ! d
-      context stop self
-    case Authenticated =>
-      log.info("Authenticated successfully, moving on...")
-//      logReceiver = Option(actor(context, name = "log-receiver")(new LogReceiver(service, remote, server)))
-//      demoReceiver = Option(actor(context, name = "demo-receiver")(new DemoReceiver(service, remote, server)))
-      self ! PushServerUsers(initialServerUsers)
-      context.parent ! Authenticated
-      become(authenticated)
-    case AuthenticationFailed =>
-      throw new RuntimeException("Authentication failed. Possibly the wrong packet.")
-    case CheckAuthenticateTimeout =>
-      throw new RuntimeException("Authentication timed out.")
-  }
-
-  var demoReceiver = Option.empty[ActorRef]
-  var logReceiver = Option.empty[ActorRef]
-  var keyExchanger = Option.empty[ActorRef]
-
-  def authenticated: Receive = {
-    case packet: PacketFromPeer =>
-      logReceiver.foreach(_ ! packet)
-      demoReceiver.foreach(_ ! packet)
-      keyExchanger.foreach(_ ! packet)
-    case PushServerUsers(serverUsers) =>
-      // todo ensure key exchange finishes before we give it another one
-      keyExchanger = Option(actor(context, name="key-exchanger")(new KeyExchanger(service, remote, server, serverUsers)))
-      context.watch(keyExchanger.get)
-    case d: DisconnectedPeer =>
-      context.parent ! d
-      context stop self
-    case Terminated(keyer) if keyExchanger.contains(keyer) =>
-      keyExchanger = Option.empty
-    case ExchangeComplete =>
-      context.parent ! ExchangeComplete
-  }
-
-  def connecting: Receive = {
+  become {
     case conn: ConnectedPeer =>
-      val authenticator = actor(context, name = "authenticator")(new Authenticator(service, remote, server))
-      authenticator ! conn
-      become(authenticating(authenticator))
-      import context.dispatcher
-      import scala.concurrent.duration._
-      context.system.scheduler.scheduleOnce(5.seconds, self, CheckAuthenticateTimeout)
-    case d: DisconnectedPeer =>
-      context.parent ! d
-      context stop self
-    case CheckConnectTimeout =>
-      throw new RuntimeException(s"Failed to connect to remote $remote")
+      beginAuthentication {
+        if ( exchangeKeysImmediately.nonEmpty ) {
+          exchangeKeys()
+        }
+        service ! logReceiver.startMessage
+        service ! demoReceiver.startMessage
+        become {
+          case logReceiver(logMessage) =>
+            log.info("Received log message {}", logMessage)
+          case demoReceiver(demoMessage) =>
+            log.info("Received demo message {}", demoMessage)
+          case m if keyExchanger.Completed.unapply(m).isDefined =>
+            keyExchanger.Completed.unapply(m).foreach{ case (com, msg) =>
+              log.info(msg)
+            }
+        }
+      }
   }
 
-  case object CheckAuthenticateTimeout
-  case object CheckConnectTimeout
-  whenStarting {
-    service ! ConnectPeer(remote, 4)
-    become(connecting)
-    import context.dispatcher
-    import scala.concurrent.duration._
-    context.system.scheduler.scheduleOnce(5.seconds, self, CheckConnectTimeout)
+  override def unhandled(message: Any): Unit = {
+    message match {
+      case p: PacketFromPeer =>
+        log.info("Unexpected message received: {}", p)
+        context stop self
+      case dp @ DisconnectedPeer(`remote`) =>
+        log.info("Unexpected disconnection: {}", dp)
+        context stop self
+      case _ =>
+        super.unhandled(message)
+    }
   }
 
 }

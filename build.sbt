@@ -108,10 +108,11 @@ lazy val masterClient =
   )
     .settings(
       libraryDependencies ++= Seq(
-        "com.h2database" % "h2-mvstore" % "1.4.190",
         "commons-codec" % "commons-codec" % "1.10",
-        "org.bouncycastle" % "bcprov-jdk15" % "1.46"
-      )
+        "org.bouncycastle" % "bcprov-jdk15" % "1.46",
+        "com.typesafe.slick" %% "slick" % "3.1.0",
+        "org.postgresql" % "postgresql" % "9.4-1205-jdbc42"
+      ) ++ akka("testkit").map(_ % "test")
     )
 
 lazy val masterServer =
