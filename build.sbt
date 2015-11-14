@@ -40,6 +40,8 @@ lazy val api =
     .enablePlugins(PlayScala)
     .dependsOn(achievements)
     .settings(dontDocument)
-    .settings(
-      libraryDependencies ++= akka("actor", "agent", "slf4j")
-    )
+    .settings(libraryDependencies ++= akka("actor", "agent", "slf4j"))
+    .settings(libraryDependencies ++= Seq(
+      "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.5.4"
+    ))
+
