@@ -1,9 +1,10 @@
 package acleague.ranker.achievements
 
 import acleague.enrichers.{JsonGamePlayer, JsonGameTeam, JsonGame}
-import acleague.ranker.achievements.immutable.{AchievedState, Achievement, Combined}
+import acleague.ranker.achievements.immutable.{PlayerStatistics, AchievedState, Achievement, Combined}
 
-case class PlayerState(combined: Combined, events: Vector[(String, String)], achieved: Vector[(String, Achievement[AchievedState.type])]) {
+case class PlayerState(combined: Combined,
+                       playerStatistics: PlayerStatistics, events: Vector[(String, String)], achieved: Vector[(String, Achievement[AchievedState.type])]) {
   def includeGame(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer)(isRegisteredPlayer: JsonGamePlayer => Boolean): Option[(PlayerState, Vector[(String, String)])] ={
     combined.include(jsonGame, jsonGameTeam, jsonGamePlayer)(isRegisteredPlayer).map {
       case (newCombined, newEvents, newAchievements) =>
@@ -19,6 +20,7 @@ case class PlayerState(combined: Combined, events: Vector[(String, String)], ach
 }
 object PlayerState {
   def empty = PlayerState(
+    playerStatistics = PlayerStatistics.empty,
     combined = Combined.empty,
     events = Vector.empty,
     achieved = Vector.empty

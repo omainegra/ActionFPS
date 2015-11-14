@@ -9,9 +9,7 @@ sealed trait Slaughterer
 
 object Slaughterer {
 
-  def empty: Slaughterer = NotAchieved
-
-  case class Achieved(frags: Int) extends Slaughterer  with Achievement[AchievedState.type]
+  case class Achieved(frags: Int) extends Slaughterer  with CompletedAchievement
 
   case object NotAchieved extends Slaughterer {
     def processGame(game: JsonGame,

@@ -5,13 +5,12 @@ package acleague.ranker.achievements.immutable
   */
 
 trait Incremental {
-  def empty: CoreType = begin
   sealed trait CoreType
   type InputType
   def levels: List[Int]
   def eventLevelTitle(level: Int): String
   def levelTitle(level: Int): String
-  sealed trait Achieved extends CoreType with Achievement[AchievedState.type]
+  sealed trait Achieved extends CoreType with CompletedAchievement
   case object Completed extends Achieved
   case class AchievedLevel(level: Int) extends Achieved
   def filter(inputType: InputType): Option[Int]

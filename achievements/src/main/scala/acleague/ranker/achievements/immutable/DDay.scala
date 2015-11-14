@@ -14,13 +14,12 @@ object DDay {
   private implicit class extractDay(jsonGame: JsonGame) {
     def day: String = jsonGame.id.substring(0, 10)
   }
-  def empty:DDay = NotAchieved
-
-  case object NotAchieved extends DDay {
+  sealed trait NotAchieved
+  case object NotStarted extends DDay with NotAchieved {
     def includeGame(jsonGame: JsonGame) = Achieving(onDay = jsonGame.day, counter = 1)
   }
 
-  case class Achieving(onDay: String, counter: Int) extends DDay {
+  case class Achieving(onDay: String, counter: Int) extends DDay with NotAchieved {
     def includeGame(jsonGame: JsonGame) = {
       val day = jsonGame.day
       if (day == onDay) {
@@ -30,6 +29,6 @@ object DDay {
     }
   }
 
-  case object Achieved extends DDay with Achievement[AchievedState.type]
+  case object Achieved extends DDay with CompletedAchievement
 
 }

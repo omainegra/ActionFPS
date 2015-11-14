@@ -8,8 +8,8 @@ import acleague.enrichers.JsonGame
 sealed trait TdmLover
 object TdmLover {
   val target = 25
-  case object Achieved extends TdmLover with Achievement[AchievedState.type]
-  def empty = Achieving(counter = 0)
+  case object Achieved extends TdmLover with CompletedAchievement
+  def begin = Achieving(counter = 0)
   case class Achieving(counter: Int) extends TdmLover {
     def processGame(jsonGame: JsonGame): Option[Either[Achieving, Achieved.type]] = {
       if ( jsonGame.mode == "team deathmatch" ) {

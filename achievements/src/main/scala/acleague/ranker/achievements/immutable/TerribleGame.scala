@@ -7,8 +7,8 @@ import acleague.enrichers.JsonGamePlayer
   */
 sealed trait TerribleGame
 object TerribleGame {
-  def empty: TerribleGame = NotAchieved
-  case class Achieved(frags: Int) extends TerribleGame with Achievement[AchievedState.type]
+  def begin = NotAchieved
+  case class Achieved(frags: Int) extends TerribleGame with CompletedAchievement
   case object NotAchieved extends TerribleGame {
     def processGame(jsonGamePlayer: JsonGamePlayer): Option[Achieved] = {
       if ( jsonGamePlayer.frags <= 15 ) Option(Achieved(jsonGamePlayer.frags))
