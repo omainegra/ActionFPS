@@ -14,7 +14,7 @@ object DDay {
   private implicit class extractDay(jsonGame: JsonGame) {
     def day: String = jsonGame.id.substring(0, 10)
   }
-  sealed trait NotAchieved
+  sealed trait NotAchieved  extends IncompleteAchievement[PartialState.type]
   case object NotStarted extends DDay with NotAchieved {
     def includeGame(jsonGame: JsonGame) = Achieving(onDay = jsonGame.day, counter = 1)
   }

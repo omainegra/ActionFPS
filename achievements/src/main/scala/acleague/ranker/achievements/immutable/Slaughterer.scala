@@ -11,7 +11,7 @@ object Slaughterer {
 
   case class Achieved(frags: Int) extends Slaughterer  with CompletedAchievement
 
-  case object NotAchieved extends Slaughterer {
+  case object NotAchieved extends Slaughterer  with IncompleteAchievement[AwaitingState.type] {
     def processGame(game: JsonGame,
                     player: JsonGamePlayer,
                     isRegisteredPlayer: JsonGamePlayer => Boolean): Option[Achieved] = {

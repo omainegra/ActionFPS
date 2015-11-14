@@ -9,7 +9,7 @@ sealed trait Maverick
 
 object Maverick {
 
-  case object NotAchieved extends Maverick {
+  case object NotAchieved extends Maverick with IncompleteAchievement[AwaitingState.type] {
     def processGame(game: JsonGame,
                     player: JsonGamePlayer,
                     isRegisteredPlayer: JsonGamePlayer => Boolean): Option[Achieved] = {

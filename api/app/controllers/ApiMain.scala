@@ -5,7 +5,7 @@ import javax.inject._
 
 import acleague.enrichers.JsonGame
 import acleague.ranker.achievements.PlayerState
-import acleague.ranker.achievements.immutable.Combined
+import acleague.ranker.achievements.immutable.NotAchievedAchievements$
 import lib.clans.{Clan, ResourceClans}
 import lib.users.{User, BasexUsers}
 import play.api.Configuration
@@ -78,9 +78,13 @@ class ApiMain @Inject()(configuration: Configuration)
   def listEvents = Action {
 //    Ok(s"$combs")
     cevs match {
-      case (_, events) => Ok(Json.toJson(events))
+      case (ss, events) =>
+        ss("ven50").achieved.foreach(println)
+        ss("ven50").combined.combined.foreach(println)
+        Ok(Json.toJson(events))
     }
   }
+
 
 
 

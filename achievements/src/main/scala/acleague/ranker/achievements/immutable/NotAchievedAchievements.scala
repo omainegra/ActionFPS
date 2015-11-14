@@ -1,10 +1,12 @@
 package acleague.ranker.achievements.immutable
 
 import acleague.enrichers.{JsonGamePlayer, JsonGameTeam, JsonGame}
+import acleague.ranker.achievements.MapAchievements
 
-object Combined {
-  def empty = Combined(
-    captureMaster = Option(CaptureMaster.fresh(List.empty)),
+object NotAchievedAchievements {
+  def empty = NotAchievedAchievements(
+    //    captureMaster = Option(CaptureMaster.fresh(List.empty)),
+    captureMaster = Option(CaptureMaster.fresh(MapAchievements.captureMaster.toList.map(_.name))),
     cubeAddict = Option(CubeAddict.begin),
     dDay = Option(DDay.NotStarted),
     flagMaster = Option(FlagMaster.begin),
@@ -17,7 +19,7 @@ object Combined {
   )
 }
 
-case class Combined
+case class NotAchievedAchievements
 (captureMaster: Option[CaptureMaster.Achieving],
  cubeAddict: Option[CubeAddict.Achieving],
  dDay: Option[DDay.NotAchieved],
@@ -29,6 +31,22 @@ case class Combined
  terribleGame: Option[TerribleGame.NotAchieved.type],
  tosokLover: Option[TosokLover.Achieving]
 ) {
+  def combined: List[IncompleteAchievement[_]] = {
+    def collect(items: Option[IncompleteAchievement[_]]*) = items.flatten.toList
+    collect(
+      captureMaster,
+      cubeAddict,
+      dDay,
+      flagMaster,
+      fragMaster,
+      maverick,
+      slaughterer,
+      tdmLover,
+      terribleGame,
+      tosokLover
+    )
+  }
+
   def include(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer)(isRegisteredPlayer: JsonGamePlayer => Boolean) = {
     var me = this
     val newEvents = scala.collection.mutable.ListBuffer.empty[String]
