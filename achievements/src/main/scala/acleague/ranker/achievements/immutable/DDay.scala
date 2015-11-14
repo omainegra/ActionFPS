@@ -7,6 +7,7 @@ import acleague.enrichers.JsonGame
   */
 sealed trait DDay {
   def title = "D-Day"
+  def description = "Play at least 12 games in one day"
 }
 
 object DDay {
@@ -16,9 +17,11 @@ object DDay {
   private implicit class extractDay(jsonGame: JsonGame) {
     def day: String = jsonGame.id.substring(0, 10)
   }
-  sealed trait NotAchieved  extends IncompleteAchievement[PartialState.type]
+  sealed trait NotAchieved extends PartialAchievement
   case object NotStarted extends DDay with NotAchieved {
     def includeGame(jsonGame: JsonGame) = Achieving(onDay = jsonGame.day, counter = 1)
+
+    override def progress: Int = 0
   }
 
   case class Achieving(onDay: String, counter: Int) extends DDay with NotAchieved {
@@ -29,6 +32,8 @@ object DDay {
         else Left(copy(counter = counter + 1))
       } else Left(Achieving(onDay = day, counter = 1))
     }
+
+    override def progress: Int = 100 * counter / target
   }
 
   case object Achieved extends DDay with CompletedAchievement

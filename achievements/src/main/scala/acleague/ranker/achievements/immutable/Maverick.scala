@@ -7,11 +7,12 @@ import acleague.enrichers.{JsonGame, JsonGamePlayer}
   */
 sealed trait Maverick {
   def title = "Maverick"
+  def description = "Achieve all winning team's flags, 5 minimum"
 }
 
 object Maverick {
 
-  case object NotAchieved extends Maverick with IncompleteAchievement[AwaitingState.type] {
+  case object NotAchieved extends Maverick with AwaitingAchievement {
     def processGame(game: JsonGame,
                     player: JsonGamePlayer,
                     isRegisteredPlayer: JsonGamePlayer => Boolean): Option[Achieved] = {

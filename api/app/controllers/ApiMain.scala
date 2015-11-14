@@ -4,7 +4,7 @@ import java.io.File
 import javax.inject._
 
 import acleague.enrichers.JsonGame
-import acleague.ranker.achievements.PlayerState
+import acleague.ranker.achievements.{Jsons, PlayerState}
 import acleague.ranker.achievements.immutable.NotAchievedAchievements$
 import lib.clans.{Clan, ResourceClans}
 import lib.users.{User, BasexUsers}
@@ -75,13 +75,30 @@ class ApiMain @Inject()(configuration: Configuration)
       x
   }
 
+  lazy val cavs = cevs
+
   def listEvents = Action {
 //    Ok(s"$combs")
-    cevs match {
+    cavs match {
       case (ss, events) =>
-        ss("drakas").achieved.foreach(println)
-        ss("drakas").combined.combined.foreach(println)
-        Ok(Json.toJson(events))
+        Ok(Json.toJson(events.take(10)))
+//        ss("drakas").achieved.foreach(println)
+//        ss("drakas").combined.combined.foreach(println)
+//        import Jsons._
+//        Ok(Json.toJson(ss("drakas").buildAchievements))
+//        Ok(Json.toJson(events))
+    }
+  }
+
+  def achievements(id: String) = Action {
+    cavs match {
+      case (ss, _) =>
+        ss.get(id) match {
+          case None => NotFound("Player id not found")
+          case Some(player) =>
+            import Jsons._
+            Ok(Json.toJson(player.buildAchievements))
+        }
     }
   }
 

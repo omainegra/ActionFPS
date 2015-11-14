@@ -4,6 +4,7 @@ import acleague.enrichers.{JsonGamePlayer, JsonGameTeam, JsonGame}
 
 sealed trait CaptureMaster {
   def title = "Capture Master"
+  def description = "Complete the selected CTF maps, each sides, 3 times"
 }
 
 object CaptureMaster {
@@ -14,7 +15,7 @@ object CaptureMaster {
       achieved = List.empty
     )
 
-  case class Achieving(achieving: List[CaptureMapCompletion.Achieving], achieved: List[CaptureMapCompletion.Achieved]) extends CaptureMaster with IncompleteAchievement[PartialState.type] {
+  case class Achieving(achieving: List[CaptureMapCompletion.Achieving], achieved: List[CaptureMapCompletion.Achieved]) extends CaptureMaster with PartialAchievement {
     def includeGame(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer): Option[(Either[Achieving, Achieved], Option[CaptureMapCompletion.Achieved])] = {
       val withIncluded = achieving.map(a => a.include(jsonGame, jsonGameTeam, jsonGamePlayer).getOrElse(Left(a)))
       val nextMe = copy(
@@ -29,6 +30,8 @@ object CaptureMaster {
         myNextIteration -> newlyCompleted
       }
     }
+
+    override def progress: Int = if ( achieved.isEmpty ) 0 else 100 * achieving.length / (achieved.length + achieving.length)
   }
 
   case class Achieved(achieved: List[CaptureMapCompletion.Achieved]) extends CaptureMaster with CompletedAchievement

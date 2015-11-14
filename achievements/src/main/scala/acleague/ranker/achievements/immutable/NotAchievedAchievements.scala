@@ -31,8 +31,8 @@ case class NotAchievedAchievements
  terribleGame: Option[TerribleGame.NotAchieved.type],
  tosokLover: Option[TosokLover.Achieving]
 ) {
-  def combined: List[IncompleteAchievement[_]] = {
-    def collect(items: Option[IncompleteAchievement[_]]*) = items.flatten.toList
+  def combined: List[IncompleteAchievement] = {
+    def collect(items: Option[IncompleteAchievement]*) = items.flatten.toList
     collect(
       captureMaster,
       cubeAddict,

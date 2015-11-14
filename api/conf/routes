@@ -1,6 +1,7 @@
-GET        /recent/            @controllers.ApiMain.recent
-GET        /raw/               @controllers.ApiMain.raw
-GET        /clans/yaml/        @controllers.ApiMain.clansYaml
-GET        /clans/json/        @controllers.ApiMain.clansJson
-GET        /users/             @controllers.ApiMain.usersJson
-GET        /events/            @controllers.ApiMain.listEvents
+GET        /recent/                  @controllers.ApiMain.recent
+GET        /raw/                     @controllers.ApiMain.raw
+GET        /clans/yaml/              @controllers.ApiMain.clansYaml
+GET        /clans/json/              @controllers.ApiMain.clansJson
+GET        /users/                   @controllers.ApiMain.usersJson
+GET        /events/                  @controllers.ApiMain.listEvents
+GET        /achievements/:id/        @controllers.ApiMain.achievements(id)

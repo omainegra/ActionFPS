@@ -7,13 +7,14 @@ import acleague.enrichers.{JsonGame, JsonGamePlayer}
   */
 sealed trait Slaughterer {
   def title = "Butcher"
+  def description = "Make over 80 kills in a game"
 }
 
 object Slaughterer {
 
   case class Achieved(frags: Int) extends Slaughterer  with CompletedAchievement
 
-  case object NotAchieved extends Slaughterer  with IncompleteAchievement[AwaitingState.type] {
+  case object NotAchieved extends Slaughterer  with AwaitingAchievement {
     def processGame(game: JsonGame,
                     player: JsonGamePlayer,
                     isRegisteredPlayer: JsonGamePlayer => Boolean): Option[Achieved] = {
