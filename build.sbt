@@ -71,7 +71,7 @@ lazy val akkaEnet =
       libraryDependencies ++= Seq(
         "net.java.dev.jna" % "jna" % "4.2.1"
       ),
-      libraryDependencies ++= akka("actor")
+      libraryDependencies ++= akka("actor", "slf4j")
     )
 
 lazy val demoParser =
@@ -120,11 +120,10 @@ lazy val masterServer =
     id = "master-server",
     base = file("master-server")
   ).dependsOn(masterClient)
+    .enablePlugins(PlayScala)
     .settings(
       libraryDependencies ++= Seq(
-        "io.spray" %% "spray-can" % "1.3.3",
-        "io.spray" %% "spray-client" % "1.3.3",
-        "io.spray" %% "spray-routing-shapeless2" % "1.3.3",
-        "io.spray" %% "spray-testkit" % "1.3.3" % "test"
+        ws,
+        "com.typesafe.play" %% "play-slick" % "1.1.1"
       )
     )
