@@ -5,21 +5,24 @@ package acleague.ranker.achievements.immutable
   */
 
 trait Incremental {
+  def empty: CoreType = begin
   sealed trait CoreType
   type InputType
   def levels: List[Int]
+  def eventLevelTitle(level: Int): String
+  def levelTitle(level: Int): String
   sealed trait Achieved extends CoreType
   case object Completed extends Achieved
   case class AchievedLevel(level: Int) extends Achieved
   def filter(inputType: InputType): Option[Int]
   def begin = Achieving(counter = 0, level = levels.head)
   case class Achieving(counter: Int, level: Int) extends CoreType {
-    def include(inputType: InputType): Option[Either[(Achieving, Option[Achieved]), Completed.type ]] = {
+    def include(inputType: InputType): Option[Either[(Achieving, Option[AchievedLevel]), Completed.type ]] = {
       for {
         increment <- filter(inputType)
         incremented = counter + increment
       } yield {
-        if ( increment >= level ) {
+        if ( incremented >= level ) {
           val nextLevelO = levels.dropWhile(_ <= level).headOption
           nextLevelO match {
             case None => Right(Completed)

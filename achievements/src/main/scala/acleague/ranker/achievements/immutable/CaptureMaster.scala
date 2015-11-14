@@ -8,7 +8,7 @@ object CaptureMaster {
 
   case class ModeMap(mode: String, map: String)
 
-  def fresh(maps: List[CaptureMapCompletion.ModeMap]): Achieving =
+  def fresh(maps: List[String]): Achieving =
     Achieving(
       achieving = maps.map(map => CaptureMapCompletion.empty(map)),
       achieved = List.empty

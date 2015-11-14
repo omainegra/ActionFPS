@@ -9,6 +9,8 @@ sealed trait Maverick
 
 object Maverick {
 
+  def empty:Maverick = NotAchieved
+
   case object NotAchieved extends Maverick {
     def processGame(game: JsonGame,
                     player: JsonGamePlayer,

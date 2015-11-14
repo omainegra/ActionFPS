@@ -9,6 +9,8 @@ sealed trait Slaughterer
 
 object Slaughterer {
 
+  def empty: Slaughterer = NotAchieved
+
   case class Achieved(frags: Int) extends Slaughterer
 
   case object NotAchieved extends Slaughterer {

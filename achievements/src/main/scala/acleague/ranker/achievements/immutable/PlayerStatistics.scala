@@ -16,3 +16,7 @@ case class PlayerStatistics(playedGames: List[String], flags: Int, frags: Int, t
     )
   }
 }
+
+object PlayerStatistics{
+  def empty = PlayerStatistics(playedGames = List.empty, flags = 0, frags = 0, timePlayed = 0, gamesPlayed = 0)
+}

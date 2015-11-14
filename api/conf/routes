@@ -3,3 +3,4 @@ GET        /raw/               @controllers.ApiMain.raw
 GET        /clans/yaml/        @controllers.ApiMain.clansYaml
 GET        /clans/json/        @controllers.ApiMain.clansJson
 GET        /users/             @controllers.ApiMain.usersJson
+GET        /events/            @controllers.ApiMain.listEvents

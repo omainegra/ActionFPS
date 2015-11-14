@@ -3,6 +3,8 @@ package controllers
 import java.io.File
 import javax.inject._
 
+import acleague.enrichers.JsonGame
+import acleague.ranker.achievements.immutable.Combined
 import lib.clans.{Clan, ResourceClans}
 import lib.users.{User, BasexUsers}
 import play.api.Configuration
@@ -52,5 +54,33 @@ class ApiMain @Inject()(configuration: Configuration)
   def raw = Action {
     Ok.chunked(Enumerator.enumerate(lines).map(l => s"$l\n")).as("text/tab-separated-values")
   }
+
+  def cevs = allLines.map(_.split("\t").toList).foldLeft((Map.empty[String, Combined], List.empty[String])){
+    case ((combined, sofar), List(_, "GOOD", _, json)) =>
+      val jsonGame = JsonGame.fromJson(json)
+      val oEvents = scala.collection.mutable.Buffer.empty[String]
+      var nComb = combined
+      for {
+        team <- jsonGame.teams
+        player <- team.players
+        user <- BasexUsers.users.find(_.nickname.nickname == player.name)
+        (newCombinedPlayer, newEvents, newLevelsAchieved) <- combined.getOrElse(user.id, Combined.empty).include(jsonGame, team, player)
+      } {
+        oEvents ++= newEvents.map{s => s"${user.name} $s"}
+        nComb = nComb.updated(user.id, newCombinedPlayer)
+      }
+      (nComb, oEvents.toList ++ sofar)
+    case (x, List(_, "BAD", _, _)) =>
+      x
+  }
+
+  def listEvents = Action {
+//    Ok(s"$combs")
+    cevs match {
+      case (_, events) => Ok(Json.toJson(events))
+    }
+  }
+
+
 
 }

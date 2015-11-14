@@ -14,6 +14,7 @@ object DDay {
   private implicit class extractDay(jsonGame: JsonGame) {
     def day: String = jsonGame.id.substring(0, 10)
   }
+  def empty:DDay = NotAchieved
 
   case object NotAchieved extends DDay {
     def includeGame(jsonGame: JsonGame) = Achieving(onDay = jsonGame.day, counter = 1)

@@ -18,5 +18,15 @@ object CubeAddict extends Incremental {
     Option(inputType.duration)
   }
 
+  override def levelTitle(level: Int): String = Map(
+    5 -> "Hey, this game looks fun.",
+    10 -> "I kinda like this game.",
+    20 -> "Not stopping now!",
+    50 -> "I love this game!",
+    100 -> "Just how many hours??",
+    200 -> "Wait, when did I start?"
+  ).map { case (h, v) => (h * 60, v) }.getOrElse(level, s"Achieve ${level / 60} hours")
+
+  override def eventLevelTitle(level: Int): String = s"achieved Cube Addict level ${level/60}h"
 }
 
