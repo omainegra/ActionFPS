@@ -5,11 +5,17 @@ lazy val root =
     .aggregate(
       logParser,
       achievements,
-      api
+      api,
+      acm,
+      akkaEnet,
+      demoParser
     ).dependsOn(
     achievements,
     logParser,
-    api
+    api,
+    acm,
+    akkaEnet,
+    demoParser
   )
 
 lazy val logParser =
@@ -46,3 +52,18 @@ lazy val api =
       "org.apache.httpcomponents" % "fluent-hc" % "4.5.1"
     ))
 
+lazy val acm =
+  project
+    .dependsOn(akkaEnet, demoParser)
+
+lazy val akkaEnet =
+  Project(
+    id = "akka-enet",
+    base = file("akka-enet")
+  )
+
+lazy val demoParser =
+  Project(
+    id = "demo-parser",
+    base = file("demo-parser")
+  )
