@@ -1,20 +1,21 @@
 package ac.woop.client
 
-import ac.woop.MasterServer.Repository._
+import ac.woop.client.MasterClient.Repository.Server
 import akka.actor.{Terminated, ActorRef, ActorLogging}
 import akka.util.ByteString
-import io.enet.akka.Compressor
+import io.enet.akka.{Shapper, Compressor}
 import io.enet.akka.ENetService._
 import Compressor._
 import io.enet.akka.Shapper.packetFromPeerExtra
 import akka.actor.ActorDSL._
+import Shapper._
 
 class LogReceiver(service: ActorRef, remote: PeerId, server: Server) extends Act with ActorLogging {
   whenStarting {
-    service ! SendMessage(remote, 0)(20, ByteString.empty)
+    service ! SendMessageAddition(remote, 0)(20, ByteString.empty)
   }
   whenStopping {
-    service ! SendMessage(remote, 0)(21, ByteString.empty)
+    service ! SendMessageAddition(remote, 0)(21, ByteString.empty)
   }
   object #:~: {
     def unapply(input: ByteString): Option[(Int, ByteString)] = {

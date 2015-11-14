@@ -62,30 +62,63 @@ lazy val akkaEnet =
     id = "akka-enet",
     base = file("akka-enet")
   )
+    .settings(
+      libraryDependencies ++= Seq(
+        "net.java.dev.jna" % "jna" % "4.1.0"
+      ),
+      libraryDependencies ++= akka("actor")
+    )
 
 lazy val demoParser =
   Project(
     id = "demo-parser",
     base = file("demo-parser")
-  ).dependsOn(cubeProtocol)
+  )
+    .dependsOn(cubeProtocol)
+    .settings(libraryDependencies ++= Seq(
+      "commons-io" % "commons-io" % "2.4"
+    )
+    )
+
 
 lazy val cubeProtocol =
   Project(
-    id = "cube-protcol",
-    base = file("cube-protcol")
+    id = "cube-protocol",
+    base = file("cube-protocol")
   )
     .settings(
-      libraryDependencies ++= akka("actor")
-    )
+      libraryDependencies ++= akka("actor"),
+      libraryDependencies += "com.chuusai" %% "shapeless" % "2.0.0"
+
+    ).dependsOn(akkaEnet)
 
 lazy val masterClient =
   Project(
     id = "master-client",
     base = file("master-client")
-  ).dependsOn(akkaEnet, demoParser, cubeProtocol)
+  ).dependsOn(
+    akkaEnet,
+    demoParser,
+    cubeProtocol
+  )
+    .settings(
+      libraryDependencies ++= Seq(
+        "com.h2database" % "h2-mvstore" % "1.4.185",
+        "commons-codec" % "commons-codec" % "1.10",
+        "org.bouncycastle" % "bcprov-jdk15" % "1.46"
+      )
+    )
 
 lazy val masterServer =
   Project(
     id = "master-server",
     base = file("master-server")
   ).dependsOn(masterClient)
+.settings(
+libraryDependencies ++= Seq(
+  "io.spray"            %%  "spray-can"     % "1.3.1",
+  "io.spray"            %%  "spray-client"     % "1.3.1",
+  "io.spray"            %%  "spray-routing-shapeless2" % "1.3.1",
+  "io.spray"            %%  "spray-testkit" % "1.3.1"  % "test"
+)
+)

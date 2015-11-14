@@ -3,13 +3,13 @@ package ac.woop.demo
 import java.io.{FileInputStream, File}
 import java.util
 import java.util.zip.GZIPInputStream
-import ac.woop.client.DemoReceiver.DemoPacket
 import ac.woop.demo.DemoParser.{PositionResults, PositionResult, PositionVector}
 import akka.util.ByteString
 import io.enet.akka.Compressor
 
 import scala.util.Try
 import scala.util.control.NonFatal
+case class DemoPacket(millis: Int, chan: Int, data: ByteString)
 
 object DemoParser {
 

@@ -1,29 +1,28 @@
 package ac.woop.client
 
 import ac.woop.client.Authenticator.{AuthenticationFailed, Authenticated}
-import ac.woop.MasterServer.Repository
-import ac.woop.MasterServer.Repository._
+import ac.woop.client.MasterClient.Repository
 import akka.actor.{Terminated, ActorRef, ActorLogging}
 import akka.util.ByteString
 import io.enet.akka.Compressor
 import io.enet.akka.ENetService._
 import org.apache.commons.codec.binary.Hex
 import Compressor._
-import io.enet.akka.Shapper.packetFromPeerExtra
+import io.enet.akka.Shapper.{SendMessageAddition, packetFromPeerExtra}
 import akka.actor.ActorDSL._
 
 object Authenticator {
   case object Authenticated
   case class AuthenticationFailed(reason: String)
 }
-class Authenticator(service: ActorRef, remote: PeerId, server: Server) extends Act with ActorLogging {
+class Authenticator(service: ActorRef, remote: PeerId, server: Repository.Server) extends Act with ActorLogging {
   become {
     case ConnectedPeer(`remote`) =>
       log.info("Connected to peer {}", remote)
       val challengeToServer = Hex.encodeHexString(scala.util.Random.nextString(32).toArray.map(_.toByte))
       val expectedResponse = Hex.encodeHexString(Repository.digester.digest((server.key + challengeToServer).getBytes))
       log.info("Challenge {} sent, expected response {}", challengeToServer, expectedResponse)
-      service ! SendMessage(remote, 0)(0, challengeToServer)
+      service ! SendMessageAddition(remote, 0)(0, challengeToServer)
       become {
         case pp@PacketFromPeer(`remote`, 0, 1 #:: `expectedResponse` ##:: ByteString.empty) =>
           log.info("Server identified himself correctly.")

@@ -1,8 +1,10 @@
 package ac.woop
 
-import ac.woop.MasterClientCentral._
-import ac.woop.MasterServer.Repository
-import ac.woop.MasterServer.Repository._
+import ac.woop.client.MasterClient.Repository
+import ac.woop.client.MasterClientCentral
+import MasterClientCentral._
+import Repository._
+import ac.woop.client.MasterClientCentral
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import spray.http.{MediaTypes, MediaType}

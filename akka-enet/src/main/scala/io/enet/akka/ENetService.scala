@@ -11,8 +11,6 @@ import io.enet.akka.ENet.ENetPeer.ENetPeerByReference
 import io.enet.akka.ENet.{size_t, ENetPeer, ENetAddress, ENetEvent}
 import akka.actor.ActorDSL._
 import io.enet.akka.ENetService._
-import io.enet.akka.Shapper.addByteStrings
-import shapeless.ops.hlist.LeftFolder
 
 object ENetService {
 
@@ -30,30 +28,7 @@ object ENetService {
   case class DisconnectPeer(peer: PeerId) extends ScalaENetCommand
   // default reliable
   case class SendMessage(peer: PeerId, channelID: Byte, data: ByteString, flags: Int = 1) extends ScalaENetCommand
-  object SendMessage {
-//    def apply[P <: Product](peer: PeerId, channelID: Byte)(p: P):SendMessage  = {
-//      SendMessage(peer, channelID, Shapper.productToByteString(p))
-//    }
-    import shapeless._
-    import shapeless.HList._
-    import shapeless.Poly._
-    def apply[P <: Product, F, L <: HList, R](peer: PeerId, channelID: Byte)(p: P)(
-    implicit gen: Generic.Aux[P, L],
-    folder: LeftFolder[L, ByteString, addByteStrings.type]): SendMessage  = {
-      val a = gen.to(p).foldLeft(ByteString.empty)(addByteStrings)
-      // don't kill me. I don't get how it works.
-      // this is fine, but inside this function the same thing won't work:
-      //  val rsly = compressBytes(23, "wat", "dis", 23.toByte)
-      //  println(rsly: ByteString)
-      val byteString = a.asInstanceOf[ByteString]
-      SendMessage(peer, channelID, byteString)
-    }
-//    def int(peerId:PeerId, channelID: Byte)(d: Int) = SendMessage(peerId, channelID, Compressor.intToByteString())
-//    def apply(peer: PeerId, channelID: Byte, data: Int, flags: Int = 1): SendMessage =
-//    SendMessage(peer, channelID,Compressor.intToByteString(data),flags)
-//    def apply(peerId: PeerId, channelID: Byte)(d: Int): SendMessage = SendMessage(peerId,channelID, Compressor.intToByteString(d))
-//    def apply(peerId: PeerId, channelID: Byte)(d: ByteString): SendMessage = SendMessage(peerId,channelID, d)
-  }
+
 
   case class ENetServiceParameters
   (listen: Option[PeerId],

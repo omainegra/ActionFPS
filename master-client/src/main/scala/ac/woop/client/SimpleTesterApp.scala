@@ -1,6 +1,5 @@
 package ac.woop.client
 
-import ac.woop.PersistentRepository
 import akka.actor.ActorDSL._
 import akka.actor.ActorSystem
 import org.h2.mvstore.MVStore

@@ -1,10 +1,10 @@
 package ac.woop.client
 
-import ac.woop.MasterServer.Repository
-import ac.woop.MasterServer.Repository._
 import ac.woop.client.Authenticator.{AuthenticationFailed, Authenticated}
 import ac.woop.client.KeyExchanger.ExchangeComplete
 import ac.woop.client.MasterCClient.PushServerUsers
+import ac.woop.client.MasterClient.Repository
+import ac.woop.client.MasterClient.Repository.{ServerId, UserId, UserServer, Server}
 import akka.actor.ActorDSL._
 import akka.actor.{ActorLogging, ActorRef, Terminated}
 import io.enet.akka.ENetService
