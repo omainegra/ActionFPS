@@ -28,7 +28,9 @@ case class PlayerState(combined: NotAchievedAchievements,
           title = achievement.title,
           description = achievement.description,
           at = ZonedDateTime.parse(date),
-          extra = None
+          extra = PartialFunction.condOpt(achievement) {
+            case captureMaster: CaptureMaster => captureMaster.jsonTable
+          }
         )
       }.toList,
       partialAchievements = combined.combined.collect {
@@ -37,7 +39,9 @@ case class PlayerState(combined: NotAchievedAchievements,
             title = partial.title,
             percent = partial.progress,
             description = partial.description,
-            extra = None
+            extra = PartialFunction.condOpt(partial) {
+              case captureMaster: CaptureMaster => captureMaster.jsonTable
+            }
           )
       }.sortBy(_.percent).reverse,
       switchNotAchieveds = combined.combined.collect {

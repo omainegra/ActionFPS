@@ -1,10 +1,15 @@
 package acleague.ranker.achievements.immutable
 
 import acleague.enrichers.{JsonGamePlayer, JsonGameTeam, JsonGame}
+import play.api.libs.json.{JsArray, JsObject}
 
 sealed trait CaptureMaster {
   def title = "Capture Master"
   def description = "Complete the selected CTF maps, each sides, 3 times"
+  def all: List[CaptureMapCompletion]
+  def jsonTable: JsObject = JsObject(Map(
+    "maps" -> JsArray(all.sortBy(_.map).map(_.asJson))
+  ))
 }
 
 object CaptureMaster {
@@ -31,9 +36,13 @@ object CaptureMaster {
       }
     }
 
-    override def progress: Int = if ( achieved.isEmpty ) 0 else 100 * achieving.length / (achieved.length + achieving.length)
+    override def progress: Int = if ( achieved.isEmpty ) 0 else 100 * achieved.length / (achieved.length + achieving.length)
+
+    override def all: List[CaptureMapCompletion] = (achieving ++ achieved)
   }
 
-  case class Achieved(achieved: List[CaptureMapCompletion.Achieved]) extends CaptureMaster with CompletedAchievement
+  case class Achieved(achieved: List[CaptureMapCompletion.Achieved]) extends CaptureMaster with CompletedAchievement {
+    override def all: List[CaptureMapCompletion] = achieved
+  }
 
 }

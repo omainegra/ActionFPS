@@ -56,10 +56,10 @@ class ApiMain @Inject()(configuration: Configuration)
     Ok.chunked(Enumerator.enumerate(lines).map(l => s"$l\n")).as("text/tab-separated-values")
   }
 
-  def cevs = allLines.map(_.split("\t").toList).foldLeft((Map.empty[String, PlayerState], List.empty[String])) {
+  def cevs = allLines.map(_.split("\t").toList).foldLeft((Map.empty[String, PlayerState], List.empty[Map[String, String]])) {
     case ((combined, sofar), List(_, "GOOD", _, json)) =>
       val jsonGame = JsonGame.fromJson(json)
-      val oEvents = scala.collection.mutable.Buffer.empty[String]
+      val oEvents = scala.collection.mutable.Buffer.empty[Map[String, String]]
       var nComb = combined
       for {
         team <- jsonGame.teams
@@ -67,7 +67,7 @@ class ApiMain @Inject()(configuration: Configuration)
         user <- BasexUsers.users.find(_.nickname.nickname == player.name)
         (newPs, newEvents) <- combined.getOrElse(user.id, PlayerState.empty).includeGame(jsonGame, team, player)(p => BasexUsers.users.exists(_.nickname.nickname == p.name))
       } {
-        oEvents ++= newEvents.map{s => s"${s._1} ${user.name} ${s._2}"}
+        oEvents ++= newEvents.map{case (date, text) => Map("user"-> user.id, "date" -> date, "text" -> s"${user.name} $text")}
         nComb = nComb.updated(user.id, newPs)
       }
       (nComb, oEvents.toList ++ sofar)
