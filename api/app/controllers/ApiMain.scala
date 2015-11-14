@@ -4,6 +4,7 @@ import java.io.File
 import javax.inject._
 
 import acleague.enrichers.JsonGame
+import acleague.ranker.achievements.PlayerState
 import acleague.ranker.achievements.immutable.Combined
 import lib.clans.{Clan, ResourceClans}
 import lib.users.{User, BasexUsers}
@@ -55,7 +56,7 @@ class ApiMain @Inject()(configuration: Configuration)
     Ok.chunked(Enumerator.enumerate(lines).map(l => s"$l\n")).as("text/tab-separated-values")
   }
 
-  def cevs = allLines.take(250).map(_.split("\t").toList).foldLeft((Map.empty[String, Combined], List.empty[String])){
+  def cevs = allLines.take(250).map(_.split("\t").toList).foldLeft((Map.empty[String, PlayerState], List.empty[String])) {
     case ((combined, sofar), List(_, "GOOD", _, json)) =>
       val jsonGame = JsonGame.fromJson(json)
       val oEvents = scala.collection.mutable.Buffer.empty[String]
@@ -64,10 +65,10 @@ class ApiMain @Inject()(configuration: Configuration)
         team <- jsonGame.teams
         player <- team.players
         user <- BasexUsers.users.find(_.nickname.nickname == player.name)
-        (newCombinedPlayer, newEvents, newLevelsAchieved) <- combined.getOrElse(user.id, Combined.empty).include(jsonGame, team, player)
+        (newPs, newEvents) <- combined.getOrElse(user.id, PlayerState.empty).includeGame(jsonGame, team, player)(p => BasexUsers.users.exists(_.nickname.nickname == p.name))
       } {
-        oEvents ++= newEvents.map{s => s"${user.name} $s"}
-        nComb = nComb.updated(user.id, newCombinedPlayer)
+        oEvents ++= newEvents.map{s => s"${s._1} ${user.name} ${s._2}"}
+        nComb = nComb.updated(user.id, newPs)
       }
       (nComb, oEvents.toList ++ sofar)
     case (x, List(_, "BAD", _, _)) =>

@@ -31,10 +31,10 @@ case class Combined
  terribleGame: TerribleGame,
  tosokLover: TosokLover
 ) {
-  def include(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer) = {
+  def include(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer)(isRegisteredPlayer: JsonGamePlayer => Boolean) = {
     var me = this
     val newEvents = scala.collection.mutable.ListBuffer.empty[String]
-    val achievedAchievements = scala.collection.mutable.ListBuffer.empty[AchievedAchievement]
+    val achievedAchievements = scala.collection.mutable.ListBuffer.empty[Achievement[AchievedState.type]]
     captureMaster match {
       case a: CaptureMaster.Achieving =>
         a.includeGame(jsonGame, jsonGameTeam, jsonGamePlayer).foreach {
@@ -120,7 +120,7 @@ case class Combined
 
     maverick match {
       case a@Maverick.NotAchieved =>
-        a.processGame(jsonGame, jsonGamePlayer, _ => false).foreach {
+        a.processGame(jsonGame, jsonGamePlayer, isRegisteredPlayer).foreach {
           achieved =>
             achievedAchievements += achieved
             me = me.copy(maverick = achieved)
@@ -131,7 +131,7 @@ case class Combined
 
     slaughterer match {
       case a@Slaughterer.NotAchieved =>
-        a.processGame(jsonGame, jsonGamePlayer, _ => false).foreach {
+        a.processGame(jsonGame, jsonGamePlayer, isRegisteredPlayer).foreach {
           achieved =>
             achievedAchievements += achieved
             me = me.copy(slaughterer = achieved)

@@ -9,7 +9,7 @@ sealed trait Maverick
 
 object Maverick {
 
-  def empty:Maverick = NotAchieved
+  def empty: Maverick = NotAchieved
 
   case object NotAchieved extends Maverick {
     def processGame(game: JsonGame,
@@ -35,7 +35,7 @@ object Maverick {
     }.headOption
   }
 
-  case class Achieved(flags: Int) extends Maverick with AchievedAchievement
+  case class Achieved(flags: Int) extends Maverick  with Achievement[AchievedState.type]
 
 }
 

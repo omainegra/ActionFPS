@@ -31,6 +31,6 @@ object CaptureMaster {
     }
   }
 
-  case class Achieved(achieved: List[CaptureMapCompletion.Achieved]) extends CaptureMaster with AchievedAchievement
+  case class Achieved(achieved: List[CaptureMapCompletion.Achieved]) extends CaptureMaster with Achievement[AchievedState.type]
 
 }

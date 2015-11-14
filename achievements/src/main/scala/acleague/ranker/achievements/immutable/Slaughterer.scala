@@ -11,7 +11,7 @@ object Slaughterer {
 
   def empty: Slaughterer = NotAchieved
 
-  case class Achieved(frags: Int) extends Slaughterer with AchievedAchievement
+  case class Achieved(frags: Int) extends Slaughterer  with Achievement[AchievedState.type]
 
   case object NotAchieved extends Slaughterer {
     def processGame(game: JsonGame,

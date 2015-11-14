@@ -30,6 +30,6 @@ object DDay {
     }
   }
 
-  case object Achieved extends DDay with AchievedAchievement
+  case object Achieved extends DDay with Achievement[AchievedState.type]
 
 }
