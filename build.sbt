@@ -60,7 +60,7 @@ lazy val api =
 
 lazy val acm =
   project
-    .dependsOn(akkaEnet, demoParser)
+    .dependsOn(akkaEnet, demoParser, cubeProtocol)
 
 lazy val akkaEnet =
   Project(
