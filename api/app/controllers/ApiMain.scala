@@ -4,6 +4,7 @@ import java.io.File
 import javax.inject._
 
 import lib.clans.{Clan, ResourceClans}
+import lib.users.{User, BasexUsers}
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.{JsArray, Json}
@@ -31,6 +32,11 @@ class ApiMain @Inject()(configuration: Configuration)
 
   def recent = Action {
     Ok(JsArray(recentGames.map { case (_, json) => json }))
+  }
+
+  def usersJson = Action {
+    import User.WithoutEmailFormat.noEmailUserWrite
+    Ok(Json.toJson(BasexUsers.users))
   }
 
   implicit val fmtClan = Json.format[Clan]
