@@ -9,7 +9,7 @@ usort($users, function($a, $b) {
 ?>
 <article id="players"><ol><?php
 foreach($users as $user) {
-    ?><li><a><?php echo htmlspecialchars($user['name']); ?></a></li><?php
+    ?><li><a href="/player/?id=<?php echo $user['id']; ?>"><?php echo htmlspecialchars($user['name']); ?></a></li><?php
 }
 ?></ol></article><?php
 echo $foot;
