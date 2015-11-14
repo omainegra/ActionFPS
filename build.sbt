@@ -42,7 +42,12 @@ lazy val achievements =
     id = "achievements",
     base = file("achievements")
   ).settings(
-    libraryDependencies += json
+    libraryDependencies ++= Seq(
+      json,
+      "com.maxmind.geoip2" % "geoip2" % "2.3.1",
+      "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
+      "commons-net" % "commons-net" % "3.3"
+    )
   ).dependsOn(logParser)
 
 lazy val api =
@@ -52,7 +57,7 @@ lazy val api =
     .settings(dontDocument)
     .settings(libraryDependencies ++= akka("actor", "agent", "slf4j"))
     .settings(libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.5.4",
+      "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
       "org.apache.httpcomponents" % "fluent-hc" % "4.5.1"
     ))
 
@@ -64,7 +69,7 @@ lazy val akkaEnet =
   )
     .settings(
       libraryDependencies ++= Seq(
-        "net.java.dev.jna" % "jna" % "4.1.0"
+        "net.java.dev.jna" % "jna" % "4.2.1"
       ),
       libraryDependencies ++= akka("actor")
     )
@@ -88,7 +93,7 @@ lazy val cubeProtocol =
   )
     .settings(
       libraryDependencies ++= akka("actor"),
-      libraryDependencies += "com.chuusai" %% "shapeless" % "2.0.0"
+      libraryDependencies += "com.chuusai" %% "shapeless" % "2.2.5"
 
     ).dependsOn(akkaEnet)
 
@@ -103,7 +108,7 @@ lazy val masterClient =
   )
     .settings(
       libraryDependencies ++= Seq(
-        "com.h2database" % "h2-mvstore" % "1.4.185",
+        "com.h2database" % "h2-mvstore" % "1.4.190",
         "commons-codec" % "commons-codec" % "1.10",
         "org.bouncycastle" % "bcprov-jdk15" % "1.46"
       )
@@ -114,11 +119,11 @@ lazy val masterServer =
     id = "master-server",
     base = file("master-server")
   ).dependsOn(masterClient)
-.settings(
-libraryDependencies ++= Seq(
-  "io.spray"            %%  "spray-can"     % "1.3.1",
-  "io.spray"            %%  "spray-client"     % "1.3.1",
-  "io.spray"            %%  "spray-routing-shapeless2" % "1.3.1",
-  "io.spray"            %%  "spray-testkit" % "1.3.1"  % "test"
-)
-)
+    .settings(
+      libraryDependencies ++= Seq(
+        "io.spray" %% "spray-can" % "1.3.3",
+        "io.spray" %% "spray-client" % "1.3.3",
+        "io.spray" %% "spray-routing-shapeless2" % "1.3.3",
+        "io.spray" %% "spray-testkit" % "1.3.3" % "test"
+      )
+    )
