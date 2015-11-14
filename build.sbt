@@ -8,14 +8,20 @@ lazy val root =
       api,
       acm,
       akkaEnet,
-      demoParser
+      demoParser,
+      cubeProtocol,
+      masterClient,
+      masterServer
     ).dependsOn(
     achievements,
     logParser,
     api,
     acm,
     akkaEnet,
-    demoParser
+    demoParser,
+    cubeProtocol,
+    masterClient,
+    masterServer
   )
 
 lazy val logParser =
@@ -66,4 +72,25 @@ lazy val demoParser =
   Project(
     id = "demo-parser",
     base = file("demo-parser")
+  ).dependsOn(cubeProtocol)
+
+lazy val cubeProtocol =
+  Project(
+    id = "cube-protcol",
+    base = file("cube-protcol")
   )
+    .settings(
+      libraryDependencies ++= akka("actor")
+    )
+
+lazy val masterClient =
+  Project(
+    id = "master-client",
+    base = file("master-client")
+  ).dependsOn(acm)
+
+lazy val masterServer =
+  Project(
+    id = "master-server",
+    base = file("master-server")
+  ).dependsOn(masterClient)

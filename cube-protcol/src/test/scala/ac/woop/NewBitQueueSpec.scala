@@ -1,16 +1,14 @@
 package ac.woop
 
-import java.nio.ByteBuffer
-
-import ac.woop.demo.DemoParser.{BitQueue2, BitQueue}
 import akka.util.ByteString
+import io.enet.akka.Compressor
 import org.scalatest.{Matchers, WordSpec}
 
 class NewBitQueueSpec extends WordSpec with Matchers {
   "Alternate bit queue" must {
     "Produce the same result as the old bit queue" in {
       val rest = ByteString(1,2,3,-4,5,6,7,8,9,10,11,-20)
-      import ac.woop.demo.DemoParser.byteStringToBits
+      import Compressor._
       val oq = new BitQueue(rest)
       val nq = new BitQueue2(rest)
       oq.rembits shouldBe nq.rembits

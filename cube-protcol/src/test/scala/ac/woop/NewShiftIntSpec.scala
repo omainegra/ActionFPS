@@ -1,8 +1,5 @@
 package ac.woop
 
-import java.nio.ByteBuffer
-
-import ac.woop.demo.DemoParser.{BitQueue2, BitQueue}
 import akka.util.ByteString
 import io.enet.akka.Compressor
 import org.scalatest.{Inspectors, Matchers, WordSpec}
