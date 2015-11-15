@@ -58,7 +58,7 @@ class MasterServer @Inject()(dbConfigProvider: DatabaseConfigProvider)
         case _ =>
       }
 
-      runIt.map { case (_, Some(nu)) => nu }
+      runIt.map { case (_, Some(nu)) => nu; case _ => ??? }
     }
 
     /**
@@ -131,7 +131,7 @@ class MasterServer @Inject()(dbConfigProvider: DatabaseConfigProvider)
         case _ =>
       }
 
-      runIt.map { case (_, Some(ns)) => ns }
+      runIt.map { case (_, Some(ns)) => ns; case _ => ??? }
 
     }
 
