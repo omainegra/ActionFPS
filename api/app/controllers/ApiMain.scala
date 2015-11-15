@@ -4,37 +4,27 @@ import java.io.File
 import javax.inject._
 
 import acleague.enrichers.JsonGame
+import acleague.ranker.achievements.immutable.PlayerStatistics
 import acleague.ranker.achievements.{Jsons, PlayerState}
-import acleague.ranker.achievements.immutable.{PlayerStatistics, NotAchievedAchievements$}
 import lib.clans.{Clan, ResourceClans}
 import lib.users.{User, BasexUsers}
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.{JsObject, JsArray, Json}
 import play.api.mvc.{Action, Controller}
+import services.{AchievementsService, GamesService}
 
 import scala.concurrent.ExecutionContext
 
 
 @Singleton
-class ApiMain @Inject()(configuration: Configuration)
+class ApiMain @Inject()(configuration: Configuration,
+                        gamesService: GamesService,
+                        achievementsService: AchievementsService)
                        (implicit executionContext: ExecutionContext) extends Controller {
 
-  val file = new File(configuration.underlying.getString("af.games.path"))
-
-  val allLines = scala.io.Source.fromFile(file).getLines.toList //.take(500)
-  val allReverseLines = allLines.reverse
-
-  def recentGames = allReverseLines.toIterator.map(_.split("\t").toList).collect {
-    case List(id, "GOOD", "", json) => id -> Json.parse(json)
-  }.take(10).toList
-
-  val lines = scala.io.Source.fromFile(file).getLines.map(_.split("\t").toList).collect {
-    case List(id, "GOOD", _, json) => s"$id\t$json  "
-  }.take(10).toList
-
   def recent = Action {
-    Ok(JsArray(recentGames.map { case (_, json) => json }))
+    Ok(JsArray(gamesService.allGames.get().takeRight(10).reverse.map(_.toJson)))
   }
 
   def usersJson = Action {
@@ -64,47 +54,20 @@ class ApiMain @Inject()(configuration: Configuration)
   }
 
   def raw = Action {
-    Ok.chunked(Enumerator.enumerate(lines).map(l => s"$l\n")).as("text/tab-separated-values")
+    val enumerator = Enumerator
+      .enumerate(gamesService.allGames.get())
+      .map(game => s"${game.id}\t${game.toJson}\n")
+    Ok.chunked(enumerator).as("text/tab-separated-values")
   }
-
-  def cevs = allLines.map(_.split("\t").toList).foldLeft((Map.empty[String, PlayerState], List.empty[Map[String, String]])) {
-    case ((combined, sofar), List(_, "GOOD", _, json)) =>
-      val jsonGame = JsonGame.fromJson(json)
-      val oEvents = scala.collection.mutable.Buffer.empty[Map[String, String]]
-      var nComb = combined
-      for {
-        team <- jsonGame.teams
-        player <- team.players
-        user <- BasexUsers.users.find(_.nickname.nickname == player.name)
-        (newPs, newEvents) <- combined.getOrElse(user.id, PlayerState.empty).includeGame(jsonGame, team, player)(p => BasexUsers.users.exists(_.nickname.nickname == p.name))
-      } {
-        oEvents ++= newEvents.map { case (date, text) => Map("user" -> user.id, "date" -> date, "text" -> s"${user.name} $text") }
-        nComb = nComb.updated(user.id, newPs)
-      }
-      (nComb, oEvents.toList ++ sofar)
-    case (x, List(_, "BAD", _, _)) =>
-      x
-  }
-
-  lazy val cavs = cevs
 
   def listEvents = Action {
-    //    Ok(s"$combs")
-    cavs match {
-      case (ss, events) =>
-        Ok(Json.toJson(events.take(10)))
-      //        ss("drakas").achieved.foreach(println)
-      //        ss("drakas").combined.combined.foreach(println)
-      //        import Jsons._
-      //        Ok(Json.toJson(ss("drakas").buildAchievements))
-      //        Ok(Json.toJson(events))
-    }
+    Ok(Json.toJson(achievementsService.achievements.get().events.take(10)))
   }
 
   def fullUser(id: String) = Action {
     val fullOption = for {
       user <- BasexUsers.users.find(_.id == id)
-      playerState <- cavs._1.get(user.id)
+      playerState <- achievementsService.achievements.get().map.get(user.id)
     } yield {
       import User.WithoutEmailFormat.noEmailUserWrite
       import Jsons._
@@ -120,20 +83,16 @@ class ApiMain @Inject()(configuration: Configuration)
     }
     fullOption match {
       case Some(json) => Ok(json)
-
       case None => NotFound("User not found")
     }
   }
 
   def achievements(id: String) = Action {
-    cavs match {
-      case (ss, _) =>
-        ss.get(id) match {
-          case None => NotFound("Player id not found")
-          case Some(player) =>
-            import Jsons._
-            Ok(Json.toJson(player.buildAchievements))
-        }
+    achievementsService.achievements.get().map.get(id) match {
+      case None => NotFound("Player id not found")
+      case Some(player) =>
+        import Jsons._
+        Ok(Json.toJson(player.buildAchievements))
     }
   }
 
