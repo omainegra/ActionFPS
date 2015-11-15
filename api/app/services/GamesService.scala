@@ -23,6 +23,6 @@ class GamesService @Inject()(configuration: Configuration, applicationLifecycle:
 
   val allGames: Agent[List[JsonGame]] = Agent(List.empty)
   val tailer = new GameTailer(file, false)((game) =>
-    allGames.alter(list => list :+ game))
+    allGames.alter(list => list :+ game.withoutHosts))
 
 }

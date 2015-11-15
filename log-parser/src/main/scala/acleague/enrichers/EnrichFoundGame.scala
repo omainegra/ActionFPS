@@ -107,10 +107,13 @@ object EnrichFoundGame {
 case class JsonGamePlayer(name: String, host: Option[String], score: Option[Int],
                           flags: Option[Int], frags: Int, deaths: Int)
 
-case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer])
+case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer]) {
+  def withoutHosts = copy(players = players.map(_.copy(host = None)))
+}
 
 case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: String, state: String,
                     teams: List[JsonGameTeam], server: String, duration: Int) {
+  def withoutHosts = copy(teams = teams.map(team => team.withoutHosts))
   def toJson: JsObject = {
     Json.toJson(this)(JsonGame.fmt).asInstanceOf[JsObject]
   }
