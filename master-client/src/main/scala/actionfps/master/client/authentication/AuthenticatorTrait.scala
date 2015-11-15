@@ -1,4 +1,7 @@
-package ac.woop.client
+package actionfps
+package master
+package client
+package authentication
 
 import akka.actor.ActorDSL._
 import akka.actor.{ActorLogging, ActorRef}
@@ -8,6 +11,7 @@ trait AuthenticatorTrait { auth: Act with ActorLogging =>
   def service: ActorRef
   def remote: PeerId
   def serverKey: String
+  protected case class FailedAuthentication(reason: String)
   def beginAuthentication(whenAuthenticated: => Unit): Unit = {
     val fsm = AuthFsm(remote, serverKey)
     val sendChallenge = fsm.SendChallenge(fsm.randomChallenge)
@@ -27,8 +31,7 @@ trait AuthenticatorTrait { auth: Act with ActorLogging =>
         }
       case sendChallenge.WrongResponse(gotResponse, logMessage) =>
         log.info(logMessage)
-        // todo throw exception here?
-        context stop self
+        self ! FailedAuthentication(s"Wrong response: $logMessage")
     }
   }
 }

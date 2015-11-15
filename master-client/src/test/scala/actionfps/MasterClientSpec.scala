@@ -1,6 +1,4 @@
-package ac
-package woop
-package client
+package actionfps
 
 import akka.actor.{Terminated, ActorSystem, Kill, Props}
 import akka.testkit.{ImplicitSender, TestKit}

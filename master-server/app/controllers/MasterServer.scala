@@ -1,7 +1,7 @@
 package controllers
 
 import javax.inject._
-import ac.woop.client.MasterCClient
+import actionfps.master.client.MasterCClient
 import akka.actor.ActorSystem
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.mvc.Controller
