@@ -109,9 +109,7 @@ lazy val masterClient =
     .settings(
       libraryDependencies ++= Seq(
         "commons-codec" % "commons-codec" % "1.10",
-        "org.bouncycastle" % "bcprov-jdk15" % "1.46",
-        "com.typesafe.slick" %% "slick" % "3.1.0",
-        "org.postgresql" % "postgresql" % "9.4-1205-jdbc42"
+        "org.bouncycastle" % "bcprov-jdk15" % "1.46"
       ) ++ akka("testkit").map(_ % "test")
     )
 
@@ -124,6 +122,8 @@ lazy val masterServer =
     .settings(
       libraryDependencies ++= Seq(
         ws,
-        "com.typesafe.play" %% "play-slick" % "1.1.1"
-      )
+        "com.typesafe.play" %% "play-slick" % "1.1.1",
+        "com.typesafe.slick" %% "slick" % "3.1.0",
+        "org.postgresql" % "postgresql" % "9.4-1205-jdbc42"
+      ) ++ akka("actor", "agent")
     )

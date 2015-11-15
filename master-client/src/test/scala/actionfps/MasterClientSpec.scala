@@ -1,4 +1,6 @@
 package actionfps
+package master
+package client
 
 import akka.actor.{Terminated, ActorSystem, Kill, Props}
 import akka.testkit.{ImplicitSender, TestKit}
@@ -41,12 +43,12 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with OptionValues {
       mcc ! ConnectedPeer(peerId)
       val sendMessage = expectMsgClass(classOf[SendMessage])
       expectNoMsg()
-      val fakeClient = AuthServerFsm(serverKey = serverKey)
+      val fakeClient = authentication.AuthServerFsm(serverKey = serverKey)
       println(sendMessage)
       val receivedChallenge = fakeClient.ReceiveChallenge.unapply(sendMessage.reverse(peerId)).value
       mcc ! receivedChallenge.responseMessage.reverse(peerId)
       val sendMessage2 = expectMsgClass(classOf[SendMessage])
-      receivedChallenge.IdentifiedCorrectly.unapply(sendMessage2.reverse(peerId)) should not be empty
+      receivedChallenge.IAmIdentifiedCorrectly.unapply(sendMessage2.reverse(peerId)) should not be empty
       val challengeClient = receivedChallenge.SendChallengeToClient("xyz")
       mcc ! challengeClient.challengeMessage.reverse(peerId)
       val clientToServerChallengeResponse = expectMsgClass(classOf[SendMessage]).reverse(peerId)

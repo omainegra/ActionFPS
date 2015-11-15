@@ -1,4 +1,5 @@
-package actionfps.master
+package actionfps
+package master
 
 import java.security.{MessageDigest, SecureRandom, Security}
 
@@ -43,4 +44,6 @@ package object client {
     serverId match {
       case sidMatch(host, port) => PeerId(host, port.toInt)
     }
+
+  case object Authenticated
 }

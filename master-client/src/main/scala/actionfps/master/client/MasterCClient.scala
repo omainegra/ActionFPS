@@ -11,7 +11,12 @@ import akka.actor.{ActorLogging, ActorRef, Props}
 import io.enet.akka.ENetService
 import io.enet.akka.ENetService._
 
-class MasterCClient(enetService: ActorRef => Props, val remote: PeerId, val serverKey: String, exchangeKeysImmediately: Option[List[ServerUser]]) extends Act with ActorLogging with AuthenticatorTrait {
+class MasterCClient(enetService: ActorRef => Props,
+                    val remote: PeerId,
+                    val serverKey: String)
+  extends Act
+  with ActorLogging
+  with AuthenticatorTrait {
 
   val service = context.actorOf(enetService(self))
   val logReceiver = LogReceiverParser(remote)
@@ -22,20 +27,17 @@ class MasterCClient(enetService: ActorRef => Props, val remote: PeerId, val serv
   }
 
   def exchangeKeys(keyExchanger: KeyExchanger): Unit = {
+    log.info("Beginning key exchange")
     service ! keyExchanger.beginSending
     keyExchanger.pushOutMessages.foreach(service ! _)
     service ! keyExchanger.finishSending
+    log.info("Completing key exchange")
   }
 
   become {
     case conn: ConnectedPeer =>
       beginAuthentication {
-        if (exchangeKeysImmediately.nonEmpty) {
-          exchangeKeys(KeyExchanger(
-            remote = remote,
-            users = exchangeKeysImmediately.toList.flatten
-          ))
-        }
+        context.parent ! Authenticated
         service ! logReceiver.startMessage
         service ! demoReceiver.startMessage
         become {
@@ -43,6 +45,11 @@ class MasterCClient(enetService: ActorRef => Props, val remote: PeerId, val serv
             log.info("Received log message {}", logMessage)
           case demoReceiver(demoMessage) =>
             log.info("Received demo message {}", demoMessage)
+          case sendkeys.SendKeys(serverUsers) =>
+            exchangeKeys(KeyExchanger(
+              remote = remote,
+              users = serverUsers
+            ))
           case KeyExchanger.Completed(_, message) =>
             log.info(message)
         }
@@ -69,7 +76,7 @@ class MasterCClient(enetService: ActorRef => Props, val remote: PeerId, val serv
 
 object MasterCClient {
 
-  case class MyProps(remote: PeerId, serverKey: String, exchangeKeysImmediately: Option[List[ServerUser]]) {
+  case class MyProps(remote: PeerId, serverKey: String) {
     def defaultEnetService(to: ActorRef) = {
       val enetParams = ENetServiceParameters(
         listen = None,
@@ -80,7 +87,7 @@ object MasterCClient {
     }
 
     def apply(enetService: ActorRef => Props): Props = Props(new MasterCClient(
-      enetService = enetService, remote = remote, serverKey = serverKey, exchangeKeysImmediately = exchangeKeysImmediately
+      enetService = enetService, remote = remote, serverKey = serverKey
     ))
 
     def apply(): Props = apply(defaultEnetService)
