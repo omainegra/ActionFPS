@@ -1,9 +1,8 @@
 package controllers
 
 import javax.inject._
-import actionfps.master.client.MasterCClient
-import akka.actor.{Props, ActorRef, ActorSystem}
-import akka.agent.Agent
+
+import akka.actor.ActorSystem
 import model.{Server, User}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.http.Writeable
@@ -12,7 +11,7 @@ import play.api.mvc.{Action, Controller}
 import services.MasterServer
 import slick.driver.JdbcProfile
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class MasterServerController @Inject()(dbConfigProvider: DatabaseConfigProvider,
@@ -31,7 +30,6 @@ class MasterServerController @Inject()(dbConfigProvider: DatabaseConfigProvider,
   implicit val userWritable = Writeable.writeableOf_JsValue.map[User](u =>Json.toJson(u))
   implicit val serverWritable = Writeable.writeableOf_JsValue.map[Server](s=>Json.toJson(s))
 
-  import org.scalactic._
   def updateUserData(id: String) = Action.async { request =>
     val context = masterServer.UserContext(userId = id)
     val userData = request.body.asText.get
@@ -42,6 +40,7 @@ class MasterServerController @Inject()(dbConfigProvider: DatabaseConfigProvider,
       }
     }
   }
+
   def refreshUserKey(id: String, updateId: String) = Action.async { request =>
     val context = masterServer.UserContext(userId = id)
     async {
@@ -51,6 +50,7 @@ class MasterServerController @Inject()(dbConfigProvider: DatabaseConfigProvider,
       }
     }
   }
+
   def createUser(id: String) = Action.async { request =>
     val context = masterServer.UserContext(userId = id)
     val userData = request.body.asText.get
