@@ -27,8 +27,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with OptionValues {
       val serverKey = "WHAT"
       val props = MasterCClient.MyProps(
         remote = peerId,
-        serverKey = serverKey,
-        exchangeKeysImmediately = Option.empty
+        serverKey = serverKey
       ).apply { listenerRef =>
         Props(new Act {
           become { case x => testActor ! x }
