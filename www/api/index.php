@@ -4,8 +4,9 @@ require("../render_game.inc.php");
 ?>
     <article id="questions">
         <h1>API</h1>
-        <p>All the data accessible via the website is freely accessible via the API.</p>
-        <p>See <a href="https://github.com/ScalaWilliam/ActionFPS/tree/master/www" target="_blank">the website source code</a>
+        <p>All the data accessible via the website is freely accessible via the API.
+            <br/>
+            See <a href="https://github.com/ScalaWilliam/ActionFPS/tree/master/www" target="_blank">the website source code</a>
         for some examples.</p>
         
         <h2>Query the most recent games</h2>
