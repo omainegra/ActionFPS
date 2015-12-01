@@ -1,5 +1,5 @@
 <?php
-require_once("../render.inc.php");
+require_once("../../render.inc.php");
 ?>
 <article id="servers">
         <h2>AssaultCube</h2>
