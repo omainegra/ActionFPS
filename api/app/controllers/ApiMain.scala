@@ -24,7 +24,7 @@ class ApiMain @Inject()(configuration: Configuration,
                        (implicit executionContext: ExecutionContext) extends Controller {
 
   def recent = Action {
-    Ok(JsArray(gamesService.allGames.get().takeRight(17).reverse.map(_.toJson)))
+    Ok(JsArray(gamesService.allGames.get().takeRight(30).reverse.map(_.toJson)))
   }
 
   def usersJson = Action {
