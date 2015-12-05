@@ -10,7 +10,8 @@ lazy val root =
       demoParser,
       cubeProtocol,
       masterClient,
-      masterServer
+      masterServer,
+      referenceReader
     ).dependsOn(
     achievements,
     logParser,
@@ -19,7 +20,8 @@ lazy val root =
     demoParser,
     cubeProtocol,
     masterClient,
-    masterServer
+    masterServer,
+    referenceReader
   )
 
 lazy val logParser =
@@ -54,6 +56,7 @@ lazy val api =
   project
     .enablePlugins(PlayScala)
     .dependsOn(achievements)
+    .dependsOn(referenceReader)
     .settings(dontDocument)
     .settings(libraryDependencies ++= akka("actor", "agent", "slf4j"))
     .settings(libraryDependencies ++= Seq(
@@ -128,3 +131,11 @@ lazy val masterServer =
         "org.postgresql" % "postgresql" % "9.4-1205-jdbc42"
       ) ++ akka("actor", "agent")
     )
+
+lazy val referenceReader =
+  Project(
+    id = "reference-reader",
+    base = file("reference-reader")
+  ).settings(
+    libraryDependencies += "org.apache.commons" % "commons-csv" % "1.1"
+  )
