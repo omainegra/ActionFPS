@@ -16,7 +16,7 @@ function onSignIn(googleUser) {
   var queryUrl = rootUrl + "?email=" + googleUser.getBasicProfile().getEmail();
   $.get(queryUrl).then(function(x) {
 	  if ( x === false ) {
-		  $("reg_form").css("display", "block");
+		  $("#reg_form").css("display", "block");
 	  } else if ( "id" in x ) {
       $.cookie("af_id", x.id, { path:'/', expires: 10 });
       $.cookie("af_name", x.name, { path:'/', expires: 10 });
