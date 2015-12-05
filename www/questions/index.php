@@ -26,7 +26,7 @@ require("../render_game.inc.php");
     <p>Find us on <a href="http://www.teamspeak.com/?page=downloads">TeamSpeak</a> at our server <a href="ts3server://aura.actionfps" target="_blank">&quot;aura.actionfps&quot;</a>.</p>
     <p>Also join us on <a href="https://webchat.gamesurge.net/?channels=woop-clan">#woop-clan @ GameSurge</a> IRC channel.</p>
     <h2>Which servers do you record from?</h2>
-    <p>See the <a href="servers">servers</a> page.</p>
+    <p>See the <a href="/servers/">servers</a> page.</p>
     <h2>Any rules for play?</h2>
     <p>Be fair.</p>
     <h2>What are your plans?</h2>
