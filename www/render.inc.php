@@ -11,6 +11,12 @@ $split_text = "---SPLIT HERE---";
 $content_node = $domdoc->getElementById("content");
 $split_text_node = $domdoc->createTextNode($split_text);
 $content_node->replaceChild($split_text_node, $content_node->childNodes->item(0));
+$log_in = $domdoc->getElementById('log-in');
+if ( isset($_COOKIE['af_name'], $_COOKIE['af_id'])) {
+    $player_name = $domdoc->createTextNode($_COOKIE['af_name']);
+    $log_in->replaceChild($player_name, $log_in->childNodes->item(0));
+    $log_in->setAttribute("href", "/player/?id=".rawurlencode($_COOKIE['af_id']));
+}
 list($head, $foot) = explode($split_text, $domdoc->saveHTML());
 if (!isset($skip_head) || $skip_head === false) {
     echo $head;
