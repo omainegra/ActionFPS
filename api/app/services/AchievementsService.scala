@@ -45,7 +45,7 @@ class AchievementsService @Inject()(gamesService: GamesService,
       for {
         team <- jsonGame.teams
         player <- team.players
-        user <- recordsService.users.find(_.nickname.nickname == player.name)
+        `user` <- recordsService.users.find(_.nickname.nickname == player.name)
         (newPs, newEvents) <- playerState.includeGame(jsonGame, team, player)(p => recordsService.users.exists(_.nickname.nickname == p.name))
       } yield copy(
         playerState = newPs,
