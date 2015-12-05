@@ -2,7 +2,7 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$url = "http://api.actionfps.com/clans/json/";
+$url = "http://api.actionfps.com/clans/";
 $yaml = str_replace("json", "yaml", $url);
 $clans = json_decode(file_get_contents($url), true);
 ?>
@@ -16,9 +16,5 @@ $clans = json_decode(file_get_contents($url), true);
             href="<?php echo htmlspecialchars($clan['website']); ?>"
             target="_blank">Website</a></p><?php }
         } ?>
-        <hr/>
-        <p>This list is available as <a href="<?php echo $url; ?>">JSON</a> and
-            <a href="<?php echo $yaml; ?>">YAML</a>
-        </p>
     </article>
 <?php echo $foot;

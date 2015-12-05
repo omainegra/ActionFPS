@@ -13,8 +13,7 @@ require("../render_game.inc.php");
         <pre><code><a href="http://api.actionfps.com/recent/" rel="nofollow" target="_blank">http://api.actionfps.com/recent/</a></code></pre>
 
         <h2>Query clans</h2>
-        <pre><code><a href="http://api.actionfps.com/clans/json/" rel="nofollow" target="_blank">http://api.actionfps.com/clans/json/</a></code></pre>
-        <pre><code><a href="http://api.actionfps.com/clans/yaml/" rel="nofollow" target="_blank">http://api.actionfps.com/clans/yaml/</a></code></pre>
+        <pre><code><a href="http://api.actionfps.com/clans/" rel="nofollow" target="_blank">http://api.actionfps.com/clans/</a></code></pre>
 
         <h2>Query users</h2>
         <pre><code><a href="http://api.actionfps.com/users/" rel="nofollow" target="_blank">http://api.actionfps.com/users/</a></code></pre>
