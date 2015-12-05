@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class RecordsService @Inject()(recordsReader: RecordsReader,
-                              achievementsService: AchievementsService)
+                              achievementsService: Provider[AchievementsService])
                               (implicit executionContext: ExecutionContext) {
 
   val clansAgt = Agent(recordsReader.clans)
@@ -26,7 +26,7 @@ class RecordsService @Inject()(recordsReader: RecordsReader,
     clansAgt.send(recordsReader.clans)
     usersAgt.send(recordsReader.users)
     val updatedUsers = nu.toSet -- ou.toSet
-    updatedUsers.foreach(u => achievementsService.updateUser(u))
+    updatedUsers.foreach(u => achievementsService.get().updateUser(u))
   }
 
 }
