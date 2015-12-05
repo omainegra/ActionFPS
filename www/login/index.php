@@ -18,8 +18,8 @@ function onSignIn(googleUser) {
 	  if ( x === false ) {
 		  $("reg_form").css("display", "block");
 	  } else if ( "id" in x ) {
-      $.cookie("af_id", x.id, { expires : 10 });
-      $.cookie("af_name", x.name, { expires : 10 });
+      $.cookie("af_id", x.id, { path:'/', expires: 10 });
+      $.cookie("af_name", x.name, { path:'/', expires: 10 });
       $('#login_welcome a').attr("href", "/player/?id=" + x.id).text(x.name);
       $('#login_welcome').css("display", "block");
 	  }
