@@ -5,7 +5,7 @@ import java.time.ZoneId
 import javax.inject.Inject
 
 import af.rr._
-import lib.users.{CurrentNickname, User}
+import lib.users.{PreviousNickname, CurrentNickname, User}
 import org.apache.http.client.fluent.Request
 import play.api.Configuration
 
@@ -48,7 +48,15 @@ class RecordsReader @Inject()(configuration: Configuration) {
       hisNicks = nicknames.filter(_.id == registration.id).sortBy(_.from.toString)
       if hisNicks.nonEmpty
       currentNickname = hisNicks.last
-      previousNicknames = hisNicks.dropRight(1)
+      previousNicknames = hisNicks.sliding(2).collect {
+        case List(nick, nextNick) =>
+          PreviousNickname(
+            nickname = nick.nickname,
+            from = nick.from.atZone(ZoneId.of("UTC")),
+            to = nextNick.from.atZone(ZoneId.of("UTC")),
+            countryCode = None
+          )
+      }.toList
     } yield User(
       id = registration.id,
       name = registration.name,
@@ -60,7 +68,7 @@ class RecordsReader @Inject()(configuration: Configuration) {
         countryCode = None,
         from = currentNickname.from.atZone(ZoneId.of("UTC"))
       ),
-      previousNicknames = None
+      previousNicknames = Option(previousNicknames).filter(_.nonEmpty)
     )
   }
 }
