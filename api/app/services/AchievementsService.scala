@@ -69,7 +69,7 @@ class AchievementsService @Inject()(gamesService: GamesService,
       a.copy(
         map = a.map.updated(user.id, state.playerState),
         events = {
-          a.events.filter(_.get("user").contains(user.id)) ++ state.events
+          a.events.filterNot(_.get("user").contains(user.id)) ++ state.events
         }.sortBy(_.get("date"))
       )
     }
