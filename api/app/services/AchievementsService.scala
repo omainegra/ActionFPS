@@ -30,8 +30,9 @@ class AchievementsService @Inject()(gamesService: GamesService,
       for {
         team <- jsonGame.teams
         player <- team.players
-        user <- recordsService.users.find(_.nickname.nickname == player.name)
-        (newPs, newEvents) <- map.getOrElse(user.id, PlayerState.empty).includeGame(jsonGame, team, player)(p => recordsService.users.exists(_.nickname.nickname == p.name))
+        user <- recordsService.users.find(_.validAt(player.name, jsonGame.gameTime))
+        (newPs, newEvents) <- map.getOrElse(user.id, PlayerState.empty).includeGame(jsonGame, team, player)(p =>
+          recordsService.users.exists(_.validAt(p.name, jsonGame.gameTime)))
       } {
         oEvents ++= newEvents.map { case (date, text) => Map("user" -> user.id, "date" -> date, "text" -> s"${user.name} $text") }
         nComb = nComb.updated(user.id, newPs)
@@ -45,8 +46,8 @@ class AchievementsService @Inject()(gamesService: GamesService,
       for {
         team <- jsonGame.teams
         player <- team.players
-        `user` <- recordsService.users.find(_.nickname.nickname == player.name)
-        (newPs, newEvents) <- playerState.includeGame(jsonGame, team, player)(p => recordsService.users.exists(_.nickname.nickname == p.name))
+        if user.validAt(player.name, jsonGame.gameTime)
+        (newPs, newEvents) <- playerState.includeGame(jsonGame, team, player)(p => recordsService.users.exists(u => u.validAt(p.name, jsonGame.gameTime)))
       } yield copy(
         playerState = newPs,
         events = events ++ newEvents.map { case (date, text) => Map("user" -> user.id, "date" -> date, "text" -> s"${user.name} $text") }

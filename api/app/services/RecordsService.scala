@@ -4,6 +4,7 @@ import javax.inject._
 
 import akka.agent.Agent
 import lib.RecordsReader
+import play.api.Logger
 
 import scala.concurrent.ExecutionContext
 
@@ -26,6 +27,7 @@ class RecordsService @Inject()(recordsReader: RecordsReader,
     clansAgt.send(recordsReader.clans)
     usersAgt.send(recordsReader.users)
     val updatedUsers = nu.toSet -- ou.toSet
+    Logger.info(s"Updated users: $updatedUsers")
     updatedUsers.foreach(u => achievementsService.get().updateUser(u))
   }
 
