@@ -11,7 +11,8 @@ import scala.concurrent.ExecutionContext
   * Created by William on 05/12/2015.
   */
 @Singleton
-class RecordsService @Inject()(recordsReader: RecordsReader)
+class RecordsService @Inject()(recordsReader: RecordsReader,
+                              achievementsService: AchievementsService)
                               (implicit executionContext: ExecutionContext) {
 
   val clansAgt = Agent(recordsReader.clans)
@@ -20,8 +21,12 @@ class RecordsService @Inject()(recordsReader: RecordsReader)
   def clans = clansAgt.get()
 
   def updateSync(): Unit = {
-    clansAgt.alter(recordsReader.clans)
-    usersAgt.alter(recordsReader.users)
+    val ou = users
+    val nu = recordsReader.users
+    clansAgt.send(recordsReader.clans)
+    usersAgt.send(recordsReader.users)
+    val updatedUsers = nu.toSet -- ou.toSet
+    updatedUsers.foreach(u => achievementsService.updateUser(u))
   }
 
 }
