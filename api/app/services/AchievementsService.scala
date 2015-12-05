@@ -6,7 +6,6 @@ import javax.inject._
 import acleague.enrichers.JsonGame
 import acleague.ranker.achievements.PlayerState
 import akka.agent.Agent
-import lib.users.BasexUsers
 import play.api.Configuration
 import play.api.inject.ApplicationLifecycle
 
@@ -15,6 +14,7 @@ import scala.concurrent.{Future, ExecutionContext}
 @Singleton
 class AchievementsService @Inject()(gamesService: GamesService,
                                     applicationLifecycle: ApplicationLifecycle,
+                                    recordsService: RecordsService,
                                     configuration: Configuration)
                                    (implicit executionContext: ExecutionContext) {
 
@@ -29,8 +29,8 @@ class AchievementsService @Inject()(gamesService: GamesService,
       for {
         team <- jsonGame.teams
         player <- team.players
-        user <- BasexUsers.users.find(_.nickname.nickname == player.name)
-        (newPs, newEvents) <- map.getOrElse(user.id, PlayerState.empty).includeGame(jsonGame, team, player)(p => BasexUsers.users.exists(_.nickname.nickname == p.name))
+        user <- recordsService.users.find(_.nickname.nickname == player.name)
+        (newPs, newEvents) <- map.getOrElse(user.id, PlayerState.empty).includeGame(jsonGame, team, player)(p => recordsService.users.exists(_.nickname.nickname == p.name))
       } {
         oEvents ++= newEvents.map { case (date, text) => Map("user" -> user.id, "date" -> date, "text" -> s"${user.name} $text") }
         nComb = nComb.updated(user.id, newPs)

@@ -1,18 +1,16 @@
 package controllers
 
-import java.io.File
 import javax.inject._
 
-import acleague.enrichers.JsonGame
+import acleague.ranker.achievements.Jsons
 import acleague.ranker.achievements.immutable.PlayerStatistics
-import acleague.ranker.achievements.{Jsons, PlayerState}
-import lib.clans.{Clan, ResourceClans}
-import lib.users.{User, BasexUsers}
+import lib.clans.Clan
+import lib.users.User
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
-import play.api.libs.json.{JsObject, JsArray, Json}
+import play.api.libs.json.{JsArray, JsObject, Json}
 import play.api.mvc.{Action, Controller}
-import services.{AchievementsService, GamesService}
+import services.{AchievementsService, GamesService, RecordsService}
 
 import scala.concurrent.ExecutionContext
 
@@ -20,6 +18,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ApiMain @Inject()(configuration: Configuration,
                         gamesService: GamesService,
+                       recordsService: RecordsService,
                         achievementsService: AchievementsService)
                        (implicit executionContext: ExecutionContext) extends Controller {
 
@@ -29,11 +28,11 @@ class ApiMain @Inject()(configuration: Configuration,
 
   def usersJson = Action {
     import User.WithoutEmailFormat.noEmailUserWrite
-    Ok(Json.toJson(BasexUsers.users))
+    Ok(Json.toJson(recordsService.users))
   }
 
   def userJson(id: String) = Action {
-    BasexUsers.users.find(_.id == id) match {
+    recordsService.users.find(_.id == id) match {
       case Some(user) =>
         import User.WithoutEmailFormat.noEmailUserWrite
         Ok(Json.toJson(user))
@@ -44,13 +43,8 @@ class ApiMain @Inject()(configuration: Configuration,
 
   implicit val fmtClan = Json.format[Clan]
 
-  def clansJson = Action {
-
-    Ok(Json.toJson(ResourceClans.clans))
-  }
-
-  def clansYaml = Action {
-    Ok(ResourceClans.yaml).as("text/x-yaml; charset=utf-8")
+  def clans = Action {
+    Ok(Json.toJson(recordsService.clans))
   }
 
   def raw = Action {
@@ -66,12 +60,12 @@ class ApiMain @Inject()(configuration: Configuration,
 
   def fullUser(id: String) = Action {
     val fullOption = for {
-      user <- BasexUsers.users.find(_.id == id)
+      user <- recordsService.users.find(_.id == id)
       playerState <- achievementsService.achievements.get().map.get(user.id)
     } yield {
-      import User.WithoutEmailFormat.noEmailUserWrite
       import Jsons._
       import PlayerStatistics.fmts
+      import User.WithoutEmailFormat.noEmailUserWrite
       Json.toJson(user).asInstanceOf[JsObject].deepMerge(
         JsObject(
           Map(

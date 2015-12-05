@@ -20,7 +20,7 @@ object ClanRecord {
         longName <- Option(rec.get(2)).filter(_.nonEmpty)
         website = Try(new URI(rec.get(3))).toOption
         tag <- Option(rec.get(4)).filter(_.nonEmpty)
-        tag2 = Option(rec.get(5)).filter(_.nonEmpty)
+        tag2 = Try(rec.get(5)).toOption.filter(_ != null).filter(_.nonEmpty)
       } yield ClanRecord(
         id = id,
         shortName = shortName,
