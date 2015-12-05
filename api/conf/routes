@@ -1,8 +1,9 @@
-GET        /recent/                  @controllers.ApiMain.recent
-GET        /raw/                     @controllers.ApiMain.raw
-GET        /clans/                   @controllers.ApiMain.clans
-GET        /users/                   @controllers.ApiMain.usersJson
-GET        /events/                  @controllers.ApiMain.listEvents
-GET        /achievements/:id/        @controllers.ApiMain.achievements(id)
-GET        /user/:id/                @controllers.ApiMain.userJson(id: String)
-GET        /user/:id/full/           @controllers.ApiMain.fullUser(id: String)
+GET         /recent/                        @controllers.ApiMain.recent
+GET         /raw/                           @controllers.ApiMain.raw
+GET         /clans/                         @controllers.ApiMain.clans
+GET         /users/                         @controllers.ApiMain.usersJson
+GET         /events/                        @controllers.ApiMain.listEvents
+GET         /achievements/:id/              @controllers.ApiMain.achievements(id)
+GET         /user/:id/                      @controllers.ApiMain.userJson(id: String)
+GET         /user/:id/full/                 @controllers.ApiMain.fullUser(id: String)
+POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
