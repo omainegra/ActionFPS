@@ -42,7 +42,7 @@ class ApiMain @Inject()(configuration: Configuration,
   }
 
   def userJson(id: String) = Action {
-    recordsService.users.find(_.id == id) match {
+    recordsService.users.find(user => user.id == id || user.email == id) match {
       case Some(user) =>
         import User.WithoutEmailFormat.noEmailUserWrite
         Ok(Json.toJson(user))
@@ -91,7 +91,7 @@ class ApiMain @Inject()(configuration: Configuration,
 
   def fullUser(id: String) = Action {
     val fullOption = for {
-      user <- recordsService.users.find(_.id == id)
+      user <- recordsService.users.find(user => user.id == id || user.email == id)
       playerState <- achievementsService.achievements.get().map.get(user.id)
     } yield fullProfile(user, playerState)
     fullOption match {
