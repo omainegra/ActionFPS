@@ -131,8 +131,10 @@ case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: Stri
 
   def transformTeams(f: JsonGameTeam => JsonGameTeam) = copy(teams = teams.map(f))
 
+  def endTime: ZonedDateTime = gameTime.plusMinutes(duration)
+
   def toJson: JsObject = {
-    Json.toJson(this)(JsonGame.fmt).asInstanceOf[JsObject]
+    Json.toJson(this)(JsonGame.fmt).asInstanceOf[JsObject].+("endTime" -> Json.toJson(endTime))
   }
 
   import org.scalactic._
