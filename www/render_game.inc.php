@@ -54,8 +54,8 @@ function render_game($game)
                         @
                         <?php echo $game['map']; ?>
 
-                    <time is="relative-time" datetime="<?php echo $game['gameTime']; ?>">
-                        <?php echo $game['gameTime']; ?>
+                    <time is="relative-time" datetime="<?php echo $game['endTime']; ?>">
+                        <?php echo $game['endTime']; ?>
                     </time>
                     </a>
                 </h2>
