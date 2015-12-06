@@ -25,6 +25,9 @@ class ApiMain @Inject()(configuration: Configuration,
   def recent = Action {
     Ok(JsArray(gamesService.allGames.get().takeRight(30).reverse.map(_.toJson)))
   }
+  def recentClangames = Action {
+    Ok(JsArray(gamesService.allGames.get().filter(_.clangame.isDefined).takeRight(30).reverse.map(_.toJson)))
+  }
 
   def usersJson = Action {
     import User.WithoutEmailFormat.noEmailUserWrite

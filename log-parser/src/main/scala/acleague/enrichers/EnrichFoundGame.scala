@@ -25,7 +25,11 @@ object JsonGame {
     val fdt = date.format(DateTimeFormatter.ISO_INSTANT)
 
     JsonGame(
-      id = fdt, gameTime = date, server = serverId, duration = duration,
+      id = fdt,
+      gameTime = date,
+      server = serverId,
+      duration = duration,
+      clangame = None,
       map = foundGame.header.map,
       mode = foundGame.header.mode.name,
       state = foundGame.header.state,
@@ -36,7 +40,10 @@ object JsonGame {
 
         for {team <- tt.sortBy(team => (team.flags, team.frags)).reverse.toList}
           yield JsonGameTeam(
-            name = team.name, flags = team.flags, frags = team.frags,
+            name = team.name,
+            flags = team.flags,
+            frags = team.frags,
+            clan = None,
             players = {
               for {player <- tp.filter(_.team == team.name).sortBy(p => (p.flag, p.frag)).reverse}
                 yield JsonGamePlayer(
@@ -46,7 +53,8 @@ object JsonGame {
                   flags = player.flag,
                   frags = player.frag,
                   deaths = player.death,
-                  user = None
+                  user = None,
+                  clan = None
                 )
             }
           )
@@ -110,16 +118,18 @@ object EnrichFoundGame {
 }
 
 case class JsonGamePlayer(name: String, host: Option[String], score: Option[Int],
-                          flags: Option[Int], frags: Int, deaths: Int, user: Option[String])
+                          flags: Option[Int], frags: Int, deaths: Int, user: Option[String], clan: Option[String])
 
-case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer])
+case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer], clan: Option[String])
 
 case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: String, state: String,
-                    teams: List[JsonGameTeam], server: String, duration: Int) {
+                    teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[List[String]]) {
   def withoutHosts = transformPlayers((_, player) => player.copy(host = None))
 
   def transformPlayers(f: (JsonGameTeam, JsonGamePlayer) => JsonGamePlayer) =
     copy(teams = teams.map(team => team.copy(players = team.players.map(player => f(team, player)))))
+
+  def transformTeams(f: JsonGameTeam => JsonGameTeam) = copy(teams = teams.map(f))
 
   def toJson: JsObject = {
     Json.toJson(this)(JsonGame.fmt).asInstanceOf[JsObject]

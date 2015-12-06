@@ -6,6 +6,7 @@ import javax.inject._
 
 import acleague.enrichers.JsonGame
 import akka.agent.Agent
+import lib.clans.Clan
 import lib.users.User
 import org.apache.commons.io.input.{TailerListenerAdapter, Tailer}
 import play.api.Configuration
@@ -24,19 +25,37 @@ class GamesService @Inject()(configuration: Configuration,
 
   implicit class withUsersClass(jsonGame: JsonGame) {
     def withUsersL(users: List[User]) = jsonGame.transformPlayers((_, player) =>
-      users.find(_.validAt(player.name, jsonGame.gameTime)) match {
-        case Some(u) => player.copy(user = Option(u.id))
-        case _ => player
-      }
+      player.copy(user = users.find(_.validAt(player.name, jsonGame.gameTime)).map(_.id))
     )
+
     def withUsers: JsonGame = withUsersL(recordsService.users)
+
+    def withClansL(clans: List[Clan]) = {
+      val newGame = jsonGame.transformPlayers((_, player) =>
+        player.copy(clan = clans.find(_.nicknameInClan(player.name)).map(_.id))
+      ).transformTeams { team =>
+        team.copy(
+          clan = PartialFunction.condOpt(team.players.map(_.clan).distinct) {
+            case List(Some(clan)) => clan
+          }
+        )
+      }
+
+      newGame.copy(clangame =
+        PartialFunction.condOpt(newGame.teams.map(_.clan)) {
+          case List(Some(a), Some(b)) if a != b => List(a, b)
+        }
+      )
+    }
+
+    def withClans: JsonGame = withClansL(recordsService.clans)
   }
 
   val file = new File(configuration.underlying.getString("af.games.path"))
 
   val allGames: Agent[List[JsonGame]] = Agent(List.empty)
   val tailer = new GameTailer(file, false)((game) =>
-    allGames.alter(list => list :+ game.withoutHosts.withUsers
+    allGames.alter(list => list :+ game.withoutHosts.withUsers.withClans
     ))
 
 }
