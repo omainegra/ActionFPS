@@ -27,6 +27,9 @@ require("../render_game.inc.php");
         <h2>Query a full user profile</h2>
         <pre><code><a href="http://api.actionfps.com/user/lozi/full/" rel="nofollow" target="_blank">http://api.actionfps.com/user/lozi/full/</a></code></pre>
 
+        <h2>Query users with full profile</h2>
+        <pre><code><a href="http://api.actionfps.com/users/full/" rel="nofollow" target="_blank">http://api.actionfps.com/users/full/</a></code></pre>
+
         <h2>Query <span style="text-decoration: underline;">ALL GAMES</span></h2>
         <p>This is a goldmine for data exploration</p>
         <pre><code><a href="http://api.actionfps.com/all/" rel="nofollow" target="_blank">http://api.actionfps.com/all/</a></code></pre>

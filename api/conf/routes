@@ -2,6 +2,7 @@ GET         /recent/                        @controllers.ApiMain.recent
 GET         /all/                           @controllers.ApiMain.all
 GET         /clans/                         @controllers.ApiMain.clans
 GET         /users/                         @controllers.ApiMain.usersJson
+GET         /users/full/                    @controllers.ApiMain.usersFull
 GET         /events/                        @controllers.ApiMain.listEvents
 GET         /achievements/:id/              @controllers.ApiMain.achievements(id)
 GET         /user/:id/                      @controllers.ApiMain.userJson(id: String)

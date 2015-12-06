@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import acleague.ranker.achievements.Jsons
+import acleague.ranker.achievements.{PlayerState, Jsons}
 import acleague.ranker.achievements.immutable.PlayerStatistics
 import af.rr.ServerRecord
 import lib.clans.Clan
@@ -75,27 +75,39 @@ class ApiMain @Inject()(configuration: Configuration,
     Ok(Json.toJson(achievementsService.achievements.get().events.take(10)))
   }
 
+  def fullProfile(user: User, playerState: PlayerState) = {
+    import Jsons._
+    import PlayerStatistics.fmts
+    import User.WithoutEmailFormat.noEmailUserWrite
+    Json.toJson(user).asInstanceOf[JsObject].deepMerge(
+      JsObject(
+        Map(
+          "stats" -> Json.toJson(playerState.playerStatistics),
+          "achievements" -> Json.toJson(playerState.buildAchievements)
+        )
+      )
+    )
+  }
+
   def fullUser(id: String) = Action {
     val fullOption = for {
       user <- recordsService.users.find(_.id == id)
       playerState <- achievementsService.achievements.get().map.get(user.id)
-    } yield {
-      import Jsons._
-      import PlayerStatistics.fmts
-      import User.WithoutEmailFormat.noEmailUserWrite
-      Json.toJson(user).asInstanceOf[JsObject].deepMerge(
-        JsObject(
-          Map(
-            "stats" -> Json.toJson(playerState.playerStatistics),
-            "achievements" -> Json.toJson(playerState.buildAchievements)
-          )
-        )
-      )
-    }
+    } yield fullProfile(user, playerState)
     fullOption match {
       case Some(json) => Ok(json)
       case None => NotFound("User not found")
     }
+  }
+
+  def usersFull = Action {
+    val theMap = {
+      for {
+        user <- recordsService.users
+        playerState <- achievementsService.achievements.get().map.get(user.id)
+      } yield user.id -> fullProfile(user, playerState)
+    }.toMap
+    Ok(Json.toJson(theMap))
   }
 
   def achievements(id: String) = Action {
