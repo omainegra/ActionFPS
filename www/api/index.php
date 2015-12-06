@@ -29,7 +29,7 @@ require("../render_game.inc.php");
 
         <h2>Query user by e-mail</h2>
         <p>You would use this if you are building a custom service and want to get the user's ID based on their GMail address.</p>
-        <pre><code><a href="http://api.actionfps.com/user/drakas.tralas@googlemail.com/" rel="nofollow" target="_blank">http://api.actionfps.com/user/drakas.tralas@googlemail.com/full/</a></code></pre>
+        <pre><code><a href="http://api.actionfps.com/user/drakas.tralas@googlemail.com/" rel="nofollow" target="_blank">http://api.actionfps.com/user/drakas.tralas@googlemail.com/</a></code></pre>
 
         <h2>Query users with full profile</h2>
         <pre><code><a href="http://api.actionfps.com/users/full/" rel="nofollow" target="_blank">http://api.actionfps.com/users/full/</a></code></pre>
