@@ -1,16 +1,33 @@
 <?php
 require_once("../render.inc.php");
+
+$servers = json_decode(file_get_contents("http://api.actionfps.com/servers/"), true);
+$groups = array_unique(array_map(function ($server) {
+    return $server['region'];
+}, $servers));
 ?>
-<article id="servers">
+    <article id="servers">
         <h2>AssaultCube</h2>
-        <h3>European (France)</h3>
-        <ul>
-            <li><a href="assaultcube://aura.woop.ac:1999">aura.woop.ac 1999</a></li>
-            <li><a href="assaultcube://aura.woop.ac:2999">aura.woop.ac 2999</a></li>
-            <li><a href="assaultcube://aura.woop.ac:3999">aura.woop.ac 3999</a></li>
-            <li><a href="assaultcube://aura.woop.ac:4999">aura.woop.ac 4999</a></li>
-            <li><a href="assaultcube://aura.woop.ac:1337">aura.woop.ac 1337</a> (Match Client)</li>
-        </ul>
+
+        <?php foreach ($groups as $group) {
+            ?><h3><?php echo htmlspecialchars($group); ?></h3>
+
+            <ul>
+                <?php foreach ($servers as $server) {
+                    if ($server['region'] == $group) {
+
+                        $url = "assaultcube://" . $server['hostname'] . ":" . $server['port'];
+                        ?>
+                        <li><a href="<?php echo $url; ?>">
+                                <?php echo $server['hostname'] . ' ' . $server['port']; ?>
+                            </a>
+                            <?php if ($server['kind'] != "Standard") { ?> (<?php echo htmlspecialchars($server['kind']); ?>) <?php } ?>
+                        </li>
+                    <?php }
+                } ?>
+            </ul>
+
+        <?php } ?>
     </article>
 
 <?php echo $foot; ?>

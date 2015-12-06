@@ -9,3 +9,4 @@ GET         /user/:id/full/                 @controllers.ApiMain.fullUser(id: St
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
 GET         /game/                          @controllers.ApiMain.game(id: String)
 GET         /recent/clangames/              @controllers.ApiMain.recentClangames
+GET         /servers/                       @controllers.ApiMain.getServers

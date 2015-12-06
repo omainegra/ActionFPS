@@ -13,7 +13,6 @@ import scala.util.Try
 
 case class ServerRecord(region: String, hostname: String, port: Int, kind: String)
 
-
 object ServerRecord {
   def parseRecords(input: Reader): List[ServerRecord] = {
     import collection.JavaConverters._

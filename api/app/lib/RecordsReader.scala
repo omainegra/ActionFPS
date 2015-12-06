@@ -23,11 +23,11 @@ class RecordsReader @Inject()(configuration: Configuration) {
     }
   }
 
-  def videos = VideoRecord.parseRecords(getConfigUrlReader("videos"))
+  def fetchVideos() = VideoRecord.parseRecords(getConfigUrlReader("videos"))
 
-  def servers = ServerRecord.parseRecords(getConfigUrlReader("servers"))
+  def fetchServers() = ServerRecord.parseRecords(getConfigUrlReader("servers"))
 
-  def headings = HeadingsRecord.parseRecords(getConfigUrlReader("headings"))
+  def fetchHeadings() = HeadingsRecord.parseRecords(getConfigUrlReader("headings"))
 
   def fetchClans(): List[lib.clans.Clan] = ClanRecord.parseRecords(getConfigUrlReader("clans")).map { clan =>
     lib.clans.Clan(

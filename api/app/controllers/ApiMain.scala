@@ -4,6 +4,7 @@ import javax.inject._
 
 import acleague.ranker.achievements.Jsons
 import acleague.ranker.achievements.immutable.PlayerStatistics
+import af.rr.ServerRecord
 import lib.clans.Clan
 import lib.users.User
 import play.api.Configuration
@@ -27,6 +28,12 @@ class ApiMain @Inject()(configuration: Configuration,
   }
   def recentClangames = Action {
     Ok(JsArray(gamesService.allGames.get().filter(_.clangame.isDefined).takeRight(30).reverse.map(_.toJson)))
+  }
+
+  implicit val serversWrites = Json.writes[ServerRecord]
+
+  def getServers = Action {
+    Ok(Json.toJson(recordsService.servers))
   }
 
   def usersJson = Action {

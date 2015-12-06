@@ -19,8 +19,10 @@ class RecordsService @Inject()(recordsReader: RecordsReader,
 
   val clansAgt = Agent(recordsReader.fetchClans())
   val usersAgt = Agent(recordsReader.fetchUsers())
+  val serversAgt = Agent(recordsReader.fetchServers())
   def users = usersAgt.get()
   def clans = clansAgt.get()
+  def servers = serversAgt.get()
 
   def updateSync(): Unit = {
     val ou = users
@@ -28,6 +30,7 @@ class RecordsService @Inject()(recordsReader: RecordsReader,
     val nc = recordsReader.fetchClans()
     clansAgt.send(nc)
     usersAgt.send(nu)
+    serversAgt.send(recordsReader.fetchServers())
     val updatedUsers = nu.toSet -- ou.toSet
     Logger.info(s"Updated users: $updatedUsers")
     updatedUsers.foreach(u => achievementsService.get().updateUser(u))
