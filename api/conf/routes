@@ -8,3 +8,4 @@ GET         /user/:id/                      @controllers.ApiMain.userJson(id: St
 GET         /user/:id/full/                 @controllers.ApiMain.fullUser(id: String)
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
 GET         /game/                          @controllers.ApiMain.game(id: String)
+GET         /recent/clangames/              @controllers.ApiMain.recentClangames

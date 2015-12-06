@@ -17,22 +17,24 @@ class RecordsService @Inject()(recordsReader: RecordsReader,
                               gamesService: Provider[GamesService])
                               (implicit executionContext: ExecutionContext) {
 
-  val clansAgt = Agent(recordsReader.fetchClans)
-  val usersAgt = Agent(recordsReader.fetchUsers)
+  val clansAgt = Agent(recordsReader.fetchClans())
+  val usersAgt = Agent(recordsReader.fetchUsers())
   def users = usersAgt.get()
   def clans = clansAgt.get()
 
   def updateSync(): Unit = {
     val ou = users
-    val nu = recordsReader.fetchUsers
-    clansAgt.send(recordsReader.fetchClans)
-    usersAgt.send(recordsReader.fetchUsers)
+    val nu = recordsReader.fetchUsers()
+    val nc = recordsReader.fetchClans()
+    clansAgt.send(nc)
+    usersAgt.send(nu)
     val updatedUsers = nu.toSet -- ou.toSet
     Logger.info(s"Updated users: $updatedUsers")
     updatedUsers.foreach(u => achievementsService.get().updateUser(u))
     val gs = gamesService.get()
+    import gs.withUsersClass
     gs.allGames.send(games =>
-      games.map(game => gs.withUsersClass(game).withUsersL(nu))
+      games.map(game => game.withUsersL(nu).withClansL(nc))
     )
   }
 
