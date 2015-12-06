@@ -15,14 +15,20 @@ require("../render_game.inc.php");
         <h2>Query the most recent clangames</h2>
         <pre><code><a href="http://api.actionfps.com/recent/clangames/" rel="nofollow" target="_blank">http://api.actionfps.com/recent/clangames/</a></code></pre>
 
-        <h2>Query a game by ID</h2>
+        <h2>Find a game by ID</h2>
         <pre><code><a href="http://api.actionfps.com/game/?id=2015-12-05T23:48:55Z" rel="nofollow" target="_blank">http://api.actionfps.com/game/?id=2015-12-05T23:48:55Z</a></code></pre>
 
-        <h2>Query clans</h2>
+        <h2>List clans</h2>
         <pre><code><a href="http://api.actionfps.com/clans/" rel="nofollow" target="_blank">http://api.actionfps.com/clans/</a></code></pre>
 
-        <h2>Query users</h2>
+        <h2>List users</h2>
         <pre><code><a href="http://api.actionfps.com/users/" rel="nofollow" target="_blank">http://api.actionfps.com/users/</a></code></pre>
+
+        <h2>List nicknames</h2>
+        <pre><code><a href="http://api.actionfps.com/nicknames/" rel="nofollow" target="_blank">http://api.actionfps.com/nicknames/</a></code></pre>
+
+        <h2>List nicknames with game counts</h2>
+        <pre><code><a href="http://api.actionfps.com/nicknames/?with=game-counts" rel="nofollow" target="_blank">http://api.actionfps.com/nicknames/?with=game-counts</a></code></pre>
 
         <h2>Query a full user profile</h2>
         <pre><code><a href="http://api.actionfps.com/user/lozi/full/" rel="nofollow" target="_blank">http://api.actionfps.com/user/lozi/full/</a></code></pre>

@@ -11,3 +11,4 @@ POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
 GET         /game/                          @controllers.ApiMain.game(id: String)
 GET         /recent/clangames/              @controllers.ApiMain.recentClangames
 GET         /servers/                       @controllers.ApiMain.getServers
+GET         /nicknames/                     @controllers.ApiMain.listNicknames

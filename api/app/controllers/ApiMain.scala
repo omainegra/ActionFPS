@@ -9,7 +9,7 @@ import lib.clans.Clan
 import lib.users.User
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
-import play.api.libs.json.{JsArray, JsObject, Json}
+import play.api.libs.json._
 import play.api.mvc.{Action, Controller}
 import services.{AchievementsService, GamesService, RecordsService}
 
@@ -116,6 +116,18 @@ class ApiMain @Inject()(configuration: Configuration,
       case Some(player) =>
         import Jsons._
         Ok(Json.toJson(player.buildAchievements))
+    }
+  }
+
+  def listNicknames() = Action { request =>
+    val names = gamesService.allGames.get().flatMap(_.teams.flatMap(_.players)).map(_.name)
+    val nameToCount = names.groupBy(identity).mapValues(_.length).toList.sortBy(_._2).reverse
+    if ( request.queryString.get("with").exists(_.contains("game-counts")) ) {
+      Ok(Json.toJson(nameToCount.map{ case (name, count) =>
+          JsObject(Map("name" -> JsString(name), "games" -> JsNumber(count))
+        )}))
+    } else {
+      Ok(Json.toJson(nameToCount.map{case (name, count) => name}))
     }
   }
 
