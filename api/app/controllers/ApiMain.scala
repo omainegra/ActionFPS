@@ -64,7 +64,7 @@ class ApiMain @Inject()(configuration: Configuration,
     }
   }
 
-  def raw = Action {
+  def all = Action {
     val enumerator = Enumerator
       .enumerate(gamesService.allGames.get())
       .map(game => s"${game.id}\t${game.toJson}\n")
