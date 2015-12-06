@@ -3,7 +3,6 @@ require_once("../render.inc.php");
 require("../render_game.inc.php");
 
 $url = "http://api.actionfps.com/recent/clangames/";
-$url = "http://localhost:9000/recent/clangames/";
 $games = json_decode(file_get_contents($url), true);
 ?><br/>
 <br/>
