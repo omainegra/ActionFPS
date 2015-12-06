@@ -29,7 +29,7 @@ class RecordsReader @Inject()(configuration: Configuration) {
 
   def headings = HeadingsRecord.parseRecords(getConfigUrlReader("headings"))
 
-  def clans: List[lib.clans.Clan] = ClanRecord.parseRecords(getConfigUrlReader("clans")).map { clan =>
+  def fetchClans(): List[lib.clans.Clan] = ClanRecord.parseRecords(getConfigUrlReader("clans")).map { clan =>
     lib.clans.Clan(
       id = clan.id,
       name = clan.shortName,
@@ -40,7 +40,7 @@ class RecordsReader @Inject()(configuration: Configuration) {
     )
   }
 
-  def users: List[User] = {
+  def fetchUsers(): List[User] = {
     val registrations = Registration.parseRecords(getConfigUrlReader("registrations"))
     val nicknames = NicknameRecord.parseRecords(getConfigUrlReader("nicknames"))
     for {

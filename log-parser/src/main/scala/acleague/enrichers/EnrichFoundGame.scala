@@ -40,8 +40,13 @@ object JsonGame {
             players = {
               for {player <- tp.filter(_.team == team.name).sortBy(p => (p.flag, p.frag)).reverse}
                 yield JsonGamePlayer(
-                  name = player.name, host = player.host, score = player.score, flags = player.flag,
-                  frags = player.frag, deaths = player.death
+                  name = player.name,
+                  host = player.host,
+                  score = player.score,
+                  flags = player.flag,
+                  frags = player.frag,
+                  deaths = player.death,
+                  user = None
                 )
             }
           )
@@ -105,27 +110,30 @@ object EnrichFoundGame {
 }
 
 case class JsonGamePlayer(name: String, host: Option[String], score: Option[Int],
-                          flags: Option[Int], frags: Int, deaths: Int)
+                          flags: Option[Int], frags: Int, deaths: Int, user: Option[String])
 
-case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer]) {
-  def withoutHosts = copy(players = players.map(_.copy(host = None)))
-}
+case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer])
 
 case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: String, state: String,
                     teams: List[JsonGameTeam], server: String, duration: Int) {
-  def withoutHosts = copy(teams = teams.map(team => team.withoutHosts))
+  def withoutHosts = transformPlayers((_, player) => player.copy(host = None))
+
+  def transformPlayers(f: (JsonGameTeam, JsonGamePlayer) => JsonGamePlayer) =
+    copy(teams = teams.map(team => team.copy(players = team.players.map(player => f(team, player)))))
+
   def toJson: JsObject = {
     Json.toJson(this)(JsonGame.fmt).asInstanceOf[JsObject]
   }
 
   import org.scalactic._
+
   def validate: JsonGame Or ErrorMessage = {
     def numberOfPlayers = teams.map(_.players.size).sum
     def averageFrags = teams.flatMap(_.players.map(_.frags)).sum / numberOfPlayers
-    if ( duration < 10 ) Bad(s"Duration is $duration, expecting at least 10")
-    else if ( numberOfPlayers < 4) Bad(s"Player count is $numberOfPlayers, expecting 4 or more.")
-    else if ( teams.size < 2 ) Bad(s"Expected team size >= 2, got ${teams.size}")
-    else if ( averageFrags < 15 ) Bad(s"Average frags $averageFrags, expected >= 15 ")
+    if (duration < 10) Bad(s"Duration is $duration, expecting at least 10")
+    else if (numberOfPlayers < 4) Bad(s"Player count is $numberOfPlayers, expecting 4 or more.")
+    else if (teams.size < 2) Bad(s"Expected team size >= 2, got ${teams.size}")
+    else if (averageFrags < 15) Bad(s"Average frags $averageFrags, expected >= 15 ")
     else Good(this)
   }
 }

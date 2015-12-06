@@ -2,12 +2,10 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$games = json_decode(file_get_contents("http://api.actionfps.com/recent/"), true);
-foreach($games as $game) {
-    if ( $game['id'] == $_GET['id'] ) {
-        ?>
-<div id="game"><?php
-        render_game($game); ?></div><?php
-    }
+$game = json_decode(file_get_contents("http://api.actionfps.com/game/?id=" . rawurlencode((string)$_GET['id'])), true);
+if ($game) {
+    ?>
+    <div id="game"><?php
+    render_game($game); ?></div><?php
 }
 echo $foot;

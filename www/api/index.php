@@ -12,6 +12,9 @@ require("../render_game.inc.php");
         <h2>Query the most recent games</h2>
         <pre><code><a href="http://api.actionfps.com/recent/" rel="nofollow" target="_blank">http://api.actionfps.com/recent/</a></code></pre>
 
+        <h2>Query a game by ID</h2>
+        <pre><code><a href="http://api.actionfps.com/game/?id=2015-12-05T23:48:55Z" rel="nofollow" target="_blank">http://api.actionfps.com/game/?id=2015-12-05T23:48:55Z</a></code></pre>
+
         <h2>Query clans</h2>
         <pre><code><a href="http://api.actionfps.com/clans/" rel="nofollow" target="_blank">http://api.actionfps.com/clans/</a></code></pre>
 

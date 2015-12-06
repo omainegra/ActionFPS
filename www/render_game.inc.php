@@ -7,8 +7,11 @@ function render_game_team_player($game, $team, $player)
             <span class="score flags"><?php echo $player['flags']; ?></span>
         <?php } ?>
         <span class="subscore frags"><?php echo $player['frags']; ?></span>
+        <?php if ( isset($player['user']) ) { ?>
+        <span class="name"><a href="/player/?id=<?php echo $player['user']; ?>"><?php echo htmlspecialchars($player['name']); ?></a></span>
+    <?php } else { ?>
         <span class="name"><?php echo htmlspecialchars($player['name']); ?></span>
-
+<?php } ?>
     </li>
     <?php
 }

@@ -7,3 +7,4 @@ GET         /achievements/:id/              @controllers.ApiMain.achievements(id
 GET         /user/:id/                      @controllers.ApiMain.userJson(id: String)
 GET         /user/:id/full/                 @controllers.ApiMain.fullUser(id: String)
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
+GET         /game/                          @controllers.ApiMain.game(id: String)

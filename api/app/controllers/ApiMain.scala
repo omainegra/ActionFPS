@@ -47,6 +47,13 @@ class ApiMain @Inject()(configuration: Configuration,
     Ok(Json.toJson(recordsService.clans))
   }
 
+  def game(id: String) = Action {
+    gamesService.allGames.get().find(_.id == id) match {
+      case Some(game) => Ok(game.toJson)
+      case None => NotFound("Game not found")
+    }
+  }
+
   def raw = Action {
     val enumerator = Enumerator
       .enumerate(gamesService.allGames.get())
