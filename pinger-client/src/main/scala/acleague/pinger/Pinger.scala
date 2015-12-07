@@ -13,7 +13,9 @@ object Pinger {
 import akka.actor.ActorDSL._
 
 class Pinger extends Act with ActorLogging {
+
   val serverStates = scala.collection.mutable.Map.empty[(String, Int), ServerStateMachine].withDefaultValue(NothingServerStateMachine)
+
   whenStarting {
     import context.system
     IO(Udp) ! Udp.Bind(self, new InetSocketAddress("0.0.0.0", 0))
@@ -40,9 +42,9 @@ class Pinger extends Act with ActorLogging {
           nextState match {
             case r: CompletedServerStateMachine =>
               val newStatus = r.toStatus(from._1, from._2)
-              context.system.eventStream.publish(newStatus)
+              context.parent ! newStatus
               val newStatus2 = r.toGameNow(from._1, from._2)
-              context.system.eventStream.publish(newStatus2)
+              context.parent ! newStatus2
               log.debug(s"Changed:  $r")
             case o =>
               log.debug(s"Unchanged: $o")
