@@ -21,11 +21,21 @@ $events = json_decode(file_get_contents("http://api.actionfps.com/events/"), tru
 
     </ol>
 
-</div><div id="games"><div id="existing-games"><?php
+</div><div id="games">
+
+    <div id="dynamic-games">
+
+    </div>
+
+
+    <div id="existing-games"><?php
 foreach($games as $game) {
     render_game($game);
 }
 
-?></div></div><?php
+?></div></div>
+
+<?php require("live/bits.inc.php"); ?>
+<?php
 
 echo $foot;
