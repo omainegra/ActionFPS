@@ -11,7 +11,8 @@ lazy val root =
       cubeProtocol,
       masterClient,
       masterServer,
-      referenceReader
+      referenceReader,
+      pingerClient
     ).dependsOn(
     achievements,
     logParser,
@@ -21,7 +22,8 @@ lazy val root =
     cubeProtocol,
     masterClient,
     masterServer,
-    referenceReader
+    referenceReader,
+    pingerClient
   )
 
 lazy val logParser =
@@ -57,6 +59,7 @@ lazy val api =
     .enablePlugins(PlayScala)
     .dependsOn(achievements)
     .dependsOn(referenceReader)
+    .dependsOn(pingerClient)
     .settings(dontDocument)
     .settings(libraryDependencies ++= akka("actor", "agent", "slf4j"))
     .settings(libraryDependencies ++= Seq(
@@ -138,4 +141,18 @@ lazy val referenceReader =
     base = file("reference-reader")
   ).settings(
     libraryDependencies += "org.apache.commons" % "commons-csv" % "1.1"
+  )
+
+lazy val pingerClient =
+  Project(
+    id = "pinger-client",
+    base = file("pinger-client")
+  ).settings(
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-actor" % "2.4.0",
+      "com.typesafe.akka" %% "akka-slf4j" % "2.4.0",
+      "com.typesafe.akka" %% "akka-testkit" % "2.4.0" % "test",
+      "commons-net" % "commons-net" % "3.3",
+      "joda-time" % "joda-time" % "2.9"
+    )
   )
