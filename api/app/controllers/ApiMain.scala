@@ -11,7 +11,7 @@ import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
 import play.api.mvc.{Action, Controller}
-import services.{AchievementsService, GamesService, RecordsService}
+import services.{PingerService, AchievementsService, GamesService, RecordsService}
 
 import scala.concurrent.ExecutionContext
 
@@ -19,13 +19,15 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ApiMain @Inject()(configuration: Configuration,
                         gamesService: GamesService,
-                       recordsService: RecordsService,
+                        recordsService: RecordsService,
+                        pingerService: PingerService,
                         achievementsService: AchievementsService)
                        (implicit executionContext: ExecutionContext) extends Controller {
 
   def recent = Action {
     Ok(JsArray(gamesService.allGames.get().takeRight(30).reverse.map(_.toJson)))
   }
+
   def recentClangames = Action {
     Ok(JsArray(gamesService.allGames.get().filter(_.clangame.isDefined).takeRight(30).reverse.map(_.toJson)))
   }
@@ -122,13 +124,20 @@ class ApiMain @Inject()(configuration: Configuration,
   def listNicknames() = Action { request =>
     val names = gamesService.allGames.get().flatMap(_.teams.flatMap(_.players)).map(_.name)
     val nameToCount = names.groupBy(identity).mapValues(_.length).toList.sortBy(_._2).reverse
-    if ( request.queryString.get("with").exists(_.contains("game-counts")) ) {
-      Ok(Json.toJson(nameToCount.map{ case (name, count) =>
-          JsObject(Map("name" -> JsString(name), "games" -> JsNumber(count))
-        )}))
+    if (request.queryString.get("with").exists(_.contains("game-counts"))) {
+      Ok(Json.toJson(nameToCount.map { case (name, count) =>
+        JsObject(Map("name" -> JsString(name), "games" -> JsNumber(count))
+        )
+      }))
     } else {
-      Ok(Json.toJson(nameToCount.map{case (name, count) => name}))
+      Ok(Json.toJson(nameToCount.map { case (name, count) => name }))
     }
+  }
+
+  def serverUpdates = Action {
+    Ok.feed(
+      content = pingerService.liveGamesEnum
+    ).as("text/event-stream")
   }
 
 }
