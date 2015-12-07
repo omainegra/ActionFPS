@@ -8,23 +8,60 @@ import akka.actor.{Props, Kill, ActorSystem}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, JsObject, Json}
+import play.api.libs.ws.WSClient
 
 import scala.concurrent.{Future, ExecutionContext}
+import scala.util.{Success, Failure}
 
 /**
   * Created by William on 07/12/2015.
   */
 @Singleton
 class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
-                              recordsService: RecordsService
+                              recordsService: RecordsService,
+                              wsClient: WSClient
                              )(implicit actorSystem: ActorSystem,
                                executionContext: ExecutionContext) {
 
   val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
 
-  val listenerActor = actor(factory = actorSystem, name = "pinger")(new PingerService.ListenerActor({ e =>
-    liveGamesChan.push(e)
+  implicit val spw = Json.writes[ServerPlayer]
+  implicit val stw = Json.writes[ServerTeam]
+  implicit val cgw = Json.writes[CurrentGame]
+  implicit val ssw = Json.writes[ServerStatus]
+  implicit val cgpw = Json.writes[CurrentGamePlayer]
+  implicit val cgtw = Json.writes[CurrentGameTeam]
+  implicit val cgnsw = Json.writes[CurrentGameNowServer]
+  implicit val cgnw = Json.writes[CurrentGameNow]
+  implicit val cgsw = Json.writes[CurrentGameStatus]
+  val listenerActor = actor(factory = actorSystem, name = "pinger")(new PingerService.ListenerActor({
+    a =>
+      liveGamesChan.push(
+        Event(
+          id = Option(a.server),
+          name = Option("server-status"),
+          data = Json.toJson(a).toString()
+        ))
+
+  }, { b =>
+    liveGamesChan.push(
+      Event(
+        id = Option(b.now.server.server),
+        name = Option("current-game-status"),
+        data = Json.toJson(b).toString()
+      )
+    )
+    wsClient.url("http://actionfps.com/live/render-fragment.php").post(Json.toJson(b)).foreach {
+      response =>
+        liveGamesChan.push(
+          Event(
+            id = Option(b.now.server.server),
+            name = Option("current-game-status-fragment"),
+            data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(response.body)).toString()
+          )
+        )
+    }
   }))
 
   import concurrent.duration._
@@ -43,21 +80,12 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
 object PingerService {
 
-  implicit val spw = Json.writes[ServerPlayer]
-  implicit val stw = Json.writes[ServerTeam]
-  implicit val cgw = Json.writes[CurrentGame]
-  implicit val ssw = Json.writes[ServerStatus]
-  implicit val cgpw = Json.writes[CurrentGamePlayer]
-  implicit val cgtw = Json.writes[CurrentGameTeam]
-  implicit val cgnsw = Json.writes[CurrentGameNowServer]
-  implicit val cgnw = Json.writes[CurrentGameNow]
-  implicit val cgsw = Json.writes[CurrentGameStatus]
 
   object ListenerActor {
-    def props(g: Event => Unit) = Props(new ListenerActor(g))
+    def props(g: ServerStatus => Unit, h: CurrentGameStatus => Unit) = Props(new ListenerActor(g, h))
   }
 
-  class ListenerActor(g: Event => Unit) extends Act {
+  class ListenerActor(g: ServerStatus => Unit, h: CurrentGameStatus => Unit) extends Act {
 
     val pingerActor = context.actorOf(name = "pinger", props = Pinger.props)
 
@@ -65,17 +93,9 @@ object PingerService {
       case sp: SendPings =>
         pingerActor ! sp
       case a: ServerStatus =>
-        g(Event(
-          id = Option(a.server),
-          name = Option("server-status"),
-          data = Json.toJson(a).toString()
-        ))
+        g(a)
       case b: CurrentGameStatus =>
-        g(Event(
-          id = Option(b.now.server.server),
-          name = Option("current-game-status"),
-          data = Json.toJson(b).toString()
-        ))
+        h(b)
     }
   }
 
