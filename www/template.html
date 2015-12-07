@@ -67,7 +67,8 @@
     })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
     ga('create', 'UA-71093306-1', 'auto');
-    var userId = /id=(.+)$/.exec(document.querySelector("#log-in").getAttribute("href")).pop();
+    var uu = /id=(.+)$/.exec(document.querySelector("#log-in").getAttribute("href"));
+    var userId = uu ? uu.pop() : null;
     if (userId) {
         ga('set', 'user', userId);
         ga('set', 'loggedin', 'true');
