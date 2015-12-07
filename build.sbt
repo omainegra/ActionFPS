@@ -65,7 +65,8 @@ lazy val api =
     .settings(libraryDependencies ++= Seq(
       "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
       "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
-      "commons-io" % "commons-io" % "2.4"
+      "commons-io" % "commons-io" % "2.4",
+      filters
     ))
 
 
