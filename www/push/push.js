@@ -11,7 +11,8 @@
         var url = "assaultcube://" + json.server;
         var options = {
             icon: 'https://assault.cubers.net/docs/images/ac_knife.gif',
-            body: json.name + ' calls an inter. Click to join!'
+            body: json.name + ' calls an inter. Click to join!',
+            requireInteraction: true
         };
         var notification = new Notification("Inter on " + serverName.toUpperCase(), options);
         notification.onclick = function() {
