@@ -54,6 +54,8 @@ function render_game($game)
     <article
         class="GameCard game <?php if (isset($game['now'])) {
             echo "isLive";
+        } ?>  <?php if (isset($game['isNew']) && $game['isNew']) {
+            echo "isNew";
         } ?> "
         style="background-image: url('http://woop.ac/assets/maps/<?php echo htmlspecialchars($game['map']); ?>.jpg');">
         <div class="w">

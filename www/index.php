@@ -27,6 +27,8 @@ $events = json_decode(file_get_contents("http://api.actionfps.com/events/"), tru
 
     </div>
 
+    <div id="new-games"></div>
+
 
     <div id="existing-games"><?php
 foreach($games as $game) {
