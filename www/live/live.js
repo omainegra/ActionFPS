@@ -37,7 +37,7 @@
     }, false);
 
 
-    var newGamesSource = new EventSource("http://localhost:9000/new-games/");
+    var newGamesSource = new EventSource("http://api.actionfps.com/new-games/");
     newGamesSource.addEventListener("new-game", function(event) {
         var game = JSON.parse(event.data);
         var gameId = game.id;
