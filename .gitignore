@@ -56,3 +56,7 @@ build.log
 
 #SHITTY output not in target directory
 build.log
+
+.cache-main
+.classpath
+.project

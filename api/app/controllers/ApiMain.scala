@@ -11,7 +11,7 @@ import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
 import play.api.mvc.{Action, Controller}
-import services.{PingerService, AchievementsService, GamesService, RecordsService}
+import services._
 
 import scala.concurrent.ExecutionContext
 
@@ -21,6 +21,7 @@ class ApiMain @Inject()(configuration: Configuration,
                         gamesService: GamesService,
                         recordsService: RecordsService,
                         pingerService: PingerService,
+                        intersService: IntersService,
                         achievementsService: AchievementsService)
                        (implicit executionContext: ExecutionContext) extends Controller {
 
@@ -137,6 +138,12 @@ class ApiMain @Inject()(configuration: Configuration,
   def serverUpdates = Action {
     Ok.feed(
       content = pingerService.liveGamesEnum
+    ).as("text/event-stream")
+  }
+
+  def inters = Action {
+    Ok.feed(
+      content = intersService.intersEnum
     ).as("text/event-stream")
   }
 

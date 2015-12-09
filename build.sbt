@@ -12,7 +12,8 @@ lazy val root =
       masterClient,
       masterServer,
       referenceReader,
-      pingerClient
+      pingerClient,
+      interParser
     ).dependsOn(
     achievements,
     logParser,
@@ -23,7 +24,8 @@ lazy val root =
     masterClient,
     masterServer,
     referenceReader,
-    pingerClient
+    pingerClient,
+    interParser
   )
 
 lazy val logParser =
@@ -60,6 +62,7 @@ lazy val api =
     .dependsOn(achievements)
     .dependsOn(referenceReader)
     .dependsOn(pingerClient)
+    .dependsOn(interParser)
     .settings(dontDocument)
     .settings(libraryDependencies ++= akka("actor", "agent", "slf4j"))
     .settings(libraryDependencies ++= Seq(
@@ -93,6 +96,12 @@ lazy val demoParser =
       "commons-io" % "commons-io" % "2.4"
     )
     )
+
+lazy val interParser =
+  Project(
+    id = "inter-parser",
+    base = file("inter-parser")
+  )
 
 
 lazy val cubeProtocol =
