@@ -22,6 +22,7 @@ class ApiMain @Inject()(configuration: Configuration,
                         recordsService: RecordsService,
                         pingerService: PingerService,
                         intersService: IntersService,
+                       newGamesService: NewGamesService,
                         achievementsService: AchievementsService)
                        (implicit executionContext: ExecutionContext) extends Controller {
 
@@ -144,6 +145,12 @@ class ApiMain @Inject()(configuration: Configuration,
   def inters = Action {
     Ok.feed(
       content = intersService.intersEnum
+    ).as("text/event-stream")
+  }
+
+  def newGames = Action {
+    Ok.feed(
+      content = newGamesService.newGamesEnum
     ).as("text/event-stream")
   }
 
