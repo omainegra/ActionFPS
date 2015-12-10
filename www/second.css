@@ -1,8 +1,19 @@
-#tlkio {
-    position:fixed;
-    bottom:0;
-    right:0;
-    height:50vh;
-    width:35vh;
-    background:#333;
+.GameCard .dm-players {
+    font-size:1.3em;
+}
+.GameCard .dm-players ul {
+    list-style-type: none;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.GameCard .dm-players li {
+    display: inline-block;
+    margin: 0 0.2em;
+    padding: 0;
 }

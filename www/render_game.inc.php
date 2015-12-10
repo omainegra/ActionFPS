@@ -108,24 +108,22 @@ function render_game($game)
                 }
                 ?>
             </div>
+            <?php if (isset($game['players']) && is_array($game['players']) && !empty($game['players'])) { ?>
+                <div class="dm-players">
+                    <ul>
+                        <?php foreach ($game['players'] as $player) { ?>
+                            <li><span><?php echo htmlspecialchars($player); ?></span></li>
+                        <?php } ?>
+                    </ul>
+                </div>
+            <?php } ?>
             <?php if (isset($game['spectators']) && !empty($game['spectators'])) { ?>
                 <div class="spectators">
                     <h4>Spectators:</h4>
                     <ul>
                         <?php foreach ($game['spectators'] as $spectator) {
                             ?>
-                            <li><?php
-                                if (isset($spectator['user'])) { ?>
-                                    <a href="/player/?id=<?php echo rawurlencode($spectator['user']); ?>">
-                                        <?php echo htmlspecialchars($spectator['name']); ?>
-                                    </a>
-                                    <?php
-                                } else {
-                                    ?><span><?php echo htmlspecialchars($spectator['name']); ?></span><?php
-                                }
-
-                                ?>
-                            </li>
+                            <li><span><?php echo htmlspecialchars($spectator); ?></span></li>
                         <?php } ?>
                     </ul>
                 </div>

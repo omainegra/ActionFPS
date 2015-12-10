@@ -33,7 +33,7 @@ class RecordsReader @Inject()(configuration: Configuration) {
     lib.clans.Clan(
       id = clan.id,
       name = clan.shortName,
-      `full name` = clan.longName,
+      fullName = clan.longName,
       tag = if (clan.tag2.nonEmpty) None else Option(clan.tag),
       tags = if (clan.tag2.isEmpty) None else Option(List(clan.tag) ++ clan.tag2),
       website = clan.website.map(_.toString)

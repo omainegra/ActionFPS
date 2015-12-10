@@ -21,6 +21,8 @@ package object pinger {
     "ctf", "hunt the flag", "team keep the flag", "keep the flag"
   )
 
+  val specTeams = Set("SPECTATOR", "SPEC", "CSPEC", "RSPEC")
+
   val teamModes = Set(0, 4, 5, 7, 11, 13, 14, 16, 17, 20, 21)
 
   case class SendPings(ip: String, port: Int)
@@ -41,7 +43,6 @@ package object pinger {
     }
   }
 
-
   case class ServerStatus(server: String, connectName: String, canonicalName: String, shortName: String, description: String, maxClients: Int, updatedTime: String, game: Option[CurrentGame])
 
   case class CurrentGame(mode: String, map: String, minRemain: Int, numClients: Int, teams: Option[Map[String, ServerTeam]], players: Option[List[ServerPlayer]])
@@ -50,7 +51,18 @@ package object pinger {
 
   case class ServerPlayer(name: String, ping: Int, frags: Int, flags: Option[Int], isAdmin: Boolean, state: String, ip: String)
 
-  case class CurrentGameStatus(when: String = "right now", reasonablyActive: Boolean, now: CurrentGameNow, hasFlags: Boolean, map: Option[String], mode: Option[String], minRemain: Int, teams: List[CurrentGameTeam], updatedTime: String, players: Option[List[String]])
+  case class CurrentGameStatus
+  (when: String = "right now",
+   reasonablyActive: Boolean,
+   now: CurrentGameNow,
+   hasFlags: Boolean,
+   map: Option[String],
+   mode: Option[String],
+   minRemain: Int,
+   teams: List[CurrentGameTeam],
+   updatedTime: String,
+   players: Option[List[String]],
+   spectators: Option[List[String]])
 
   case class CurrentGameTeam(name: String, flags: Option[Int], frags: Int, players: List[CurrentGamePlayer])
 
