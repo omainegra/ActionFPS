@@ -17,3 +17,6 @@
     margin: 0 0.2em;
     padding: 0;
 }
+.LiveEvents.live-events li a  {
+    width:!important 26em;
+}
