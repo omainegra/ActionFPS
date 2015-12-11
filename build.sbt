@@ -6,7 +6,7 @@ lazy val root =
     base = file(".")
   )
     .aggregate(
-      logParser,
+      gameParser,
       achievements,
       api,
       referenceReader,
@@ -15,7 +15,7 @@ lazy val root =
       master
     ).dependsOn(
     achievements,
-    logParser,
+    gameParser,
     api,
     referenceReader,
     pingerClient,
@@ -48,10 +48,10 @@ lazy val api =
       ws
     ))
 
-lazy val logParser =
+lazy val gameParser =
   Project(
-    id = "log-parser",
-    base = file("log-parser")
+    id = "game-parser",
+    base = file("game-parser")
   )
     .enablePlugins(JavaAppPackaging)
     .enablePlugins(RpmPlugin)
@@ -74,7 +74,7 @@ lazy val achievements =
       "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
       "commons-net" % "commons-net" % "3.3"
     )
-  ).dependsOn(logParser)
+  ).dependsOn(gameParser)
 
 lazy val interParser =
   Project(
