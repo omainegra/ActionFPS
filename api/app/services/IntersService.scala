@@ -43,7 +43,7 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
             val isNotExpired = oldState.canAdd(interCall)
             userIsRegistered && isNotExpired
           }
-          logger.info(s"Received interCall. Allowed? $allowed")
+          logger.info(s"Received $interCall. Allowed? $allowed")
           if (allowed) {
             thing.push(Event(
               id = Option(interCall.time.toString),
