@@ -23,7 +23,7 @@ require("../render_game.inc.php");
     <h2>AssaultCube</h2>
     <iframe width="560" height="315" src="//www.youtube-nocookie.com/embed/1k5sI1Rz558?rel=0" frameborder="0" allowfullscreen></iframe>
     <h2>I'd like to talk to you</h2>
-    <p>Find us on <a href="http://www.teamspeak.com/?page=downloads">TeamSpeak</a> at our server <a href="ts3server://aura.actionfps" target="_blank">&quot;aura.actionfps&quot;</a>.</p>
+    <p>Find us on <a href="http://www.teamspeak.com/?page=downloads">TeamSpeak</a> at our server <a href="ts3server://aura.woop.ac:9988" target="_blank">&quot;aura.actionfps&quot;</a>.</p>
     <p>Also join us on <a href="https://webchat.gamesurge.net/?channels=woop-clan">#woop-clan @ GameSurge</a> IRC channel.</p>
     <h2>Which servers do you record from?</h2>
     <p>See the <a href="/servers/">servers</a> page.</p>
@@ -31,10 +31,25 @@ require("../render_game.inc.php");
     <p>Be fair.</p>
     <h2>What are your plans?</h2>
     <p>Expand. We want your participation.</p>
+    <h2 id="what-is-the-matchclient"><a href="#what-is-the-matchclient">What is the MatchClient?</a></h2>
+    <p>The MatchClient is a custom client we made to better suits the needs of clanwars. 
+    With it you will be able to access compatible servers that support features like <strong>/pause</strong>!</p>
+    <h2>Why should I <a href="/login/">register</a>?</h2>
+    <p>When registering, it creates your profile page where you can find statistics about all your games on our servers. 
+    You will also unlock achievements while playing!</p>
     <h2>Why Google sign in?</h2>
     <p>Saves us time in development.</p>
-    <h2>Why is the homepage slow?</h2>
-    <p>It's fast on Google Chrome. We are using Polymer/Web Components which save us time.</p>
+    <h2 id="can-i-change-name"><a href="#can-i-change-name">Can I change the in-game name i picked while registering?</a></h2>
+    <p>In the current state you are not able to change it. 
+        However if the name change is necessary (i.e joined or left a clan..) then you can make a post on the <a href="https://groups.google.com/forum/#!forum/actionfps" target="_blank">forum</a> and we will do it for you. </p>
+    <h2>Why are some games circled with blue on the frontpage?</h2>
+    <p>This means that the games are happenning right now ! The real time game display allows you to see the score of a game in real time on your browser!</p>
+    <h2 id="should-i-accept-notifications"><a href="#should-i-accept-notifications">Should I accept notifications?</a></h2>
+    <p>Yes! When you are registered on the website, you are able to use an inter finding feature we created. Go on any of our <a href="/servers/">servers</a>, then type <strong>!inter.</strong>
+        This will send a notification on people's browser with a link to join the inter. There is a spam protection, doing it once is enough.</p>
+     <h2 id="how-can-i-support"><a href="#how-can-i-support">How can I support the project?</a></h2>
+    <p>By registering and playing ! You can also post your ideas and feedback on the forum. Don't hesitate to report any <a href="https://github.com/ScalaWilliam/ActionFPS/issues" target="_blank">issue</a> you have.
+        If you are willing to be actively participating in the development then join on on Gitter! </p>
 </article>
 
 <?php echo $foot; ?>
