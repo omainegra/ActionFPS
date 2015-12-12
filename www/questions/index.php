@@ -44,9 +44,9 @@ require("../render_game.inc.php");
     However if the name change is necessary (i.e joined or left a clan..) then you can contact Sanzo that will do it for you. </p>
     <h2>Why are some games circled with blue on the frontpage?</h2>
     <p>This means that the games are happenning right now ! The real time game display allows you to see the score of a game in real time on your browser!</p>
-    <p>Should i accept notifications?</p>
-    <h2>Yes ! When you are registered on the website, you are able to use an inter finding feature we created. Go on any of our servers, then type "!inter".
-        This will send a notification on people's browser with a link to join the inter. There is a spam protection, doing it once is enough.</h2>
+    <h2>Should i accept notifications?</h2>
+    <hp>Yes ! When you are registered on the website, you are able to use an inter finding feature we created. Go on any of our servers, then type "!inter".
+        This will send a notification on people's browser with a link to join the inter. There is a spam protection, doing it once is enough.</p>
      <h2>How can i support the project?</h2>
     <p>By registering and playing ! You can also post your ideas and feedback on the forum. Don't hesitate to report any bugs you find or any issue you have.
         If you are willing to be actively participating in the development then join on on Gitter! </p>
