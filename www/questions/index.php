@@ -31,23 +31,23 @@ require("../render_game.inc.php");
     <p>Be fair.</p>
     <h2>What are your plans?</h2>
     <p>Expand. We want your participation.</p>
-    <h2>What is the match client?</h2>
-    <p>The match client is a custom client we made to better suits the needs of clanwars. 
+    <h2>What is the MatchClient?</h2>
+    <p>The MatchClient is a custom client we made to better suits the needs of clanwars. 
     With it you will be able to access compatible servers that support features like /pause !</p>
-    <h2>Why should i register?</h2>
+    <h2>Why should I register?</h2>
     <p>When registering, it creates your profile page where you can find statistics about all your games on our servers. 
     You will also unlock achievements while playing!</p>
     <h2>Why Google sign in?</h2>
     <p>Saves us time in development.</p>
-    <h2>Can i change the in-game name i picked while registering?</h2>
+    <h2>Can I change the in-game name i picked while registering?</h2>
     <p>In the current state you are not able to change it. 
     However if the name change is necessary (i.e joined or left a clan..) then you can contact Sanzo that will do it for you. </p>
     <h2>Why are some games circled with blue on the frontpage?</h2>
     <p>This means that the games are happenning right now ! The real time game display allows you to see the score of a game in real time on your browser!</p>
-    <h2>Should i accept notifications?</h2>
-    <hp>Yes ! When you are registered on the website, you are able to use an inter finding feature we created. Go on any of our servers, then type "!inter".
+    <h2>Should I accept notifications?</h2>
+    <hp>Yes! When you are registered on the website, you are able to use an inter finding feature we created. Go on any of our servers, then type "!inter".
         This will send a notification on people's browser with a link to join the inter. There is a spam protection, doing it once is enough.</p>
-     <h2>How can i support the project?</h2>
+     <h2>How can I support the project?</h2>
     <p>By registering and playing ! You can also post your ideas and feedback on the forum. Don't hesitate to report any bugs you find or any issue you have.
         If you are willing to be actively participating in the development then join on on Gitter! </p>
 </article>
