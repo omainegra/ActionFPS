@@ -4,7 +4,7 @@ import javax.inject._
 
 import akka.actor.ActorDSL._
 import acleague.pinger._
-import akka.actor.{Props, Kill, ActorSystem}
+import akka.actor.{ActorLogging, Props, Kill, ActorSystem}
 import play.api.{Logger, Configuration}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
@@ -93,7 +93,9 @@ object PingerService {
     def props(g: ServerStatus => Unit, h: CurrentGameStatus => Unit) = Props(new ListenerActor(g, h))
   }
 
-  class ListenerActor(g: ServerStatus => Unit, h: CurrentGameStatus => Unit) extends Act {
+  class ListenerActor(g: ServerStatus => Unit, h: CurrentGameStatus => Unit) extends Act with ActorLogging {
+
+    log.info("Starting listener actor for pinger service...")
 
     val pingerActor = context.actorOf(name = "pinger", props = Pinger.props)
 
