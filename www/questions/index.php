@@ -3,7 +3,7 @@ require_once("../render.inc.php");
 require("../render_game.inc.php");
 ?>
 <article id="questions">
-    <h2>What is this?</h2>
+    <h2 id="what-is">What is this?</h2>
     <p>This is a clan match recording system for <a href="http://woop.us/" target="_blank">Woop Clan's</a> <a href="http://assault.cubers.net/" target="_blank">AssaultCube</a> servers.</p>
     <h2>Is this project open source?</h2>
     <p>Yes, see GitHub: <a href="http://github.com/ScalaWilliam/actionfps" target="_blank">ScalaWilliam/actionfps</a>. Contributions, issues, pull requests are welcome.</p>
