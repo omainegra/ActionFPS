@@ -23,7 +23,7 @@ require("../render_game.inc.php");
     <h2>AssaultCube</h2>
     <iframe width="560" height="315" src="//www.youtube-nocookie.com/embed/1k5sI1Rz558?rel=0" frameborder="0" allowfullscreen></iframe>
     <h2>I'd like to talk to you</h2>
-    <p>Find us on <a href="http://www.teamspeak.com/?page=downloads">TeamSpeak</a> at our server <a href="ts3server://aura.wwop.ac:9988" target="_blank">&quot;aura.actionfps&quot;</a>.</p>
+    <p>Find us on <a href="http://www.teamspeak.com/?page=downloads">TeamSpeak</a> at our server <a href="ts3server://aura.woop.ac:9988" target="_blank">&quot;aura.actionfps&quot;</a>.</p>
     <p>Also join us on <a href="https://webchat.gamesurge.net/?channels=woop-clan">#woop-clan @ GameSurge</a> IRC channel.</p>
     <h2>Which servers do you record from?</h2>
     <p>See the <a href="/servers/">servers</a> page.</p>
