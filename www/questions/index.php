@@ -47,7 +47,7 @@ require("../render_game.inc.php");
     <h2 id="should-i-accept-notifications"><a href="#should-i-accept-notifications">Should I accept notifications?</a></h2>
     <p>Yes! When you are registered on the website, you are able to use an inter finding feature we created. Go on any of our <a href="/servers/">servers</a>, then type <strong>!inter.</strong>
         This will send a notification on people's browser with a link to join the inter. There is a spam protection, doing it once is enough.</p>
-     <h2>How can I support the project?</h2>
+     <h2 id="how-can-i-support"><a href="#how-can-i-support">How can I support the project?</a></h2>
     <p>By registering and playing ! You can also post your ideas and feedback on the forum. Don't hesitate to report any <a href="https://github.com/ScalaWilliam/ActionFPS/issues" target="_blank">issue</a> you have.
         If you are willing to be actively participating in the development then join on on Gitter! </p>
 </article>
