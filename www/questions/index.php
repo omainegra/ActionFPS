@@ -31,7 +31,7 @@ require("../render_game.inc.php");
     <p>Be fair.</p>
     <h2>What are your plans?</h2>
     <p>Expand. We want your participation.</p>
-    <h2>What is the MatchClient?</h2>
+    <h2 id="what-is-the-matchclient"><a href="#what-is-the-matchclient">What is the MatchClient?</a></h2>
     <p>The MatchClient is a custom client we made to better suits the needs of clanwars. 
     With it you will be able to access compatible servers that support features like <strong>/pause</strong>!</p>
     <h2>Why should I <a href="/login/">register</a>?</h2>
@@ -39,7 +39,7 @@ require("../render_game.inc.php");
     You will also unlock achievements while playing!</p>
     <h2>Why Google sign in?</h2>
     <p>Saves us time in development.</p>
-    <h2>Can I change the in-game name i picked while registering?</h2>
+    <h2 id="can-i-change-name"><a href="#can-i-change-name">Can I change the in-game name i picked while registering?</a></h2>
     <p>In the current state you are not able to change it. 
         However if the name change is necessary (i.e joined or left a clan..) then you can make a post on the <a href="https://groups.google.com/forum/#!forum/actionfps" target="_blank">forum</a> and we will do it for you. </p>
     <h2>Why are some games circled with blue on the frontpage?</h2>
