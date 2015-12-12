@@ -44,7 +44,7 @@ require("../render_game.inc.php");
         However if the name change is necessary (i.e joined or left a clan..) then you can make a post on the <a href="https://groups.google.com/forum/#!forum/actionfps" target="_blank">forum</a> and we will do it for you. </p>
     <h2>Why are some games circled with blue on the frontpage?</h2>
     <p>This means that the games are happenning right now ! The real time game display allows you to see the score of a game in real time on your browser!</p>
-    <h2>Should I accept notifications?</h2>
+    <h2 id="should-i-accept-notifications"><a href="#should-i-accept-notifications">Should I accept notifications?</a></h2>
     <p>Yes! When you are registered on the website, you are able to use an inter finding feature we created. Go on any of our <a href="/servers/">servers</a>, then type <strong>!inter.</strong>
         This will send a notification on people's browser with a link to join the inter. There is a spam protection, doing it once is enough.</p>
      <h2>How can I support the project?</h2>
