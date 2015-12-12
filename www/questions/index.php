@@ -33,22 +33,22 @@ require("../render_game.inc.php");
     <p>Expand. We want your participation.</p>
     <h2>What is the MatchClient?</h2>
     <p>The MatchClient is a custom client we made to better suits the needs of clanwars. 
-    With it you will be able to access compatible servers that support features like /pause !</p>
-    <h2>Why should I register?</h2>
+    With it you will be able to access compatible servers that support features like <strong>/pause</strong>!</p>
+    <h2>Why should I <a href="/login/">register</a>?</h2>
     <p>When registering, it creates your profile page where you can find statistics about all your games on our servers. 
     You will also unlock achievements while playing!</p>
     <h2>Why Google sign in?</h2>
     <p>Saves us time in development.</p>
     <h2>Can I change the in-game name i picked while registering?</h2>
     <p>In the current state you are not able to change it. 
-        However if the name change is necessary (i.e joined or left a clan..) then you can contact Sanzo that will do it for you. </p>
+        However if the name change is necessary (i.e joined or left a clan..) then you can make a post on the <a href="https://groups.google.com/forum/#!forum/actionfps" target="_blank">forum</a> and we will do it for you. </p>
     <h2>Why are some games circled with blue on the frontpage?</h2>
     <p>This means that the games are happenning right now ! The real time game display allows you to see the score of a game in real time on your browser!</p>
-  <h2 id="should-i-accept-notifications"><a href="#should-i-accept-notifications">Should I accept notifications?</a></h2>
-    <hp>Yes! When you are registered on the website, you are able to use an inter finding feature we created. Go on any of our <a href="/servers/">servers</a>, then type <strong>!inter.</strong>
+    <h2>Should I accept notifications?</h2>
+    <p>Yes! When you are registered on the website, you are able to use an inter finding feature we created. Go on any of our <a href="/servers/">servers</a>, then type <strong>!inter.</strong>
         This will send a notification on people's browser with a link to join the inter. There is a spam protection, doing it once is enough.</p>
      <h2>How can I support the project?</h2>
-    <p>By registering and playing ! You can also post your ideas and feedback on the forum. Don't hesitate to report any bugs you find or any issue you have.
+    <p>By registering and playing ! You can also post your ideas and feedback on the forum. Don't hesitate to report any <a href="https://github.com/ScalaWilliam/ActionFPS/issues" target="_blank">issue</a> you have.
         If you are willing to be actively participating in the development then join on on Gitter! </p>
 </article>
 
