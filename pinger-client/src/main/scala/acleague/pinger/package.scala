@@ -21,7 +21,7 @@ package object pinger {
     "ctf", "hunt the flag", "team keep the flag", "keep the flag"
   )
 
-  val specTeams = Set("SPECTATOR", "SPEC", "CSPEC", "RSPEC")
+  val activeTeams = Set("CLA", "RVSF")
 
   val teamModes = Set(0, 4, 5, 7, 11, 13, 14, 16, 17, 20, 21)
 
