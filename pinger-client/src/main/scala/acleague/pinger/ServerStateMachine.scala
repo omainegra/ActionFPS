@@ -74,7 +74,7 @@ case class CompletedServerStateMachine(serverInfoReply: ServerInfoReply, playerI
         frags = frags,
         players = for {
           p <- playerInfoReplies.sortBy(x => (x.flagScore, x.frags)).reverse
-          if p.team == name
+          if p.team.contains(name)
         } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_>=0), frags = p.frags)
       )).toList
     )
