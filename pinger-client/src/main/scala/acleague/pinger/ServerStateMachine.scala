@@ -68,6 +68,7 @@ case class CompletedServerStateMachine(serverInfoReply: ServerInfoReply, playerI
       spectators = Option(playerInfoReplies.filter(pi => specTeams.contains(pi.team)).map(_.name)).filter(_.nonEmpty),
       teams = (for {
         TeamScore(name, frags, flags) <- teamInfos.toSeq.flatMap(_.teams)
+        if !specTeams.contains(name)
       } yield CurrentGameTeam(
         name = name,
         flags = Option(flags).filter(_ >= 0),
