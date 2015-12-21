@@ -47,6 +47,13 @@ case class PartialServerStateMachine(serverInfoReplyO: Option[ServerInfoReply] =
 
 case class CompletedServerStateMachine(serverInfoReply: ServerInfoReply, playerInfoReplies: List[PlayerInfoReply], teamInfos: Option[TeamInfos]) extends ServerStateMachine {
   override def next(input: ParsedResponse) = NothingServerStateMachine.next(input)
+  
+  def spectators() : Option[List[String]] = {
+      if(teamModes.contains(serverInfoReply.mode))
+          Option(playerInfoReplies.filter(pi => Set("SPECTATOR", "SPEC").contains(pi.team)).map(_.name)).filter(_.nonEmpty)
+      else
+          Option(playerInfoReplies.filter(pi => !activeTeams.contains(pi.team)).map(_.name)).filter(_.nonEmpty)
+  }
 
   def toGameNow(ip: String, port: Int) =
     CurrentGameStatus(
@@ -65,7 +72,7 @@ case class CompletedServerStateMachine(serverInfoReply: ServerInfoReply, playerI
       mode = modes.get(serverInfoReply.mode),
       minRemain = serverInfoReply.minRemain,
       players = if ( teamInfos.nonEmpty ) None else Option(playerInfoReplies.filter(pi => activeTeams.contains(pi.team)).map(_.name)).filter(_.nonEmpty),
-      spectators = Option(playerInfoReplies.filter(pi => !activeTeams.contains(pi.team)).map(_.name)).filter(_.nonEmpty),
+      spectators = spectators(),
       teams = (for {
         TeamScore(name, frags, flags) <- teamInfos.toSeq.flatMap(_.teams)
         if activeTeams.contains(name)
@@ -75,8 +82,12 @@ case class CompletedServerStateMachine(serverInfoReply: ServerInfoReply, playerI
         frags = frags,
         players = for {
           p <- playerInfoReplies.sortBy(x => (x.flagScore, x.frags)).reverse
-          if p.team.contains(name)
-        } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_>=0), frags = p.frags)
+          if p.team == name
+        } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_>=0), frags = p.frags),
+        spectators = Option(for {
+          p <- playerInfoReplies.sortBy(x => (x.flagScore, x.frags)).reverse
+          if (p.team.contains(name) && !activeTeams.contains(p.team))
+        } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_>=0), frags = p.frags))
       )).toList
     )
 

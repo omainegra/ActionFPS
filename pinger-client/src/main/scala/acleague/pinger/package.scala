@@ -64,7 +64,7 @@ package object pinger {
    players: Option[List[String]],
    spectators: Option[List[String]])
 
-  case class CurrentGameTeam(name: String, flags: Option[Int], frags: Int, players: List[CurrentGamePlayer])
+  case class CurrentGameTeam(name: String, flags: Option[Int], frags: Int, players: List[CurrentGamePlayer], spectators: Option[List[CurrentGamePlayer]])
 
   case class CurrentGamePlayer(name: String, flags: Option[Int], frags: Int)
 
