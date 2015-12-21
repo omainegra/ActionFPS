@@ -35,12 +35,10 @@ function render_game_team($game, $team)
         <ol><?php foreach ($team['players'] as $player) {
                 render_game_team_player($game, $team, $player);
             } ?>
-        </ol>
-        <?php if(isset($team['spectators'])) foreach($team['spectators'] as $spectator) { ?>
-            <ol>
-                <?php render_game_team_player($game, $team, $spectator, true); ?>
-            </ol>
-        <?php } ?>
+            <?php foreach ((isset($team['spectators']) ? $team['spectators'] : []) as $spectator) {
+                render_game_team_player($game, $team, $spectator, true);
+            } ?>
+        </ol
     </div>
     </div><?php
 
