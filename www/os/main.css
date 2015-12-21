@@ -362,6 +362,9 @@ code {
   padding: 0.2em;
   padding-left: 0.5em;
 }
+.GameCard .players ol li.spectator {
+    color: gray;
+}
 .GameCard .players ol li > * {
   display: inline-block;
 }

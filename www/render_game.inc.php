@@ -1,8 +1,8 @@
 <?php
-function render_game_team_player($game, $team, $player)
+function render_game_team_player($game, $team, $player, $spectator = false)
 {
     ?>
-    <li>
+    <li class="<?php echo $spectator ? "spectator" : "player" ?>">
         <?php if (isset($player['flags'])) { ?>
             <span class="score flags"><?php echo $player['flags']; ?></span>
         <?php } ?>
@@ -36,6 +36,11 @@ function render_game_team($game, $team)
                 render_game_team_player($game, $team, $player);
             } ?>
         </ol>
+        <?php if(isset($team['spectators'])) foreach($team['spectators'] as $spectator) { ?>
+            <ol>
+                <?php render_game_team_player($game, $team, $spectator, true); ?>
+            </ol>
+        <?php } ?>
     </div>
     </div><?php
 
