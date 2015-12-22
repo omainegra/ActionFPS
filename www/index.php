@@ -28,6 +28,8 @@ $events = json_decode(file_get_contents("http://api.actionfps.com/events/"), tru
     </div>
 
     <div id="new-games"></div>
+    
+    <div id="latest-clanwar"><?php echo file_get_contents('http://woop.ac:81/html/latest-clanwars/') ?></div>
 
 
     <div id="existing-games"><?php
