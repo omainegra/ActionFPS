@@ -38,7 +38,7 @@ function render_game_team($game, $team)
             <?php foreach ((isset($team['spectators']) ? $team['spectators'] : []) as $spectator) {
                 render_game_team_player($game, $team, $spectator, true);
             } ?>
-        </ol
+        </ol>
     </div>
     </div><?php
 
