@@ -3,5 +3,5 @@ div[role='main'] {
 }
 
 .GameCard.game {
-    44em;
+    width: 44em;
 }
