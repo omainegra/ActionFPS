@@ -1,0 +1,6 @@
+vendor
+*~
+*.lock
+all.tsv
+api/clans.json
+data/
