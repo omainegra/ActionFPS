@@ -32,7 +32,7 @@ case class PlayerState(combined: NotAchievedAchievements,
         CompletedAchievement(
           title = achievement.title,
           description = achievement.description,
-          at = ZonedDateTime.parse(date),
+          at = date,
           extra = PartialFunction.condOpt(achievement) {
             case captureMaster: CaptureMaster => captureMaster.jsonTable
           }
@@ -74,7 +74,7 @@ case class AchievementsRepresentation(completedAchievements: List[CompletedAchie
                                       partialAchievements: List[PartialAchievement],
                                       switchNotAchieveds: List[SwitchNotAchieved])
 
-case class CompletedAchievement(title: String, description: String, at: ZonedDateTime, extra: Option[JsObject])
+case class CompletedAchievement(title: String, description: String, at: String, extra: Option[JsObject])
 
 case class PartialAchievement(title: String, description: String, percent: Int, extra: Option[JsObject])
 

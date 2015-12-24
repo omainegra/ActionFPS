@@ -63,8 +63,8 @@ function completed_achievement($achievement)
     ?>
                     <p
 } class="achieved-on">
-                    <time is="relative-time" datetime="<?php echo $achievement['at']; ?>">
-                        <?php echo $achievement['at']; ?>                    </time>
+                    <a href="/game/?id=<?php echo htmlspecialchars($achievement['at']); ?>"><time is="relative-time" datetime="<?php echo $achievement['at']; ?>">
+                        <?php echo $achievement['at']; ?>                    </time></a>
                 </p>
             </div>
         </div>
