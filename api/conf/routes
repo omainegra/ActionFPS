@@ -1,17 +1,17 @@
-GET         /recent/                        @controllers.ApiMain.recent
-GET         /all/                           @controllers.ApiMain.all
-GET         /clans/                         @controllers.ApiMain.clans
-GET         /users/                         @controllers.ApiMain.usersJson
-GET         /users/full/                    @controllers.ApiMain.usersFull
-GET         /events/                        @controllers.ApiMain.listEvents
-GET         /achievements/:id/              @controllers.ApiMain.achievements(id)
-GET         /user/:id/                      @controllers.ApiMain.userJson(id: String)
-GET         /user/:id/full/                 @controllers.ApiMain.fullUser(id: String)
+GET         /recent/                        @controllers.GamesApiController.recent
+GET         /all/                           @controllers.GamesApiController.all
+GET         /clans/                         @controllers.RecordsController.clans
+GET         /users/                         @controllers.RecordsController.usersJson
+GET         /users/full/                    @controllers.GamesApiController.usersFull
+GET         /events/                        @controllers.GamesApiController.listEvents
+GET         /achievements/:id/              @controllers.GamesApiController.achievements(id)
+GET         /user/:id/                      @controllers.RecordsController.userJson(id: String)
+GET         /user/:id/full/                 @controllers.GamesApiController.fullUser(id: String)
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
-GET         /game/                          @controllers.ApiMain.game(id: String)
-GET         /recent/clangames/              @controllers.ApiMain.recentClangames
-GET         /servers/                       @controllers.ApiMain.getServers
-GET         /nicknames/                     @controllers.ApiMain.listNicknames
-GET         /server-updates/                @controllers.ApiMain.serverUpdates
-GET         /inters/                        @controllers.ApiMain.inters
-GET         /new-games/                     @controllers.ApiMain.newGames
+GET         /game/                          @controllers.GamesApiController.game(id: String)
+GET         /recent/clangames/              @controllers.GamesApiController.recentClangames
+GET         /servers/                       @controllers.RecordsController.getServers
+GET         /nicknames/                     @controllers.GamesApiController.listNicknames
+GET         /server-updates/                @controllers.LiveUpdatesController.serverUpdates
+GET         /inters/                        @controllers.LiveUpdatesController.inters
+GET         /new-games/                     @controllers.LiveUpdatesController.newGames

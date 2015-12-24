@@ -4,8 +4,6 @@ import javax.inject._
 
 import acleague.ranker.achievements.{PlayerState, Jsons}
 import acleague.ranker.achievements.immutable.PlayerStatistics
-import af.rr.ServerRecord
-import lib.clans.Clan
 import lib.users.User
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
@@ -16,15 +14,18 @@ import services._
 import scala.concurrent.ExecutionContext
 
 
+/**
+  * This API depends on the games
+  */
 @Singleton
-class ApiMain @Inject()(configuration: Configuration,
-                        gamesService: GamesService,
-                        recordsService: RecordsService,
-                        pingerService: PingerService,
-                        intersService: IntersService,
-                       newGamesService: NewGamesService,
-                        achievementsService: AchievementsService)
-                       (implicit executionContext: ExecutionContext) extends Controller {
+class GamesApiController @Inject()(configuration: Configuration,
+                                   gamesService: GamesService,
+                                   recordsService: RecordsService,
+                                   pingerService: PingerService,
+                                   intersService: IntersService,
+                                   newGamesService: NewGamesService,
+                                   achievementsService: AchievementsService)
+                                  (implicit executionContext: ExecutionContext) extends Controller {
 
   def recent = Action {
     Ok(JsArray(gamesService.allGames.get().takeRight(50).reverse.map(_.toJson)))
@@ -32,33 +33,6 @@ class ApiMain @Inject()(configuration: Configuration,
 
   def recentClangames = Action {
     Ok(JsArray(gamesService.allGames.get().filter(_.clangame.isDefined).takeRight(30).reverse.map(_.toJson)))
-  }
-
-  implicit val serversWrites = Json.writes[ServerRecord]
-
-  def getServers = Action {
-    Ok(Json.toJson(recordsService.servers))
-  }
-
-  def usersJson = Action {
-    import User.WithoutEmailFormat.noEmailUserWrite
-    Ok(Json.toJson(recordsService.users))
-  }
-
-  def userJson(id: String) = Action {
-    recordsService.users.find(user => user.id == id || user.email == id) match {
-      case Some(user) =>
-        import User.WithoutEmailFormat.noEmailUserWrite
-        Ok(Json.toJson(user))
-      case None =>
-        NotFound("User not found")
-    }
-  }
-
-  implicit val fmtClan = Json.format[Clan]
-
-  def clans = Action {
-    Ok(Json.toJson(recordsService.clans))
   }
 
   def game(id: String) = Action {
@@ -89,9 +63,9 @@ class ApiMain @Inject()(configuration: Configuration,
           "stats" -> Json.toJson(playerState.playerStatistics),
           "achievements" -> Json.toJson(playerState.buildAchievements),
           "recent-games" ->
-          Json.toJson(playerState.playerStatistics.playedGames.sorted.takeRight(7).reverse.flatMap(gid =>
-            gamesService.allGames.get().find(_.id == gid).map(_.toJson)
-          ))
+            Json.toJson(playerState.playerStatistics.playedGames.sorted.takeRight(7).reverse.flatMap(gid =>
+              gamesService.allGames.get().find(_.id == gid).map(_.toJson)
+            ))
         )
       )
     )
@@ -138,24 +112,6 @@ class ApiMain @Inject()(configuration: Configuration,
     } else {
       Ok(Json.toJson(nameToCount.map { case (name, count) => name }))
     }
-  }
-
-  def serverUpdates = Action {
-    Ok.feed(
-      content = pingerService.liveGamesEnum
-    ).as("text/event-stream")
-  }
-
-  def inters = Action {
-    Ok.feed(
-      content = intersService.intersEnum
-    ).as("text/event-stream")
-  }
-
-  def newGames = Action {
-    Ok.feed(
-      content = newGamesService.newGamesEnum
-    ).as("text/event-stream")
   }
 
 }
