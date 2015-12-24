@@ -163,7 +163,7 @@ function render_war_clan($war, $clan, $show_players = false)
 ?>
     <div class="team">
         <div class="team-header">
-            <h3><img src="http://woop.ac:81/html/clan_picture.php?name=<?php echo htmlspecialchars($clan['name']) ?>&amp;id=<?php echo htmlspecialchars($clan['name']) ?>" width="64" height="64"></h3>
+            <h3><img src="http://woop.ac:81/html/clan_picture.php?name=<?php echo htmlspecialchars($clan['name']) ?>&amp;id=<?php echo htmlspecialchars($clan['id']) ?>" width="64" height="64"></h3>
 
             <div class="result">
                 <span class="clan"><a href="/clan/?id=<?php echo htmlspecialchars($clan['clan']) ?>"><?php echo htmlspecialchars($clan['name']) ?></a></span>
@@ -179,17 +179,6 @@ function render_war_clan($war, $clan, $show_players = false)
         </div>
         <?php endif; ?>
     </div>
-<?php } ?>
-<?php
-function render_war_clans($war, $show_players = false)
-{
-?>
- <div class="teams">
-       <?php foreach($war['clans'] as $clan) { ?>
-            <?php render_war_clan($war, $clan, $show_players); ?>
-       <?php } ?>
-  </div>
-
 <?php } ?>
 <?php 
 function render_war($war, $show_players = false)
@@ -207,7 +196,12 @@ function render_war($war, $show_players = false)
                     </a>
                 </h2>
              </header>
-             <?php render_war_clans($war, $show_players); ?>
+             
+            <div class="teams">
+                <?php foreach($war['clans'] as $clan) { ?>
+                    <?php render_war_clan($war, $clan, $show_players); ?>
+                <?php } ?>
+             </div>
           </div>
 
     </article>
