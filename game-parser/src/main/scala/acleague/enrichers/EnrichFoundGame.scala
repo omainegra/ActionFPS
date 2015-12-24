@@ -123,7 +123,6 @@ case class JsonGamePlayer(name: String, host: Option[String], score: Option[Int]
 case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer], clan: Option[String]) {
   /**
     * A player might disconnect mid-game, get a new IP. Goal here is to sum up their scores properly.
-    * We don't do aggregation for non-registered players.
     */
   def flattenPlayers = {
     var newPlayers = players
