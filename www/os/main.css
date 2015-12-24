@@ -361,6 +361,7 @@ code {
   display: flex;
   padding: 0.2em;
   padding-left: 0.5em;
+  font-size:0.9em;
 }
 .GameCard .players ol li > * {
   display: inline-block;
@@ -379,10 +380,7 @@ code {
 }
 .GameCard .players ol li .name {
   margin-left: 0.3em;
-  width: 6em;
-}
-.GameCard .players ol li .name > * {
-  white-space: nowrap;
+  width: 8em;
 }
 .GameCard .players ol li .name a {
   text-decoration: none;
