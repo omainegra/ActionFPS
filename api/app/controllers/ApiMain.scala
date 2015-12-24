@@ -87,7 +87,11 @@ class ApiMain @Inject()(configuration: Configuration,
       JsObject(
         Map(
           "stats" -> Json.toJson(playerState.playerStatistics),
-          "achievements" -> Json.toJson(playerState.buildAchievements)
+          "achievements" -> Json.toJson(playerState.buildAchievements),
+          "recent-games" ->
+          Json.toJson(playerState.playerStatistics.playedGames.sorted.takeRight(7).reverse.flatMap(gid =>
+            gamesService.allGames.get().find(_.id == gid).map(_.toJson)
+          ))
         )
       )
     )
