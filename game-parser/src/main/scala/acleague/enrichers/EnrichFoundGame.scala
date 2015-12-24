@@ -6,13 +6,14 @@ import java.util.{Date}
 import acleague.ingesters.{FlagGameBuilder, FoundGame, FragGameBuilder}
 import org.joda.time.{DateTimeZone, DateTime}
 import org.joda.time.format.ISODateTimeFormat
-import play.api.libs.json.{JsValue, Json, JsObject}
+import play.api.libs.json.{Writes, JsValue, Json, JsObject}
 import scala.util.hashing.MurmurHash3
 import scala.xml.UnprefixedAttribute
 
 case class GameJsonFound(jsonGame: JsonGame)
 
 object JsonGame {
+  implicit val vf = ViewFields.DefaultZonedDateTimeWrites
   implicit val Af = Json.format[JsonGamePlayer]
   implicit val Bf = Json.format[JsonGameTeam]
   implicit val fmt = Json.format[JsonGame]
@@ -152,6 +153,7 @@ case class ViewFields(startTime: ZonedDateTime, endTime: ZonedDateTime, winner: 
 }
 
 object ViewFields {
+  implicit val DefaultZonedDateTimeWrites = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_INSTANT)
   implicit val jsonFormat = Json.writes[ViewFields]
 }
 
