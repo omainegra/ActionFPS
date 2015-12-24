@@ -4,7 +4,7 @@ class Clanwar implements JsonSerializable
     public $id = "";
     public $startTime = "";
     public $endTime = "";
-    public $clans = array();7
+    public $clans = array();
     public $games = array();
     public $server = "";
     public $teamsize = "";
