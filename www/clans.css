@@ -13,7 +13,7 @@
 }
 
 
-.GameCard.game .clanwar {
+.GameCard.game.clanwar {
     background-color: transparent; 
 }
 
