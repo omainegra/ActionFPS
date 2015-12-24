@@ -12,7 +12,7 @@ object NotAchievedAchievements {
     flagMaster = Option(FlagMaster.begin),
     fragMaster = Option(FragMaster.begin),
     maverick = Option(Maverick.NotAchieved),
-    slaughterer = Option(Slaughterer.NotAchieved),
+    butcher = Option(Butcher.NotAchieved),
     tdmLover = Option(TdmLover.begin),
     tosokLover = Option(TosokLover.begin),
     terribleGame = Option(TerribleGame.begin)
@@ -26,7 +26,7 @@ case class NotAchievedAchievements
  flagMaster: Option[FlagMaster.Achieving],
  fragMaster: Option[FragMaster.Achieving],
  maverick: Option[Maverick.NotAchieved.type],
- slaughterer: Option[Slaughterer.NotAchieved.type],
+ butcher: Option[Butcher.NotAchieved.type],
  tdmLover: Option[TdmLover.Achieving],
  terribleGame: Option[TerribleGame.NotAchieved.type],
  tosokLover: Option[TosokLover.Achieving]
@@ -40,7 +40,7 @@ case class NotAchievedAchievements
       flagMaster,
       fragMaster,
       maverick,
-      slaughterer,
+      butcher,
       tdmLover,
       terribleGame,
       tosokLover
@@ -140,13 +140,13 @@ case class NotAchievedAchievements
         }
     }
 
-    slaughterer foreach {
+    butcher foreach {
       a =>
         a.processGame(jsonGame, jsonGamePlayer, isRegisteredPlayer).foreach {
           achieved =>
             achievedAchievements += achieved
-            me = me.copy(slaughterer = None)
-            newEvents += "became Maverick"
+            me = me.copy(butcher = None)
+            newEvents += "became Butcher"
         }
     }
 
