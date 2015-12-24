@@ -8,7 +8,7 @@ $clanwar = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterat
 <?php render_war($clanwar, true); ?>
 
 <?php foreach($clanwar['games'] as $game) { ?>
-    <?php render_game($game, true)); ?>
+    <?php render_game($game, true); ?>
 <?php } ?>
 </div><?php
 echo $foot;

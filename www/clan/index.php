@@ -10,7 +10,7 @@ $stats = $clan['stats'];
             <div class="clan-header">
                 <img src="http://woop.ac:81/html/clan_picture.php?name=<?php echo htmlspecialchars($clan['name']) ?>&id=<?php echo htmlspecialchars($clan['id']) ?>" width="64">
                 <h1><?php echo htmlspecialchars($clan['fullName']) ?></h1>
-                <?php if(!empty($clan['website']) { ?>
+                <?php if(!empty($clan['website'])) { ?>
                   <div>
                     - <a href="<?php echo htmlspecialchars($clan['website']) ?>" target="_blank">Website</a>
                   </div>
