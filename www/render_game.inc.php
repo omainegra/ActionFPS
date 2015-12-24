@@ -138,19 +138,19 @@ function render_game($game)
 function render_war_clan_player($war, $clan, $player)
 {
     ?>
-    <li style="padding-left: 0";>
+    <li>
         <?php if (isset($player->flags)) { ?>
             <span class="score flags"><?php echo $player->flags; ?></span>
         <?php } ?>
         <span class="subscore frags"><?php echo $player->frags; ?></span>
-        <span class="name" style="width: 8em">
+        <span class="name">
             <?php if (isset($player->user)) { ?>
                 <a href="/player/?id=<?php echo rawurlencode($player->user); ?>"><?php echo htmlspecialchars($player->name); ?></a>
             <?php } else { ?>
                 <?php echo htmlspecialchars($player->name); ?>
             <?php } ?>
             <?php if(isset($clan->trophies->mvp) && $clan->trophies->mvp->name == $player->name) { ?>
-                <img src="http://woop.ac:81/html/assets/mvp.png" width="16" height="13" title="MVP" style="display: inline;"  />
+                <img src="http://woop.ac:81/html/assets/mvp.png" title="MVP"  />
             <?php } ?>
         </span>
     </li>
@@ -163,11 +163,11 @@ function render_war_clan($war, $clan, $show_players = false)
 ?>
     <div class="team">
         <div class="team-header">
-            <h3><img src="http://woop.ac:81/html/clan_picture.php?name=<?php echo htmlspecialchars($clan->name) ?>&id=<?php echo htmlspecialchars($clan->clan) ?>" width="64"></h3>
+            <h3><img src="http://woop.ac:81/html/clan_picture.php?name=<?php echo htmlspecialchars($clan->name) ?>&id=<?php echo htmlspecialchars($clan->clan) ?>" width="64" height="64"></h3>
 
             <div class="result">
-                <span class="score" style="font-size: 2.5em;"><a href="/clan/?id=<?php echo htmlspecialchars($clan->clan) ?>"><?php echo htmlspecialchars($clan->name) ?></a></span>
-                <span class="score" style="padding-left: 10px"><?php echo $clan->wins; ?></span>
+                <span class="clan"><a href="/clan/?id=<?php echo htmlspecialchars($clan->clan) ?>"><?php echo htmlspecialchars($clan->name) ?></a></span>
+                <span class="score"><?php echo $clan->wins; ?></span>
             </div>
         </div>
         <?php if($show_players) : ?>
@@ -197,9 +197,9 @@ function render_war($war, $show_players = false)
     $finalgame = $war->games[count($war->games)-1];
     ?>
     <?php if($show_players) : ?>
-    <article class="GameCard game" style="background-color: transparent; background-image: url('http://woop.ac:81/html/assets/clanwar.png')">
+    <article class="GameCard game clanwar" style="background-color: transparent; background-image: url('http://woop.ac:81/html/assets/clanwar.png')">
     <?php else : ?>
-    <article class="GameCard game" style="background-image: url('http://woop.ac/assets/maps/<?php echo htmlspecialchars($finalgame->map); ?>.jpg');">
+    <article class="GameCard game clanwar" style="background-image: url('http://woop.ac/assets/maps/<?php echo htmlspecialchars($finalgame->map); ?>.jpg');">
     <?php endif; ?>
         <div class="w">
             <header>

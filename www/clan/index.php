@@ -7,9 +7,9 @@ $stats = $clan->stats;
 ?>
 <article id="profile">
     <div class="profile">
-            <div class="clan-header" style="display: flex; align-items: center; margin-bottom: 1em">
-                <img style="margin-right: 0.25em;" src="http://woop.ac:81/html/clan_picture.php?name=<?php echo htmlspecialchars($clan->name) ?>&id=<?php echo htmlspecialchars($clan->id) ?>" width="64">
-                <h1 style="margin: 0 0.25em"><?php echo htmlspecialchars($clan->fullName) ?></h1>
+            <div class="clan-header">
+                <img src="http://woop.ac:81/html/clan_picture.php?name=<?php echo htmlspecialchars($clan->name) ?>&id=<?php echo htmlspecialchars($clan->id) ?>" width="64">
+                <h1><?php echo htmlspecialchars($clan->fullName) ?></h1>
                 <?php if(!empty($clan->website)) : ?>
                   <div>
                     - <a href="<?php echo htmlspecialchars($clan->website) ?>" target="_blank">Website</a>
@@ -44,9 +44,9 @@ $stats = $clan->stats;
     </div>
     <div id="games">
         <h3>Recent Wars</h3>
-        <ol style="list-style-type: none;">
+        <ol class="recent-games">
         <?php foreach($clan->wars as $war) : ?>
-            <li style="line-height: 1.5em;"><?php render_compact_war($war, $clan->id) ?></li>
+            <li><?php render_compact_war($war, $clan->id) ?></li>
         <?php endforeach; ?>
         </ol>
     </div>

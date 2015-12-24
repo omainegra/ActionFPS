@@ -1,7 +1,40 @@
-/* div[role='main'] {
-    width: 52em;
+.clan-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
 }
 
-.GameCard.game {
-    width: 44em;
-} */
+.clan-header img {
+    margin-right: 0.25em;
+}
+
+.clan-header h1 {
+    margin: 0 0.25em;
+}
+
+
+.GameCard.game .clanwar {
+    
+}
+
+.clanwar .result .clan {
+  font-size: 2.5em;
+  display: inline-block;
+  text-align: center;
+}
+
+.clanwar .result .score {
+  padding-left: 10px;
+}
+
+.clanwar .players ol li {
+  padding-left: 0;
+}
+
+.clanwar .players ol li .name {
+    width: 8em;
+}
+
+.clanwar .players ol li .name img {
+  display: inline;
+}
