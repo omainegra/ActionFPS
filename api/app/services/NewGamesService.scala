@@ -36,7 +36,7 @@ class NewGamesService @Inject()(applicationLifecycle: ApplicationLifecycle,
   import gamesService.withUsersClass
 
   def pushGame(game: JsonGame): Unit = {
-    val b = game.withoutHosts.withUsers.withClans.toJson.+("isNew" -> JsBoolean(true))
+    val b = game.withoutHosts.withUsers.flattenPlayers.withClans.toJson.+("isNew" -> JsBoolean(true))
     wSClient.url(url).post(b).foreach {
       response =>
         thing.push(
