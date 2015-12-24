@@ -147,7 +147,7 @@ function render_war_clan_player($war, $clan, $player)
             <?php if (isset($player['user'])) { ?>
                 <a href="/player/?id=<?php echo rawurlencode($player['user']); ?>"><?php echo htmlspecialchars($player['name']); ?></a>
             <?php } else { ?>
-                <?php echo htmlspecialchars($player['name'])); ?>
+                <?php echo htmlspecialchars($player['name']); ?>
             <?php } ?>
             <?php if(isset($clan['trophies']['mvp']) && $clan['trophies']['mvp']['name'] == $player['name']) { ?>
                 <img src="http://woop.ac:81/html/assets/mvp.png" title="MVP"  />
