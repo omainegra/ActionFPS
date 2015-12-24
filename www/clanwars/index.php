@@ -2,7 +2,13 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$html = file_get_contents("http://woop.ac:81/html/clanwars/");
+$clanwars = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?count=50'));
 ?>
-<?php echo $html ?>
+<article id="questions">
+    <h2>Recent Clanwars</h2>
+    <p>Clan Achievements here ?</p>
+</article>
+<div id="games">
+    <?php foreach($clanwars as $war) render_war($war); ?>
+</div>
 <?php echo $foot;

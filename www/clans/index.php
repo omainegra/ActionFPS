@@ -2,7 +2,33 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$html = file_get_contents("http://woop.ac:81/html/clans/");
+$clans = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10'))->now;
 ?>
-<?php echo $html ?>
+<article id="questions">
+    <div id="rank">
+    <h2>Warriors</h2>
+    <table style="width: 480px;">
+        <tr>
+            <th>Clan</th>
+            <td>Wars</td>
+            <td>Won</td>
+            <td>Games</td>
+            <td>Score</td>
+            <td>Elo Rank</td>
+        </tr>
+        <?php foreach($clans as $clan) : ?>
+        <tr>
+            <th><a href="/clan/?id=<?php echo htmlspecialchars($clan->clan) ?>"><?php echo htmlspecialchars($clan->name) ?></a></th>
+            <td><?php echo $clan->wars ?></td>
+            <td><?php echo $clan->wins ?></td>
+            <td><?php echo $clan->games ?></td>
+            <td><?php echo $clan->score ?></td>
+            <td><?php echo $clan->rank ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+    </div>
+</article>
+
+
 <?php echo $foot;
