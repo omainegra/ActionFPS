@@ -2,7 +2,7 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$clans = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10'))->now;
+$clans = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10'), true)['now'];
 ?>
 <article id="questions">
     <div id="rank">
@@ -18,12 +18,12 @@ $clans = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator
         </tr>
         <?php foreach($clans as $clan) : ?>
         <tr>
-            <th><a href="/clan/?id=<?php echo htmlspecialchars($clan->clan) ?>"><?php echo htmlspecialchars($clan->name) ?></a></th>
-            <td><?php echo $clan->wars ?></td>
-            <td><?php echo $clan->wins ?></td>
-            <td><?php echo $clan->games ?></td>
-            <td><?php echo $clan->score ?></td>
-            <td><?php echo $clan->rank ?></td>
+            <th><a href="/clan/?id=<?php echo htmlspecialchars($clan['clan']) ?>"><?php echo htmlspecialchars($clan['name']) ?></a></th>
+            <td><?php echo $clan['wars'] ?></td>
+            <td><?php echo $clan['wins'] ?></td>
+            <td><?php echo $clan['games'] ?></td>
+            <td><?php echo $clan['score'] ?></td>
+            <td><?php echo $clan['rank'] ?></td>
         </tr>
         <?php endforeach; ?>
     </table>
