@@ -7,13 +7,14 @@ import org.apache.commons.csv.CSVFormat
 
 import scala.util.Try
 
-case class ClanRecord(id: String, shortName: String, longName: String, website: Option[URI], tag: String, tag2: Option[String])
+case class ClanRecord(id: String, shortName: String, longName: String, website: Option[URI], tag: String, tag2: Option[String],
+                     logo: Option[URI])
 
 object ClanRecord {
 
   def parseRecords(input: Reader): List[ClanRecord] = {
     import collection.JavaConverters._
-    CSVFormat.EXCEL.parse(input).asScala.flatMap { rec =>
+    CSVFormat.EXCEL.parse(input).asScala.map { rec =>
       for {
         id <- Option(rec.get(0)).filter(_.nonEmpty)
         shortName <- Option(rec.get(1)).filter(_.nonEmpty)
@@ -21,15 +22,17 @@ object ClanRecord {
         website = Try(new URI(rec.get(3))).toOption
         tag <- Option(rec.get(4)).filter(_.nonEmpty)
         tag2 = Try(rec.get(5)).toOption.filter(_ != null).filter(_.nonEmpty)
+        logo = Try(Option(new URI(rec.get(6))).filter(u => u.getPath.endsWith(".png") || u.getPath.endsWith(".svg"))).toOption.flatten
       } yield ClanRecord(
         id = id,
         shortName = shortName,
         longName = longName,
         website = website,
         tag = tag,
-        tag2 = tag2
+        tag2 = tag2,
+        logo = logo
       )
-    }.toList
+    }.flatten.toList
 
   }
 }

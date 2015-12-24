@@ -20,7 +20,8 @@ class ClansTest
       longName = "Woop Clan",
       website = Some(new URI("http://woop.us/")).filter(_.getScheme != null),
       tag = "w00p|*",
-      tag2 = None
+      tag2 = None,
+      logo = Some(new URI("http://woop.us/logo.svg"))
     ))
   }
 }
