@@ -139,8 +139,8 @@ function render_war_clan_player($war, $clan, $player)
 {
     ?>
     <li>
-        <?php if (isset($player['frags'])) { ?>
-            <span class="score flags"><?php echo $player['frags']; ?></span>
+        <?php if (isset($player['flags'])) { ?>
+            <span class="score flags"><?php echo $player['flags']; ?></span>
         <?php } ?>
         <span class="subscore frags"><?php echo $player['frags']; ?></span>
         <span class="name">
@@ -196,19 +196,14 @@ function render_war($war, $show_players = false)
 {
     $finalgame = $war['games'][count($war['games'])-1];
     ?>
-    <?php if($show_players) { ?>
-        <article class="GameCard game clanwar" style="background-color: transparent; background-image: url('http://woop.ac:81/html/assets/clanwar.png')">
-    <?php } else { ?>
-        <article class="GameCard game clanwar" style="background-image: url('http://woop.ac/assets/maps/<?php echo htmlspecialchars($finalgame['map']); ?>.jpg');">
-    <?php } ?>
+    <article class="GameCard game clanwar" style="background-image: url('http://woop.ac:81/html/assets/clanwar.png')">
         <div class="w">
             <header>
                 <h2>
                     <a href="/clanwar/?id=<?php echo rawurlencode($war['startTime']); ?>">
-                            <time is="local-time" datetime="<?php echo $war['endTime']; ?>" weekday="short" year="numeric" month="short" day="numeric">
-                                <?php echo $war['endTime']; ?>
-                            </time><br />
-                    <?php echo $war['teamsize'] ?> vs <?php echo $war['teamsize'] ?>, <?php echo count($war['games']) ?> games
+                        <time is="local-time" datetime="<?php echo $war['endTime']; ?>" weekday="short" year="numeric" month="short" day="numeric">
+                            <?php echo $war['endTime']; ?>
+                        </time>
                     </a>
                 </h2>
              </header>
