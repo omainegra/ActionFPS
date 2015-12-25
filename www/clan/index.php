@@ -8,7 +8,7 @@ $stats = $clan['stats'];
 <article id="profile">
     <div class="profile">
             <div class="clan-header">
-                <img class="clan-logo" src="http://woop.ac:81/html/clan_picture.php?name=<?php echo rawurlencode($clan['name']) ?>&amp;id=<?php echo rawurlencode($clan['id']) ?>" width="64">
+                <?php clan_logo($clan); ?>
                 <h1><?php echo htmlspecialchars($clan['fullName']) ?></h1>
                 <?php if(isset($clan['website'])) { ?>
                   <div>

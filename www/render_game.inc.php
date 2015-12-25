@@ -169,7 +169,7 @@ function render_war_clan($war, $clan, $show_players = false)
 ?>
     <div class="team">
         <div class="team-header">
-            <h3><a href="/clan/?id=<?php echo rawurlencode($clan['clan']) ?>"><img class="clan-logo" src="http://woop.ac:81/html/clan_picture.php?name=<?php echo rawurlencode($clan['name']) ?>&amp;id=<?php echo rawurlencode($clan['clan']) ?>" width="64" height="64"/></a></h3>
+            <h3><a href="/clan/?id=<?php echo rawurlencode($clan['clan']) ?>"><?php clan_logo($clan); ?></a></h3>
 
             <div class="result">
                 <span class="clan"><a href="/clan/?id=<?php echo rawurlencode($clan['clan']) ?>"><?php echo htmlspecialchars($clan['name']) ?></a></span>

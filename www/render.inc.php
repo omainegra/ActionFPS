@@ -1,4 +1,11 @@
 <?php
+
+function clan_logo($clan) {
+    $url = @$clan['logo'] ?: 'http://woop.ac:81/html/clan_picture.php?name='.rawurlencode($clan['name']).'&id='.rawurlencode(@($clan['id'] ?: $clan['clan']));
+    ?><img class="clan-logo" src="<?php echo htmlspecialchars($url); ?>" width="64" height="64"/>
+<?php
+
+}
 $main_template_path = dirname(__FILE__) . "/template.html";
 $domdoc = new DOMDocument();
 libxml_use_internal_errors(true);

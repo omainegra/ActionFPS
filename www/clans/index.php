@@ -9,10 +9,7 @@ $clans = json_decode(file_get_contents('http://api.actionfps.com/clans/'), true)
        <?php foreach($clans as $clan) { ?>
             <li>
                 <a href="/clan/?id=<?php echo rawurlencode($clan['id']) ?>" title="<?php echo htmlspecialchars($clan['fullName']) ?>">
-                    <?php
-                    $logo = @$clan['logo'] ?: 'http://woop.ac:81/html/clan_picture.php?name='.rawurlencode($clan['name']).'&id='.rawurlencode($clan['id']);
-                    ?>
-                    <img class="clan-logo" src="<?php echo htmlspecialchars($logo); ?>">
+                    <?php clan_logo($clan); ?>
                 </a>
             </li>
        <?php } ?>
