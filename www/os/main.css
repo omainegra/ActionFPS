@@ -15,17 +15,56 @@ div[role='main'] {
   padding-bottom: 2em;
   box-shadow: #f5f5f5 1px 1px 3px, #f5f5f5 -1px -1px 3px, #f5f5f5 1px -1px 2px, #f5f5f5 -1px 1px 3px;
 }
-div[role='main'] > header {
+
+#top {
+  text-align: center;
+  text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
+  margin-top: -1em;
+  padding-bottom: 1em;
+}
+#top {
+  display:flex;
+  /*background:rgba(10,20,20,0.6);*/
+  background:linear-gradient(rgba(10,20,20,0.8),rgba(30,50,50,0.6))
+}
+#top article {
+  padding-top:4.8em;
+  padding-left:1.6em;
+  padding-right:2em;
+}
+div[role='main'] #top header {
+  padding-left:2em;
   padding-top: 1em;
   font-size: 1.2em;
   font-family: Georgia, serif;
   text-align: center;
   text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
 }
-div[role='main'] > header h1 {
+#menu {
+  list-style-type: none;
+  display:flex;
+  flex-flow:row wrap;
+  margin:0;
+  padding:0;
+  font-size:1.2em;
+  text-align:left;
+}
+#top header img {
+  max-width:300px;
+}
+#menu {
+  justify-content:space-between;
+}
+#menu li {
+  margin:0;
+  padding:0;
+  display:block;
+  margin-bottom:0.6em;
+}
+div[role='main'] header h1 {
   margin-bottom: 0;
 }
-div[role='main'] > header h2 {
+div[role='main'] header h2 {
   margin-top: 0;
 }
 .teams {
@@ -113,12 +152,6 @@ a {
 }
 a:hover {
   color: brown;
-}
-#top {
-  text-align: center;
-  text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
-  margin-top: -1em;
-  margin-bottom: 1em;
 }
 #sprs,
 #questions,
