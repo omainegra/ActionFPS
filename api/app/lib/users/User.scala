@@ -2,6 +2,7 @@ package lib.users
 
 import java.time.ZonedDateTime
 
+import acleague.enrichers.ViewFields
 import play.api.libs.json._
 
 sealed trait Nickname {
@@ -24,6 +25,7 @@ case class User(id: String, name: String, countryCode: Option[String], email: St
   def validAt(nickname: String, zonedDateTime: ZonedDateTime) = nicknames.exists(n => n.nickname == nickname && n.validAt(zonedDateTime))
 }
 object User {
+  implicit val vf = ViewFields.DefaultZonedDateTimeWrites
   implicit val pnFormat = Json.format[PreviousNickname]
   implicit val cnFormat = Json.format[CurrentNickname]
   implicit val userFormat = Json.format[User]

@@ -4,7 +4,8 @@ import javax.inject._
 
 import akka.actor.ActorDSL._
 import acleague.pinger._
-import akka.actor.{Props, Kill, ActorSystem}
+import akka.actor.{ActorLogging, Props, Kill, ActorSystem}
+import play.api.{Logger, Configuration}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
@@ -20,11 +21,18 @@ import scala.util.{Success, Failure}
 @Singleton
 class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
                               recordsService: RecordsService,
-                              wsClient: WSClient
+                              wsClient: WSClient,
+                              configuration: Configuration
                              )(implicit actorSystem: ActorSystem,
                                executionContext: ExecutionContext) {
 
+  val logger = Logger(getClass)
+
   val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
+  val url = configuration.underlying.getString("af.render.live-fragment")
+  logger.info(s"Pinger service rendering with $url")
+
+
 
   implicit val spw = Json.writes[ServerPlayer]
   implicit val stw = Json.writes[ServerTeam]
@@ -52,7 +60,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
         data = Json.toJson(b).toString()
       )
     )
-    wsClient.url("http://actionfps.com/live/render-fragment.php").post(Json.toJson(b)).foreach {
+    wsClient.url(url).post(Json.toJson(b)).foreach {
       response =>
         liveGamesChan.push(
           Event(
@@ -85,7 +93,9 @@ object PingerService {
     def props(g: ServerStatus => Unit, h: CurrentGameStatus => Unit) = Props(new ListenerActor(g, h))
   }
 
-  class ListenerActor(g: ServerStatus => Unit, h: CurrentGameStatus => Unit) extends Act {
+  class ListenerActor(g: ServerStatus => Unit, h: CurrentGameStatus => Unit) extends Act with ActorLogging {
+
+    log.info("Starting listener actor for pinger service...")
 
     val pingerActor = context.actorOf(name = "pinger", props = Pinger.props)
 

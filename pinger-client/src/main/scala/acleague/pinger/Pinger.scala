@@ -17,6 +17,7 @@ class Pinger extends Act with ActorLogging {
   val serverStates = scala.collection.mutable.Map.empty[(String, Int), ServerStateMachine].withDefaultValue(NothingServerStateMachine)
 
   whenStarting {
+    log.info("Starting pinger actor")
     import context.system
     IO(Udp) ! Udp.Bind(self, new InetSocketAddress("0.0.0.0", 0))
   }

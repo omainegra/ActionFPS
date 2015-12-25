@@ -1,8 +1,43 @@
-#tlkio {
-    position:fixed;
-    bottom:0;
-    right:0;
-    height:50vh;
-    width:35vh;
-    background:#333;
+.GameCard .dm-players {
+    font-size:1.3em;
 }
+.GameCard .dm-players ul {
+    list-style-type: none;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.GameCard .dm-players li {
+    display: inline-block;
+    margin: 0 0.2em;
+    padding: 0;
+}
+.LiveEvents.live-events li a  {
+    width:!important 26em;
+}
+        h2:target {
+            -webkit-animation: highlighter 5s 2; /* Safari 4+ */
+            -moz-animation:    highlighter 5s 2; /* Fx 5+ */
+            -o-animation:      highlighter 5s 2; /* Opera 12+ */
+            animation:         highlighter 5s 2; /* IE 10+, Fx 29+ */
+        }
+
+        @keyframes highlighter {
+            0%   { text-shadow:1px 1px 1px gold, -1px 1px 1px gold, 1px -1px 1px gold, -1px -1px 1px gold; }
+            100% { text-shadow:0 0 2px white; }
+        }
+
+        @-moz-keyframes highlighter {
+            0%   { text-shadow:1px 1px 1px gold, -1px 1px 1px gold, 1px -1px 1px gold, -1px -1px 1px gold; }
+            100% { text-shadow:0 0 2px white; }
+        }
+
+        @-webkit-keyframes highlighter {
+            0%   { text-shadow:1px 1px 1px gold, -1px 1px 1px gold, 1px -1px 1px gold, -1px -1px 1px gold; }
+            100% { text-shadow:0 0 2px white; }
+        }

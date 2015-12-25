@@ -8,6 +8,8 @@
 * http://actionfps.com/
 * Previously known as http://woop.ac/
 * Also see http://duel.gg/
+* Contributors very much welcome. Start with Issues.
+* We also have an API here: http://actionfps.com/api/ - feel free to build on top.
 
 # Technology Choices
 

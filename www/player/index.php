@@ -63,8 +63,8 @@ function completed_achievement($achievement)
     ?>
                     <p
 } class="achieved-on">
-                    <time is="relative-time" datetime="<?php echo $achievement['at']; ?>">
-                        <?php echo $achievement['at']; ?>                    </time>
+                    <a href="/game/?id=<?php echo htmlspecialchars($achievement['at']); ?>"><time is="relative-time" datetime="<?php echo $achievement['at']; ?>">
+                        <?php echo $achievement['at']; ?>                    </time></a>
                 </p>
             </div>
         </div>
@@ -166,6 +166,20 @@ function none_achievement($achievement)
             </div>
         </div>
         </div>
+
+        <h2>Recent games</h2>
+        <ol class="recent-games">
+            <?php foreach($user['recent-games'] as $game) { ?>
+
+            <li><a href="/game/?id=<?php echo $game['id']; ?>"><?php echo $game['mode']; ?> @ <?php echo $game['map']; ?>,
+                <time is="relative-time" datetime="<?php echo htmlspecialchars($game['endTime']); ?>">
+                    <?php echo htmlspecialchars($game['endTime']); ?>
+                </time>
+                    </a>
+            </li>
+    <?php } ?>
+
+        </ol>
     </div>
 
     </article><?php

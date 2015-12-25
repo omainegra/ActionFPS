@@ -6,13 +6,14 @@ import java.util.{Date}
 import acleague.ingesters.{FlagGameBuilder, FoundGame, FragGameBuilder}
 import org.joda.time.{DateTimeZone, DateTime}
 import org.joda.time.format.ISODateTimeFormat
-import play.api.libs.json.{JsValue, Json, JsObject}
+import play.api.libs.json.{Writes, JsValue, Json, JsObject}
 import scala.util.hashing.MurmurHash3
 import scala.xml.UnprefixedAttribute
 
 case class GameJsonFound(jsonGame: JsonGame)
 
 object JsonGame {
+  implicit val vf = ViewFields.DefaultZonedDateTimeWrites
   implicit val Af = Json.format[JsonGamePlayer]
   implicit val Bf = Json.format[JsonGameTeam]
   implicit val fmt = Json.format[JsonGame]
@@ -120,10 +121,47 @@ object EnrichFoundGame {
 case class JsonGamePlayer(name: String, host: Option[String], score: Option[Int],
                           flags: Option[Int], frags: Int, deaths: Int, user: Option[String], clan: Option[String])
 
-case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer], clan: Option[String])
+case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer], clan: Option[String]) {
+  /**
+    * A player might disconnect mid-game, get a new IP. Goal here is to sum up their scores properly.
+    */
+  def flattenPlayers = {
+    var newPlayers = players
+    players.groupBy(_.name).collect{
+      case (playerName, them @ first :: rest) if rest.nonEmpty =>
+        val newPlayer = JsonGamePlayer(
+          name = playerName,
+          host = first.host,
+          score = first.score.map(_ => them.flatMap(_.score).sum),
+          flags = first.flags.map(_ => them.flatMap(_.flags).sum),
+          frags = them.map(_.frags).sum,
+          deaths = them.map(_.frags).sum,
+          user = first.user,
+          clan = first.clan
+        )
+        (playerName, newPlayer)
+    }.foreach { case (playerName, newPlayer) =>
+      newPlayers = newPlayers.filterNot(_.name == playerName)
+      newPlayers = newPlayers :+ newPlayer
+    }
+    copy(players = newPlayers.sortBy(player => player.flags -> player.frags).reverse)
+  }
+}
+
+case class ViewFields(startTime: ZonedDateTime, endTime: ZonedDateTime, winner: Option[String], winnerClan: Option[String]) {
+  def toJson = Json.toJson(this)(ViewFields.jsonFormat)
+}
+
+object ViewFields {
+  implicit val DefaultZonedDateTimeWrites = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_INSTANT)
+  implicit val jsonFormat = Json.writes[ViewFields]
+}
 
 case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: String, state: String,
                     teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[List[String]]) {
+
+  def flattenPlayers = transformTeams(_.flattenPlayers)
+
   def withoutHosts = transformPlayers((_, player) => player.copy(host = None))
 
   def transformPlayers(f: (JsonGameTeam, JsonGamePlayer) => JsonGamePlayer) =
@@ -131,10 +169,39 @@ case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: Stri
 
   def transformTeams(f: JsonGameTeam => JsonGameTeam) = copy(teams = teams.map(f))
 
-  def endTime: ZonedDateTime = gameTime.plusMinutes(duration)
+  def winner = {
+    for {
+      teamA <- teams
+      scoreA = teamA.flags.getOrElse(teamA.frags)
+      teamB <- teams
+      scoreB = teamB.flags.getOrElse(teamB.frags)
+      if scoreA != scoreB
+    } yield {
+      if (scoreA > scoreB) teamA.name
+      else teamB.name
+    }
+  }.headOption
+
+  def isClangame = clangame.exists(_.nonEmpty)
+
+  def winnerClan =
+    if (isClangame)
+      for {
+        winningTeamName <- winner
+        team <- teams.find(_.name == winningTeamName)
+        clan <- team.clan
+      } yield clan
+    else None
+
+  def viewFields = ViewFields(
+    startTime = gameTime,
+    endTime = gameTime.plusMinutes(duration),
+    winner = winner,
+    winnerClan = winnerClan
+  )
 
   def toJson: JsObject = {
-    Json.toJson(this)(JsonGame.fmt).asInstanceOf[JsObject].+("endTime" -> Json.toJson(endTime))
+    Json.toJson(this)(JsonGame.fmt).asInstanceOf[JsObject] ++ viewFields.toJson.asInstanceOf[JsObject]
   }
 
   import org.scalactic._

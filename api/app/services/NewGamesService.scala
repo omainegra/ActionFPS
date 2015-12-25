@@ -31,12 +31,13 @@ class NewGamesService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
   val logger = Logger(getClass)
   logger.info("Starting new games service")
+  val url = configuration.underlying.getString("af.render.new-game")
 
   import gamesService.withUsersClass
 
   def pushGame(game: JsonGame): Unit = {
-    val b = game.withoutHosts.withUsers.withClans.toJson.+("isNew" -> JsBoolean(true))
-    wSClient.url("http://actionfps.com/live/render-fragment.php").post(b).foreach {
+    val b = game.withoutHosts.withUsers.flattenPlayers.withClans.toJson.+("isNew" -> JsBoolean(true))
+    wSClient.url(url).post(b).foreach {
       response =>
         thing.push(
           Event(

@@ -64,16 +64,18 @@ case class CompletedServerStateMachine(serverInfoReply: ServerInfoReply, playerI
       map = Option(serverInfoReply.mapName).filter(_.nonEmpty),
       mode = modes.get(serverInfoReply.mode),
       minRemain = serverInfoReply.minRemain,
-      players = if ( teamInfos.nonEmpty ) None else Option(playerInfoReplies.map(_.name)),
+      players = if ( teamInfos.nonEmpty ) None else Option(playerInfoReplies.filter(pi => activeTeams.contains(pi.team)).map(_.name)).filter(_.nonEmpty),
+      spectators = Option(playerInfoReplies.filter(pi => !activeTeams.contains(pi.team)).map(_.name)).filter(_.nonEmpty),
       teams = (for {
         TeamScore(name, frags, flags) <- teamInfos.toSeq.flatMap(_.teams)
+        if activeTeams.contains(name)
       } yield CurrentGameTeam(
         name = name,
         flags = Option(flags).filter(_ >= 0),
         frags = frags,
         players = for {
           p <- playerInfoReplies.sortBy(x => (x.flagScore, x.frags)).reverse
-          if p.team == name
+          if p.team.contains(name)
         } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_>=0), frags = p.frags)
       )).toList
     )

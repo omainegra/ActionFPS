@@ -55,7 +55,7 @@ class GamesService @Inject()(configuration: Configuration,
 
   val allGames: Agent[List[JsonGame]] = Agent(List.empty)
   val tailer = new GameTailer(file, false)((game) =>
-    allGames.alter(list => list :+ game.withoutHosts.withUsers.withClans
+    allGames.alter(list => list :+ game.withoutHosts.withUsers.flattenPlayers.withClans
     ))
 
 }

@@ -11,7 +11,7 @@ function render_game_team_player($game, $team, $player)
             <span class="name"><a
                     href="/player/?id=<?php echo rawurlencode($player['user']); ?>"><?php echo htmlspecialchars($player['name']); ?></a></span>
         <?php } else { ?>
-            <span class="name"><?php echo htmlspecialchars($player['name']); ?></span>
+            <span class="name"><span><?php echo htmlspecialchars($player['name']); ?></span></span>
         <?php } ?>
     </li>
     <?php
