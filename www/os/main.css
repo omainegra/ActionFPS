@@ -126,6 +126,7 @@ a:hover {
 #create-profile,
 #profile,
 #players,
+#clans,
 #live-events,
 article#videos,
 #settings {
@@ -225,7 +226,7 @@ table.map-master td.complete {
 code {
   font-family: Consolas, monospace;
 }
-#players ol {
+#players ol, #clans ol {
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -249,11 +250,11 @@ code {
   -webkit-align-content: flex-end;
   align-content: flex-end;
 }
-#players ol li {
+#players ol li, #clans ol li {
   display: inline-block;
   padding: 0.4em 1em;
 }
-#players ol li a {
+#players ol li a, #clans ol li a {
   text-decoration: none;
 }
 #download-ac-button {
@@ -428,6 +429,31 @@ code {
   text-align: center;
   margin-bottom: 0;
 }
+
+.GameCard.game.clanwar {
+    background-color: transparent; 
+}
+
+.clanwar .result .clan {
+  font-size: 2.5em;
+  display: inline-block;
+  text-align: center;
+}
+.clanwar .result .score {
+  padding-left: 10px;
+}
+
+.clanwar .players ol li {
+  padding-left: 0;
+}
+
+.clanwar .players ol li .name {
+    width: 8em;
+}
+
+.clanwar .players ol li .name img {
+  display: inline;
+}
 .LiveEvents.live-events {
   margin: 0;
   padding: 0;
@@ -517,3 +543,18 @@ code {
   margin-top: 0.7em;
 }
 /*# sourceMappingURL=main.css.map */
+
+.clan-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+.clan-header img {
+    margin-right: 0.25em;
+}
+
+.clan-header h1 {
+    margin: 0 0.25em;
+}
+
