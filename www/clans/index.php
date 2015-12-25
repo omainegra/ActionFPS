@@ -4,7 +4,7 @@ require("../render_game.inc.php");
 
 $clans = json_decode(file_get_contents('http://api.actionfps.com/clans/'), true);
 ?>
-<article id="clans">
+<article id="players">
    <ol>
        <?php foreach($clans as $clan) { ?>
             <li>
