@@ -214,15 +214,12 @@ lazy val logService =
       rpmBrpJavaRepackJars := true,
       version := "4.0",
       rpmLicense := Some("BSD"),
+      resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
       libraryDependencies ++= Seq(
         "org.syslog4j" % "syslog4j" % "0.9.30",
         "org.scalatest" %% "scalatest" % "2.2.5" % "test",
         "ch.qos.logback" % "logback-classic" % "1.1.3",
-        "com.typesafe.akka" %% "akka-actor" % "2.4.1",
-        "com.typesafe.akka" %% "akka-agent" % "2.4.1",
-        "com.typesafe.akka" %% "akka-slf4j" % "2.4.1",
         "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-        "com.typesafe" % "config" % "1.3.0",
         "joda-time" % "joda-time" % "2.9.1",
         "org.joda" % "joda-convert" % "1.8.1",
         "org.gnieh" % "logback-journal" % "0.1.0-SNAPSHOT"

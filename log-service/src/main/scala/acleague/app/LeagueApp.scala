@@ -2,44 +2,36 @@ package acleague.app
 
 import java.net.URI
 
+import acleague.actors.EventProcessor
 import acleague.actors.ReceiveMessages.RealMessage
-import acleague.actors.SyslogServerActor.SyslogServerOptions
-import acleague.actors._
 import acleague.syslog.SyslogServerEventIFScala
-import akka.actor.ActorSystem
-import com.typesafe.scalalogging.LazyLogging
-import org.productivity.java.syslog4j.Syslog
+import com.typesafe.scalalogging.StrictLogging
+import org.productivity.java.syslog4j.server.{SyslogServer, SyslogServerEventHandlerIF, SyslogServerEventIF, SyslogServerIF}
 
-import scala.util.Try
-
-object LeagueApp extends App with LazyLogging {
+object LeagueApp extends App with StrictLogging {
 
   val bindUri = new URI(args(0))
-  implicit val system = ActorSystem("acleague")
-  val syslogOptions = SyslogServerOptions(
-    protocol = bindUri.getScheme,
-    host = bindUri.getHost,
-    port = bindUri.getPort
-  )
-  val syslogServer = system.actorOf(
-    name = "syslogServer",
-    props = SyslogServerActor.props(syslogOptions)
-  )
-  val syslogProcessor = system.actorOf(
-    name = "syslogProcessor",
-    props = SyslogServerEventProcessorActor.props
-  )
-  system.eventStream.subscribe(
-    subscriber = syslogProcessor,
-    channel = classOf[SyslogServerEventIFScala]
-  )
-  val journaller = system.actorOf(
-    name = "fileJournaler",
-    props = OutputStreamJournaller.localProps(System.out)
-  )
-  system.eventStream.subscribe(
-    subscriber = journaller,
-    channel = classOf[RealMessage]
-  )
-  system.awaitTermination()
+
+  val syslogserver = SyslogServer.getInstance(bindUri.getScheme)
+  syslogserver.getConfig.setPort(bindUri.getPort)
+  syslogserver.getConfig.setHost(bindUri.getHost)
+  var state = EventProcessor.empty
+  val handler = new SyslogServerEventHandlerIF {
+    override def event(syslogServer: SyslogServerIF, event: SyslogServerEventIF): Unit = {
+      val scalaEvent = SyslogServerEventIFScala(event)
+      logger.debug("Received event from syslog server {}", scalaEvent)
+      state.process(scalaEvent, EventProcessor.currentTime) match {
+        case None =>
+          logger.debug(s"Ignored message: ${scalaEvent}")
+        case Some((nep, rm @ RealMessage(date, serverName, payload))) =>
+          logger.debug(s"Accepted message with new $nep: ${rm}")
+          state = nep
+          System.out.write(s"""Date: $date, Server: $serverName, Payload: $payload\n""".getBytes)
+      }
+    }
+  }
+  syslogserver.getConfig.addEventHandler(handler)
+  syslogserver.run()
+  Thread.sleep(50000)
+//  syslogserver.shutdown()
 }
