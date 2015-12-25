@@ -1,6 +1,0 @@
-GET         /                               @controllers.MasterServerController.main
-POST        /user/:id/                      @controllers.MasterServerController.createUser(id: String)
-POST        /user/:id/data/                 @controllers.MasterServerController.updateUserData(id: String)
-POST        /user/:id/refresh-key/          @controllers.MasterServerController.refreshUserKey(id: String, updateId: String)
-POST        /server/:id/                    @controllers.MasterServerController.createServer(id: String)
-POST        /server/:id/refresh-key/        @controllers.MasterServerController.refreshServerKey(id: String, updateId: String)
