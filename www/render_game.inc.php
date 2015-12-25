@@ -163,10 +163,10 @@ function render_war_clan($war, $clan, $show_players = false)
 ?>
     <div class="team">
         <div class="team-header">
-            <h3><img src="http://woop.ac:81/html/clan_picture.php?name=<?php echo htmlspecialchars($clan['name']) ?>&amp;id=<?php echo htmlspecialchars($clan['clan']) ?>" width="64" height="64"></h3>
+            <h3><img class="clan-logo" src="http://woop.ac:81/html/clan_picture.php?name=<?php echo rawurlencode($clan['name']) ?>&amp;id=<?php echo rawurlencode($clan['clan']) ?>" width="64" height="64"></h3>
 
             <div class="result">
-                <span class="clan"><a href="/clan/?id=<?php echo htmlspecialchars($clan['clan']) ?>"><?php echo htmlspecialchars($clan['name']) ?></a></span>
+                <span class="clan"><a href="/clan/?id=<?php echo rawurlencode($clan['clan']) ?>"><?php echo htmlspecialchars($clan['name']) ?></a></span>
                 <span class="score"><?php echo $clan['wins']; ?></span>
             </div>
         </div>
@@ -228,9 +228,9 @@ function render_compact_war($war, $perspective)
 <?php } else { ?>
         Lost <?php echo $clan['wins'] ?> - <?php echo $opponent['wins'] ?> vs
 <?php } ?>
-        <a href="/clan/?id=<?php echo htmlspecialchars($opponent['clan']) ?>"><?php echo htmlspecialchars($opponent['name']) ?></a>
+        <a href="/clan/?id=<?php echo rawurlencode($opponent['clan']) ?>"><?php echo htmlspecialchars($opponent['name']) ?></a>
         -
-        <a href="/clanwar/?id=<?php echo htmlspecialchars($war['startTime']); ?>">
+        <a href="/clanwar/?id=<?php echo rawurlencode($war['startTime']); ?>">
              <time is="local-time" datetime="<?php echo htmlspecialchars($war['endTime']); ?>" weekday="short" year="numeric" month="short" day="numeric">
                  <?php echo htmlspecialchars($war['endTime']); ?>
              </time> (<?php echo $war['teamsize'] ?> vs <?php echo $war['teamsize'] ?>)

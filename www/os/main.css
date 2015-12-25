@@ -558,3 +558,8 @@ code {
     margin: 0 0.25em;
 }
 
+img.clan-logo {
+	max-width:64px;
+	max-height:64px;
+}
+
