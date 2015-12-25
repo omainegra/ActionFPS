@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>info.log</file>
+        <file>syslog-ac.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>info.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <fileNamePattern>syslog-ac.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -12,7 +12,7 @@
     </appender>
     <logger name="acleague.syslog.SyslogServerEventProcessorActor" level="DEBUG">
         <appender-ref ref="file"/>
-        <appender-ref ref="systemd"/>
+        <!--<appender-ref ref="systemd"/>-->
         <appender-ref ref="STDERR"/>
     </logger>
     <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
@@ -22,7 +22,7 @@
         </encoder>
     </appender>
     <root level="INFO">
-        <appender-ref ref="systemd"/>
+        <!--<appender-ref ref="systemd"/>-->
         <appender-ref ref="file"/>
     </root>
 </configuration>
