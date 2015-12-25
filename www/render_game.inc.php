@@ -206,7 +206,7 @@ function render_war($war, $show_players = false, $show_as_first = false)
                     <?php
 
                     if(!$war['completed']) {
-                        ?><a class="lcw" title="Incomplete clanwar"><i class="fa fa-exclamation"></i></a><?php
+                        ?><a class="lcw" title="Incomplete clanwar" href="/questions/#completed-clanwar"><i class="fa fa-exclamation"></i></a><?php
                     } else if ( $show_as_first ) {
                         ?><a class="lcw" title="Latest clanwar"><i class="fa fa-question-circle"></i></a><?php
                     } ?>
@@ -239,7 +239,10 @@ function render_compact_war($war, $perspective)
         $opponent = $war['clans'][0];
     }
 ?>
-<?php if(!isset($war['winner'])) { ?>
+    <?php if ( !$war['completed'] ) { ?>
+    Incomplete vs
+    <?php
+        } elseif(!isset($war['winner'])) { ?>
         Tied <?php echo $clan['wins'] ?> - <?php echo $opponent['wins'] ?> vs
 <?php } elseif($war['winner'] == $clan['clan']) { ?>
         Won <?php echo $clan['wins'] ?> - <?php echo $opponent['wins'] ?> vs
