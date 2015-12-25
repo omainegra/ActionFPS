@@ -22,6 +22,7 @@ class NewGamesService @Inject()(applicationLifecycle: ApplicationLifecycle,
                                 recordsService: RecordsService,
                                 wSClient: WSClient,
                                 gamesService: GamesService,
+                               validServersService: ValidServersService,
                                 configuration: Configuration)(implicit
                                                               actorSystem: ActorSystem,
                                                               executionContext: ExecutionContext) {
@@ -51,7 +52,7 @@ class NewGamesService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
 //  val ka2 = actorSystem.scheduler.schedule(5.seconds, 5.seconds)(pushGame(gamesService.allGames.get().head))
 
-  val tailer = new GameTailer(gamesService.file, true)(pushGame)
+  val tailer = new GameTailer(validServersService.validServers, gamesService.file, true)(pushGame)
 
   applicationLifecycle.addStopHook(() => Future(keepAlive.cancel()))
 //  applicationLifecycle.addStopHook(() => Future(ka2.cancel()))

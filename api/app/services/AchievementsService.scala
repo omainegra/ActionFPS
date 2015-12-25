@@ -16,6 +16,7 @@ import scala.concurrent.{Future, ExecutionContext}
 class AchievementsService @Inject()(gamesService: GamesService,
                                     applicationLifecycle: ApplicationLifecycle,
                                     recordsService: RecordsService,
+                                    validServersService: ValidServersService,
                                     configuration: Configuration)
                                    (implicit executionContext: ExecutionContext) {
 
@@ -60,7 +61,7 @@ class AchievementsService @Inject()(gamesService: GamesService,
   val file = new File(configuration.underlying.getString("af.games.path"))
 
   val achievements: Agent[AchievementsIterator] = Agent(AchievementsIterator.empty)
-  val tailer = new GameTailer(file, false)(game => achievements.alter(_.includeGame(game)))
+  val tailer = new GameTailer(validServersService.validServers, file, false)(game => achievements.alter(_.includeGame(game)))
 
   def updateUser(user: User) = {
     var state = IndividualUserIterator(user = user, playerState = PlayerState.empty, events = List.empty)
