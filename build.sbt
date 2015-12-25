@@ -13,7 +13,7 @@ lazy val root =
       pingerClient,
       interParser,
       master,
-      logService
+      syslogAc
     ).dependsOn(
     achievements,
     gameParser,
@@ -22,7 +22,7 @@ lazy val root =
     pingerClient,
     interParser,
     master,
-    logService
+    syslogAc
   )
 
 /**
@@ -201,10 +201,10 @@ lazy val masterServer =
       ) ++ akka("actor", "agent")
     )
 
-lazy val logService =
+lazy val syslogAc =
   Project(
-    id = "log-service",
-    base = file("log-service")
+    id = "syslog-ac",
+    base = file("syslog-ac")
   )
     .enablePlugins(JavaAppPackaging)
     .enablePlugins(RpmPlugin)

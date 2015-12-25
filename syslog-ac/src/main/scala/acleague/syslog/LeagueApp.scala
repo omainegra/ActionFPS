@@ -1,10 +1,7 @@
-package acleague.app
+package acleague.syslog
 
 import java.net.URI
 
-import acleague.actors.EventProcessor
-import acleague.actors.ReceiveMessages.RealMessage
-import acleague.syslog.SyslogServerEventIFScala
 import com.typesafe.scalalogging.StrictLogging
 import org.productivity.java.syslog4j.server.{SyslogServer, SyslogServerEventHandlerIF, SyslogServerEventIF, SyslogServerIF}
 
@@ -23,15 +20,13 @@ object LeagueApp extends App with StrictLogging {
       state.process(scalaEvent, EventProcessor.currentTime) match {
         case None =>
           logger.debug(s"Ignored message: ${scalaEvent}")
-        case Some((nep, rm @ RealMessage(date, serverName, payload))) =>
+        case Some((nep, rm@AcServerMessage(date, serverName, payload))) =>
           logger.debug(s"Accepted message with new $nep: ${rm}")
           state = nep
-          System.out.write(s"""Date: $date, Server: $serverName, Payload: $payload\n""".getBytes)
+          System.out.write(rm.toLine.getBytes)
       }
     }
   }
   syslogserver.getConfig.addEventHandler(handler)
   syslogserver.run()
-  Thread.sleep(50000)
-//  syslogserver.shutdown()
 }
