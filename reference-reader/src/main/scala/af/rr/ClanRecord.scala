@@ -22,7 +22,7 @@ object ClanRecord {
         website = Try(new URI(rec.get(3))).toOption.filter(_.toString.nonEmpty)
         tag <- Option(rec.get(4)).filter(_.nonEmpty)
         tag2 = Try(rec.get(5)).toOption.filter(_ != null).filter(_.nonEmpty)
-        logo = Try(Option(new URI(rec.get(6))).filter(u => u.getPath.endsWith(".png") || u.getPath.endsWith(".svg"))).toOption.flatten
+        logo = Try(Option(new URI(rec.get(6))).filter(u => u.getPath.endsWith(".png") || u.getPath.endsWith(".svg") || u.getHost.contains("github"))).toOption.flatten
       } yield ClanRecord(
         id = id,
         shortName = shortName,
