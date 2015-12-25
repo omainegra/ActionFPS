@@ -2,33 +2,18 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$clans = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10'), true)['now'];
+$clans = json_decode(file_get_contents('http://api.actionfps.com/clans/'), true);
 ?>
-<article id="questions">
-    <div id="rank">
-    <h2>Warriors</h2>
-    <table style="width: 480px;">
-        <tr>
-            <th>Clan</th>
-            <td>Wars</td>
-            <td>Won</td>
-            <td>Games</td>
-            <td>Score</td>
-            <td>Elo Rank</td>
-        </tr>
-        <?php foreach($clans as $clan) : ?>
-        <tr>
-            <th><a href="/clan/?id=<?php echo htmlspecialchars($clan['clan']) ?>"><?php echo htmlspecialchars($clan['name']) ?></a></th>
-            <td><?php echo $clan['wars'] ?></td>
-            <td><?php echo $clan['wins'] ?></td>
-            <td><?php echo $clan['games'] ?></td>
-            <td><?php echo $clan['score'] ?></td>
-            <td><?php echo $clan['rank'] ?></td>
-        </tr>
-        <?php endforeach; ?>
-    </table>
-    </div>
+<article id="clans">
+   <ol>
+       <?php foreach($clans as $clan) { ?>
+            <li>
+                <a href="/clan/?id=<?php echo htmlspecialchars($clan['id']) ?>" title="<?php echo htmlspecialchars($clan['fullName']) ?>">
+                    <img src="http://woop.ac:81/html/clan_picture.php?name=<?php echo htmlspecialchars($clan['name']) ?>&id=<?php echo htmlspecialchars($clan['id']) ?>" width="64">
+                </a>
+            </li>
+       <?php } ?>
+   <ol>
 </article>
-
 
 <?php echo $foot;
