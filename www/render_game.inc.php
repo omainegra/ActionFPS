@@ -48,7 +48,9 @@ function render_game($game)
 
 
     }
-
+    if ( !isset($game['now']) && isset($game['server']) && strpos($game['server'], 'aura') > 0 ) {
+        $demo_link = 'http://woop.ac:81/find-demo.php?time=' . rawurlencode($game['id']) . '&map=' . rawurlencode($game['map']);
+    }
 
     ?>
     <article
@@ -75,6 +77,10 @@ function render_game($game)
                             </time>
                         <?php } ?>
                     </a>
+
+                    <?php if (isset($demo_link)) { ?>
+    <a target="_blank" class="demo-link" href="<?php echo htmlspecialchars($demo_link) ?>">demo</a>
+    <?php } ?>
 
                     <?php if (isset($ac_link)) { ?>
                         <a class="server-link"
