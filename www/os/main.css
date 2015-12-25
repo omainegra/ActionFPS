@@ -15,17 +15,40 @@ div[role='main'] {
   padding-bottom: 2em;
   box-shadow: #f5f5f5 1px 1px 3px, #f5f5f5 -1px -1px 3px, #f5f5f5 1px -1px 2px, #f5f5f5 -1px 1px 3px;
 }
-div[role='main'] > header {
+#top {
+  display:flex;
+}
+#top article {
+  padding-top:4.5em;
+}
+div[role='main'] header {
+  padding-left:2em;
   padding-top: 1em;
   font-size: 1.2em;
   font-family: Georgia, serif;
   text-align: center;
   text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
 }
-div[role='main'] > header h1 {
+#menu {
+  list-style-type: none;
+  display:flex;
+  flex-flow:row wrap;
+  margin:0;
+padding:0;
+}
+#top header img {
+  max-width:300px;
+}
+#menu li {
+  margin:0;
+  padding:0;
+  width:24%;
+  display:block;
+}
+div[role='main'] header h1 {
   margin-bottom: 0;
 }
-div[role='main'] > header h2 {
+div[role='main'] header h2 {
   margin-top: 0;
 }
 .teams {
