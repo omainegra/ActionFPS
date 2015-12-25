@@ -27,6 +27,10 @@ class GamesApiController @Inject()(configuration: Configuration,
                                    achievementsService: AchievementsService)
                                   (implicit executionContext: ExecutionContext) extends Controller {
 
+  def gameIds = Action {
+    Ok(Json.toJson(gamesService.allGames.get().map(_.id)))
+  }
+
   def recent = Action {
     Ok(JsArray(gamesService.allGames.get().takeRight(50).reverse.map(_.toJson)))
   }

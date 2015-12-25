@@ -15,3 +15,4 @@ GET         /nicknames/                     @controllers.GamesApiController.list
 GET         /server-updates/                @controllers.LiveUpdatesController.serverUpdates
 GET         /inters/                        @controllers.LiveUpdatesController.inters
 GET         /new-games/                     @controllers.LiveUpdatesController.newGames
+GET         /game-ids/                      @controllers.GamesApiController.gameIds
