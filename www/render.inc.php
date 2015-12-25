@@ -16,6 +16,9 @@ if ( isset($_COOKIE['af_name'], $_COOKIE['af_id'])) {
     $player_name = $domdoc->createTextNode($_COOKIE['af_name']);
     $log_in->replaceChild($player_name, $log_in->childNodes->item(0));
     $log_in->setAttribute("href", "/player/?id=".rawurlencode($_COOKIE['af_id']));
+    // remove log in link, it's getting on my nerves now with accidental clicking :D
+    $dac = $domdoc->getElementById("download-ac-button");
+    $dac->parentNode->removeChild($dac);
 }
 list($head, $foot) = explode($split_text, $domdoc->saveHTML());
 if (!isset($skip_head) || $skip_head === false) {
