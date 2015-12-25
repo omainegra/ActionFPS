@@ -163,7 +163,7 @@ function render_war_clan($war, $clan, $show_players = false)
 ?>
     <div class="team">
         <div class="team-header">
-            <h3><img class="clan-logo" src="http://woop.ac:81/html/clan_picture.php?name=<?php echo rawurlencode($clan['name']) ?>&amp;id=<?php echo rawurlencode($clan['clan']) ?>" width="64" height="64"></h3>
+            <h3><a href="/clan/?id=<?php echo rawurlencode($clan['clan']) ?>"><img class="clan-logo" src="http://woop.ac:81/html/clan_picture.php?name=<?php echo rawurlencode($clan['name']) ?>&amp;id=<?php echo rawurlencode($clan['clan']) ?>" width="64" height="64"/></a></h3>
 
             <div class="result">
                 <span class="clan"><a href="/clan/?id=<?php echo rawurlencode($clan['clan']) ?>"><?php echo htmlspecialchars($clan['name']) ?></a></span>
@@ -181,7 +181,7 @@ function render_war_clan($war, $clan, $show_players = false)
     </div>
 <?php } ?>
 <?php 
-function render_war($war, $show_players = false)
+function render_war($war, $show_players = false, $show_as_first = false)
 {
     $finalgame = $war['games'][count($war['games'])-1];
     ?>
@@ -189,11 +189,17 @@ function render_war($war, $show_players = false)
         <div class="w">
             <header>
                 <h2>
-                    <a href="/clanwar/?id=<?php echo rawurlencode($war['startTime']); ?>">
+                    <a href="/clanwar/?id=<?php echo rawurlencode($war['startTime']); ?>"
+                    >
                         <time is="local-time" datetime="<?php echo $war['endTime']; ?>" weekday="short" year="numeric" month="short" day="numeric">
                             <?php echo $war['endTime']; ?>
                         </time>
+
+
                     </a>
+                    <?php if ( $show_as_first ) {?><a class="lcw" title="Latest clanwar"><i class="fa fa-question-circle"></i></a><?php } ?>
+
+
                 </h2>
              </header>
              

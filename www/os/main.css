@@ -28,9 +28,10 @@ div[role='main'] {
   background:linear-gradient(rgba(10,20,20,0.8),rgba(30,50,50,0.6))
 }
 #top article {
-  padding-top:4.8em;
+  padding-top:3.8em;
   padding-left:1.6em;
   padding-right:2em;
+  width:100%;
 }
 div[role='main'] #top header {
   padding-left:2em;
@@ -40,7 +41,10 @@ div[role='main'] #top header {
   text-align: center;
   text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
 }
-#menu {
+#top header img {
+  max-width:300px;
+}
+.menu {
   list-style-type: none;
   display:flex;
   flex-flow:row wrap;
@@ -48,14 +52,9 @@ div[role='main'] #top header {
   padding:0;
   font-size:1.2em;
   text-align:left;
-}
-#top header img {
-  max-width:300px;
-}
-#menu {
   justify-content:space-between;
 }
-#menu li {
+.menu li {
   margin:0;
   padding:0;
   display:block;
@@ -596,3 +595,9 @@ img.clan-logo {
 	max-height:64px;
 }
 
+
+.lcw {
+  display:block;
+  margin-left:22em;
+  margin-top:-1.3em;
+}

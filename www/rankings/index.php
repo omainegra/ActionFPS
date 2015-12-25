@@ -6,7 +6,7 @@ $clans = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator
 ?>
 <article id="questions">
     <div id="rank">
-    <h2>Warriors</h2>
+    <h2>Clan Ranks</h2>
     <table style="width: 480px;">
         <tr>
             <th>Clan</th>

@@ -31,7 +31,7 @@ $latest_clanwar = reset($clanwars);
 
     <div id="new-games"></div>
     
-    <div id="latest-clanwar"><?php render_war($latest_clanwar); ?></div>
+    <div id="latest-clanwar"><?php render_war($latest_clanwar, false, true); ?></div>
 
 
     <div id="existing-games"><?php
