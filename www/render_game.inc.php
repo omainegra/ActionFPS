@@ -203,7 +203,13 @@ function render_war($war, $show_players = false, $show_as_first = false)
 
 
                     </a>
-                    <?php if ( $show_as_first ) {?><a class="lcw" title="Latest clanwar"><i class="fa fa-question-circle"></i></a><?php } ?>
+                    <?php
+
+                    if(!$war['completed']) {
+                        ?><a class="lcw" title="Incomplete clanwar"><i class="fa fa-exclamation"></i></a><?php
+                    } else if ( $show_as_first ) {
+                        ?><a class="lcw" title="Latest clanwar"><i class="fa fa-question-circle"></i></a><?php
+                    } ?>
 
 
                 </h2>
