@@ -12,7 +12,8 @@ lazy val root =
       referenceReader,
       pingerClient,
       interParser,
-      master
+      master,
+      syslogAc
     ).dependsOn(
     achievements,
     gameParser,
@@ -20,7 +21,8 @@ lazy val root =
     referenceReader,
     pingerClient,
     interParser,
-    master
+    master,
+    syslogAc
   )
 
 /**
@@ -109,9 +111,9 @@ lazy val pingerClient =
 
 
 
-/***
+/** *
   *
-  *  MASTER SERVER
+  * MASTER SERVER
   *
   */
 
@@ -199,3 +201,26 @@ lazy val masterServer =
       ) ++ akka("actor", "agent")
     )
 
+lazy val syslogAc =
+  Project(
+    id = "syslog-ac",
+    base = file("syslog-ac")
+  )
+    .enablePlugins(JavaAppPackaging)
+    .enablePlugins(RpmPlugin)
+    .settings(
+      rpmVendor := "typesafe",
+      libraryDependencies += json,
+      rpmBrpJavaRepackJars := true,
+      version := "4.0",
+      rpmLicense := Some("BSD"),
+      libraryDependencies ++= Seq(
+        "org.syslog4j" % "syslog4j" % "0.9.30",
+        "org.scalatest" %% "scalatest" % "2.2.5" % "test",
+        "ch.qos.logback" % "logback-classic" % "1.1.3",
+        "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
+        "joda-time" % "joda-time" % "2.9.1",
+        "org.joda" % "joda-convert" % "1.8.1"
+      ),
+      bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener""""
+    )
