@@ -13,7 +13,8 @@ lazy val root =
       pingerClient,
       interParser,
       demoParser,
-      syslogAc
+      syslogAc,
+      clans
     ).dependsOn(
     achievements,
     gameParser,
@@ -22,7 +23,8 @@ lazy val root =
     pingerClient,
     interParser,
     demoParser,
-    syslogAc
+    syslogAc,
+    clans
   )
 
 /**
@@ -149,4 +151,18 @@ lazy val syslogAc =
         "org.joda" % "joda-convert" % "1.8.1"
       ),
       bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener""""
+    )
+
+lazy val clans =
+  Project(
+    id = "clans",
+    base = file("clans")
+  )
+    .dependsOn(gameParser)
+    .settings(
+      libraryDependencies ++= Seq(
+        "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
+        "org.apache.httpcomponents" % "httpmime" % "4.5.1",
+        json
+      )
     )
