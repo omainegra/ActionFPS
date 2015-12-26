@@ -26,7 +26,7 @@ class GamesService @Inject()(configuration: Configuration,
 
   implicit class withUsersClass(jsonGame: JsonGame) {
     def withUsersL(users: List[User]) = jsonGame.transformPlayers((_, player) =>
-      player.copy(user = users.find(_.validAt(player.name, jsonGame.gameTime)).map(_.id))
+      player.copy(user = users.find(_.validAt(player.name, jsonGame.endTime)).map(_.id))
     )
 
     def withUsers: JsonGame = withUsersL(recordsService.users)
@@ -55,6 +55,7 @@ class GamesService @Inject()(configuration: Configuration,
   val file = new File(configuration.underlying.getString("af.games.path"))
 
   val allGames: Agent[List[JsonGame]] = Agent(List.empty)
+
   val tailer = new GameTailer(validServersService.validServers, file, false)((game) =>
     allGames.alter(list => list :+ game.withoutHosts.withUsers.flattenPlayers.withClans
     ))

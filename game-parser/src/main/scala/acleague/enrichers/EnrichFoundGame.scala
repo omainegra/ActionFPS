@@ -22,12 +22,11 @@ object JsonGame {
     Json.fromJson[JsonGame](Json.parse(string)).get
   }
 
-  def build(foundGame: FoundGame, date: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
-    val fdt = date.format(DateTimeFormatter.ISO_INSTANT)
+  def build(id: String, foundGame: FoundGame, endDate: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
 
     JsonGame(
-      id = fdt,
-      gameTime = date,
+      id = id,
+      endTime = endDate,
       server = serverId,
       duration = duration,
       clangame = None,
@@ -148,16 +147,17 @@ case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: L
   }
 }
 
-case class ViewFields(startTime: ZonedDateTime, endTime: ZonedDateTime, winner: Option[String], winnerClan: Option[String]) {
+case class ViewFields(startTime: ZonedDateTime, gameTime: ZonedDateTime, endTime: ZonedDateTime, winner: Option[String], winnerClan: Option[String]) {
   def toJson = Json.toJson(this)(ViewFields.jsonFormat)
 }
 
 object ViewFields {
-  implicit val DefaultZonedDateTimeWrites = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_INSTANT)
+  val DefaultZonedDateTimeWrites = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_INSTANT)
+  implicit val ZonedWrite = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_ZONED_DATE_TIME)
   implicit val jsonFormat = Json.writes[ViewFields]
 }
 
-case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: String, state: String,
+case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: String, state: String,
                     teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[List[String]]) {
 
   def flattenPlayers = transformTeams(_.flattenPlayers)
@@ -194,8 +194,9 @@ case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: Stri
     else None
 
   def viewFields = ViewFields(
-    startTime = gameTime,
-    endTime = gameTime.plusMinutes(duration),
+    startTime = endTime.minusMinutes(duration),
+    gameTime = endTime.minusMinutes(duration),
+    endTime = endTime,
     winner = winner,
     winnerClan = winnerClan
   )

@@ -16,7 +16,10 @@ case class ServerStateProcessing(parserState: ParserState, gameDuration: GameDur
   def next(line: String): ServerState = {
     parserState.next(line) match {
       case fg: FoundGame =>
-        ServerFoundGame(foundGame = fg, duration = gameDuration.getOrElse(15))
+        ServerFoundGame(
+          foundGame = fg,
+          duration = gameDuration.getOrElse(15)
+        )
       case _ =>
         copy(
           parserState = parserState.next(line),
