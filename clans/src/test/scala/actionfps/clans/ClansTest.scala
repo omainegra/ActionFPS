@@ -4,16 +4,30 @@ package clans
 import java.net.URI
 import java.time.ZonedDateTime
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import play.api.libs.json.Json
 
 class ClansTest
   extends FunSuite
-  with Matchers {
+  with Matchers
+  with BeforeAndAfterAll {
+
+  var proc: Process = _
+
+  override protected def beforeAll(): Unit = {
+    val bin = if (scala.util.Properties.isWin) """C:\php\php.exe""" else "php"
+    proc = Runtime.getRuntime.exec(Array(bin, "-S", "127.0.0.1:7778", "-t", "php-clans-api"))
+    super.beforeAll()
+  }
+
+  override protected def afterAll(): Unit = {
+    proc.destroy()
+    super.afterAll()
+  }
 
   val comp = Computation(
     apiHost = "http://api.actionfps.com",
-    phpApiEndpoint = new URI("http://localhost:7777/http-input.php")
+    phpApiEndpoint = new URI("http://localhost:7778/http-input.php")
   )
 
   ignore("Clanwars listing works") {
@@ -30,7 +44,7 @@ class ClansTest
     mp.get
   }
 
-  ignore("Game thing works") {
+  test("Game thing works") {
     val map = comp.calculateClanwars(comp.loadAllGames().map(_._2))
 
     map.completed.keySet should contain allOf("2015-12-25T18:51:44Z", "2015-12-23T19:36:15Z")
