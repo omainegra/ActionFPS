@@ -18,9 +18,9 @@ case class AchievementsIterator(map: Map[String, PlayerState], events: List[Map[
     for {
       team <- jsonGame.teams
       player <- team.players
-      user <- users.find(_.validAt(player.name, jsonGame.gameTime))
+      user <- users.find(_.validAt(player.name, jsonGame.endTime))
       (newPs, newEvents) <- map.getOrElse(user.id, PlayerState.empty).includeGame(jsonGame, team, player)(p =>
-        users.exists(_.validAt(p.name, jsonGame.gameTime)))
+        users.exists(_.validAt(p.name, jsonGame.endTime)))
     } {
       oEvents ++= newEvents.map { case (date, text) => Map("user" -> user.id, "date" -> date, "text" -> s"${user.name} $text") }
       nComb = nComb.updated(user.id, newPs)
@@ -34,8 +34,8 @@ case class IndividualUserIterator(user: User, playerState: PlayerState, events: 
     for {
       team <- jsonGame.teams
       player <- team.players
-      if user.validAt(player.name, jsonGame.gameTime)
-      (newPs, newEvents) <- playerState.includeGame(jsonGame, team, player)(p => users.exists(u => u.validAt(p.name, jsonGame.gameTime)))
+      if user.validAt(player.name, jsonGame.endTime)
+      (newPs, newEvents) <- playerState.includeGame(jsonGame, team, player)(p => users.exists(u => u.validAt(p.name, jsonGame.endTime)))
     } yield copy(
       playerState = newPs,
       events = events ++ newEvents.map { case (date, text) => Map("user" -> user.id, "date" -> date, "text" -> s"${user.name} $text") }
