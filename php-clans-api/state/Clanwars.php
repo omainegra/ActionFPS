@@ -13,7 +13,8 @@ class Clanwar implements JsonSerializable
     
     public function __construct($game)
     {
-        $this->id = $this->startTime = $game->gameTime;
+        $this->id = $game->id;
+        $this->startTime = $game->startTime;
         $this->clans = array(new stdClass(), new stdClass());
         $this->server = $game->server;
         
@@ -68,7 +69,7 @@ class Clanwar implements JsonSerializable
     public function timeDiff($game)
     {
         $last_game_end = new DateTime($this->endTime);
-        $game_start = new DateTime($game->gameTime);
+        $game_start = new DateTime($game->startTime);
         return $game_start->getTimestamp() - $last_game_end->getTimestamp();
     }
     
@@ -104,7 +105,7 @@ class Clanwar implements JsonSerializable
             if($win)
             {
                 $this->clans[$id]->wins++;
-                $this->clans[$id]->won[] = $game->gameTime; // FIXME use ID even if both are = ATM
+                $this->clans[$id]->won[] = $game->startTime; // FIXME use ID even if both are = ATM
             }
             if(isset($team->flags)) $this->clans[$id]->flags += $team->flags;
             $this->clans[$id]->frags += $team->frags;
