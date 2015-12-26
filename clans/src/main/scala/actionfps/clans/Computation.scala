@@ -26,11 +26,11 @@ case class Computation(apiHost: String, phpApiEndpoint: URI) {
     Json.fromJson[Clanstats](Json.parse(res)).get
   }
 
-  def loadAllGames(): ListMap[String, JsObject] = {
+  def loadAllGames(): List[(String, JsObject)] = {
     val parseLine = """(.*)\t(.*)""".r
-    ListMap(Source.fromInputStream(new URI(s"${apiHost}/all/").toURL.openStream()).getLines().collect {
+    Source.fromInputStream(new URI(s"${apiHost}/all/").toURL.openStream()).getLines().collect {
       case parseLine(id, str) => id -> Json.parse(str).asInstanceOf[JsObject]
-    }.toList: _*)
+    }.toList.sortBy(_._1)
   }
 
   def loadRecentClangames(): ListMap[String, JsObject] = {

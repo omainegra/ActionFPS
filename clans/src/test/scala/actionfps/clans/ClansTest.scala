@@ -31,7 +31,7 @@ class ClansTest
   }
 
   ignore("Game thing works") {
-    val map = comp.calculateClanwars(comp.loadAllGames().values.toList)
+    val map = comp.calculateClanwars(comp.loadAllGames().map(_._2))
 
     map.completed.keySet should contain allOf("2015-12-25T18:51:44Z", "2015-12-23T19:36:15Z")
     map.completed.keySet should not contain ("2015-12-13T14:20:48Z")
@@ -45,9 +45,9 @@ class ClansTest
     completed shouldBe expectedClanwar
   }
 
-  ignore("Clanstats works") {
-    val map = comp.calculateClanwars(comp.loadAllGames().values.toList)
-    val clanStats = comp.calculateClanstats(map.completed.flatMap { case (id, cw) => cw.json }.toList)
+  test("Clanstats works") {
+    val map = comp.calculateClanwars(comp.loadAllGames().map(_._2))
+    val clanStats = comp.calculateClanstats(map.completed.toList.sortBy(_._1).flatMap { case (id, cw) => cw.json })
     val shouldHaveWoop = Clanstat(
       clan = "woop",
       elo = 1053.9081684082,
@@ -63,9 +63,8 @@ class ClansTest
       deaths = 0,
       rank = Option(4)
     )
-    clanStats.now("woop") shouldBe shouldHaveWoop.copy(rank = None, elo = 1008.653400844)
+    clanStats.now("woop") shouldBe shouldHaveWoop.copy(rank = None)
   }
-
 
   def expectedClanwar =
     Clanwar(
