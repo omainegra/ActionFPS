@@ -9,9 +9,9 @@ if (isset($_POST['games'])) {
     foreach ($games as $game) {
         $state = games_to_clanwars($state, $game);
     }
-} else if ( isset($_POST['clanwars'])) {
+} else if (isset($_POST['clanwars'])) {
     $clanwars = json_decode($_POST['clanwars'], false);
-    foreach($clanwars as $clanwar) {
+    foreach ($clanwars as $clanwar) {
         $state = clanwars_to_clanstats($state, $clanwar);
     }
 }

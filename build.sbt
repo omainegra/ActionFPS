@@ -173,5 +173,6 @@ lazy val clans =
         "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
         "org.apache.httpcomponents" % "httpmime" % "4.5.1",
         json
-      )
+      ),
+      watchSources += baseDirectory.value.getParentFile / "php-clans-api"
     )
