@@ -195,7 +195,7 @@ function render_war($war, $show_players = false, $show_as_first = false)
         <div class="w">
             <header>
                 <h2>
-                    <a href="/clanwar/?id=<?php echo rawurlencode($war['startTime']); ?>"
+                    <a href="/clanwar/?id=<?php echo rawurlencode($war['id']); ?>"
                     >
                         <time is="local-time" datetime="<?php echo $war['endTime']; ?>" weekday="short" year="numeric" month="short" day="numeric">
                             <?php echo $war['endTime']; ?>
@@ -251,7 +251,7 @@ function render_compact_war($war, $perspective)
 <?php } ?>
         <a href="/clan/?id=<?php echo rawurlencode($opponent['clan']) ?>"><?php echo htmlspecialchars($opponent['name']) ?></a>
         -
-        <a href="/clanwar/?id=<?php echo rawurlencode($war['startTime']); ?>">
+        <a href="/clanwar/?id=<?php echo rawurlencode($war['id']); ?>">
              <time is="local-time" datetime="<?php echo htmlspecialchars($war['endTime']); ?>" weekday="short" year="numeric" month="short" day="numeric">
                  <?php echo htmlspecialchars($war['endTime']); ?>
              </time> (<?php echo $war['teamsize'] ?> vs <?php echo $war['teamsize'] ?>)
