@@ -13,7 +13,7 @@ import scala.xml.UnprefixedAttribute
 case class GameJsonFound(jsonGame: JsonGame)
 
 object JsonGame {
-  implicit val vf = ViewFields.DefaultZonedDateTimeWrites
+  implicit val vf = ViewFields.ZonedWrite
   implicit val Af = Json.format[JsonGamePlayer]
   implicit val Bf = Json.format[JsonGameTeam]
   implicit val fmt = Json.format[JsonGame]
@@ -126,8 +126,8 @@ case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: L
     */
   def flattenPlayers = {
     var newPlayers = players
-    players.groupBy(_.name).collect{
-      case (playerName, them @ first :: rest) if rest.nonEmpty =>
+    players.groupBy(_.name).collect {
+      case (playerName, them@first :: rest) if rest.nonEmpty =>
         val newPlayer = JsonGamePlayer(
           name = playerName,
           host = first.host,
@@ -147,7 +147,7 @@ case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: L
   }
 }
 
-case class ViewFields(startTime: ZonedDateTime, gameTime: ZonedDateTime, endTime: ZonedDateTime, winner: Option[String], winnerClan: Option[String]) {
+case class ViewFields(startTime: ZonedDateTime, winner: Option[String], winnerClan: Option[String]) {
   def toJson = Json.toJson(this)(ViewFields.jsonFormat)
 }
 
@@ -195,8 +195,6 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
 
   def viewFields = ViewFields(
     startTime = endTime.minusMinutes(duration),
-    gameTime = endTime.minusMinutes(duration),
-    endTime = endTime,
     winner = winner,
     winnerClan = winnerClan
   )
@@ -211,9 +209,11 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
     def numberOfPlayers = teams.map(_.players.size).sum
     def averageFrags = teams.flatMap(_.players.map(_.frags)).sum / numberOfPlayers
     if (duration < 10) Bad(s"Duration is $duration, expecting at least 10")
+    else if (duration > 15) Bad(s"Duration is $duration, expecting at most 15")
     else if (numberOfPlayers < 4) Bad(s"Player count is $numberOfPlayers, expecting 4 or more.")
     else if (teams.size < 2) Bad(s"Expected team size >= 2, got ${teams.size}")
     else if (averageFrags < 15) Bad(s"Average frags $averageFrags, expected >= 15 ")
     else Good(this)
   }
+
 }

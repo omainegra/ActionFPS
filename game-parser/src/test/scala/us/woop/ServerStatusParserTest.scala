@@ -31,6 +31,12 @@ class ServerStatusParserTest
     TimeCorrector(d, serverStatusTime)(d).toString shouldBe "2015-05-07T13:35:20-04:00"
   }
 
+  test("LA shift is good") {
+    val fullMessage = """Date: 2015-12-24T00:41:16.092Z, Server: 104.255.33.235 la AssaultCube[local#33333], Payload: Status at 23-12-2015 19:39:03: 1 remote clients, 25.3 send, 0.4 rec (K/sec); Ping: #486|28889|2124; CSL: #12|474|126 (bytes)"""
+    val ExtractMessage(d, _, ServerStatus(serverStatusTime, _)) = fullMessage
+    TimeCorrector(d, serverStatusTime)(d).toString shouldBe "2015-12-23T19:39:03-05:00"
+  }
+
   ignore("MSP against a local thing") {
     scala.io.Source.fromFile("../j.log")
       .getLines()
