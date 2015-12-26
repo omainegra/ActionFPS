@@ -40,7 +40,7 @@ object User {
     implicit val noEmailUserWrite = Json.writes[User].transform(jv => jv.validate((__ \ 'email).json.prune).get)
   }
 
-  def registrationToUser(registration: Registration, nicknames: List[NicknameRecord]): Option[User] = {
+  def fromRegistration(registration: Registration, nicknames: List[NicknameRecord]): Option[User] = {
     val hisNicks = nicknames.filter(_.id == registration.id).sortBy(_.from.toString)
     PartialFunction.condOpt(hisNicks) {
       case nicks if nicks.nonEmpty =>

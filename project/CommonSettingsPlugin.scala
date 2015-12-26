@@ -14,6 +14,8 @@ object CommonSettingsPlugin extends AutoPlugin {
       "-language:existentials", "-language:implicitConversions",
       "-language:reflectiveCalls", "-target:jvm-1.8"
     ),
+    javaOptions += "-Duser.timezone=UTC",
+    javaOptions in run += "-Duser.timezone=UTC",
     resolvers += Resolver.mavenLocal,
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "2.2.5" % "test",

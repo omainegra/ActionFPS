@@ -1,0 +1,67 @@
+{
+  "id" : "2015-12-26T11:49:59Z",
+  "gameTime" : "2015-12-26T11:49:59Z",
+  "map" : "ac_desert3",
+  "mode" : "ctf",
+  "state" : "match",
+  "teams" : [ {
+    "name" : "RVSF",
+    "flags" : 10,
+    "frags" : 144,
+    "players" : [ {
+      "name" : "Brett",
+      "score" : 803,
+      "flags" : 5,
+      "frags" : 36,
+      "deaths" : 36,
+      "user" : "brett"
+    }, {
+      "name" : "w00p|Sanzo",
+      "score" : 947,
+      "flags" : 4,
+      "frags" : 68,
+      "deaths" : 41,
+      "user" : "sanzo",
+      "clan" : "woop"
+    }, {
+      "name" : "quico",
+      "score" : 583,
+      "flags" : 1,
+      "frags" : 40,
+      "deaths" : 42,
+      "user" : "quico"
+    } ]
+  }, {
+    "name" : "CLA",
+    "flags" : 7,
+    "frags" : 119,
+    "players" : [ {
+      "name" : "grenadier",
+      "score" : 320,
+      "flags" : 5,
+      "frags" : 13,
+      "deaths" : 55
+    }, {
+      "name" : "w00p|.ech0",
+      "score" : 802,
+      "flags" : 2,
+      "frags" : 56,
+      "deaths" : 40,
+      "user" : "echo",
+      "clan" : "woop"
+    }, {
+      "name" : "w00p|Lucas",
+      "score" : 750,
+      "flags" : 0,
+      "frags" : 50,
+      "deaths" : 46,
+      "user" : "lucas",
+      "clan" : "woop"
+    } ]
+  } ],
+  "server" : "aura 1999",
+  "duration" : 15,
+  "startTime" : "2015-12-26T11:49:59Z",
+  "endTime" : "2015-12-26T12:04:59Z",
+  "winner" : "RVSF"
+}

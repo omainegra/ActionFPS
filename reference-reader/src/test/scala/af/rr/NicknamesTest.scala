@@ -1,7 +1,5 @@
 package af.rr
 
-import java.io.InputStreamReader
-
 import org.scalatest.{FunSuite, Matchers, OptionValues}
 
 /**
@@ -10,8 +8,8 @@ import org.scalatest.{FunSuite, Matchers, OptionValues}
 class NicknamesTest extends FunSuite with Matchers with OptionValues {
 
   test("It should parse both") {
-    val r = NicknameRecord.parseRecords(new InputStreamReader(getClass.getResourceAsStream("nicknames.csv")))
-    r should have size 9
+    val r = NicknameRecord.parseRecords(getSample("nicknames.csv"))
+    r should have size 139
   }
 
 }

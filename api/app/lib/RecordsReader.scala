@@ -36,7 +36,7 @@ class RecordsReader @Inject()(configuration: Configuration) {
     val registrations = Registration.parseRecords(getConfigUrlReader("registrations"))
     val nicknames = NicknameRecord.parseRecords(getConfigUrlReader("nicknames"))
     registrations.flatMap { registration =>
-      User.registrationToUser(registration, nicknames)
+      User.fromRegistration(registration, nicknames)
     }
   }
 }
