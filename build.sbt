@@ -26,6 +26,15 @@ lazy val root =
     syslogAc,
     clans
   )
+    .settings(
+      commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
+        val extracted = Project.extract(state)
+        val newSettings = extracted.structure.allProjectRefs map { proj =>
+          testOptions in proj += sbt.Tests.Argument("-l", "af.RequiresPHP")
+        }
+        extracted.append(newSettings, state)
+      }
+    )
 
 /**
   * API
