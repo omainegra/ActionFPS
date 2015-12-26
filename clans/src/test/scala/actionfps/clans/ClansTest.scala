@@ -44,7 +44,7 @@ class ClansTest
     mp.get
   }
 
-  test("Game thing works") {
+  ignore("Game thing works") {
     val map = comp.calculateClanwars(comp.loadAllGames().map(_._2))
 
     map.completed.keySet should contain allOf("2015-12-25T18:51:44Z", "2015-12-23T19:36:15Z")
@@ -59,7 +59,7 @@ class ClansTest
     completed shouldBe expectedClanwar
   }
 
-  test("Clanstats works") {
+  ignore("Clanstats works") {
     val map = comp.calculateClanwars(comp.loadAllGames().map(_._2))
     val clanStats = comp.calculateClanstats(map.completed.toList.sortBy(_._1).flatMap { case (id, cw) => cw.json })
     val shouldHaveWoop = Clanstat(
