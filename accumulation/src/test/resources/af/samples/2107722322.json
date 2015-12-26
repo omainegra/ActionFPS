@@ -1,6 +1,6 @@
 {
   "id" : "2015-12-26T14:02:53Z",
-  "gameTime" : "2015-12-26T14:02:53Z",
+  "endTime" : "2015-12-26T15:15:04+01:00",
   "map" : "ac_shine",
   "mode" : "ctf",
   "state" : "match",
@@ -70,7 +70,6 @@
   } ],
   "server" : "aura 2999",
   "duration" : 15,
-  "startTime" : "2015-12-26T14:02:53Z",
-  "endTime" : "2015-12-26T14:17:53Z",
+  "startTime" : "2015-12-26T15:00:04+01:00",
   "winner" : "RVSF"
 }

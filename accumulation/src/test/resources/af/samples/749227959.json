@@ -1,6 +1,6 @@
 {
   "id" : "2015-12-26T11:49:59Z",
-  "gameTime" : "2015-12-26T11:49:59Z",
+  "endTime" : "2015-12-26T13:02:03+01:00",
   "map" : "ac_desert3",
   "mode" : "ctf",
   "state" : "match",
@@ -61,7 +61,6 @@
   } ],
   "server" : "aura 1999",
   "duration" : 15,
-  "startTime" : "2015-12-26T11:49:59Z",
-  "endTime" : "2015-12-26T12:04:59Z",
+  "startTime" : "2015-12-26T12:47:03+01:00",
   "winner" : "RVSF"
 }

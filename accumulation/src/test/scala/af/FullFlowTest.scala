@@ -13,11 +13,11 @@ import scala.util.hashing.MurmurHash3
 /**
   * Created by William on 26/12/2015.
   */
-class FullFlow
+class FullFlowTest
   extends FunSuite
   with Matchers {
 
-  test("It works") {
+  test("Games are written in properly") {
 
     val clans = ClanRecord.parseRecords(af.rr.getSample("clans.csv")).map(Clan.fromClanRecord)
     val nicknames = NicknameRecord.parseRecords(af.rr.getSample("nicknames.csv"))

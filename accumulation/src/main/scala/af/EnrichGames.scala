@@ -9,7 +9,7 @@ case class EnrichGames(users: List[User], clans: List[Clan]) {
 
   implicit class withUsersClass(jsonGame: JsonGame) {
     def withUsersL(users: List[User]) = jsonGame.transformPlayers((_, player) =>
-      player.copy(user = users.find(_.validAt(player.name, jsonGame.gameTime)).map(_.id))
+      player.copy(user = users.find(_.validAt(player.name, jsonGame.endTime)).map(_.id))
     )
 
     def withUsers: JsonGame = withUsersL(users)
@@ -34,4 +34,5 @@ case class EnrichGames(users: List[User], clans: List[Clan]) {
 
     def withClans: JsonGame = withClansL(clans)
   }
+
 }

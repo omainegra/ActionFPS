@@ -1,6 +1,6 @@
 {
   "id" : "2015-12-26T15:08:51Z",
-  "gameTime" : "2015-12-26T15:08:51Z",
+  "endTime" : "2015-12-26T15:21:32Z",
   "map" : "ac_gothic",
   "mode" : "ctf",
   "state" : "open",
@@ -60,7 +60,6 @@
   } ],
   "server" : "ny 33333",
   "duration" : 15,
-  "startTime" : "2015-12-26T15:08:51Z",
-  "endTime" : "2015-12-26T15:23:51Z",
+  "startTime" : "2015-12-26T15:06:32Z",
   "winner" : "RVSF"
 }

@@ -16,14 +16,8 @@ object ProcessJournalApp extends App {
       .collect { case m: MultipleServerParserFoundGame => m }
   }
 
-  args.toList match {
-    case List(a, b) =>
-      val input = if ( a == "-" ) System.in else new FileInputStream(a)
-      val output = if ( b == "-") System.out else new FileOutputStream(b, false)
-      try parseSource(input)
-        .map(g => s"${g.detailString}\n".getBytes("UTF-8"))
-        .foreach(b => output.write(b))
-      finally { input.close(); output.close() }
-  }
+  parseSource(System.in)
+    .map(g => s"${g.detailString}\n".getBytes("UTF-8"))
+    .foreach(b => System.out.write(b))
 
 }

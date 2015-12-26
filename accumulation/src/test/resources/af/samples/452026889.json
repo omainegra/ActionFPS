@@ -1,6 +1,6 @@
 {
   "id" : "2015-12-26T13:29:19Z",
-  "gameTime" : "2015-12-26T13:29:19Z",
+  "endTime" : "2015-12-26T14:41:04+01:00",
   "map" : "ac_ingress",
   "mode" : "ctf",
   "state" : "match",
@@ -61,7 +61,6 @@
   } ],
   "server" : "aura 2999",
   "duration" : 15,
-  "startTime" : "2015-12-26T13:29:19Z",
-  "endTime" : "2015-12-26T13:44:19Z",
+  "startTime" : "2015-12-26T14:26:04+01:00",
   "winner" : "CLA"
 }

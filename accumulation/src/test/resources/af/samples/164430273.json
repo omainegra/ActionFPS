@@ -1,6 +1,6 @@
 {
   "id" : "2015-12-26T14:18:28Z",
-  "gameTime" : "2015-12-26T14:18:28Z",
+  "endTime" : "2015-12-26T15:31:08+01:00",
   "map" : "ac_gothic",
   "mode" : "ctf",
   "state" : "open",
@@ -63,7 +63,6 @@
   } ],
   "server" : "aura 2999",
   "duration" : 15,
-  "startTime" : "2015-12-26T14:18:28Z",
-  "endTime" : "2015-12-26T14:33:28Z",
+  "startTime" : "2015-12-26T15:16:08+01:00",
   "winner" : "RVSF"
 }
