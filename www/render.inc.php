@@ -1,4 +1,11 @@
 <?php
+
+function clan_logo($clan) {
+    $url = @$clan['logo'] ?: 'http://woop.ac:81/html/clan_picture.php?name='.rawurlencode($clan['name']).'&id='.rawurlencode(@($clan['id'] ?: $clan['clan']));
+    ?><img class="clan-logo" src="<?php echo htmlspecialchars($url); ?>" width="64" height="64"/>
+<?php
+
+}
 $main_template_path = dirname(__FILE__) . "/template.html";
 $domdoc = new DOMDocument();
 libxml_use_internal_errors(true);
@@ -16,6 +23,9 @@ if ( isset($_COOKIE['af_name'], $_COOKIE['af_id'])) {
     $player_name = $domdoc->createTextNode($_COOKIE['af_name']);
     $log_in->replaceChild($player_name, $log_in->childNodes->item(0));
     $log_in->setAttribute("href", "/player/?id=".rawurlencode($_COOKIE['af_id']));
+    // remove log in link, it's getting on my nerves now with accidental clicking :D
+    $dac = $domdoc->getElementById("download-ac-button");
+    $dac->parentNode->removeChild($dac);
 }
 list($head, $foot) = explode($split_text, $domdoc->saveHTML());
 if (!isset($skip_head) || $skip_head === false) {

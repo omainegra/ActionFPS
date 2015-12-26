@@ -15,17 +15,55 @@ div[role='main'] {
   padding-bottom: 2em;
   box-shadow: #f5f5f5 1px 1px 3px, #f5f5f5 -1px -1px 3px, #f5f5f5 1px -1px 2px, #f5f5f5 -1px 1px 3px;
 }
-div[role='main'] > header {
+
+#top {
+  text-align: center;
+  text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
+  margin-top: -1em;
+  padding-bottom: 1em;
+}
+#top {
+  display:flex;
+  /*background:rgba(10,20,20,0.6);*/
+  background:linear-gradient(rgba(10,20,20,0.8),rgba(30,50,50,0.6))
+}
+#top article {
+  padding-top:3.8em;
+  padding-left:1.6em;
+  padding-right:2em;
+  width:100%;
+}
+div[role='main'] #top header {
+  padding-left:2em;
   padding-top: 1em;
   font-size: 1.2em;
   font-family: Georgia, serif;
   text-align: center;
   text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
 }
-div[role='main'] > header h1 {
+#top header img {
+  max-width:300px;
+}
+.menu {
+  list-style-type: none;
+  display:flex;
+  flex-flow:row wrap;
+  margin:0;
+  padding:0;
+  font-size:1.2em;
+  text-align:left;
+  justify-content:space-between;
+}
+.menu li {
+  margin:0;
+  padding:0;
+  display:block;
+  margin-bottom:0.6em;
+}
+div[role='main'] header h1 {
   margin-bottom: 0;
 }
-div[role='main'] > header h2 {
+div[role='main'] header h2 {
   margin-top: 0;
 }
 .teams {
@@ -114,18 +152,13 @@ a {
 a:hover {
   color: brown;
 }
-#top {
-  text-align: center;
-  text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
-  margin-top: -1em;
-  margin-bottom: 1em;
-}
 #sprs,
 #questions,
 #servers,
 #create-profile,
 #profile,
 #players,
+#clans,
 #live-events,
 article#videos,
 #settings {
@@ -225,7 +258,7 @@ table.map-master td.complete {
 code {
   font-family: Consolas, monospace;
 }
-#players ol {
+#players ol, #clans ol {
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -249,11 +282,11 @@ code {
   -webkit-align-content: flex-end;
   align-content: flex-end;
 }
-#players ol li {
+#players ol li, #clans ol li {
   display: inline-block;
   padding: 0.4em 1em;
 }
-#players ol li a {
+#players ol li a, #clans ol li a {
   text-decoration: none;
 }
 #download-ac-button {
@@ -428,6 +461,31 @@ code {
   text-align: center;
   margin-bottom: 0;
 }
+
+.GameCard.game.clanwar {
+    background-color: transparent; 
+}
+
+.clanwar .result .clan {
+  font-size: 2.5em;
+  display: inline-block;
+  text-align: center;
+}
+.clanwar .result .score {
+  padding-left: 10px;
+}
+
+.clanwar .players ol li {
+  padding-left: 0;
+}
+
+.clanwar .players ol li .name {
+    width: 8em;
+}
+
+.clanwar .players ol li .name img {
+  display: inline;
+}
 .LiveEvents.live-events {
   margin: 0;
   padding: 0;
@@ -517,3 +575,29 @@ code {
   margin-top: 0.7em;
 }
 /*# sourceMappingURL=main.css.map */
+
+.clan-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+.clan-header img {
+    margin-right: 0.25em;
+}
+
+.clan-header h1 {
+    margin: 0 0.25em;
+}
+
+img.clan-logo {
+	max-width:64px;
+	max-height:64px;
+}
+
+
+.lcw {
+  display:block;
+  margin-left:22em;
+  margin-top:-1.3em;
+}

@@ -169,12 +169,22 @@ function none_achievement($achievement)
 
         <h2>Recent games</h2>
         <ol class="recent-games">
-            <?php foreach($user['recent-games'] as $game) { ?>
+            <?php foreach($user['recent-games'] as $game) {
 
+
+                if ( !isset($game['now']) && isset($game['server']) && strpos($game['server'], 'aura') > -1 ) {
+                    $demo_link = 'http://woop.ac:81/find-demo.php?time=' . rawurlencode($game['id']) . '&map=' . rawurlencode($game['map']);
+                }
+
+                ?>
             <li><a href="/game/?id=<?php echo $game['id']; ?>"><?php echo $game['mode']; ?> @ <?php echo $game['map']; ?>,
                 <time is="relative-time" datetime="<?php echo htmlspecialchars($game['endTime']); ?>">
                     <?php echo htmlspecialchars($game['endTime']); ?>
                 </time>
+
+                    <?php if (isset($demo_link)) { ?>
+                        <a target="_blank" class="demo-link" href="<?php echo htmlspecialchars($demo_link) ?>">demo</a>
+                    <?php } ?>
                     </a>
             </li>
     <?php } ?>

@@ -2,19 +2,18 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$url = "http://api.actionfps.com/clans/";
-$yaml = str_replace("json", "yaml", $url);
-$clans = json_decode(file_get_contents($url), true);
+$clans = json_decode(file_get_contents('http://api.actionfps.com/clans/'), true);
 ?>
-    <article id="questions">
-        <?php foreach ($clans as $id => $clan) {
-            ?>
+<article id="clans">
+   <ol>
+       <?php foreach($clans as $clan) { ?>
+            <li>
+                <a href="/clan/?id=<?php echo rawurlencode($clan['id']) ?>" title="<?php echo htmlspecialchars($clan['fullName']) ?>">
+                    <?php clan_logo($clan); ?>
+                </a>
+            </li>
+       <?php } ?>
+   <ol>
+</article>
 
-            <h3><?php echo htmlspecialchars($clan['full name']); ?></h3>
-            <?php if (isset($clan['website'])) { ?>
-            <p><a
-            href="<?php echo htmlspecialchars($clan['website']); ?>"
-            target="_blank">Website</a></p><?php }
-        } ?>
-    </article>
 <?php echo $foot;

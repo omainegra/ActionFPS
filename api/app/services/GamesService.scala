@@ -18,6 +18,7 @@ import scala.concurrent.{Future, ExecutionContext}
 @Singleton
 class GamesService @Inject()(configuration: Configuration,
                              applicationLifecycle: ApplicationLifecycle,
+                             validServersService: ValidServersService,
                              recordsService: RecordsService)
                             (implicit executionContext: ExecutionContext) {
 
@@ -54,7 +55,7 @@ class GamesService @Inject()(configuration: Configuration,
   val file = new File(configuration.underlying.getString("af.games.path"))
 
   val allGames: Agent[List[JsonGame]] = Agent(List.empty)
-  val tailer = new GameTailer(file, false)((game) =>
+  val tailer = new GameTailer(validServersService.validServers, file, false)((game) =>
     allGames.alter(list => list :+ game.withoutHosts.withUsers.flattenPlayers.withClans
     ))
 

@@ -36,7 +36,8 @@ class RecordsReader @Inject()(configuration: Configuration) {
       fullName = clan.longName,
       tag = if (clan.tag2.nonEmpty) None else Option(clan.tag),
       tags = if (clan.tag2.isEmpty) None else Option(List(clan.tag) ++ clan.tag2),
-      website = clan.website.map(_.toString)
+      website = clan.website.map(_.toString),
+      logo = clan.logo.map(_.toString)
     )
   }
 
