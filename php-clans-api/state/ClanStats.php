@@ -27,6 +27,14 @@ class ClanStats implements JsonSerializable
     }
 }
 
+function clanwars_to_clanstats($state, $clanwar) {
+    $accum = new ClanStatsAccumulator();
+    if ( !$state ) {
+        $state = $accum->initialState();
+    }
+    return $accum->reduce(new \ActionFPS\EmptyActionReference(), $state, $clanwar);
+}
+
 class ClanStatsAccumulator implements ActionFPS\OrderedActionIterator
 {   
     public function clanExists($state, $id)

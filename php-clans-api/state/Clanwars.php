@@ -187,6 +187,14 @@ class Clanwar implements JsonSerializable
     }
 }
 
+function games_to_clanwars($state, $game) {
+    $accum = new ClanwarsAccumulator();
+    if ( !$state ) {
+        $state = $accum->initialState();
+    }
+    return $accum->reduce(new \ActionFPS\EmptyActionReference(), $state, $game);
+}
+
 class ClanwarsAccumulator implements ActionFPS\OrderedActionIterator
 {   
     // FIXME: $state->completed = [], $state->incomplete = [], $state->unprocessed = []
