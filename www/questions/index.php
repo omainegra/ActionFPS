@@ -48,7 +48,7 @@ require("../render_game.inc.php");
     <p>Yes! When you are registered on the website, you are able to use an inter finding feature we created. Go on any of our <a href="/servers/">servers</a>, then type <strong>!inter.</strong>
         This will send a notification on people's browser with a link to join the inter. There is a spam protection, doing it once is enough.</p>
     <h2 id="completed-clanwar"><a href="#completed-clanwar">How to complete a Clan War ?</a></h2>
-    <p>In order to complete a Clan War, you need to play at least two consecutive games against the same clan. Moreover, if these games resulted in two ties or one win for both clans, a third game has to be played as a tie breaker. </p>
+    <p>In order to complete a Clan War, you need to play at least 2 consecutive games against the same clan. Moreover, if these games resulted in 2 ties or 1 win for both clans, a third game has to be played as a tie breaker. </p>
     <h2 id="how-can-i-support"><a href="#how-can-i-support">How can I support the project?</a></h2>
     <p>By registering and playing ! You can also post your ideas and feedback on the forum. Don't hesitate to report any <a href="https://github.com/ScalaWilliam/ActionFPS/issues" target="_blank">issue</a> you have.
         If you are willing to be actively participating in the development then join on on Gitter! </p>
