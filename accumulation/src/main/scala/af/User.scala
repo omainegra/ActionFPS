@@ -1,8 +1,12 @@
-package lib.users
+package af
 
-import java.time.ZonedDateTime
+/**
+  * Created by William on 26/12/2015.
+  */
+import java.time.{ZoneId, ZonedDateTime}
 
 import acleague.enrichers.ViewFields
+import af.rr.{NicknameRecord, Registration}
 import play.api.libs.json._
 
 sealed trait Nickname {
@@ -34,5 +38,35 @@ object User {
     import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
     implicit val noEmailUserWrite = Json.writes[User].transform(jv => jv.validate((__ \ 'email).json.prune).get)
+  }
+
+  def registrationToUser(registration: Registration, nicknames: List[NicknameRecord]): Option[User] = {
+    val hisNicks = nicknames.filter(_.id == registration.id).sortBy(_.from.toString)
+    PartialFunction.condOpt(hisNicks) {
+      case nicks if nicks.nonEmpty =>
+        val currentNickname = hisNicks.last
+        val previousNicknames = hisNicks.sliding(2).collect {
+          case List(nick, nextNick) =>
+            PreviousNickname(
+              nickname = nick.nickname,
+              from = nick.from.atZone(ZoneId.of("UTC")),
+              to = nextNick.from.atZone(ZoneId.of("UTC")),
+              countryCode = None
+            )
+        }.toList
+        User(
+          id = registration.id,
+          name = registration.name,
+          countryCode = None,
+          email = registration.email,
+          registrationDate = registration.registrationDate.atZone(ZoneId.of("UTC")),
+          nickname = CurrentNickname(
+            nickname = currentNickname.nickname,
+            countryCode = None,
+            from = currentNickname.from.atZone(ZoneId.of("UTC"))
+          ),
+          previousNicknames = Option(previousNicknames).filter(_.nonEmpty)
+        )
+    }
   }
 }

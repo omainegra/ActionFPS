@@ -4,7 +4,7 @@ import javax.inject._
 
 import acleague.ranker.achievements.{PlayerState, Jsons}
 import acleague.ranker.achievements.immutable.PlayerStatistics
-import lib.users.User
+import af.User
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._

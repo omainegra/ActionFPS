@@ -3,6 +3,7 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import acleague.enrichers.JsonGame
+import af.EnrichGames
 import akka.actor.ActorSystem
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
@@ -34,9 +35,12 @@ class NewGamesService @Inject()(applicationLifecycle: ApplicationLifecycle,
   logger.info("Starting new games service")
   val url = configuration.underlying.getString("af.render.new-game")
 
-  import gamesService.withUsersClass
+
+
 
   def pushGame(game: JsonGame): Unit = {
+    val er = EnrichGames(recordsService.users, recordsService.clans)
+    import er.withUsersClass
     val b = game.withoutHosts.withUsers.flattenPlayers.withClans.toJson.+("isNew" -> JsBoolean(true))
     wSClient.url(url).post(b).foreach {
       response =>

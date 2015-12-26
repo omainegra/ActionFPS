@@ -5,9 +5,14 @@ package services
   */
 import javax.inject._
 
-import lib.validservers.ValidServers
+import af.ValidServers._
+import play.api.libs.json.Json
 
 @Singleton
 class ValidServersService {
-  val validServers = ValidServers.fromResource
+  def fromResource = {
+    val res = Json.parse(getClass.getResourceAsStream("/servers.json"))
+    fromJson(res).get
+  }
+  val validServers = fromResource
 }

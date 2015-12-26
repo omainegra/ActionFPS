@@ -13,7 +13,8 @@ lazy val root =
       pingerClient,
       interParser,
       demoParser,
-      syslogAc
+      syslogAc,
+      accumulation
     ).dependsOn(
     achievements,
     gameParser,
@@ -22,7 +23,8 @@ lazy val root =
     pingerClient,
     interParser,
     demoParser,
-    syslogAc
+    syslogAc,
+    accumulation
   )
 
 /**
@@ -36,10 +38,9 @@ lazy val api =
     base = file("api")
   )
     .enablePlugins(PlayScala)
-    .dependsOn(achievements)
-    .dependsOn(referenceReader)
     .dependsOn(pingerClient)
     .dependsOn(interParser)
+    .dependsOn(accumulation)
     .settings(dontDocument)
     .settings(libraryDependencies ++= akka("actor", "agent", "slf4j"))
     .settings(libraryDependencies ++= Seq(
@@ -150,3 +151,11 @@ lazy val syslogAc =
       ),
       bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener""""
     )
+
+lazy val accumulation =
+  Project(
+    id = "accumulation",
+    base = file("accumulation")
+  )
+    .dependsOn(achievements)
+    .dependsOn(referenceReader)
