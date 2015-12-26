@@ -6,6 +6,7 @@ import javax.inject._
 import akka.actor.ActorSystem
 import akka.agent.Agent
 import inter.{InterCall, InterState}
+import lib.CallbackTailer
 import play.api.libs.json.Json
 import play.api.{Logger, Configuration}
 import play.api.inject.ApplicationLifecycle

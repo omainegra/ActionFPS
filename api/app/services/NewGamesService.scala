@@ -19,14 +19,15 @@ import scala.concurrent.{ExecutionContext, Future}
   * Created by William on 09/12/2015.
   */
 @Singleton
-class NewGamesService @Inject()(applicationLifecycle: ApplicationLifecycle,
-                                recordsService: RecordsService,
+class NewGamesService @Inject()(val applicationLifecycle: ApplicationLifecycle,
+                                val recordsService: RecordsService,
                                 wSClient: WSClient,
                                 gamesService: GamesService,
-                               validServersService: ValidServersService,
-                                configuration: Configuration)(implicit
-                                                              actorSystem: ActorSystem,
-                                                              executionContext: ExecutionContext) {
+                                val validServersService: ValidServersService,
+                                val configuration: Configuration)(implicit
+                                                                  actorSystem: ActorSystem,
+                                                                  executionContext: ExecutionContext)
+  extends TailsGames {
 
   val (newGamesEnum, thing) = Concurrent.broadcast[Event]
   val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(thing.push(Event("")))
@@ -35,10 +36,7 @@ class NewGamesService @Inject()(applicationLifecycle: ApplicationLifecycle,
   logger.info("Starting new games service")
   val url = configuration.underlying.getString("af.render.new-game")
 
-
-
-
-  def pushGame(game: JsonGame): Unit = {
+  override def processGame(game: JsonGame): Unit = {
     val er = EnrichGames(recordsService.users, recordsService.clans)
     import er.withUsersClass
     val b = game.withoutHosts.withUsers.flattenPlayers.withClans.toJson.+("isNew" -> JsBoolean(true))
@@ -54,12 +52,8 @@ class NewGamesService @Inject()(applicationLifecycle: ApplicationLifecycle,
     }
   }
 
-//  val ka2 = actorSystem.scheduler.schedule(5.seconds, 5.seconds)(pushGame(gamesService.allGames.get().head))
-
-  val tailer = new GameTailer(validServersService.validServers, gamesService.file, true)(pushGame)
-
   applicationLifecycle.addStopHook(() => Future(keepAlive.cancel()))
-//  applicationLifecycle.addStopHook(() => Future(ka2.cancel()))
-  applicationLifecycle.addStopHook(() => Future(tailer.shutdown()))
+
+  initialiseTailer(fromStart = false)
 
 }
