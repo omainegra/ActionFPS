@@ -1,12 +1,13 @@
-package lib.validservers
+package af
 
 import java.time.ZoneId
 
 import play.api.libs.json.{Reads, JsValue, Json}
 
 /**
-  * Created by William on 25/12/2015.
+  * Created by William on 26/12/2015.
   */
+
 object ValidServers {
   implicit val zidReads = implicitly[Reads[String]].map(ZoneId.of)
   implicit val rvs = Json.reads[ValidServer]
@@ -14,7 +15,7 @@ object ValidServers {
   def fromJson(jsValue: JsValue) = Json.fromJson[Map[String, ValidServer]](jsValue).map(ValidServers.apply)
 
   def fromResource = {
-    val res = Json.parse(getClass.getResourceAsStream("/servers.json"))
+    val res = Json.parse(getClass.getResourceAsStream("/af/acc/valid-servers.json"))
     fromJson(res).get
   }
 

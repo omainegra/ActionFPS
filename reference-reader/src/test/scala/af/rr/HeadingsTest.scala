@@ -1,7 +1,5 @@
 package af.rr
 
-import java.io.InputStreamReader
-
 import org.scalatest.{Matchers, FunSuite}
 
 /**
@@ -11,6 +9,6 @@ class HeadingsTest
   extends FunSuite
   with Matchers {
   test("should work") {
-    HeadingsRecord.parseRecords(new InputStreamReader(getClass.getResourceAsStream("headings.csv"))) should have size 3
+    HeadingsRecord.parseRecords(getSample("headings.csv")) should have size 3
   }
 }

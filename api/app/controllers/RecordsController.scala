@@ -1,8 +1,7 @@
 package controllers
 
+import af.{User, Clan}
 import af.rr.ServerRecord
-import lib.clans.Clan
-import lib.users.User
 import play.api.libs.json.Json
 import javax.inject._
 
@@ -25,6 +24,7 @@ class RecordsController @Inject()(recordsService: RecordsService)
   def getServers = Action {
     Ok(Json.toJson(recordsService.servers))
   }
+
   def usersJson = Action {
     import User.WithoutEmailFormat.noEmailUserWrite
     Ok(Json.toJson(recordsService.users))
@@ -39,6 +39,7 @@ class RecordsController @Inject()(recordsService: RecordsService)
         NotFound("User not found")
     }
   }
+
   def clans = Action {
     Ok(Json.toJson(recordsService.clans))
   }

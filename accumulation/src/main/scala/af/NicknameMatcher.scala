@@ -1,5 +1,8 @@
-package lib.clans
+package af
 
+/**
+  * Created by William on 26/12/2015.
+  */
 object NicknameMatcher {
   def apply(format: String)(nickname: String): Boolean = {
     if ( format.endsWith("*") && format.startsWith("*") ) {

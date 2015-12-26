@@ -1,9 +1,9 @@
-package services
+package lib
 
 import java.io.File
 
 import acleague.enrichers.JsonGame
-import lib.validservers.ValidServers
+import af.ValidServers
 
 class GameTailer(validServers: ValidServers, file: File, endOnly: Boolean)(callback: JsonGame => Unit)
   extends CallbackTailer(file, endOnly)(line =>
