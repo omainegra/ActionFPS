@@ -11,8 +11,8 @@ class GameTailer(validServers: ValidServers, file: File, endOnly: Boolean)(callb
       case List(id, _, _, json) =>
         val game = JsonGame.fromJson(json)
         validServers.items.get(game.server).filter(_.isValid).foreach(vs =>
-          if (game.validate.isGood) {
-            callback(game.copy(
+          game.validate.foreach { goodGame =>
+            callback(goodGame.copy(
               server = vs.name,
               endTime = game.endTime
             ))
