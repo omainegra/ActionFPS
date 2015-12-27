@@ -18,7 +18,10 @@ object JsonGame {
   implicit val fmt = Json.format[JsonGame]
 
   def fromJson(string: String): JsonGame = {
-    Json.fromJson[JsonGame](Json.parse(string)).get
+    val g = Json.fromJson[JsonGame](Json.parse(string)).get
+
+    // some weird edge case from NYC/LA servers
+    if ( g.duration == 60 ) g.copy(duration = 15) else g
   }
 
   def build(id: String, foundGame: FoundGame, endDate: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
@@ -154,10 +157,7 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
     def numberOfPlayers = teams.map(_.players.size).sum
     def averageFrags = teams.flatMap(_.players.map(_.frags)).sum / numberOfPlayers
     if (duration < 10) Bad(s"Duration is $duration, expecting at least 10")
-    else if (duration > 15
-      // some weird edge case from NYC/LA servers
-      && duration != 60
-    ) Bad(s"Duration is $duration, expecting at most 15")
+    else if (duration > 15) Bad(s"Duration is $duration, expecting at most 15")
     else if (numberOfPlayers < 4) Bad(s"Player count is $numberOfPlayers, expecting 4 or more.")
     else if (teams.size < 2) Bad(s"Expected team size >= 2, got ${teams.size}")
     else if (averageFrags < 15) Bad(s"Average frags $averageFrags, expected >= 15 ")
