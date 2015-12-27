@@ -1,20 +1,14 @@
-GET         /recent/                        @controllers.GamesApiController.recent
-GET         /all/                           @controllers.GamesApiController.all
 GET         /clans/                         @controllers.RecordsController.clans
-GET         /users/                         @controllers.RecordsController.usersJson
-GET         /users/full/                    @controllers.GamesApiController.usersFull
-GET         /events/                        @controllers.GamesApiController.listEvents
-GET         /achievements/:id/              @controllers.GamesApiController.achievements(id)
-GET         /user/:id/                      @controllers.RecordsController.userJson(id: String)
-GET         /user/:id/full/                 @controllers.GamesApiController.fullUser(id: String)
+GET         /registrations/                 @controllers.RecordsController.registrations
+GET         /servers/                       @controllers.RecordsController.servers
+GET         /nicknames/                     @controllers.RecordsController.nicknames
+
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
+
 GET         /game/                          @controllers.GamesApiController.game(id: String)
-GET         /recent/clangames/              @controllers.GamesApiController.recentClangames
-GET         /servers/                       @controllers.RecordsController.getServers
-GET         /nicknames/                     @controllers.GamesApiController.listNicknames
-GET         /server-updates/                @controllers.LiveUpdatesController.serverUpdates
+GET         /game-ids/                      @controllers.GamesApiController.gameIds
+GET         /games/                         @controllers.GamesApiController.games(from: Option[String], to: Option[String], limit: Option[Int])
+GET         /recent-games/                  @controllers.GamesApiController.recentGames
+
 GET         /inters/                        @controllers.LiveUpdatesController.inters
 GET         /new-games/                     @controllers.LiveUpdatesController.newGames
-GET         /game-ids/                      @controllers.GamesApiController.gameIds
-GET         /index/                         @controllers.Website.index
-GET         /logo/*file                     @controllers.Assets.at(path = "../www", file)

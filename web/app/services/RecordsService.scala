@@ -19,7 +19,9 @@ class RecordsService @Inject()(recordsReader: RecordsReader,
                               (implicit executionContext: ExecutionContext) {
 
   val clansAgt = Agent(recordsReader.fetchClans())
-  val usersAgt = Agent(recordsReader.fetchUsers())
+  val usersAgt = Agent {
+    recordsReader.fetchUsers()
+  }
   val serversAgt = Agent(recordsReader.fetchServers())
   def users = usersAgt.get()
   def clans = clansAgt.get()

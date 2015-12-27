@@ -1,9 +1,8 @@
 <?php
-if (!ctype_alnum($_GET['id'])) die("id invalid");
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$user = json_decode(file_get_contents("http://api.actionfps.com/user/" . $_GET['id'] . "/full/"), true);
+$user = source_data();
 $achievements = $user['achievements'];
 
 function capture_master($maps) {

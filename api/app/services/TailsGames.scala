@@ -21,10 +21,8 @@ trait TailsGames {
 
   def processGame(game: JsonGame): Unit
 
-  def validServersService: ValidServersService
-
   def initialiseTailer(fromStart: Boolean): GameTailer = {
-    val tailer = new GameTailer(validServersService.validServers, file, !fromStart)(processGame)
+    val tailer = new GameTailer(file, !fromStart)(processGame)
     applicationLifecycle.addStopHook(() => Future.successful(tailer.shutdown()))
     tailer
   }

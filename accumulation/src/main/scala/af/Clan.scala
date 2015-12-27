@@ -1,6 +1,7 @@
 package af
 
 import af.rr.ClanRecord
+import play.api.libs.json.Json
 
 /**
   * Created by William on 26/12/2015.
@@ -12,8 +13,11 @@ case class Clan(id: String, name: String, fullName: String,
   def nicknameInClan(nickname: String): Boolean = {
     (tag.toList ++ tags.toList.flatten).exists(NicknameMatcher.apply(_)(nickname))
   }
+  implicit val cw = Json.writes[Clan]
+  def toJson = Json.toJson(this)
 }
 object Clan {
+
   def fromClanRecord(clanRecord: ClanRecord): Clan = {
     Clan(
       id = clanRecord.id,

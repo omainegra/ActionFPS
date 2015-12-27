@@ -14,19 +14,11 @@ import play.api.Configuration
 class RecordsReader @Inject()(configuration: Configuration) {
 
   def getConfigUrlReader(id: String): InputStreamReader = {
-    configuration.getString(s"af.csv.$id") match {
-      case Some(url) =>
-        new InputStreamReader(Request.Get(url).execute().returnContent().asStream())
-      case _ =>
-        throw new RuntimeException(s"Could not find config option af.csv.$id")
-    }
+    val url = s"http://localhost:9001/${id}/"
+    new InputStreamReader(Request.Get(url).execute().returnContent().asStream())
   }
 
-  def fetchVideos() = VideoRecord.parseRecords(getConfigUrlReader("videos"))
-
   def fetchServers() = ServerRecord.parseRecords(getConfigUrlReader("servers"))
-
-  def fetchHeadings() = HeadingsRecord.parseRecords(getConfigUrlReader("headings"))
 
   def fetchClans(): List[Clan] = ClanRecord.parseRecords(getConfigUrlReader("clans")).map { clanRecord =>
     Clan.fromClanRecord(clanRecord)

@@ -1,7 +1,7 @@
 <?php
 require_once("../render.inc.php");
 
-$servers = json_decode(file_get_contents("http://api.actionfps.com/servers/"), true);
+$servers = source_data();
 $groups = array_unique(array_map(function ($server) {
     return $server['region'];
 }, $servers));

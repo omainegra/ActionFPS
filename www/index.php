@@ -2,10 +2,9 @@
 require_once("render.inc.php");
 require("render_game.inc.php");
 
-$games = source_data('/recent/');
-$events = source_data("/events/");
-$clanwars = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?completed=1&count=1'), true);
-$latest_clanwar = reset($clanwars);
+$games = source_data("recent");
+$events = source_data("events");
+$latest_clanwar = source_data("clanwar");
 ?><div id="live-events">
     <ol class="LiveEvents live-events">
         <?php foreach($events as $i => $event) {
@@ -30,8 +29,8 @@ $latest_clanwar = reset($clanwars);
     </div>
 
     <div id="new-games"></div>
-    
-    <div id="latest-clanwar"><?php render_war($latest_clanwar, false, true); ?></div>
+
+    <?php if ( $latest_clanwar ) {  ?> <div id="latest-clanwar"><?php render_war($latest_clanwar, false, true); ?></div><?php } ?>
 
 
     <div id="existing-games"><?php

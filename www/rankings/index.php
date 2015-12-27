@@ -2,7 +2,7 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$clans = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10'), true)['now'];
+$clans = source_data()['now'];
 ?>
 <article id="questions">
     <div id="rank">

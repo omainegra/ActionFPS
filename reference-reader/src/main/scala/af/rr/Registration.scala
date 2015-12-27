@@ -20,7 +20,7 @@ object Registration {
       for {
         id <- Option(rec.get(0)).filter(_.nonEmpty)
         name <- Option(rec.get(1)).filter(_.nonEmpty)
-        email <- Option(rec.get(2)).filter(_.nonEmpty)
+        email <- Option(rec.get(2))
         registrationDate <- Try(LocalDateTime.parse(rec.get(3), dtf))
           .orElse(Try(LocalDateTime.parse(rec.get(3), dtf2))).toOption
       } yield Registration(

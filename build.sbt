@@ -15,7 +15,8 @@ lazy val root =
       demoParser,
       syslogAc,
       accumulation,
-      phpClient
+      phpClient,
+      web
     ).dependsOn(
     achievements,
     gameParser,
@@ -26,7 +27,8 @@ lazy val root =
     demoParser,
     syslogAc,
     accumulation,
-    phpClient
+    phpClient,
+    web
   )
 
 /**
@@ -37,6 +39,34 @@ lazy val api =
   Project(
     id = "api",
     base = file("api")
+  )
+    .enablePlugins(PlayScala)
+    .dependsOn(pingerClient)
+    .dependsOn(interParser)
+    .dependsOn(accumulation)
+    .dependsOn(phpClient)
+    .settings(dontDocument)
+    .settings(
+      libraryDependencies ++= akka("actor", "agent", "slf4j"),
+      libraryDependencies += cache,
+      libraryDependencies ++= Seq(
+        "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
+        "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
+        "commons-io" % "commons-io" % "2.4",
+        filters,
+        ws
+      ),
+      mappings in Universal ++= (baseDirectory.value / "php" * "*" get).map { file =>
+        file -> ("php/" + file.getName)
+      },
+      scriptClasspath := Seq("*"),
+      unmanagedResourceDirectories in Assets += baseDirectory.value / "../www"
+    )
+
+lazy val web =
+  Project(
+    id = "web",
+    base = file("web")
   )
     .enablePlugins(PlayScala)
     .dependsOn(pingerClient)

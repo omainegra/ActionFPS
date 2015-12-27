@@ -3,13 +3,11 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import acleague.enrichers.JsonGame
-import af.EnrichGames
 import akka.actor.ActorSystem
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
-import play.api.libs.json.{JsBoolean, JsString, JsObject, Json}
-import play.api.libs.ws.WSClient
+import play.api.libs.json.{JsBoolean, JsObject, Json}
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.duration._
@@ -21,12 +19,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class NewGamesService @Inject()(val applicationLifecycle: ApplicationLifecycle,
                                 val configuration: Configuration,
-                                val recordsService: RecordsService,
-                                gamesService: GamesService,
-                                gameRenderService: GameRenderService,
-                                val validServersService: ValidServersService)(implicit
-                                                                              actorSystem: ActorSystem,
-                                                                              executionContext: ExecutionContext)
+                                gamesService: GamesService)(implicit
+                                                            actorSystem: ActorSystem,
+                                                            executionContext: ExecutionContext)
   extends TailsGames {
 
   val (newGamesEnum, thing) = Concurrent.broadcast[Event]
@@ -36,15 +31,12 @@ class NewGamesService @Inject()(val applicationLifecycle: ApplicationLifecycle,
   logger.info("Starting new games service")
 
   override def processGame(game: JsonGame): Unit = {
-    val er = EnrichGames(recordsService.users, recordsService.clans)
-    import er.withUsersClass
-    val b = game.withoutHosts.withUsers.flattenPlayers.withClans.toJson.+("isNew" -> JsBoolean(true))
-    val html = gameRenderService.renderGame(b)
+    val b = game.withoutHosts.toJson.+("isNew" -> JsBoolean(true))
     thing.push(
       Event(
         id = Option(game.id),
         name = Option("new-game"),
-        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(html)).toString()
+        data = Json.toJson(b).asInstanceOf[JsObject].toString()
       )
     )
   }

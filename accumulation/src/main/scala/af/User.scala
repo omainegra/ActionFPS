@@ -27,6 +27,9 @@ case class User(id: String, name: String, countryCode: Option[String], email: St
                 registrationDate: ZonedDateTime, nickname: CurrentNickname, previousNicknames: Option[List[PreviousNickname]]) {
   def nicknames: List[Nickname] = List(nickname) ++ previousNicknames.toList.flatten
   def validAt(nickname: String, zonedDateTime: ZonedDateTime) = nicknames.exists(n => n.nickname == nickname && n.validAt(zonedDateTime))
+  def toJson = {
+    Json.toJson(this)(User.userFormat)
+  }
 }
 object User {
   implicit val vf = ViewFields.DefaultZonedDateTimeWrites

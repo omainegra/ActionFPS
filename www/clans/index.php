@@ -2,7 +2,7 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$clans = json_decode(file_get_contents('http://api.actionfps.com/clans/'), true);
+$clans = source_data();
 ?>
 <article id="clans">
    <ol>

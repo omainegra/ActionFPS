@@ -1,11 +1,13 @@
 <?php
-function source_data($id) {
-    if ( isset($_POST[$id])) {
-        $json = $_POST[$id];
-    } else {
-        $json = file_get_contents("http://api.actionfps.com" . $id);
+function source_data($id = null) {
+    static $datum;
+    if ( !isset($datum) ) {
+        $datum = json_decode(file_get_contents("php://input"), true);
     }
-    return json_decode($json, true);
+    if ( $id == null ) {
+        return $datum;
+    }
+    return $datum[$id];
 }
 function clan_logo($clan) {
     $url = @$clan['logo'] ?: 'http://woop.ac:81/html/clan_picture.php?name='.rawurlencode($clan['name']).'&id='.rawurlencode(@($clan['id'] ?: $clan['clan']));
