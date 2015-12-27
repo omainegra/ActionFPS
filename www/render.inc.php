@@ -1,5 +1,12 @@
 <?php
-
+function source_data($id) {
+    if ( isset($_POST[$id])) {
+        $json = $_POST[$id];
+    } else {
+        $json = file_get_contents("http://api.actionfps.com" . $id);
+    }
+    return json_decode($json, true);
+}
 function clan_logo($clan) {
     $url = @$clan['logo'] ?: 'http://woop.ac:81/html/clan_picture.php?name='.rawurlencode($clan['name']).'&id='.rawurlencode(@($clan['id'] ?: $clan['clan']));
     ?><img class="clan-logo" src="<?php echo htmlspecialchars($url); ?>" width="64" height="64"/>

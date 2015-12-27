@@ -56,7 +56,8 @@ lazy val api =
       mappings in Universal ++= (baseDirectory.value / "php" * "*" get).map { file =>
         file -> ("php/" + file.getName)
       },
-      scriptClasspath := Seq("*")
+      scriptClasspath := Seq("*"),
+      unmanagedResourceDirectories in Assets += baseDirectory.value / "../www"
     )
 
 lazy val gameParser =

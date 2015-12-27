@@ -5,7 +5,7 @@ package services
   */
 
 import java.io.File
-import java.net.Socket
+import java.net.{URLEncoder, Socket}
 import javax.inject._
 
 import af.php.Stuff
@@ -18,18 +18,32 @@ import scala.util.Try
 
 @Singleton
 class GameRenderService @Inject()(configuration: Configuration,
-                                   applicationLifecycle: ApplicationLifecycle) {
+                                  applicationLifecycle: ApplicationLifecycle) {
 
   val port = configuration.underlying.getInt("af.php-cgi.port")
   implicit val fcgi = Stuff.buildFcgi(port, start = GameRenderService.portIsAvailable(port))
-  val apiPhp = new File(scala.util.Properties.userDir + "/api/php")
-  val herePhp = new File(scala.util.Properties.userDir + "/php")
+  val apiPhp = new File(scala.util.Properties.userDir + "/www")
   val sourceDir = if (apiPhp.exists()) apiPhp
-  else if (herePhp.exists()) herePhp
-  else throw new RuntimeException(s"Cannot find anything at ${apiPhp} or ${herePhp}")
+  else throw new RuntimeException(s"Cannot find anything at ${apiPhp}")
 
   val logger = Logger(getClass)
   logger.info(s"Working against ${sourceDir}")
+
+  def query(path: String, data: Map[String, String]): String = {
+    val request = af.php.Stuff.sampleRequest.copy(
+      servletPath = path,
+      realPath = something => {
+        sourceDir + something
+      },
+      headers = List("Content-Type" -> "application/x-www-form-urlencoded"),
+      data = Option(
+        data.map { case (k, v) => URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(v, "UTF-8") }.mkString("&")
+      ),
+      method = "POST"
+    )
+    import com.scalawilliam.sfc.Implicits._
+    request.process().output.get
+  }
 
   def renderGame(jsGame: JsValue): String = {
     val request = af.php.Stuff.sampleRequest.copy(

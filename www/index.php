@@ -2,8 +2,8 @@
 require_once("render.inc.php");
 require("render_game.inc.php");
 
-$games = json_decode(file_get_contents("http://api.actionfps.com/recent/"), true);
-$events = json_decode(file_get_contents("http://api.actionfps.com/events/"), true);
+$games = source_data('/recent/');
+$events = source_data("/events/");
 $clanwars = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?completed=1&count=1'), true);
 $latest_clanwar = reset($clanwars);
 ?><div id="live-events">

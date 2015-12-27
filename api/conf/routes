@@ -16,3 +16,5 @@ GET         /server-updates/                @controllers.LiveUpdatesController.s
 GET         /inters/                        @controllers.LiveUpdatesController.inters
 GET         /new-games/                     @controllers.LiveUpdatesController.newGames
 GET         /game-ids/                      @controllers.GamesApiController.gameIds
+GET         /index/                         @controllers.Website.index
+GET         /logo/*file                     @controllers.Assets.at(path = "../www", file)
