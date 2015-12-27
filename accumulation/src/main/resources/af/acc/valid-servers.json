@@ -66,5 +66,9 @@
   "ny.weed-lounge.me ny AssaultCube[local#33333]": {
     "name": "ny 33333",
     "timezone": "UTC"
+  },
+  "ny.weed-lounge.me ny AssaultCube[local#2222]": {
+    "name": "ny 2222",
+    "timezone": "UTC"
   }
 }
