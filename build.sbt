@@ -62,7 +62,7 @@ lazy val gameParser =
       rpmVendor := "typesafe",
       libraryDependencies += json,
       rpmBrpJavaRepackJars := true,
-      version := "4.0",
+      version := "4.1",
       rpmLicense := Some("BSD")
     )
 
