@@ -19,7 +19,7 @@ class Index @Inject()(gamesService: GamesService,
 
   def index = Action {
     val events = Json.toJson(achievementsService.achievements.get().events.take(7))
-    val recent = Json.toJson(gamesService.allGames.get().sortBy(_.id).takeRight(50).map(_.toJson))
+    val recent = Json.toJson(gamesService.allGames.get().sortBy(_.id).takeRight(50).map(_.toJson).reverse)
 
     val clanwar = Json.fromJson[Map[String, JsValue]](Json.parse(Request.Get("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?completed=1&count=1").execute().returnContent().asString()))
       .map(_.headOption.get._2).get

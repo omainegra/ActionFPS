@@ -6,6 +6,7 @@ import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
 import play.api.mvc.{Action, Controller}
+import play.filters.gzip.{Gzip, GzipFilter}
 import services._
 
 import scala.concurrent.ExecutionContext
@@ -18,7 +19,8 @@ import scala.concurrent.ExecutionContext
 class GamesApiController @Inject()(configuration: Configuration,
                                    gamesService: GamesService,
                                    intersService: IntersService,
-                                   newGamesService: NewGamesService)
+                                   newGamesService: NewGamesService,
+                                   gzipFilter: GzipFilter)
                                   (implicit executionContext: ExecutionContext) extends Controller {
 
   def gameIds = Action {
@@ -49,7 +51,11 @@ class GamesApiController @Inject()(configuration: Configuration,
         gms
       )
       .map(game => s"${game.id}\t${game.toJson}\n")
-    Ok.chunked(enumerator).as("text/tab-separated-values")
+
+    val gzEnum = enumerator.map(_.getBytes("UTF-8")).&>(Gzip.gzip(123))
+    Ok.chunked(gzEnum)
+      .as("text/tab-separated-values")
+      .withHeaders("Content-Encoding" -> "gzip")
   }
 
 }

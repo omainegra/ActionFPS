@@ -40,7 +40,7 @@ class GamesService @Inject()(val configuration: Configuration,
 
   val validServers = ValidServers.fromResource
 
-  Source.fromInputStream(Request.Get("http://localhost:9001/games/").execute().returnContent().asStream())
+  Source.fromInputStream(Request.Get("http://odin.duel.gg:59991/games/").execute().returnContent().asStream())
     .getLines().foreach { line =>
     line.split("\t").toList match {
       case List(id, json) =>

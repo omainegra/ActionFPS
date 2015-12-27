@@ -14,7 +14,7 @@ import play.api.Configuration
 class RecordsReader @Inject()(configuration: Configuration) {
 
   def getConfigUrlReader(id: String): InputStreamReader = {
-    val url = s"http://localhost:9001/${id}/"
+    val url = s"http://odin.duel.gg:59991/${id}/"
     new InputStreamReader(Request.Get(url).execute().returnContent().asStream())
   }
 

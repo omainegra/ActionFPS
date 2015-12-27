@@ -23,7 +23,7 @@ class Games @Inject()(gamesService: GamesService,
 
   def game(id: String) = Action {
     gamesService.allGames.get().find(_.id == id) match {
-      case Some(game) => Ok(game.toJson)
+      case Some(game) => Ok(jsonToHtml("/game/", game.toJson))
       case None => NotFound("Game not found.")
     }
   }
