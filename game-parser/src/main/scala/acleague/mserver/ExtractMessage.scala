@@ -38,7 +38,8 @@ object ExtractMessage {
       Some((date, server, payload))
     }
   }
-  val parsers = Array(
+  // Joda appears to be much faster than JUT, approx 40% or so.
+  val parsers = Array( // Joda ZZZ == JUT VV
     DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss ZZZ yyyy").getParser,
     ISODateTimeFormat.dateTimeNoMillis().getParser,
     ISODateTimeFormat.dateTime().getParser

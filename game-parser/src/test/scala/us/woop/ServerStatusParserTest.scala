@@ -25,6 +25,14 @@ class ServerStatusParserTest
     TimeCorrector(d, serverStatusTime)(d).toString shouldBe "2015-05-22T15:14:59+02:00"
   }
 
+  test("Uglier format is good") {
+//    val A = java.time.format.DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss VV yyyy")
+    // EEE MMM dd HH:mm:ss zzz yyyy
+//    ZonedDateTime.parse("Sat Dec 13 19:36:16 CET 2014", A)
+    val fullMessage = """Date: Sat Dec 13 19:36:16 CET 2014, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#1999], Payload: Status at 22-05-2015 15:14:59: 4 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"""
+    val ExtractMessage(d, _, _) = fullMessage
+  }
+
   test("Opposite shift is good") {
     val fullMessage = """Date: 2015-05-07T17:37:44.435Z, Server: 104.219.54.14 tyrwoopac AssaultCube[local#1999], Payload: Status at 07-05-2015 13:35:20: 9 remote clients, 16.2 send, 4.8 rec (K/sec); Ping: #49|2545|86; CSL: #24|4740|72 (bytes)"""
     val ExtractMessage(d, _, ServerStatus(serverStatusTime, _)) = fullMessage
