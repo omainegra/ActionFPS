@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import play.api.mvc.{Action, Controller}
-import services.{PingerService, IntersService}
+import services.{PingerService}
 
 /**
   * Created by William on 24/12/2015.

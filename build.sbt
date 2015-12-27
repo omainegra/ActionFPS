@@ -15,7 +15,6 @@ lazy val root =
       demoParser,
       syslogAc,
       accumulation,
-      phpClient,
       web
     ).dependsOn(
     achievements,
@@ -27,7 +26,6 @@ lazy val root =
     demoParser,
     syslogAc,
     accumulation,
-    phpClient,
     web
   )
 
@@ -44,9 +42,9 @@ lazy val api =
     .dependsOn(pingerClient)
     .dependsOn(interParser)
     .dependsOn(accumulation)
-    .dependsOn(phpClient)
     .settings(dontDocument)
     .settings(
+      version := "5.0",
       libraryDependencies ++= akka("actor", "agent", "slf4j"),
       libraryDependencies += cache,
       libraryDependencies ++= Seq(
@@ -56,9 +54,6 @@ lazy val api =
         filters,
         ws
       ),
-      mappings in Universal ++= (baseDirectory.value / "php" * "*" get).map { file =>
-        file -> ("php/" + file.getName)
-      },
       scriptClasspath := Seq("*"),
       unmanagedResourceDirectories in Assets += baseDirectory.value / "../www"
     )
@@ -72,9 +67,9 @@ lazy val web =
     .dependsOn(pingerClient)
     .dependsOn(interParser)
     .dependsOn(accumulation)
-    .dependsOn(phpClient)
     .settings(dontDocument)
     .settings(
+      version := "5.0",
       libraryDependencies ++= akka("actor", "agent", "slf4j"),
       libraryDependencies ++= Seq(
         "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
@@ -102,7 +97,7 @@ lazy val gameParser =
       libraryDependencies += json,
       libraryDependencies += scalactic,
       rpmBrpJavaRepackJars := true,
-      version := "4.1",
+      version := "5.0",
       rpmLicense := Some("BSD")
     )
 
@@ -199,15 +194,3 @@ lazy val accumulation =
   )
     .dependsOn(achievements)
     .dependsOn(referenceReader)
-
-
-lazy val phpClient =
-  Project(
-    id = "php-client",
-    base = file("php-client")
-  )
-    .settings(
-      resolvers += Resolver.bintrayRepo("scalawilliam", "maven"),
-      libraryDependencies += "com.scalawilliam" %% "scala-fastcgi-client" % "0.3",
-      libraryDependencies += json
-    )
