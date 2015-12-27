@@ -20,9 +20,25 @@ class ServerStatusParserTest
   }
 
   test("Shift is good") {
-    val fullMessage = """Date: 2015-05-22T13:17:24.097Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#1999], Payload: Status at 22-05-2015 15:14:59: 4 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"""
-    val ExtractMessage(d, _, ServerStatus(serverStatusTime, _)) = fullMessage
+    val fullMessage = """Date: 2015-05-22T13:17:24.097Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#1999], Payload: Status at 22-05-2015 15:14:59: 45 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"""
+    val ExtractMessage(d, _, ServerStatus(serverStatusTime, cnt)) = fullMessage
+    cnt shouldBe 45
     TimeCorrector(d, serverStatusTime)(d).toString shouldBe "2015-05-22T15:14:59+02:00"
+  }
+
+  test("Bad stuff doesn't cause failure") {
+    val serverMessage = """Status at 22-05-2015 15:14:Xx59: 45 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"""
+    ServerStatus.unapply(serverMessage) shouldBe empty
+  }
+
+  test("Bad stuff doesn't cause failure (int)") {
+    val serverMessage = """Status at 22-05-2015 15:14:59: 4x45 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"""
+    ServerStatus.unapply(serverMessage) shouldBe empty
+  }
+
+  test("Bad stuff doesn't cause failure (missing stuff after date)") {
+    val serverMessage = """Status at 22-05-2015 15:14:59"""
+    ServerStatus.unapply(serverMessage) shouldBe empty
   }
 
   test("Uglier format is good") {

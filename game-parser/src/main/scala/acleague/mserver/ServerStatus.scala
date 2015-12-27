@@ -20,7 +20,7 @@ object ServerStatus {
     val dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
 
     def unapply(input: String): Option[LocalDateTime] = {
-      Option(LocalDateTime.parse(input, dtf))
+      Try(LocalDateTime.parse(input, dtf)).toOption
     }
   }
 
