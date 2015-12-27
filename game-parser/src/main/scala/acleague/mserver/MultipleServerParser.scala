@@ -45,22 +45,37 @@ case class MultipleServerParserProcessing(serverStates: Map[String, ServerState]
   extends MultipleServerParser {
   def process(line: String): MultipleServerParser = {
     line match {
-      case ExtractMessage(d, s, ServerStatus(serverStatusTime, clients)) =>
-        copy(serverTimeCorrectors = serverTimeCorrectors.updated(s, TimeCorrector(d, serverStatusTime)))
-      case ExtractMessage(date, server, message) if serverTimeCorrectors.contains(server) =>
-        val corrector = serverTimeCorrectors(server)
-        serverStates.getOrElse(server, ServerState.empty).next(message) match {
-          case sfg: ServerFoundGame =>
-            val jg = JsonGame.build(
-              id = date.minusMinutes(sfg.duration).format(DateTimeFormatter.ISO_INSTANT),
-              foundGame = sfg.foundGame,
-              endDate = corrector.apply(date),
-              serverId = server,
-              duration = sfg.duration
-            )
-            MultipleServerParserFoundGame(jg, copy(serverStates = serverStates.updated(server, ServerState.empty)))
-          case other =>
-            copy(serverStates = serverStates.updated(server, other))
+      case ExtractMessage(date, server, message) =>
+        val correctorO = message match {
+          case ServerStatus(serverStatusTime, clients) =>
+            Option(TimeCorrector(date, serverStatusTime))
+          case _ => serverTimeCorrectors.get(server)
+        }
+        correctorO match {
+          case None => MultipleServerParserFailedLine(line = line, next = this)
+          case Some(corrector) =>
+            serverStates.getOrElse(server, ServerState.empty).next(message) match {
+              case sfg: ServerFoundGame =>
+                val jg = JsonGame.build(
+                  id = date.minusMinutes(sfg.duration).format(DateTimeFormatter.ISO_INSTANT),
+                  foundGame = sfg.foundGame,
+                  endDate = corrector.apply(date),
+                  serverId = server,
+                  duration = sfg.duration
+                )
+                MultipleServerParserFoundGame(
+                  cg = jg,
+                  next = copy(
+                    serverStates = serverStates.updated(server, ServerState.empty),
+                    serverTimeCorrectors = serverTimeCorrectors.updated(server, corrector)
+                  )
+                )
+              case other =>
+                copy(
+                  serverStates = serverStates.updated(server, other),
+                  serverTimeCorrectors = serverTimeCorrectors.updated(server, corrector)
+                )
+            }
         }
       case m =>
         MultipleServerParserFailedLine(line = line, next = this)
