@@ -11,6 +11,9 @@
 * Contributors very much welcome. Start with Issues.
 * We also have an API here: http://actionfps.com/api/ - feel free to build on top.
 
+[![Throughput Graph](https://graphs.waffle.io/ScalaWilliam/actionfps/throughput.svg)](https://waffle.io/ScalaWilliam/actionfps/metrics) 
+
+
 # Technology Choices
 
 * __Scala__ for data processing and Play framework: solid, stable toolkit for dealing with complex data.
