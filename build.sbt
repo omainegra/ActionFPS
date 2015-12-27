@@ -14,7 +14,8 @@ lazy val root =
       interParser,
       demoParser,
       syslogAc,
-      accumulation
+      accumulation,
+      phpClient
     ).dependsOn(
     achievements,
     gameParser,
@@ -24,7 +25,8 @@ lazy val root =
     interParser,
     demoParser,
     syslogAc,
-    accumulation
+    accumulation,
+    phpClient
   )
 
 /**
@@ -61,6 +63,7 @@ lazy val gameParser =
     .settings(
       rpmVendor := "typesafe",
       libraryDependencies += json,
+      libraryDependencies += scalactic,
       rpmBrpJavaRepackJars := true,
       version := "4.1",
       rpmLicense := Some("BSD")
@@ -75,7 +78,8 @@ lazy val achievements =
       json,
       "com.maxmind.geoip2" % "geoip2" % "2.3.1",
       "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
-      "commons-net" % "commons-net" % "3.3"
+      "commons-net" % "commons-net" % "3.3",
+      xml
     )
   ).dependsOn(gameParser)
 
@@ -110,8 +114,6 @@ lazy val pingerClient =
   )
 
 
-
-
 /** *
   *
   * MASTER SERVER
@@ -125,7 +127,8 @@ lazy val demoParser =
   )
     .settings(
       libraryDependencies += "commons-io" % "commons-io" % "2.4",
-      libraryDependencies ++= akka("actor")
+      libraryDependencies ++= akka("actor"),
+      libraryDependencies += json4s
     )
 
 lazy val syslogAc =
@@ -159,3 +162,15 @@ lazy val accumulation =
   )
     .dependsOn(achievements)
     .dependsOn(referenceReader)
+
+
+lazy val phpClient =
+  Project(
+    id = "php-client",
+    base = file("php-client")
+  )
+    .settings(
+      resolvers += Resolver.bintrayRepo("scalawilliam", "maven"),
+      libraryDependencies += "com.scalawilliam" %% "scala-fastcgi-client" % "0.3",
+      libraryDependencies += json
+    )
