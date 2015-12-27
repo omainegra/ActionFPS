@@ -20,18 +20,13 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
                               recordsService: RecordsService,
-                              wsClient: WSClient,
-                              configuration: Configuration
+                              gameRenderService: GameRenderService
                              )(implicit actorSystem: ActorSystem,
                                executionContext: ExecutionContext) {
 
   val logger = Logger(getClass)
 
   val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
-  val url = configuration.underlying.getString("af.render.live-fragment")
-  logger.info(s"Pinger service rendering with $url")
-
-
 
   implicit val spw = Json.writes[ServerPlayer]
   implicit val stw = Json.writes[ServerTeam]
@@ -59,16 +54,14 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
         data = Json.toJson(b).toString()
       )
     )
-    wsClient.url(url).post(Json.toJson(b)).foreach {
-      response =>
-        liveGamesChan.push(
-          Event(
-            id = Option(b.now.server.server),
-            name = Option("current-game-status-fragment"),
-            data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(response.body)).toString()
-          )
-        )
-    }
+    val html = gameRenderService.renderGame(Json.toJson(b))
+    liveGamesChan.push(
+      Event(
+        id = Option(b.now.server.server),
+        name = Option("current-game-status-fragment"),
+        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(html)).toString()
+      )
+    )
   }))
 
   import concurrent.duration._

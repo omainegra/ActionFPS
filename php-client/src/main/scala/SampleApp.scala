@@ -8,24 +8,6 @@ import play.api.libs.json.Json
 import scala.io.Source
 
 object SampleApp extends App {
-  val sampleRequest = FastCGIRequest(
-    remoteUser = None,
-    headers = List.empty,
-    authType = Option.empty,
-    queryString = None,
-    contextPath = "",
-    servletPath = "/test.php",
-    requestURI = "/uri/",
-    serverName = "ScalaTest",
-    protocol = "HTTP/1.1",
-    remoteAddr = "127.0.0.1",
-    serverPort = 1234,
-    method = "GET",
-    data = None,
-    realPath = something => {
-      scala.util.Properties.userDir + "/php-client/src/main/resources/root" + something
-    }
-  )
 
   import collection.JavaConverters._
 
@@ -36,14 +18,10 @@ object SampleApp extends App {
 
   val specLines = "null\n" + gamesFiles.take(5).mkString("\n")
 
-  implicit val fcgi = FastCGIHandlerConfig(
-    connectionConfig = FastCGIConnectionConfig.SingleConnection(
-      address = "127.0.0.1:7772"
-    ),
-    startExecutable = Option(s"C:/php/php-cgi.exe -b 127.0.0.1:7772")
-  ).build
+  implicit val fcgi = af.php.Stuff.buildFcgi
+
   try {
-    val ar = sampleRequest.copy(
+    val ar = af.php.Stuff.sampleRequest.copy(
       headers = List("Content-Type" -> "text/plain"),
       data = Option(specLines),
       method = "POST"

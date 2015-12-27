@@ -20,13 +20,13 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 @Singleton
 class NewGamesService @Inject()(val applicationLifecycle: ApplicationLifecycle,
+                                val configuration: Configuration,
                                 val recordsService: RecordsService,
-                                wSClient: WSClient,
                                 gamesService: GamesService,
-                                val validServersService: ValidServersService,
-                                val configuration: Configuration)(implicit
-                                                                  actorSystem: ActorSystem,
-                                                                  executionContext: ExecutionContext)
+                                gameRenderService: GameRenderService,
+                                val validServersService: ValidServersService)(implicit
+                                                                              actorSystem: ActorSystem,
+                                                                              executionContext: ExecutionContext)
   extends TailsGames {
 
   val (newGamesEnum, thing) = Concurrent.broadcast[Event]
@@ -34,22 +34,19 @@ class NewGamesService @Inject()(val applicationLifecycle: ApplicationLifecycle,
 
   val logger = Logger(getClass)
   logger.info("Starting new games service")
-  val url = configuration.underlying.getString("af.render.new-game")
 
   override def processGame(game: JsonGame): Unit = {
     val er = EnrichGames(recordsService.users, recordsService.clans)
     import er.withUsersClass
     val b = game.withoutHosts.withUsers.flattenPlayers.withClans.toJson.+("isNew" -> JsBoolean(true))
-    wSClient.url(url).post(b).foreach {
-      response =>
-        thing.push(
-          Event(
-            id = Option(game.id),
-            name = Option("new-game"),
-            data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(response.body)).toString()
-          )
-        )
-    }
+    val html = gameRenderService.renderGame(b)
+    thing.push(
+      Event(
+        id = Option(game.id),
+        name = Option("new-game"),
+        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(html)).toString()
+      )
+    )
   }
 
   applicationLifecycle.addStopHook(() => Future(keepAlive.cancel()))
