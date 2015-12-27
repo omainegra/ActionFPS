@@ -18,10 +18,11 @@ import scala.concurrent.Future
 
 @Singleton
 class GameRenderService @Inject()(applicationLifecycle: ApplicationLifecycle) {
-  implicit val fcgi = Stuff.buildFcgi
+  implicit val fcgi = Stuff.buildFcgi(8841)
   val apiPhp = new File(scala.util.Properties.userDir + "/api/php")
   val herePhp = new File(scala.util.Properties.userDir + "/php")
-  val sourceDir = if ( apiPhp.exists() ) apiPhp else if (herePhp.exists()) herePhp
+  val sourceDir = if (apiPhp.exists()) apiPhp
+  else if (herePhp.exists()) herePhp
   else throw new RuntimeException(s"Cannot find anything at ${apiPhp} or ${herePhp}")
 
   val logger = Logger(getClass)
@@ -40,6 +41,7 @@ class GameRenderService @Inject()(applicationLifecycle: ApplicationLifecycle) {
     import com.scalawilliam.sfc.Implicits._
     request.process().output.get
   }
+
   applicationLifecycle.addStopHook(() => Future.successful(fcgi.destroy()))
 
 }

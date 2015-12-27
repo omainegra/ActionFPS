@@ -18,7 +18,7 @@ object SampleApp extends App {
 
   val specLines = "null\n" + gamesFiles.take(5).mkString("\n")
 
-  implicit val fcgi = af.php.Stuff.buildFcgi
+  implicit val fcgi = af.php.Stuff.buildFcgi(9912)
 
   try {
     val ar = af.php.Stuff.sampleRequest.copy(

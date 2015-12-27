@@ -25,10 +25,18 @@ object Stuff {
       scala.util.Properties.userDir + "/php-client/src/main/resources/root" + something
     }
   )
-  def buildFcgi = FastCGIHandlerConfig(
-    connectionConfig = FastCGIConnectionConfig.SingleConnection(
-      address = "127.0.0.1:7772"
-    ),
-    startExecutable = Option(s"C:/php/php-cgi.exe -b 127.0.0.1:7772")
-  ).build
+
+  def buildFcgi(port: Int) = {
+    val addr = s"127.0.0.1:$port"
+    FastCGIHandlerConfig(
+      connectionConfig = FastCGIConnectionConfig.SingleConnection(
+        address = addr
+      ),
+      startExecutable = Option {
+        if (scala.util.Properties.isWin)
+          s"C:/php/php-cgi.exe -b $addr"
+        else s"php-cgi -b $addr"
+      }
+    ).build
+  }
 }
