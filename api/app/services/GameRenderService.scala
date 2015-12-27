@@ -5,20 +5,23 @@ package services
   */
 
 import java.io.File
+import java.net.Socket
 import javax.inject._
 
-import acleague.enrichers.JsonGame
-import af.ValidServers._
 import af.php.Stuff
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
+import scala.util.Try
 
 @Singleton
-class GameRenderService @Inject()(applicationLifecycle: ApplicationLifecycle) {
-  implicit val fcgi = Stuff.buildFcgi(8841)
+class GameRenderService @Inject()(configuration: Configuration,
+                                   applicationLifecycle: ApplicationLifecycle) {
+
+  val port = configuration.underlying.getInt("af.php-cgi.port")
+  implicit val fcgi = Stuff.buildFcgi(port, start = GameRenderService.portIsAvailable(port))
   val apiPhp = new File(scala.util.Properties.userDir + "/api/php")
   val herePhp = new File(scala.util.Properties.userDir + "/php")
   val sourceDir = if (apiPhp.exists()) apiPhp
@@ -44,4 +47,13 @@ class GameRenderService @Inject()(applicationLifecycle: ApplicationLifecycle) {
 
   applicationLifecycle.addStopHook(() => Future.successful(fcgi.destroy()))
 
+}
+
+object GameRenderService {
+  def portIsAvailable(sport: Int): Boolean = {
+    Try {
+      new Socket("127.0.0.1", sport).close()
+      true
+    }.isSuccess
+  }
 }

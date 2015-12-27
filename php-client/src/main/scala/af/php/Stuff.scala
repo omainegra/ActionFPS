@@ -26,17 +26,17 @@ object Stuff {
     }
   )
 
-  def buildFcgi(port: Int) = {
+  def buildFcgi(port: Int, start: Boolean = true) = {
     val addr = s"127.0.0.1:$port"
     FastCGIHandlerConfig(
       connectionConfig = FastCGIConnectionConfig.SingleConnection(
         address = addr
       ),
-      startExecutable = Option {
+      startExecutable = if (start) Option {
         if (scala.util.Properties.isWin)
           s"C:/php/php-cgi.exe -b $addr"
         else s"php-cgi -b $addr"
-      }
+      } else None
     ).build
   }
 }
