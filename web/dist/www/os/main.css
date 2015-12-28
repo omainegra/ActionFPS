@@ -601,3 +601,14 @@ img.clan-logo {
   margin-left:22em;
   margin-top:-1.3em;
 }
+
+#view-json {
+  text-align: center;
+  font-size: 0.8em;
+}
+#view-json a {
+  display:inline-block;
+  background:#333;
+  padding:0.5em 1em;
+  border-radius:0.5em;
+}

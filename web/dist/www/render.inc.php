@@ -15,6 +15,7 @@ function clan_logo($clan) {
 <?php
 
 }
+
 $main_template_path = dirname(__FILE__) . "/template.html";
 $domdoc = new DOMDocument();
 libxml_use_internal_errors(true);
@@ -28,6 +29,9 @@ $content_node = $domdoc->getElementById("content");
 $split_text_node = $domdoc->createTextNode($split_text);
 $content_node->replaceChild($split_text_node, $content_node->childNodes->item(0));
 $log_in = $domdoc->getElementById('log-in');
+if ( isset($has_json) && $has_json) {
+    $domdoc->getElementById("content")->setAttribute("data-has-json", "has-json");
+}
 if ( isset($_GET['af_name'], $_GET['af_id'])) {
     $player_name = $domdoc->createTextNode($_GET['af_name']);
     $log_in->replaceChild($player_name, $log_in->childNodes->item(0));
@@ -37,6 +41,10 @@ if ( isset($_GET['af_name'], $_GET['af_id'])) {
     $dac->parentNode->removeChild($dac);
 }
 list($head, $foot) = explode($split_text, $domdoc->saveHTML());
+function update_foot() {
+    global $domdoc, $split_text, $foot;
+    list(, $foot) = explode($split_text, $domdoc->saveHTML());
+}
 if (!isset($skip_head) || $skip_head === false) {
     echo $head;
 }

@@ -83,6 +83,18 @@
     }
     ga('send', 'pageview');
 
+    var contentWithJson = document.querySelector("#content[data-has-json='has-json']");
+    if ( contentWithJson ) {
+        var p = document.createElement("p");
+        p.setAttribute("id", "view-json");
+        var a = document.createElement("a");
+        p.appendChild(a);
+        a.innerText = "View JSON";
+        var char = location.search.startsWith("?") ? "&" : "?";
+        a.setAttribute("href", location.search + char + "format=json");
+        contentWithJson.appendChild(p);;
+    }
+
 </script>
 <script src="/assets/push/push.js"></script>
 </body>

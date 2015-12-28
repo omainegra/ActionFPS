@@ -1,7 +1,7 @@
 <?php
+$has_json = true;
 require_once("render.inc.php");
 require("render_game.inc.php");
-
 $games = source_data("recent");
 $events = source_data("events");
 $latest_clanwar = source_data("clanwar");

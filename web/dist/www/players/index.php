@@ -1,4 +1,6 @@
 <?php
+$has_json = true;
+
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 $users = source_data();

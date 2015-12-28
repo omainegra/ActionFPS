@@ -1,4 +1,6 @@
 <?php
+$has_json = true;
+
 require_once("../render.inc.php");
 
 $servers = source_data();
