@@ -3,7 +3,7 @@ require_once("../render.inc.php");
 require("../render_game.inc.php");
 
 $user = source_data();
-$achievements = $user['achievements'];
+$achievements = @$user['achievements'];
 
 function capture_master($maps) {
     ?><section class="content">
@@ -123,6 +123,7 @@ function none_achievement($achievement)
     <article id="profile">
     <div class="profile">
         <h1><?php echo htmlspecialchars($user['nickname']['nickname']); ?></h1>
+        <?php if ( isset($user['stats'])) {?>
         <div class="main-info">
             <div class="basics">
                 <table class="basic-counts">
@@ -164,8 +165,8 @@ function none_achievement($achievement)
                 } ?>
             </div>
         </div>
-        </div>
-
+        </div><?php } ?>
+<?php if ( isset($user['recent-games'])) { ?>
         <h2>Recent games</h2>
         <ol class="recent-games">
             <?php foreach($user['recent-games'] as $game) {
@@ -189,6 +190,8 @@ function none_achievement($achievement)
     <?php } ?>
 
         </ol>
+
+    <?php } ?>
     </div>
 
     </article><?php

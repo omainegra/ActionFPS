@@ -10,5 +10,4 @@ GET         /game-ids/                      @controllers.GamesApiController.game
 GET         /games/                         @controllers.GamesApiController.games(from: Option[String], to: Option[String], limit: Option[Int])
 GET         /recent-games/                  @controllers.GamesApiController.recentGames
 
-GET         /inters/                        @controllers.LiveUpdatesController.inters
-GET         /new-games/                     @controllers.LiveUpdatesController.newGames
+GET         /events/                        @controllers.LiveUpdatesController.events

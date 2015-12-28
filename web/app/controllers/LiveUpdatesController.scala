@@ -3,13 +3,13 @@ package controllers
 import javax.inject._
 
 import play.api.mvc.{Action, Controller}
-import services.{PingerService}
+import services.{EventsListener, PingerService}
 
 /**
   * Created by William on 24/12/2015.
   */
 @Singleton
-class LiveUpdatesController @Inject()(pingerService: PingerService) extends Controller {
+class LiveUpdatesController @Inject()(pingerService: PingerService, eventsListener: EventsListener) extends Controller {
 
   def serverUpdates = Action {
     Ok.feed(

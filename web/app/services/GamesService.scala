@@ -46,6 +46,8 @@ class GamesService @Inject()(val configuration: Configuration,
     s"${gamesUrl}/games/" + (if (limit) "?limit=5" else "")
   }
 
+  logger.info(s"Loading games from $vurl")
+
   Source.fromInputStream(Request.Get(vurl).execute().returnContent().asStream())
     .getLines().foreach { line =>
     line.split("\t").toList match {

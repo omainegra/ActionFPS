@@ -19,20 +19,18 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class NewGamesService @Inject()(val applicationLifecycle: ApplicationLifecycle,
                                 val configuration: Configuration,
-                                gamesService: GamesService)(implicit
-                                                            actorSystem: ActorSystem,
-                                                            executionContext: ExecutionContext)
+                                eventPublisherService: EventPublisherService)
+                               (implicit
+                                actorSystem: ActorSystem,
+                                executionContext: ExecutionContext)
   extends TailsGames {
-
-  val (newGamesEnum, thing) = Concurrent.broadcast[Event]
-  val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(thing.push(Event("")))
 
   val logger = Logger(getClass)
   logger.info("Starting new games service")
 
   override def processGame(game: JsonGame): Unit = {
     val b = game.withoutHosts.toJson.+("isNew" -> JsBoolean(true))
-    thing.push(
+    eventPublisherService.push(
       Event(
         id = Option(game.id),
         name = Option("new-game"),
@@ -40,8 +38,6 @@ class NewGamesService @Inject()(val applicationLifecycle: ApplicationLifecycle,
       )
     )
   }
-
-  applicationLifecycle.addStopHook(() => Future(keepAlive.cancel()))
 
   initialiseTailer(fromStart = false)
 

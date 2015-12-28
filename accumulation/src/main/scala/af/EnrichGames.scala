@@ -8,13 +8,11 @@ import acleague.enrichers.JsonGame
 case class EnrichGames(users: List[User], clans: List[Clan]) {
 
   implicit class withUsersClass(jsonGame: JsonGame) {
-    def withUsersL(users: List[User]) = jsonGame.transformPlayers((_, player) =>
+    def withUsers = jsonGame.transformPlayers((_, player) =>
       player.copy(user = users.find(_.validAt(player.name, jsonGame.endTime)).map(_.id))
     )
 
-    def withUsers: JsonGame = withUsersL(users)
-
-    def withClansL(clans: List[Clan]) = {
+    def withClans = {
       val newGame = jsonGame.transformPlayers((_, player) =>
         player.copy(clan = clans.find(_.nicknameInClan(player.name)).map(_.id))
       ).transformTeams { team =>
@@ -32,7 +30,6 @@ case class EnrichGames(users: List[User], clans: List[Clan]) {
       )
     }
 
-    def withClans: JsonGame = withClansL(clans)
   }
 
 }

@@ -21,13 +21,12 @@ import concurrent.duration._
   */
 @Singleton
 class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
+                              eventPublisherService: EventPublisherService,
                               configuration: Configuration)(implicit
                                                             actorSystem: ActorSystem,
                                                             executionContext: ExecutionContext) {
 
-  val (intersEnum, thing) = Concurrent.broadcast[Event]
-  val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(thing.push(Event("")))
-//  val keepAlive2 = actorSystem.scheduler.schedule(2.seconds, 2.seconds)(thing.push(sampleInter))
+  //  val keepAlive2 = actorSystem.scheduler.schedule(2.seconds, 2.seconds)(thing.push(sampleInter))
   val file = new File(configuration.underlying.getString("af.journal.path"))
   val tailer = new CallbackTailer(file, true)(acceptLine)
   val interStateAgent = Agent(InterState.empty)
@@ -46,7 +45,7 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
           }*/
           logger.info(s"Received $interCall. Allowed? $allowed")
           if (allowed) {
-            thing.push(Event(
+            eventPublisherService.push(Event(
               id = Option(interCall.time.toString),
               name = Option("inter"),
               data = Json.toJson(Map(
@@ -69,8 +68,7 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
     )).toString
   )
 
-  applicationLifecycle.addStopHook(() => Future(keepAlive.cancel()))
-//  applicationLifecycle.addStopHook(() => Future(keepAlive2.cancel()))
+  //  applicationLifecycle.addStopHook(() => Future(keepAlive2.cancel()))
   applicationLifecycle.addStopHook(() => Future(tailer.shutdown()))
 
 }

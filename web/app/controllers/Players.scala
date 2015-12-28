@@ -29,13 +29,17 @@ class Players @Inject()(configuration: Configuration,
   }
 
   def player(id: String) = Action {
-    val fullOption = for {
-      user <- recordsService.users.find(user => user.id == id || user.email == id)
-      playerState <- achievementsService.achievements.get().map.get(user.id)
-    } yield fullProfile(user, playerState)
-    fullOption match {
-      case Some(json) => Ok(jsonToHtml("/player/", json))
-      case None => NotFound("User not found")
+    recordsService.users.find(user => user.id == id || user.email == id) match {
+      case Some(user) =>
+        val json = achievementsService.achievements.get().map.get(user.id) match {
+          case Some(playerState) =>
+            fullProfile(user, playerState)
+          case None =>
+            Json.toJson(user)
+        }
+        Ok(jsonToHtml("/player/", json))
+      case None =>
+        NotFound("User not found")
     }
   }
 

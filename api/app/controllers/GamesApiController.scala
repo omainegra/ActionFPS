@@ -35,7 +35,7 @@ class GamesApiController @Inject()(configuration: Configuration,
   }
 
   def recentGames = Action {
-    Ok(Json.toJson(gamesService.allGames.get().sortBy(_.id).takeRight(50).map(_.toJson)))
+    Ok(Json.toJson(gamesService.allGames.get().sortBy(_.id).takeRight(25).map(_.toJson)))
   }
 
   def games(from: Option[String], to: Option[String], limit: Option[Int]) = Action {
@@ -45,7 +45,9 @@ class GamesApiController @Inject()(configuration: Configuration,
       .filter(game => from.isEmpty || from.exists(_ >= game.id))
       .filter(game => to.isEmpty || to.exists(_ <= game.id))
       .sortBy(_.id)
+
     limit.foreach(l => gms = gms.takeRight(l))
+
     val enumerator = Enumerator
       .enumerate(
         gms

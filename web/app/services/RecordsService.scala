@@ -41,7 +41,7 @@ class RecordsService @Inject()(recordsReader: RecordsReader,
     val eg = EnrichGames(nu, nc)
     import eg.withUsersClass
     gs.allGames.send(games =>
-      games.map(game => game.withUsersL(nu).withClansL(nc))
+      games.map(game => game.withUsers.withClans)
     )
   }
 

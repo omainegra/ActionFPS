@@ -13,7 +13,8 @@ import scala.util.control.NonFatal
 
 @Singleton
 class GamesService @Inject()(val configuration: Configuration,
-                             val applicationLifecycle: ApplicationLifecycle)
+                             val applicationLifecycle: ApplicationLifecycle,
+                            recordsService: RecordsService)
                             (implicit executionContext: ExecutionContext)
   extends TailsGames {
 
@@ -23,7 +24,9 @@ class GamesService @Inject()(val configuration: Configuration,
   val allGames: Agent[List[JsonGame]] = Agent(List.empty)
 
   override def processGame(game: JsonGame): Unit = {
-    try allGames.alter(list => list :+ game.withoutHosts)
+    val enr = EnrichGames(users = recordsService.users, clans = recordsService.clans)
+    import enr._
+    try allGames.alter(list => list :+ game.withoutHosts.withUsers.withClans)
     catch {
       case NonFatal(e) =>
         logger.error(s"Failed to process game $game due to $e", e)
@@ -31,4 +34,5 @@ class GamesService @Inject()(val configuration: Configuration,
   }
 
   initialiseTailer(fromStart = true)
+
 }
