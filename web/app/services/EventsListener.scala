@@ -54,7 +54,7 @@ class EventsListener @Inject()(configuration: Configuration,
           if (e.name.contains("new-game")) {
             val game = Json.fromJson[JsonGame](Json.parse(e.data))
             newGamesService.accept(game.get)
-            gamesService.processGame(game.get)
+            gamesService.accept(game.get)
           }
           if (e.name.contains("inter")) {
             intersChannel.push(e)

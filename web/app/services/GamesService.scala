@@ -25,6 +25,10 @@ class GamesService @Inject()(val configuration: Configuration,
   logger.info("Starting games service...")
   val allGames: Agent[List[JsonGame]] = Agent(List.empty)
 
+  def accept(game: JsonGame): Unit = {
+    allGames.alter(list => list :+ game)
+  }
+
   def processGame(game: JsonGame): Unit = {
     val er = EnrichGames(recordsService.users, recordsService.clans)
     import er.withUsersClass
