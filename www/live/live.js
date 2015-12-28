@@ -1,5 +1,5 @@
 (function() {
-    var es = new EventSource("http://api.actionfps.com/server-updates/");
+    var es = new EventSource("/server-updates/");
     String.prototype.hashCode = function() {
         var hash = 0, i, chr, len;
         if (this.length === 0) return hash;

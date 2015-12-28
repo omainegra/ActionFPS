@@ -41,7 +41,6 @@ target
 build
 null
 tmp*
-dist
 test-output
 build.log
 

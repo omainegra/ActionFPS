@@ -55,14 +55,14 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
         data = Json.toJson(b).toString()
       )
     )
-//    val html = gameRenderService.renderGame(Json.toJson(b))
-//    liveGamesChan.push(
-//      Event(
-//        id = Option(b.now.server.server),
-//        name = Option("current-game-status-fragment"),
-//        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(html)).toString()
-//      )
-//    )
+    val html = controllers.jsonToHtml("/live/render-fragment.php", Json.toJson(b))
+    liveGamesChan.push(
+      Event(
+        id = Option(b.now.server.server),
+        name = Option("current-game-status-fragment"),
+        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(html.body)).toString()
+      )
+    )
   }))
 
   import concurrent.duration._

@@ -10,3 +10,5 @@ GET         /clan/                          @controllers.Clans.clan(id: String)
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
 GET         /servers/                       @controllers.RecordsController.getServers
 GET         /new-games/                     @controllers.LiveUpdatesController.newGames
+GET         /server-updates/                @controllers.LiveUpdatesController.serverUpdates
+GET         /assets/*file                   controllers.Diasse.get(file)

@@ -40,7 +40,13 @@ class GamesService @Inject()(val configuration: Configuration,
 
   val validServers = ValidServers.fromResource
 
-  Source.fromInputStream(Request.Get("http://odin.duel.gg:59991/games/").execute().returnContent().asStream())
+  val vurl = {
+    val gamesUrl = configuration.underlying.getString("af.api.url")
+    val limit = configuration.underlying.getBoolean("af.api.limit")
+    s"${gamesUrl}/games/" + (if (limit) "?limit=5" else "")
+  }
+
+  Source.fromInputStream(Request.Get(vurl).execute().returnContent().asStream())
     .getLines().foreach { line =>
     line.split("\t").toList match {
       case List(id, json) =>

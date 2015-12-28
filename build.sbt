@@ -78,13 +78,13 @@ lazy val web =
         filters,
         ws
       ),
-      mappings in Universal <++= (packageBin in Compile, baseDirectory) map { (_, bd) =>
-        val dir = bd / ".." / "www"
-        (dir.***) pair relativeTo(dir.getParentFile)
-      },
+//      mappings in Universal <++= (packageBin in Compile, baseDirectory) map { (_, bd) =>
+//        val dir = bd / ".." / "www"
+//        (dir.***) pair relativeTo(dir.getParentFile)
+//      },
       scriptClasspath := Seq("*")
 //      ,
-//      unmanagedResourceDirectories in Assets += baseDirectory.value / "../www"
+//      unmanagedResourceDirectories in Assets += baseDirectory.value / "dist" / "www"
     )
 
 lazy val gameParser =

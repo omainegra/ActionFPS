@@ -12,9 +12,9 @@ import play.api.Configuration
   * Created by William on 05/12/2015.
   */
 class RecordsReader @Inject()(configuration: Configuration) {
-
+  val gamesUrl = configuration.underlying.getString("af.api.url")
   def getConfigUrlReader(id: String): InputStreamReader = {
-    val url = s"http://odin.duel.gg:59991/${id}/"
+    val url = s"$gamesUrl/${id}/"
     new InputStreamReader(Request.Get(url).execute().returnContent().asStream())
   }
 
