@@ -39,7 +39,7 @@ foreach($games as $game) {
 }
 
 ?></div></div>
-
+Is a test
 <?php require("live/bits.inc.php"); ?>
 <?php
 
