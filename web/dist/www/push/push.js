@@ -1,7 +1,7 @@
 (function() {
     if ( !("Notification" in window) ) return;
     Notification.requestPermission();
-    var eventStream = new EventSource("http://api.actionfps.com/inters/");
+    var eventStream = new EventSource("/inters/");
     eventStream.addEventListener("inter", function(event) {
         showNotification(JSON.parse(event.data));
     });

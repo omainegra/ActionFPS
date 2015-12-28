@@ -9,7 +9,7 @@ class GameTailer(file: File, endOnly: Boolean)(callback: JsonGame => Unit)
   extends CallbackTailer(file, endOnly)(line =>
     line.split("\t").toList match {
       case List(id, _, _, json) =>
-        val game = JsonGame.fromJson(json)
+        val game = JsonGame.fromJsonString(json)
           game.validate.foreach { goodGame =>
             callback(goodGame.copy(endTime = game.endTime))
           }

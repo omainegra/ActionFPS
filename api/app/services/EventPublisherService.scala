@@ -24,7 +24,9 @@ class EventPublisherService @Inject()(configuration: Configuration,
 
   val (eventsEnum, thing) = Concurrent.broadcast[Event]
 
-  val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(thing.push(Event("")))
+
+  val kal = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(thing.push(Event("")))
+  applicationLifecycle.addStopHook(() => Future.successful(kal.cancel()))
 
   val file = new File(configuration.underlying.getString("af.events"))
   val fw = new FileWriter(file, true)
@@ -47,8 +49,6 @@ class EventPublisherService @Inject()(configuration: Configuration,
   }
 
   applicationLifecycle.addStopHook(() => Future.successful(fw.close()))
-
-  applicationLifecycle.addStopHook(() => Future(keepAlive.cancel()))
 
   push(Event("started up"))
 }

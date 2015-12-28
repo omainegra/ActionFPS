@@ -9,9 +9,8 @@ import services.{EventPublisherService, IntersService, NewGamesService}
   * Created by William on 24/12/2015.
   */
 @Singleton
-class LiveUpdatesController @Inject()(intersService: IntersService,
-                                     eventPublisherService: EventPublisherService,
-                                      newGamesService: NewGamesService) extends Controller {
+class EventsController @Inject()(eventPublisherService: EventPublisherService,
+                                 newGamesService: NewGamesService) extends Controller {
   def events = Action {
     Ok.feed(
       content = eventPublisherService.eventsEnum

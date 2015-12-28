@@ -6,7 +6,7 @@ import java.util.{Date}
 import acleague.ingesters.{FlagGameBuilder, FoundGame, FragGameBuilder}
 import org.joda.time.{DateTimeZone, DateTime}
 import org.joda.time.format.ISODateTimeFormat
-import play.api.libs.json.{Writes, JsValue, Json, JsObject}
+import play.api.libs.json._
 import scala.util.hashing.MurmurHash3
 
 case class GameJsonFound(jsonGame: JsonGame)
@@ -17,11 +17,15 @@ object JsonGame {
   implicit val Bf = Json.format[JsonGameTeam]
   implicit val fmt = Json.format[JsonGame]
 
-  def fromJson(string: String): JsonGame = {
-    val g = Json.fromJson[JsonGame](Json.parse(string)).get
+  def fromJson(jsValue: JsValue): JsonGame = {
+    val g = Json.fromJson[JsonGame](jsValue).get
 
     // some weird edge case from NYC/LA servers
-    if ( g.duration == 60 ) g.copy(duration = 15) else g
+    if (g.duration == 60) g.copy(duration = 15) else g
+  }
+
+  def fromJsonString(string: String): JsonGame = {
+    fromJson(Json.parse(string))
   }
 
   def build(id: String, foundGame: FoundGame, endDate: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
@@ -149,6 +153,10 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
 
   def toJson: JsObject = {
     Json.toJson(this)(JsonGame.fmt).asInstanceOf[JsObject] ++ viewFields.toJson.asInstanceOf[JsObject]
+  }
+
+  def toJsonNew: JsObject = {
+    toJson.+("isNew" -> JsBoolean(true))
   }
 
   import org.scalactic._

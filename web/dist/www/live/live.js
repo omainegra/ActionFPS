@@ -37,12 +37,12 @@
     }, false);
 
 
-    var newGamesSource = new EventSource("http://api.actionfps.com/new-games/");
+    var newGamesSource = new EventSource("/new-games/");
     newGamesSource.addEventListener("new-game", function(event) {
         var game = JSON.parse(event.data);
         var gameId = game.id;
         var divId = "new-game_" + gameId.hashCode();
-        if ( $("#"+ divId).length == 0 ) {
+        if ( $("#"+ divId).length == 0 && game.html ) {
             var newDiv = $("<div id=\"" + divId + "\"></div>").html(game.html);
             $("#new-games").prepend(newDiv);
         }

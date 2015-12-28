@@ -3,13 +3,17 @@ package controllers
 import javax.inject._
 
 import play.api.mvc.{Action, Controller}
-import services.{EventsListener, PingerService}
+import services.{NewGamesService, EventsListener, PingerService}
 
 /**
   * Created by William on 24/12/2015.
   */
 @Singleton
-class LiveUpdatesController @Inject()(pingerService: PingerService, eventsListener: EventsListener) extends Controller {
+class LiveUpdatesController @Inject()(pingerService: PingerService, eventsListener: EventsListener,
+                                      newGamesService: NewGamesService) extends Controller {
+
+
+
 
   def serverUpdates = Action {
     Ok.feed(
@@ -17,12 +21,16 @@ class LiveUpdatesController @Inject()(pingerService: PingerService, eventsListen
     ).as("text/event-stream")
   }
 
-  def inters = TODO
+  def inters = Action {
+    Ok.feed(
+      content = eventsListener.intersEnum
+    ).as("text/event-stream")
+  }
 
-  def newGames = TODO
-//  Action {
-//    Ok.feed(
-//      content = newGamesService.newGamesEnum
-//    ).as("text/event-stream")
-//  }
+  def newGames =
+    Action {
+      Ok.feed(
+        content = newGamesService.newGamesEnum
+      ).as("text/event-stream")
+    }
 }

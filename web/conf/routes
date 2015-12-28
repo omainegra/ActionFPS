@@ -20,6 +20,7 @@ POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
 GET         /servers/                       @controllers.RecordsController.getServers
 
 GET         /new-games/                     @controllers.LiveUpdatesController.newGames
+GET         /inters/                        @controllers.LiveUpdatesController.inters
 GET         /server-updates/                @controllers.LiveUpdatesController.serverUpdates
 
 GET         /assets/*file                   controllers.Diasse.get(file)

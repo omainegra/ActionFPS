@@ -39,6 +39,8 @@ class NewGamesService @Inject()(val applicationLifecycle: ApplicationLifecycle,
     )
   }
 
+//  actorSystem.scheduler.scheduleOnce(15.seconds)(processGame(af.Samples.realGame))
+
   initialiseTailer(fromStart = false)
 
 }

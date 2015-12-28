@@ -52,7 +52,7 @@ class GamesService @Inject()(val configuration: Configuration,
     .getLines().foreach { line =>
     line.split("\t").toList match {
       case List(id, json) =>
-        val game = JsonGame.fromJson(json)
+        val game = JsonGame.fromJsonString(json)
         validServers.items.get(game.server).filter(_.isValid).foreach(vs =>
           game.validate.foreach { goodGame =>
             val g = goodGame.copy(
