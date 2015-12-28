@@ -11,6 +11,8 @@ class Clanwar implements JsonSerializable
     public $completed = false;
     public $winner = null;
     
+    const MAX_GAME_INTERVAL = 15*60;
+    
     public function __construct($game)
     {
         $this->id = $game->id;
@@ -88,7 +90,7 @@ class Clanwar implements JsonSerializable
         return ($game->server == $this->server
          && $clans == $current_clans
          && $teamsize == $this->teamsize
-         && $interval <= 10*60
+         && $interval <= Clanwar::MAX_GAME_INTERVAL
          && !$this->completed);
 
     }
@@ -212,7 +214,7 @@ class ClanwarsAccumulator implements ActionFPS\OrderedActionIterator
         for (end($state->incomplete); key($state->incomplete)!==null; prev($state->incomplete))
         {
             $id = key($state->incomplete);
-            if($state->incomplete[$id]->timeDiff($game) >= 10 * 60) break;
+            if($state->incomplete[$id]->timeDiff($game) >= Clanwar::MAX_GAME_INTERVAL) break;
             else if($state->incomplete[$id]->isNext($game))
             {
                 $state->incomplete[$id]->addGame($game);
