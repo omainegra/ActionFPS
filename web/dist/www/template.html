@@ -89,7 +89,8 @@
         p.setAttribute("id", "view-json");
         var a = document.createElement("a");
         p.appendChild(a);
-        a.innerText = "View JSON";
+        var text = document.createTextNode("View JSON");
+        a.appendChild(text);
         var char = location.search.startsWith("?") ? "&" : "?";
         a.setAttribute("href", location.search + char + "format=json");
         contentWithJson.appendChild(p);;
