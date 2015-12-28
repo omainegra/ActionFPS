@@ -21,7 +21,8 @@ class PhpRenderService @Inject()(configuration: Configuration)(implicit executio
     render(path, json)
   def render(path: String, json: JsValue)(implicit requestHeader: RequestHeader): Future[Html] = {
     val url = s"$root$path"
-    wSClient.url(url).post(json).map(response =>
+    val reqp = List("af_name", "af_id").flatMap(num => requestHeader.cookies.get(num).map(v => num -> v.value))
+    wSClient.url(url).withQueryString(reqp:_*).post(json).map(response =>
       Html(response.body)
     )
   }
