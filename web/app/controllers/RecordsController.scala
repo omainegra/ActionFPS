@@ -10,37 +10,23 @@ import services._
 
 import scala.concurrent.ExecutionContext
 
+import scala.async.Async._
+
 /**
   * Created by William on 24/12/2015.
   */
 @Singleton
-class RecordsController @Inject()(recordsService: RecordsService)
+class RecordsController @Inject()(recordsService: RecordsService, phpRenderService: PhpRenderService)
                                  (implicit executionContext: ExecutionContext) extends Controller {
 
   implicit val fmtClan = Json.format[Clan]
 
   implicit val serversWrites = Json.writes[ServerRecord]
 
-  def getServers = Action {
-    Ok(jsonToHtml("/servers/", Json.toJson(recordsService.servers)))
-  }
-
-  def usersJson = Action {
-    import User.WithoutEmailFormat.noEmailUserWrite
-    Ok(Json.toJson(recordsService.users))
-  }
-
-  def userJson(id: String) = Action {
-    recordsService.users.find(user => user.id == id || user.email == id) match {
-      case Some(user) =>
-        import User.WithoutEmailFormat.noEmailUserWrite
-        Ok(Json.toJson(user))
-      case None =>
-        NotFound("User not found")
+  def getServers = Action.async { implicit req =>
+    async {
+      Ok(await(phpRenderService("/servers/", Json.toJson(recordsService.servers))))
     }
   }
 
-  def clans = Action {
-    Ok(Json.toJson(recordsService.clans))
-  }
 }

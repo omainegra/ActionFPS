@@ -8,7 +8,7 @@ import play.api.libs.json.{JsNull, JsValue, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{RequestHeader, Action, Controller}
 import play.twirl.api.Html
-import services.{AchievementsService, GamesService}
+import services.{PhpRenderService, AchievementsService, GamesService}
 
 import scala.concurrent.ExecutionContext
 
@@ -17,35 +17,39 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class Index @Inject()(gamesService: GamesService,
-                      achievementsService: AchievementsService, wSClient: WSClient)
+                      achievementsService: AchievementsService,
+                      wSClient: WSClient,
+                      phpRenderService: PhpRenderService)
                      (implicit executionContext: ExecutionContext) extends Controller {
 
-  // todo pass through cookie info to PHP
+  import scala.async.Async._
 
-  case class RenderRequest(data: Map[String, JsValue])
+  def index = Action.async { implicit req =>
+    async {
+      val events = Json.toJson(achievementsService.achievements.get().events.take(7))
+      val recent = Json.toJson(gamesService.allGames.get().takeRight(50).map(_.toJson).reverse)
+      val csUrl = "http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?completed=1&count=1"
+      val clanwar = Json.fromJson[Map[String, JsValue]](await(wSClient.url(csUrl).get()).json)
+        .map(_.headOption.get._2).get
+      val json = Json.toJson(Map("events" -> events, "recent" -> recent, "clanwar" -> clanwar))
+      Ok(await(phpRenderService("/", json)))
+    }
+  }
 
-//  def render(path: String, data: Map[String, JsValue])(implicit request: RequestHeader) = {
-//    wSClient
-//      .url(s"http://127.0.0.1:8888${path}")
-////      .withHeaders(request.cookies.map(cookie => "Cookie" -> s"${cookie.name}=${cookie.value}))
-//      .post(Json.toJson(data)).map { r =>
-//      Ok(Html(r.body.replaceAllLiterally( """<script id="ga">""", """<script id="ga" type="ignore">""")))
-//    }
-//  }
+  def login = Action.async { implicit req =>
+    phpRenderService("/login/", JsNull).map(resp => Ok(resp))
+  }
 
-  def index = Action {
-    val events = Json.toJson(achievementsService.achievements.get().events.take(7))
-    val recent = Json.toJson(gamesService.allGames.get().takeRight(50).map(_.toJson).reverse)
+  def questions = Action.async { implicit req =>
+    phpRenderService("/questions/", JsNull).map(resp => Ok(resp))
+  }
 
-    val clanwar = Json.fromJson[Map[String, JsValue]](Json.parse(Request.Get("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?completed=1&count=1").execute().returnContent().asString()))
-      .map(_.headOption.get._2).get
-    //    val clanwar = JsNull
+  def api = Action.async { implicit req =>
+    phpRenderService("/api/", JsNull).map(resp => Ok(resp))
+  }
 
-    val json = Json.toJson(Map("events" -> events, "recent" -> recent, "clanwar" -> clanwar))
-    Ok(jsonToHtml("/", json))
-    //    wSClient.url("http://127.0.0.1:8888/").post(json).map { r =>
-    //      Ok(Html(r.body.replaceAllLiterally("""<script id="ga">""", """<script id="ga" type="ignore">""")))
-    //    }
+  def client = Action.async { implicit req =>
+    phpRenderService("/client/", JsNull).map(resp => Ok(resp))
   }
 
 }

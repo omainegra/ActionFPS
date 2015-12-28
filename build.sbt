@@ -52,7 +52,8 @@ lazy val api =
         "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
         "commons-io" % "commons-io" % "2.4",
         filters,
-        ws
+        ws,
+        async
       ),
       scriptClasspath := Seq("*"),
       unmanagedResourceDirectories in Assets += baseDirectory.value / "../www"
@@ -76,15 +77,16 @@ lazy val web =
         "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
         "commons-io" % "commons-io" % "2.4",
         filters,
-        ws
+        ws,
+        async
       ),
-//      mappings in Universal <++= (packageBin in Compile, baseDirectory) map { (_, bd) =>
-//        val dir = bd / ".." / "www"
-//        (dir.***) pair relativeTo(dir.getParentFile)
-//      },
+      //      mappings in Universal <++= (packageBin in Compile, baseDirectory) map { (_, bd) =>
+      //        val dir = bd / ".." / "www"
+      //        (dir.***) pair relativeTo(dir.getParentFile)
+      //      },
       scriptClasspath := Seq("*")
-//      ,
-//      unmanagedResourceDirectories in Assets += baseDirectory.value / "dist" / "www"
+      //      ,
+      //      unmanagedResourceDirectories in Assets += baseDirectory.value / "dist" / "www"
     )
 
 lazy val gameParser =

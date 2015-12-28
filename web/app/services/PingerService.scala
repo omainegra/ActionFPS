@@ -19,9 +19,8 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 @Singleton
 class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
-                              recordsService: RecordsService
-//                              ,
-//                              gameRenderService: GameRenderService
+                              recordsService: RecordsService,
+                              phpRenderService: PhpRenderService
                              )(implicit actorSystem: ActorSystem,
                                executionContext: ExecutionContext) {
 
@@ -55,12 +54,13 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
         data = Json.toJson(b).toString()
       )
     )
-    val html = controllers.jsonToHtml("/live/render-fragment.php", Json.toJson(b))
-    liveGamesChan.push(
-      Event(
-        id = Option(b.now.server.server),
-        name = Option("current-game-status-fragment"),
-        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(html.body)).toString()
+    phpRenderService.renderStatelessRaw("/live/render-fragment.php", Json.toJson(b)).foreach(html =>
+      liveGamesChan.push(
+        Event(
+          id = Option(b.now.server.server),
+          name = Option("current-game-status-fragment"),
+          data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(html)).toString()
+        )
       )
     )
   }))

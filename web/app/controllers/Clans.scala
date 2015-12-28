@@ -9,39 +9,52 @@ import services._
 
 import scala.concurrent.ExecutionContext
 
+import scala.async.Async._
 
 /**
   * This API depends on the games
   */
 @Singleton
-class Clans @Inject()(recordsService: RecordsService, wSClient: WSClient)
+class Clans @Inject()(recordsService: RecordsService,
+                      wSClient: WSClient,
+                      phpRenderService: PhpRenderService)
                      (implicit executionContext: ExecutionContext) extends Controller {
 
-  def rankings = Action.async {
-    val url = "http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10"
-    wSClient.url(url).get().map(resp => Ok(jsonToHtml("/rankings/",resp.json)))
+  def rankings = Action.async { implicit req =>
+    async {
+      val url = "http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10"
+      val json = await(wSClient.url(url).get()).json
+      Ok(await(phpRenderService.render(path = "/rankings", json = json)))
+    }
   }
 
-  def clanwars = Action.async {
-    val url = "http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?count=50"
-    wSClient.url(url).get().map(resp => Ok(jsonToHtml("/clanwars/", resp.json)))
+  def clanwars = Action.async { implicit req =>
+    async {
+      val url = "http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?count=50"
+      val json = await(wSClient.url(url).get()).json
+      Ok(await(phpRenderService.render(path = "/clanwars/", json)))
+    }
   }
 
-  def clans = Action {
-    Ok(jsonToHtml("/clans/", Json.toJson(recordsService.clans.map(_.toJson))))
+  def clans = Action.async { implicit req =>
+    async {
+      Ok(await(phpRenderService.render(path = "/clans/", Json.toJson(recordsService.clans.map(_.toJson)))))
+    }
   }
 
-  def clan(id: String) = Action.async {
-    val url = "http://woop.ac:81/ActionFPS-PHP-Iterator/api/clan.php"
-    wSClient.url(url).withQueryString("id" -> id).execute()
-    .map(resp => Ok(jsonToHtml("/clan/", resp.json)))
+  def clan(id: String) = Action.async { implicit req =>
+    async {
+      val url = "http://woop.ac:81/ActionFPS-PHP-Iterator/api/clan.php"
+      val json = await(wSClient.url(url).withQueryString("id" -> id).execute()).json
+      Ok(await(phpRenderService.render(path = "/clan/", json)))
+    }
   }
 
-  def clanwar(id: String) = Action.async {
-    val url = "http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwar.php"
-    wSClient.url(url).withQueryString("id" -> id).get().map{ response =>
-      Ok(jsonToHtml("/clanwar/", response.json))
-//      Ok(response.json)
+  def clanwar(id: String) = Action.async { implicit req =>
+    async {
+      val url = "http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwar.php"
+      val json = await(wSClient.url(url).withQueryString("id" -> id).get()).json
+      Ok(await(phpRenderService.render(path = "/clanwar/", json)))
     }
   }
 

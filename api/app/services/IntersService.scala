@@ -22,7 +22,7 @@ import concurrent.duration._
 @Singleton
 class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
                               eventPublisherService: EventPublisherService,
-                              configuration: Configuration)(implicit
+                              configuration: Configuration, recordsService: RecordsService)(implicit
                                                             actorSystem: ActorSystem,
                                                             executionContext: ExecutionContext) {
 
@@ -37,12 +37,11 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
     PartialFunction.condOpt(line) {
       case InterCall(interCall) =>
         interStateAgent.send { oldState =>
-          val allowed = true
-          /*{
+          val allowed = {
             val userIsRegistered = recordsService.users.exists(_.nickname.nickname == interCall.nickname)
             val isNotExpired = oldState.canAdd(interCall)
             userIsRegistered && isNotExpired
-          }*/
+          }
           logger.info(s"Received $interCall. Allowed? $allowed")
           if (allowed) {
             eventPublisherService.push(Event(

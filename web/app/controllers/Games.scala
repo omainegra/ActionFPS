@@ -11,20 +11,26 @@ import play.twirl.api.Html
 import services._
 
 import scala.concurrent.ExecutionContext
-
+import scala.async.Async._
 
 /**
   * This API depends on the games
   */
 @Singleton
 class Games @Inject()(gamesService: GamesService,
-                     achievementsService: AchievementsService)
+                      achievementsService: AchievementsService,
+                      phpRenderService: PhpRenderService)
                      (implicit executionContext: ExecutionContext) extends Controller {
 
-  def game(id: String) = Action {
-    gamesService.allGames.get().find(_.id == id) match {
-      case Some(game) => Ok(jsonToHtml("/game/", game.toJson))
-      case None => NotFound("Game not found.")
+
+  def game(id: String) = Action.async { implicit req =>
+    async {
+      gamesService.allGames.get().find(_.id == id) match {
+        case Some(game) =>
+          Ok(await(phpRenderService("/game/", game.toJson)))
+        case None =>
+          NotFound("Game not found.")
+      }
     }
   }
 

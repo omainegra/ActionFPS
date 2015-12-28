@@ -20,26 +20,31 @@ import scala.concurrent.ExecutionContext
 class Players @Inject()(configuration: Configuration,
                         gamesService: GamesService,
                         recordsService: RecordsService,
-                        achievementsService: AchievementsService
+                        achievementsService: AchievementsService,
+                        phpRenderService: PhpRenderService
                        )
                        (implicit executionContext: ExecutionContext) extends Controller {
-
-  def players =  Action {
-    Ok(jsonToHtml("/players/", Json.toJson(recordsService.users.map(_.toJson))))
+import scala.async.Async._
+  def players = Action.async { implicit req =>
+    async {
+      Ok(await(phpRenderService("/players/", Json.toJson(recordsService.users.map(_.toJson)))))
+    }
   }
 
-  def player(id: String) = Action {
-    recordsService.users.find(user => user.id == id || user.email == id) match {
-      case Some(user) =>
-        val json = achievementsService.achievements.get().map.get(user.id) match {
-          case Some(playerState) =>
-            fullProfile(user, playerState)
-          case None =>
-            Json.toJson(user)
-        }
-        Ok(jsonToHtml("/player/", json))
-      case None =>
-        NotFound("User not found")
+  def player(id: String) = Action.async { implicit req =>
+    async {
+      recordsService.users.find(user => user.id == id || user.email == id) match {
+        case Some(user) =>
+          val json = achievementsService.achievements.get().map.get(user.id) match {
+            case Some(playerState) =>
+              fullProfile(user, playerState)
+            case None =>
+              Json.toJson(user)
+          }
+          Ok(await(phpRenderService("/player/", json)))
+        case None =>
+          NotFound("User not found")
+      }
     }
   }
 

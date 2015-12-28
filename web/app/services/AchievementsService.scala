@@ -46,8 +46,8 @@ class AchievementsService @Inject()(gamesService: GamesService,
     val limit = configuration.underlying.getBoolean("af.api.limit")
     s"${gamesUrl}/games/" + (if (limit) "?limit=5" else "")
   }
-  val validServers = ValidServers.fromResource
 
+  val validServers = ValidServers.fromResource
 
   Source.fromInputStream(Request.Get(vurl).execute().returnContent().asStream())
     .getLines().foreach { line =>

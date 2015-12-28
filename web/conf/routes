@@ -1,14 +1,25 @@
 GET         /                               @controllers.Index.index
+GET         /login/                         @controllers.Index.login
+GET         /questions/                     @controllers.Index.questions
+GET         /api/                           @controllers.Index.api
+GET         /client/                        @controllers.Index.client
+
 GET         /rankings/                      @controllers.Clans.rankings
 GET         /clanwars/                      @controllers.Clans.clanwars
 GET         /clans/                         @controllers.Clans.clans
-GET         /players/                       @controllers.Players.players
-GET         /player/                        @controllers.Players.player(id: String)
-GET         /game/                          @controllers.Games.game(id: String)
 GET         /clanwar/                       @controllers.Clans.clanwar(id: String)
 GET         /clan/                          @controllers.Clans.clan(id: String)
+
+GET         /players/                       @controllers.Players.players
+GET         /player/                        @controllers.Players.player(id: String)
+
+GET         /game/                          @controllers.Games.game(id: String)
+
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
+
 GET         /servers/                       @controllers.RecordsController.getServers
+
 GET         /new-games/                     @controllers.LiveUpdatesController.newGames
 GET         /server-updates/                @controllers.LiveUpdatesController.serverUpdates
+
 GET         /assets/*file                   controllers.Diasse.get(file)
