@@ -27,7 +27,7 @@ class Players @Inject()(configuration: Configuration,
 import scala.async.Async._
   def players = Action.async { implicit req =>
     async {
-      Ok(await(phpRenderService("/players/", Json.toJson(recordsService.users.map(_.toJson)))))
+      await(phpRenderService("/players/", Json.toJson(recordsService.users.map(_.toJson))))
     }
   }
 
@@ -41,7 +41,7 @@ import scala.async.Async._
             case None =>
               Json.toJson(user)
           }
-          Ok(await(phpRenderService("/player/", json)))
+          await(phpRenderService("/player/", json))
         case None =>
           NotFound("User not found")
       }

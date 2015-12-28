@@ -2,13 +2,10 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import org.apache.http.client.fluent.Request
-import play.api.http.Writeable
 import play.api.libs.json.{JsNull, JsValue, Json}
 import play.api.libs.ws.WSClient
-import play.api.mvc.{RequestHeader, Action, Controller}
-import play.twirl.api.Html
-import services.{PhpRenderService, AchievementsService, GamesService}
+import play.api.mvc.{Action, Controller}
+import services.{AchievementsService, GamesService, PhpRenderService}
 
 import scala.concurrent.ExecutionContext
 
@@ -32,24 +29,24 @@ class Index @Inject()(gamesService: GamesService,
       val clanwar = Json.fromJson[Map[String, JsValue]](await(wSClient.url(csUrl).get()).json)
         .map(_.headOption.get._2).get
       val json = Json.toJson(Map("events" -> events, "recent" -> recent, "clanwar" -> clanwar))
-      Ok(await(phpRenderService("/", json)))
+      await(phpRenderService("/", json))
     }
   }
 
   def login = Action.async { implicit req =>
-    phpRenderService("/login/", JsNull).map(resp => Ok(resp))
+    phpRenderService("/login/", JsNull)
   }
 
   def questions = Action.async { implicit req =>
-    phpRenderService("/questions/", JsNull).map(resp => Ok(resp))
+    phpRenderService("/questions/", JsNull)
   }
 
   def api = Action.async { implicit req =>
-    phpRenderService("/api/", JsNull).map(resp => Ok(resp))
+    phpRenderService("/api/", JsNull)
   }
 
   def client = Action.async { implicit req =>
-    phpRenderService("/client/", JsNull).map(resp => Ok(resp))
+    phpRenderService("/client/", JsNull)
   }
 
 }

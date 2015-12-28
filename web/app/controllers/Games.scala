@@ -27,7 +27,7 @@ class Games @Inject()(gamesService: GamesService,
     async {
       gamesService.allGames.get().find(_.id == id) match {
         case Some(game) =>
-          Ok(await(phpRenderService("/game/", game.toJson)))
+          await(phpRenderService("/game/", game.toJson))
         case None =>
           NotFound("Game not found.")
       }

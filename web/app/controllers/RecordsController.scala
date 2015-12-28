@@ -10,8 +10,6 @@ import services._
 
 import scala.concurrent.ExecutionContext
 
-import scala.async.Async._
-
 /**
   * Created by William on 24/12/2015.
   */
@@ -24,9 +22,7 @@ class RecordsController @Inject()(recordsService: RecordsService, phpRenderServi
   implicit val serversWrites = Json.writes[ServerRecord]
 
   def getServers = Action.async { implicit req =>
-    async {
-      Ok(await(phpRenderService("/servers/", Json.toJson(recordsService.servers))))
-    }
+    phpRenderService("/servers/", Json.toJson(recordsService.servers))
   }
 
 }
