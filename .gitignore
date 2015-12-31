@@ -59,3 +59,4 @@ build.log
 .cache-main
 .classpath
 .project
+buildinfo.properties

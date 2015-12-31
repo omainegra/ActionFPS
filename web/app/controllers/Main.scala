@@ -1,9 +1,10 @@
 package controllers
 
+import java.util.Base64
 import javax.inject._
 
 import play.api.Configuration
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, JsObject, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, AnyContent, BodyParsers, Controller}
 import play.twirl.api.Html
@@ -56,21 +57,86 @@ class Main @Inject()(configuration: Configuration)(implicit executionContext: Ex
     }
   }
 
-  def rankings = forward("/rankings/")
+  def rankings = Action.async { request =>
+    async {
+      val rankings = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10").get()).body
+      val rendered = await(wSClient.url(s"$mainPath/rankings/").post(
+        Map("rankings" -> Seq(rankings))
+      )).body
+      Ok(Html(rendered.cleanupPaths))
+    }
 
-  def clan(id: String) = forward("/clan/", id)
+  }
 
-  def clanwar(id: String) = forward("/clanwar/", id)
+  def clan(id: String) = Action.async { request =>
+    async {
+      val clan = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clan.php").withQueryString("id" -> id).get()).body
+      Ok(Html(await(wSClient.url(s"$mainPath/clan/").post(
+        Map("clan" -> Seq(clan))
+      )).body.cleanupPaths))
+    }
+  }
 
-  def clanwars = forward("/clanwars/")
+  def clanwar(id: String) = Action.async { request =>
+    async {
+      val clanwar = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwar.php").withQueryString("id" -> id).get()).body
+      val render = await(wSClient.url(s"$mainPath/clanwar/").post(
+        Map("clanwar" -> Seq(clanwar))
+      )).body
+      Ok(Html(render.cleanupPaths))
+    }
+  }
 
-  def game(id: String) = forward("/game/", id)
+  def clanwars = Action.async { request =>
+    async {
+      val clanwars = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?count=50").get()).body
+      val render = await(wSClient.url(s"$mainPath/clanwars/").post(
+        Map("clanwars" -> Seq(clanwars))
+      )).body
+      Ok(Html(render.cleanupPaths))
+    }
+  }
 
-  def clans = forward("/clans/")
+  def game(id: String) = Action.async { request =>
+    async {
+      val game = await(wSClient.url("http://api.actionfps.com/game/").withQueryString("id" -> id).get()).body
+      val render = await(wSClient.url(s"$mainPath/game/").post(
+        Map("game" -> Seq(game))
+      )).body
+      Ok(Html(render.cleanupPaths))
+    }
+  }
 
-  def players = forward("/players/")
+  def clans = Action.async { request =>
+    async {
+      val clans = await(wSClient.url("http://api.actionfps.com/clans/").get()).body
+      val render = await(wSClient.url(s"$mainPath/clans/").post(
+        Map("clans" -> Seq(clans))
+      )).body
+      Ok(Html(render.cleanupPaths))
+    }
+  }
 
-  def player(id: String) = forward("/player/", id)
+  def players = Action.async { request =>
+    async {
+      val players = await(wSClient.url("http://api.actionfps.com/users/").get()).body
+      val render = await(wSClient.url(s"$mainPath/players/").post(
+        Map("players" -> Seq(players))
+      )).body
+      Ok(Html(render.cleanupPaths))
+    }
+  }
+
+  def player(id: String) = Action.async { request =>
+    async {
+      require(id.matches("^[a-z]+$"), "Regex must match")
+      val player = await(wSClient.url("http://api.actionfps.com/user/" + id + "/full/").get()).body
+      val render = await(wSClient.url(s"$mainPath/player/").withQueryString("id" -> id).post(
+        Map("player" -> Seq(player))
+      )).body
+      Ok(Html(render.cleanupPaths))
+    }
+  }
 
   def api = forward("/api/")
 
@@ -80,7 +146,15 @@ class Main @Inject()(configuration: Configuration)(implicit executionContext: Ex
 
   def questions = forward("/questions/")
 
-  def servers = forward("/servers/")
+  def servers = Action.async { request =>
+    async {
+      val got = await(wSClient.url("http://api.actionfps.com/servers/").get()).body
+      val render = await(wSClient.url(s"$mainPath/servers/").post(
+        Map("servers" -> Seq(got))
+      )).body
+      Ok(Html(render.cleanupPaths))
+    }
+  }
 
   def login = forward("/login/")
 
@@ -94,7 +168,9 @@ class Main @Inject()(configuration: Configuration)(implicit executionContext: Ex
   }
 
   def version = Action {
-    Ok(Json.parse(af.BuildInfo.toJson))
+    val parsedJson = Json.parse(af.BuildInfo.toJson).asInstanceOf[JsObject]
+    val two = JsObject(CommitDescription.commitDescription.map(d => "gitCommitDescription" -> JsString(d)).toSeq)
+    Ok(parsedJson ++ two)
   }
 
 }

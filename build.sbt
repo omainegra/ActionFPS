@@ -1,3 +1,7 @@
+import java.util.Base64
+
+import org.eclipse.jgit.revwalk.RevWalk
+
 name := "actionfps"
 
 lazy val root =
@@ -88,11 +92,30 @@ lazy val web =
         scalaVersion,
         sbtVersion,
         buildInfoBuildNumber,
-        git.gitHeadCommit
+        git.gitHeadCommit,
+        gitCommitDescription
       ),
+      gitCommitDescription := {
+        val gitReader = com.typesafe.sbt.SbtGit.GitKeys.gitReader.value
+        gitReader.withGit { interface =>
+          for {
+            sha <- git.gitHeadCommit.value
+            interface <- Option(interface).collect { case i: com.typesafe.sbt.git.JGit => i }
+            ref <- Option(interface.repo.resolve(sha))
+            message <- {
+              val walk = new RevWalk(interface.repo)
+              try Option(walk.parseCommit(ref.toObjectId)).flatMap(commit => Option(commit.getFullMessage))
+              finally walk.dispose()
+            }
+          } yield message
+        }
+      }.map{str => Base64.getEncoder.encodeToString(str.getBytes("UTF-8"))},
       buildInfoPackage := "af",
       buildInfoOptions += BuildInfoOption.ToJson
     )
+
+lazy val gitCommitDescription = SettingKey[Option[String]]("gitCommitDescription", "Base64-encoded!")
+
 
 lazy val gameParser =
   Project(

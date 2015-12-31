@@ -2,7 +2,7 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$clanwar = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwar.php?id=' . rawurlencode($_GET['id'])), true);
+$clanwar = json_decode($_POST['clanwar'] ?: file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwar.php?id=' . rawurlencode($_GET['id'])), true);
 ?>
 <div id="game">
 <?php render_war($clanwar, true); ?>

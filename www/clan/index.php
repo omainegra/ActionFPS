@@ -2,7 +2,7 @@
 require_once("../render.inc.php");
 require("../render_game.inc.php");
 
-$clan = json_decode(file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clan.php?id=' . rawurlencode($_GET['id'])), true);
+$clan = json_decode($_POST['clan'] ?: file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clan.php?id=' . rawurlencode($_GET['id'])), true);
 $stats = $clan['stats'];
 ?>
 <article id="profile">
