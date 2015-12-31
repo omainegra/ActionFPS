@@ -130,7 +130,6 @@ lazy val interParser =
   )
 
 
-
 lazy val referenceReader =
   Project(
     id = "reference-reader",
