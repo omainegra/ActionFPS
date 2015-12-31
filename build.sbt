@@ -67,6 +67,8 @@ lazy val web =
     base = file("web")
   )
     .enablePlugins(PlayScala)
+//    .enablePlugins(GitVersioning)
+    .enablePlugins(BuildInfoPlugin)
     .settings(dontDocument)
     .settings(
       libraryDependencies ++= akka("actor", "agent", "slf4j"),
@@ -78,7 +80,17 @@ lazy val web =
         ws
       ),
       scriptClasspath := Seq("*"),
-      version := "5.0"
+      version := "5.0",
+      buildInfoKeys := Seq[BuildInfoKey](
+        name,
+        version,
+        scalaVersion,
+        sbtVersion,
+        buildInfoBuildNumber,
+        git.gitHeadCommit
+      ),
+      buildInfoPackage := "af",
+      buildInfoOptions += BuildInfoOption.ToJson
     )
 
 lazy val gameParser =

@@ -2,7 +2,6 @@ resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/release
 
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.4.3")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.0.0")
+addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.5.0")
 
-addSbtPlugin("com.atlassian.labs" % "sbt-git-stamp" % "0.1.2")
-
+addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.5")

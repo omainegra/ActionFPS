@@ -35,7 +35,6 @@ object CommonSettingsPlugin extends AutoPlugin {
       "joda-time" % "joda-time" % "2.9.1",
       "org.joda" % "joda-convert" % "1.8.1"
     )
-    val includeGitStamp = com.atlassian.labs.gitstamp.GitStampPlugin.gitStampSettings
     val dontDocument = Seq(
       publishArtifact in(Compile, packageDoc) := false,
       publishArtifact in packageDoc := false,
