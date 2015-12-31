@@ -1,0 +1,17 @@
+GET        /                       @controllers.Main.index
+GET        /rankings/              @controllers.Main.rankings
+GET        /clan/                  @controllers.Main.clan(id: String)
+GET        /clanwar/               @controllers.Main.clanwar(id: String)
+GET        /clanwars/              @controllers.Main.clanwars
+GET        /game/                  @controllers.Main.game(id: String)
+GET        /clans/                 @controllers.Main.clans
+GET        /players/               @controllers.Main.players
+GET        /player/                @controllers.Main.player(id: String)
+GET        /api/                   @controllers.Main.api
+GET        /client/                @controllers.Main.client
+GET        /client/changes/        @controllers.Main.clientChanges
+GET        /questions/             @controllers.Main.questions
+GET        /servers/               @controllers.Main.servers
+GET        /login/                 @controllers.Main.login
+GET        /ms/                    @controllers.Main.ms
+GET        /retrieve.do            @controllers.Main.ms

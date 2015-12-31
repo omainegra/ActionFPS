@@ -19,6 +19,8 @@ $content_node = $domdoc->getElementById("content");
 $split_text_node = $domdoc->createTextNode($split_text);
 $content_node->replaceChild($split_text_node, $content_node->childNodes->item(0));
 $log_in = $domdoc->getElementById('log-in');
+if ( isset($_GET['af_name']) ) $_COOKIE['af_name'] = $_GET['af_name'];
+if ( isset($_GET['af_id']) ) $_COOKIE['af_id'] = $_GET['af_id'];
 if ( isset($_COOKIE['af_name'], $_COOKIE['af_id'])) {
     $player_name = $domdoc->createTextNode($_COOKIE['af_name']);
     $log_in->replaceChild($player_name, $log_in->childNodes->item(0));

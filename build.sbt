@@ -9,6 +9,7 @@ lazy val root =
       gameParser,
       achievements,
       api,
+      web,
       referenceReader,
       pingerClient,
       interParser,
@@ -20,6 +21,7 @@ lazy val root =
     achievements,
     gameParser,
     api,
+    web,
     referenceReader,
     pingerClient,
     interParser,
@@ -57,6 +59,26 @@ lazy val api =
         file -> ("php/" + file.getName)
       },
       scriptClasspath := Seq("*")
+    )
+
+lazy val web =
+  Project(
+    id = "web",
+    base = file("web")
+  )
+    .enablePlugins(PlayScala)
+    .settings(dontDocument)
+    .settings(
+      libraryDependencies ++= akka("actor", "agent", "slf4j"),
+      libraryDependencies ++= Seq(
+        "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
+        "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
+        "commons-io" % "commons-io" % "2.4",
+        filters,
+        ws
+      ),
+      scriptClasspath := Seq("*"),
+      version := "5.0"
     )
 
 lazy val gameParser =
