@@ -67,7 +67,7 @@ lazy val web =
     base = file("web")
   )
     .enablePlugins(PlayScala)
-//    .enablePlugins(GitVersioning)
+    .enablePlugins(GitVersioning)
     .enablePlugins(BuildInfoPlugin)
     .settings(dontDocument)
     .settings(
