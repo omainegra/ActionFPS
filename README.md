@@ -20,7 +20,7 @@
 * __PHP__ for the server-side frontend: speedy development for dynamic websites.
 
 ## DevOps
-We have Travis CI. We also have Continuous Deployment from master to our servers (via Amazon SQS and GitHub Web Hooks). We are targeting a monolothic deployment with highly modular code. We use SBT for building everything. It is the superior tool of choice.
+We have Travis CI. We also have Continuous Deployment from master to our dedicated CentOS 7 server via Amazon SQS and GitHub Web Hooks. We are targeting a monolothic deployment with highly modular code. We use SBT for building everything. It is the superior tool of choice.
 
 # Compiling
 
