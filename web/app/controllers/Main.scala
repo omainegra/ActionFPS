@@ -2,18 +2,29 @@ package controllers
 
 import javax.inject._
 
+import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import play.api.mvc.{AnyContent, BodyParsers, Controller, Action}
+import play.api.mvc.{Action, AnyContent, BodyParsers, Controller}
 import play.twirl.api.Html
 
+import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class Main @Inject()()(implicit executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+class Main @Inject()(configuration: Configuration)(implicit executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
-  def mainPath = "http://actionfps.com"
+  implicit class cleanHtml(html: String) {
+    def cleanupPaths = html
+      .replaceAllLiterally( """/os/main.css""", s"""${mainPath}/os/main.css""")
+      .replaceAllLiterally( """/second.css""", s"""${mainPath}/second.css""")
+      .replaceAllLiterally( """/logo/action%20450px.png""", s"""${mainPath}/logo/action%20450px.png""")
+      .replaceAllLiterally( """/bower_components""", s"""${mainPath}/bower_components""")
+  }
 
+  def mainPath = configuration.underlying.getString("af.render.mainPath")
+
+  def apiPath = configuration.underlying.getString("af.apiPath")
 
   def forward(path: String, id: String): Action[AnyContent] = forward(path, Option(id))
 
@@ -25,15 +36,25 @@ class Main @Inject()()(implicit executionContext: ExecutionContext, wSClient: WS
       .withQueryString(id.map(i => "id" -> i).toList: _*)
       .get()
       // todo ugly!
-      .map(response => Ok(Html(response.body
-      .replaceAllLiterally( """/os/main.css""", s"""${mainPath}/os/main.css""")
-      .replaceAllLiterally( """/second.css""", s"""${mainPath}/second.css""")
-      .replaceAllLiterally( """/logo/action%20450px.png""", s"""${mainPath}/logo/action%20450px.png""")
-      .replaceAllLiterally( """/bower_components""", s"""${mainPath}/bower_components""")
+      .map(response => Ok(Html(response.body.cleanupPaths
     )))
   }
 
-  def index = forward("/")
+  def index = Action.async { request =>
+    async {
+      val games = await(wSClient.url(s"$apiPath/recent/").get()).body
+      val events = await(wSClient.url(s"$apiPath/events/").get()).body
+      val clanwarsJson = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?completed=1&count=1").get()).body
+      val rendered = await(wSClient.url(s"$mainPath/").post(
+        Map(
+          "games" -> Seq(games),
+          "events" -> Seq(events),
+          "clanwars" -> Seq(clanwarsJson)
+        ))
+      ).body
+      Ok(Html(rendered.cleanupPaths))
+    }
+  }
 
   def rankings = forward("/rankings/")
 

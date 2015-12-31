@@ -77,7 +77,8 @@ lazy val web =
         "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
         "commons-io" % "commons-io" % "2.4",
         filters,
-        ws
+        ws,
+        async
       ),
       scriptClasspath := Seq("*"),
       version := "5.0",
