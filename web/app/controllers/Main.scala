@@ -1,10 +1,9 @@
 package controllers
 
-import java.util.Base64
 import javax.inject._
 
 import play.api.Configuration
-import play.api.libs.json.{JsString, JsObject, Json}
+import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, AnyContent, BodyParsers, Controller}
 import play.twirl.api.Html
@@ -99,7 +98,7 @@ class Main @Inject()(configuration: Configuration)(implicit executionContext: Ex
 
   def game(id: String) = Action.async { request =>
     async {
-      val game = await(wSClient.url("http://api.actionfps.com/game/").withQueryString("id" -> id).get()).body
+      val game = await(wSClient.url(s"${apiPath}/game/").withQueryString("id" -> id).get()).body
       val render = await(wSClient.url(s"$mainPath/game/").post(
         Map("game" -> Seq(game))
       )).body
@@ -109,7 +108,7 @@ class Main @Inject()(configuration: Configuration)(implicit executionContext: Ex
 
   def clans = Action.async { request =>
     async {
-      val clans = await(wSClient.url("http://api.actionfps.com/clans/").get()).body
+      val clans = await(wSClient.url(s"${apiPath}/clans/").get()).body
       val render = await(wSClient.url(s"$mainPath/clans/").post(
         Map("clans" -> Seq(clans))
       )).body
@@ -119,7 +118,7 @@ class Main @Inject()(configuration: Configuration)(implicit executionContext: Ex
 
   def players = Action.async { request =>
     async {
-      val players = await(wSClient.url("http://api.actionfps.com/users/").get()).body
+      val players = await(wSClient.url(s"${apiPath}/users/").get()).body
       val render = await(wSClient.url(s"$mainPath/players/").post(
         Map("players" -> Seq(players))
       )).body
@@ -130,7 +129,7 @@ class Main @Inject()(configuration: Configuration)(implicit executionContext: Ex
   def player(id: String) = Action.async { request =>
     async {
       require(id.matches("^[a-z]+$"), "Regex must match")
-      val player = await(wSClient.url("http://api.actionfps.com/user/" + id + "/full/").get()).body
+      val player = await(wSClient.url(s"${apiPath}/user/" + id + "/full/").get()).body
       val render = await(wSClient.url(s"$mainPath/player/").withQueryString("id" -> id).post(
         Map("player" -> Seq(player))
       )).body
@@ -148,7 +147,7 @@ class Main @Inject()(configuration: Configuration)(implicit executionContext: Ex
 
   def servers = Action.async { request =>
     async {
-      val got = await(wSClient.url("http://api.actionfps.com/servers/").get()).body
+      val got = await(wSClient.url(s"${apiPath}/servers/").get()).body
       val render = await(wSClient.url(s"$mainPath/servers/").post(
         Map("servers" -> Seq(got))
       )).body
@@ -158,7 +157,6 @@ class Main @Inject()(configuration: Configuration)(implicit executionContext: Ex
 
   def login = forward("/login/")
 
-  def ms = forward("/ms/")
 
   def sync = Action.async(BodyParsers.parse.json) { request =>
     wSClient
