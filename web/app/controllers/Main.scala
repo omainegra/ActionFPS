@@ -13,6 +13,7 @@ class Main @Inject()()(implicit executionContext: ExecutionContext, wSClient: WS
 
   def mainPath = "http://actionfps.com"
 
+  
   def forward(path: String, id: String): Action[AnyContent] = forward(path, Option(id))
 
   def forward(path: String, id: Option[String] = None): Action[AnyContent] = Action.async { request =>
