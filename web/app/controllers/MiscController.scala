@@ -7,6 +7,7 @@ import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, BodyParsers, Controller}
 import play.twirl.api.Html
+import services.ServerProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -16,7 +17,7 @@ import scala.concurrent.ExecutionContext
   */
 
 @Singleton
-class MiscController @Inject()(common: Common)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+class MiscController @Inject()(common: Common, serverProvider: ServerProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
   import common._
 
@@ -30,9 +31,9 @@ class MiscController @Inject()(common: Common)(implicit configuration: Configura
 
   def servers = Action.async { implicit request =>
     async {
-      val got = await(wSClient.url(s"${apiPath}/servers/").get()).body
+      val got = Json.toJson(await(serverProvider.servers))
       await(renderPhp("/servers.php")(_.post(
-        Map("servers" -> Seq(got))
+        Map("servers" -> Seq(got.toString()))
       )))
     }
   }

@@ -11,13 +11,13 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import play.twirl.api.Html
-import services.ProvidesUsers
+import services.UsersProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class PlayersController @Inject()(common: Common, providesUsers: ProvidesUsers)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+class PlayersController @Inject()(common: Common, providesUsers: UsersProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
   import common._
 
