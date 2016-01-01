@@ -6,25 +6,28 @@ import play.api.Configuration
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import play.twirl.api.Html
+import services.{ClansProvider, GamesProvider}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class GamesController @Inject()(common: Common)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+class GamesController @Inject()(common: Common,
+                                clansProvider: ClansProvider,
+                                gamesProvider: GamesProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
   import common._
 
   def index = Action.async { implicit request =>
     async {
-      val games = await(wSClient.url(s"$apiPath/recent/").get()).body
-      val events = await(wSClient.url(s"$apiPath/events/").get()).body
-      val clanwarsJson = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?completed=1&count=1").get()).body
+      val games = await(gamesProvider.getRecent)
+      val events = await(gamesProvider.getEvents)
+      val latestClanwar = await(clansProvider.latestClanwar)
       await(renderPhp("/")(_.post(
         Map(
-          "games" -> Seq(games),
-          "events" -> Seq(events),
-          "clanwars" -> Seq(clanwarsJson)
+          "games" -> Seq(games.toString()),
+          "events" -> Seq(events.toString()),
+          "clanwars" -> Seq(latestClanwar.toString())
         ))
       ))
     }
@@ -32,10 +35,12 @@ class GamesController @Inject()(common: Common)(implicit configuration: Configur
 
   def game(id: String) = Action.async { implicit request =>
     async {
-      val game = await(wSClient.url(s"${apiPath}/game/").withQueryString("id" -> id).get()).body
-      await(renderPhp("/game.php")(_.post(
-        Map("game" -> Seq(game))
-      )))
+      await(gamesProvider.getGame(id)) match {
+        case Some(game) => await(renderPhp("/game.php")(_.post(
+          Map("game" -> Seq(game.toString()))
+        )))
+        case None => NotFound("Game not found")
+      }
     }
   }
 

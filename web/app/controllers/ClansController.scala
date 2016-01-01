@@ -8,54 +8,59 @@ import javax.inject._
 
 import play.api.Configuration
 import play.api.libs.json.Json
-import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import services.ReferenceProvider
+import services.{ClansProvider, ReferenceProvider}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class ClansController @Inject()(common: Common,
-                                referenceProvider: ReferenceProvider)
+                                referenceProvider: ReferenceProvider,
+                                clansProvider: ClansProvider)
                                (implicit configuration: Configuration,
-                                executionContext: ExecutionContext,
-                                wSClient: WSClient) extends Controller {
+                                executionContext: ExecutionContext) extends Controller {
 
   import common._
 
   def rankings = Action.async { implicit request =>
     async {
-      val rankings = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10").get()).body
+      val rankings = await(clansProvider.rankings)
       await(renderPhp("/rankings.php")(_.post(
-        Map("rankings" -> Seq(rankings))
+        Map("rankings" -> Seq(rankings.toString()))
       )))
     }
   }
 
   def clan(id: String) = Action.async { implicit request =>
     async {
-      val clan = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clan.php").withQueryString("id" -> id).get()).body
-      await(renderPhp("/clan.php")(_.post(
-        Map("clan" -> Seq(clan))
-      )))
+      await(clansProvider.clan(id)) match {
+        case Some(clan) =>
+          await(renderPhp("/clan.php")(_.post(
+            Map("clan" -> Seq(clan.toString()))
+          )))
+        case None => NotFound("Clan could not be found")
+      }
     }
   }
 
   def clanwar(id: String) = Action.async { implicit request =>
     async {
-      val clanwar = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwar.php").withQueryString("id" -> id).get()).body
-      await(renderPhp("/clanwar.php")(_.post(
-        Map("clanwar" -> Seq(clanwar))
-      )))
+      await(clansProvider.clanwar(id)) match {
+        case Some(clanwar) =>
+          await(renderPhp("/clanwar.php")(_.post(
+            Map("clanwar" -> Seq(clanwar.toString()))
+          )))
+        case None => NotFound("Clanwar could not be found")
+      }
     }
   }
 
   def clanwars = Action.async { implicit request =>
     async {
-      val clanwars = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?count=50").get()).body
+      val clanwars = await(clansProvider.clanwars)
       await(renderPhp("/clanwars.php")(_.post(
-        Map("clanwars" -> Seq(clanwars))
+        Map("clanwars" -> Seq(clanwars.toString()))
       )))
     }
   }

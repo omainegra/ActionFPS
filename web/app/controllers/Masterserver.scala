@@ -3,7 +3,6 @@ package controllers
 import javax.inject._
 
 import play.api.Configuration
-import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import services.ReferenceProvider
 
@@ -16,11 +15,8 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class Masterserver @Inject()(configuration: Configuration,
                             referenceProvider: ReferenceProvider)
-                            (implicit wSClient: WSClient,
-                             executionContext: ExecutionContext)
+                            (implicit executionContext: ExecutionContext)
   extends Controller {
-
-  def apiPath = configuration.underlying.getString("af.apiPath")
 
   def ms = Action.async {
     async {
