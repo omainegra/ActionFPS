@@ -7,15 +7,21 @@ package controllers
 import javax.inject._
 
 import play.api.Configuration
+import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import play.twirl.api.Html
+import services.ClansProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ClansController @Inject()(common: Common)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+class ClansController @Inject()(common: Common,
+                               clansProvider: ClansProvider)
+                               (implicit configuration: Configuration,
+                                executionContext: ExecutionContext,
+                                wSClient: WSClient) extends Controller {
 
   import common._
 
@@ -57,9 +63,9 @@ class ClansController @Inject()(common: Common)(implicit configuration: Configur
 
   def clans = Action.async { implicit request =>
     async {
-      val clans = await(wSClient.url(s"${apiPath}/clans/").get()).body
+      val clans = await(clansProvider.clans)
       await(renderPhp("/clans.php")(_.post(
-        Map("clans" -> Seq(clans))
+        Map("clans" -> Seq(Json.toJson(clans).toString))
       )))
     }
   }

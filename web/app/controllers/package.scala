@@ -1,3 +1,4 @@
+import af.Clan
 import af.rr.ServerRecord
 import play.api.libs.json.Json
 
@@ -6,7 +7,5 @@ import play.api.libs.json.Json
   */
 package object controllers {
   implicit val sw = Json.writes[ServerRecord]
-
-
-
+  implicit val cf = Json.format[Clan]
 }
