@@ -86,8 +86,12 @@ lazy val web =
     .enablePlugins(BuildInfoPlugin)
     .settings(dontDocument)
     .settings(
+      libraryDependencies += "org.postgresql" % "postgresql" % "9.4.1207",
+      libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test",
       libraryDependencies ++= akka("actor", "agent", "slf4j"),
       libraryDependencies ++= Seq(
+        "com.typesafe.play" %% "play-slick" % "1.1.1",
+        "com.typesafe.play" %% "play-slick-evolutions" % "1.1.1",
         "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
         "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
         "commons-io" % "commons-io" % "2.4",

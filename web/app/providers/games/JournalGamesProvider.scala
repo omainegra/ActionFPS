@@ -34,9 +34,16 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
   val st = System.currentTimeMillis()
   Logger.info(s"Loading games from journal ats ${sfs}")
 
-  def getFileGames(file: File) = ProcessJournalApp.parseSource(new FileInputStream(file)).map(_.cg).filter(_.validate.isGood).map(g => g.id -> g).toMap
+  def getFileGames(file: File) =
+    ProcessJournalApp.parseSource(new FileInputStream(file))
+      .map(_.cg)
+      .filter(_.validate.isGood)
+      .map(g => g.id -> g)
+      .toMap
 
-  val gamesA = Agent(sfs.par.map(getFileGames).reduce(_ ++ _))
+  val buildInitially = sfs.par.map(getFileGames).reduce(_ ++ _)
+
+  val gamesA = Agent(buildInitially)
 
   def games = gamesA.get()
 
@@ -53,8 +60,8 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
   val hooks = Agent(Set.empty[JsonGame => Unit])
 
   val tailer = new CallbackTailer(sf, false)({
-    case line @ ExtractMessage(date, _, _) if lastGame.isEmpty || date.isAfter(lastGame.get._2.endTime.minusMinutes(20)) =>
-      if ( !firstDone ) {
+    case line@ExtractMessage(date, _, _) if lastGame.isEmpty || date.isAfter(lastGame.get._2.endTime.minusMinutes(20)) =>
+      if (!firstDone) {
         Logger.info(s"Processing again from $line")
         firstDone = true
       }
