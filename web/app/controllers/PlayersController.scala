@@ -5,25 +5,23 @@ package controllers
   */
 import javax.inject._
 
-import af.User
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import play.twirl.api.Html
-import services.UsersProvider
+import services.ReferenceProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class PlayersController @Inject()(common: Common, providesUsers: UsersProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+class PlayersController @Inject()(common: Common, referenceProvider: ReferenceProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
   import common._
 
   def players = Action.async { implicit request =>
     async {
-      val players = await(providesUsers.users)
+      val players = await(referenceProvider.users)
       await(renderPhp("/players.php")(_.post(
         Map("players" -> Seq(Json.toJson(players).toString()))
       )))

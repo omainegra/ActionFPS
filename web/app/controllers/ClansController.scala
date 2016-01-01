@@ -10,15 +10,14 @@ import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import play.twirl.api.Html
-import services.ClansProvider
+import services.ReferenceProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class ClansController @Inject()(common: Common,
-                               clansProvider: ClansProvider)
+                                referenceProvider: ReferenceProvider)
                                (implicit configuration: Configuration,
                                 executionContext: ExecutionContext,
                                 wSClient: WSClient) extends Controller {
@@ -63,7 +62,7 @@ class ClansController @Inject()(common: Common,
 
   def clans = Action.async { implicit request =>
     async {
-      val clans = await(clansProvider.clans)
+      val clans = await(referenceProvider.clans)
       await(renderPhp("/clans.php")(_.post(
         Map("clans" -> Seq(Json.toJson(clans).toString))
       )))

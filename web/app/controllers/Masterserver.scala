@@ -2,12 +2,10 @@ package controllers
 
 import javax.inject._
 
-import af.rr.ServerRecord
 import play.api.Configuration
-import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import services.ServerProvider
+import services.ReferenceProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -17,7 +15,7 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class Masterserver @Inject()(configuration: Configuration,
-                            serverProvider: ServerProvider)
+                            referenceProvider: ReferenceProvider)
                             (implicit wSClient: WSClient,
                              executionContext: ExecutionContext)
   extends Controller {
@@ -27,7 +25,7 @@ class Masterserver @Inject()(configuration: Configuration,
   def ms = Action.async {
     async {
       Ok{
-        await(serverProvider.servers).map(serverRecord =>
+        await(referenceProvider.servers).map(serverRecord =>
           s"addserver ${serverRecord.hostname} ${serverRecord.port}"
         ).mkString("\n\n")
       }.as("text/plain")
