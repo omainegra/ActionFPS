@@ -35,17 +35,5 @@ class ApiAllGamesProvider @Inject()(common: Common)
 
   val allGamesFA = fetchAllGames.map(m => Agent(m))
 
-  def getGame(id: String): Future[Option[JsValue]] = {
-    allGamesFA.map(_.get().get(id).map(_.toJson))
-  }
-
-  def getRecent: Future[JsValue] = {
-    allGamesFA.map(_.get().toList.sortBy(_._1).takeRight(50).reverse.map(_._2.toJson))
-      .map(x => JsArray(x))
-  }
-
-  override def recentGamesFor(id: String): Future[List[JsonGame]] =
-    allGamesFA.map(_.get().values.filter(_.teams.exists(_.players.exists(_.user.contains(id)))).toList)
-
   override def games: Future[Map[String, JsonGame]] = allGamesFA.map(_.get())
 }

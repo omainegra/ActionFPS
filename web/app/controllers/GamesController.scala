@@ -3,10 +3,11 @@ package controllers
 import javax.inject._
 
 import play.api.Configuration
+import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import providers.games.{NewGamesProvider, GamesProvider}
-import providers.{EventsProvider, ClansProvider}
+import providers.games.NewGamesProvider
+import providers.{ClansProvider, FullProvider}
 import services.PingerService
 
 import scala.async.Async._
@@ -17,19 +18,21 @@ class GamesController @Inject()(common: Common,
                                 clansProvider: ClansProvider,
                                 newGamesProvider: NewGamesProvider,
                                 pingerService: PingerService,
-                                gamesProvider: GamesProvider,
-                                eventsProvider: EventsProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+                                fullProvider: FullProvider)
+                               (implicit configuration: Configuration,
+                                executionContext: ExecutionContext,
+                                wSClient: WSClient) extends Controller {
 
   import common._
 
   def index = Action.async { implicit request =>
     async {
-      val games = await(gamesProvider.getRecent)
-      val events = await(eventsProvider.getEvents)
+      val games = await(fullProvider.getRecent)
+      val events = await(fullProvider.events)
       val latestClanwar = await(clansProvider.latestClanwar)
       await(renderPhp("/")(_.post(
         Map(
-          "games" -> Seq(games.toString()),
+          "games" -> Seq(Json.toJson(games.map(_.toJson)).toString()),
           "events" -> Seq(events.toString()),
           "clanwars" -> Seq(latestClanwar.toString())
         ))
@@ -39,9 +42,9 @@ class GamesController @Inject()(common: Common,
 
   def game(id: String) = Action.async { implicit request =>
     async {
-      await(gamesProvider.getGame(id)) match {
+      await(fullProvider.game(id)) match {
         case Some(game) => await(renderPhp("/game.php")(_.post(
-          Map("game" -> Seq(game.toString()))
+          Map("game" -> Seq(game.toJson.toString()))
         )))
         case None => NotFound("Game not found")
       }

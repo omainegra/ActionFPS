@@ -108,6 +108,8 @@ object ViewFields {
 case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: String, state: String,
                     teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[List[String]]) {
 
+  def hasUser(user: String) = teams.exists(_.players.exists(_.user.contains(user)))
+
   def flattenPlayers = transformTeams(_.flattenPlayers)
 
   def withoutHosts = transformPlayers((_, player) => player.copy(host = None))

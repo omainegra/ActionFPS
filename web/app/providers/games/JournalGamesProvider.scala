@@ -12,11 +12,39 @@ import acleague.enrichers.JsonGame
 import acleague.mserver.{ExtractMessage, MultipleServerParser, MultipleServerParserFoundGame}
 import akka.agent.Agent
 import lib.CallbackTailer
+import play.api.Configuration
 import play.api.inject.ApplicationLifecycle
-import play.api.libs.json.{JsArray, JsValue}
-import play.api.{Configuration, Logger}
+import providers.games.JournalGamesProvider.NewGameCapture
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.collection.JavaConverters._
+import scala.concurrent.{ExecutionContext, Future, blocking}
+
+object JournalGamesProvider {
+
+  def getFileGames(file: File) =
+    ProcessJournalApp.parseSource(new FileInputStream(file))
+      .map(_.cg)
+      .filter(_.validate.isGood)
+      .map(g => g.id -> g)
+      .toMap
+
+  class NewGameCapture(gameAlreadyExists: String => Boolean, afterGame: Option[JsonGame])(registerGame: JsonGame => Unit) {
+    var currentState = MultipleServerParser.empty
+
+    def processLine(line: String) = line match {
+      case line@ExtractMessage(date, _, _)
+        if afterGame.isEmpty || date.isAfter(afterGame.get.endTime.minusMinutes(20)) =>
+        currentState = currentState.process(line)
+        PartialFunction.condOpt(currentState) {
+          case MultipleServerParserFoundGame(fg, _)
+            if !gameAlreadyExists(fg.id) && fg.validate.isGood =>
+            registerGame(fg)
+        }
+      case _ =>
+    }
+  }
+
+}
 
 /**
   * Load in the list of journals - and tail the last one to grab the games.
@@ -27,67 +55,32 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
                                     (implicit executionContext: ExecutionContext)
   extends GamesProvider {
 
-  import collection.JavaConverters._
-
-  val sfs = configuration.underlying.getStringList("af.journal.paths").asScala.map(new File(_))
-  val sf = sfs.last
-  val st = System.currentTimeMillis()
-  Logger.info(s"Loading games from journal ats ${sfs}")
-
-  def getFileGames(file: File) =
-    ProcessJournalApp.parseSource(new FileInputStream(file))
-      .map(_.cg)
-      .filter(_.validate.isGood)
-      .map(g => g.id -> g)
-      .toMap
-
-  val buildInitially = sfs.par.map(getFileGames).reduce(_ ++ _)
-
-  val gamesA = Agent(buildInitially)
-
-  def gamesS = gamesA.get()
-
-  override def games = Future(gamesS)
-
-  Logger.info(s"Games loaded from journals at ${sfs}; ${System.currentTimeMillis() - st}")
-
-  override def getGame(id: String): Future[Option[JsValue]] = Future.successful(gamesS.get(id).map(_.toJson))
-
-  override def getRecent: Future[JsValue] = Future.successful(JsArray(gamesS.toList.sortBy(_._1).takeRight(50).reverse.map(_._2).map(_.toJson)))
-
-  val lastGame = gamesS.toList.sortBy(_._1).lastOption
-  var state = MultipleServerParser.empty
-  var firstDone = false
-
-  def recentGamesFor(playerId: String): Future[List[JsonGame]] = Future {
-    gamesS.valuesIterator.filter(_.teams.exists(_.players.exists(_.user.contains(playerId))))
-    .toList.sortBy(_.id).takeRight(7).reverse
-  }
-
   val hooks = Agent(Set.empty[JsonGame => Unit])
 
-  val tailer = new CallbackTailer(sf, false)({
-    case line@ExtractMessage(date, _, _) if lastGame.isEmpty || date.isAfter(lastGame.get._2.endTime.minusMinutes(20)) =>
-      if (!firstDone) {
-        Logger.info(s"Processing again from $line")
-        firstDone = true
-      }
-      state = state.process(line)
-      PartialFunction.condOpt(state) {
-        case MultipleServerParserFoundGame(fg, _) if !gamesS.contains(fg.id) && fg.validate.isGood =>
-          gamesA.send(_ + (fg.id -> fg))
-          hooks.get().foreach(f => f(fg))
-      }
-    case _ =>
-  })
+  override def addHook(jsonGame: (JsonGame) => Unit): Unit = hooks.send(_ + jsonGame)
 
-  applicationLifecycle.addStopHook(() => Future.successful(tailer.shutdown()))
+  override def removeHook(jsonGame: (JsonGame) => Unit): Unit = hooks.send(_ - jsonGame)
 
-  override def addHook(jsonGame: (JsonGame) => Unit): Unit = {
-    hooks.send(_ + jsonGame)
+  val journalFiles = configuration.underlying.getStringList("af.journal.paths").asScala.map(new File(_))
+
+  val gamesA = Future {
+    blocking {
+      val initialGames = journalFiles.par.map(JournalGamesProvider.getFileGames).reduce(_ ++ _)
+      val gamesAgent = Agent(initialGames)
+      val lastGame = initialGames.toList.sortBy(_._1).lastOption.map(_._2)
+      val ngc = new NewGameCapture(
+        gameAlreadyExists = id => gamesAgent.get().contains(id),
+        afterGame = lastGame
+      )((game) => {
+        gamesAgent.send(_ + (game.id -> game))
+        hooks.get().foreach(f => f(game))
+      })
+      val tailer = new CallbackTailer(journalFiles.last, false)(ngc.processLine)
+      applicationLifecycle.addStopHook(() => Future.successful(tailer.shutdown()))
+      gamesAgent
+    }
   }
 
-  override def removeHook(jsonGame: (JsonGame) => Unit): Unit = {
-    hooks.send(_ - jsonGame)
-  }
+  override def games: Future[Map[String, JsonGame]] = gamesA.map(_.get())
+
 }

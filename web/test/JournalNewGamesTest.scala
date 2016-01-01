@@ -1,20 +1,16 @@
 import java.io._
-import java.nio.channels.Channels
 
 import acleague.enrichers.JsonGame
-import acleague.mserver.{MultipleServerParserFoundGame, MultipleServerParser}
+import acleague.mserver.{MultipleServerParser, MultipleServerParserFoundGame}
 import com.typesafe.config.ConfigFactory
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, OptionValues, FunSuite}
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatest.{BeforeAndAfterAll, OptionValues}
+import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
 import play.api.inject.ApplicationLifecycle
-import play.api.test.FakeApplication
 import providers.games.JournalGamesProvider
-import org.mockito.Mockito._
 import scala.concurrent.ExecutionContext.Implicits.global
-
-
+import scala.concurrent.Await
 import scala.io.Codec
 
 /**
@@ -49,8 +45,9 @@ class JournalNewGamesTest
       fw.close()
       val js = new JournalGamesProvider(conf, al)
 
-      js.getFileGames(tmpFile) must have size 1
-      js.gamesS must have size 1
+      JournalGamesProvider.getFileGames(tmpFile) must have size 1
+      import concurrent.duration._
+      Await.result(js.games, 20.seconds) must have size 1
       var calls = 0
       def callback(jsonGame: JsonGame): Unit = {
         calls = calls + 1
@@ -64,8 +61,7 @@ class JournalNewGamesTest
       fw2.close()
       Thread.sleep(2500)
       calls mustEqual 1
-      js.gamesS must have size 2
-
+      Await.result(js.games, 20.seconds) must have size 2
     }
   }
 

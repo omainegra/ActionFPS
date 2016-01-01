@@ -14,12 +14,6 @@ import scala.concurrent.Future
 //@ImplementedBy(classOf[SingleJournalGamesProvider])
 trait GamesProvider {
 
-  def recentGamesFor(id: String): Future[List[JsonGame]]
-
-  def getGame(id: String): Future[Option[JsValue]]
-
-  def getRecent: Future[JsValue]
-
   def addHook(jsonGame: JsonGame => Unit): Unit = ()
 
   def games: Future[Map[String, JsonGame]]

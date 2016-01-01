@@ -10,15 +10,14 @@ import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import providers.ReferenceProvider
-import providers.players.PlayersProvider
+import providers.{FullProvider, ReferenceProvider}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class PlayersController @Inject()(common: Common, referenceProvider: ReferenceProvider,
-                                  playersProvider: PlayersProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+                                  fullProvider: FullProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
   import common._
 
@@ -33,11 +32,10 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
 
   def player(id: String) = Action.async { implicit request =>
     async {
-      require(id.matches("^[a-z]+$"), "Regex must match")
-      await(playersProvider.player(id)) match {
+      await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>
           await(renderPhp("/player.php")(_.withQueryString("id" -> id).post(
-            Map("player" -> Seq(player.toString()))
+            Map("player" -> Seq(player.toJson.toString()))
           )))
         case None =>
           NotFound("Player could not be found")
