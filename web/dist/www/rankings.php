@@ -1,8 +1,9 @@
 <?php
-require_once("../render.inc.php");
-require("../render_game.inc.php");
+require_once "render.inc.php";
+require "render_game.inc.php";
 
-$clans = json_decode($_POST['rankings'] ?: file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10'), true)['now'];
+
+$clans = json_decode($_POST['rankings'], true)['now'];
 ?>
 <article id="questions">
     <div id="rank">

@@ -31,7 +31,7 @@ class MiscController @Inject()(common: Common)(implicit configuration: Configura
   def servers = Action.async { implicit request =>
     async {
       val got = await(wSClient.url(s"${apiPath}/servers/").get()).body
-      await(renderPhp("/servers/")(_.post(
+      await(renderPhp("/servers.php")(_.post(
         Map("servers" -> Seq(got))
       )))
     }

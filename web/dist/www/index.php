@@ -2,9 +2,9 @@
 require_once("render.inc.php");
 require("render_game.inc.php");
 
-$games = json_decode($_POST['games'] ?: file_get_contents("http://api.actionfps.com/recent/"), true);
-$events = json_decode($_POST['events'] ?: file_get_contents("http://api.actionfps.com/events/"), true);
-$clanwars = json_decode($_POST['clanwars'] ?: file_get_contents('http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?completed=1&count=1'), true);
+$games = json_decode($_POST['games'], true);
+$events = json_decode($_POST['events'], true);
+$clanwars = json_decode($_POST['clanwars'], true);
 $latest_clanwar = reset($clanwars);
 ?><div id="live-events">
     <ol class="LiveEvents live-events">

@@ -1,7 +1,8 @@
 <?php
-require_once("../render.inc.php");
-require("../render_game.inc.php");
-$users = json_decode($_POST['players'] ?: file_get_contents("http://api.actionfps.com/users/"), true);
+require_once "render.inc.php";
+require "render_game.inc.php";
+
+$users = json_decode($_POST['players'], true);
 usort($users, function($a, $b) {
     return strcmp(strtolower($a["name"]), strtolower($b["name"]));
 });

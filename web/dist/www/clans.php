@@ -1,8 +1,8 @@
 <?php
-require_once("../render.inc.php");
-require("../render_game.inc.php");
+require_once "render.inc.php";
+require "render_game.inc.php";
 
-$clans = json_decode($_POST['clans'] ?: file_get_contents('http://api.actionfps.com/clans/'), true);
+$clans = json_decode($_POST['clans'], true);
 ?>
 <article id="clans">
    <ol>

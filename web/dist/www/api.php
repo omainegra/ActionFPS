@@ -1,6 +1,6 @@
 <?php
-require_once("../render.inc.php");
-require("../render_game.inc.php");
+require_once("render.inc.php");
+require("render_game.inc.php");
 ?>
     <article id="questions">
         <h1>API</h1>

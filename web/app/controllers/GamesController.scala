@@ -33,7 +33,7 @@ class GamesController @Inject()(common: Common)(implicit configuration: Configur
   def rankings = Action.async { implicit request =>
     async {
       val rankings = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanstats.php?count=10").get()).body
-      await(renderPhp("/rankings/")(_.post(
+      await(renderPhp("/rankings.php")(_.post(
         Map("rankings" -> Seq(rankings))
       )))
     }
@@ -42,7 +42,7 @@ class GamesController @Inject()(common: Common)(implicit configuration: Configur
   def clan(id: String) = Action.async { implicit request =>
     async {
       val clan = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clan.php").withQueryString("id" -> id).get()).body
-      await(renderPhp("/clan/")(_.post(
+      await(renderPhp("/clan.php")(_.post(
         Map("clan" -> Seq(clan))
       )))
     }
@@ -51,7 +51,7 @@ class GamesController @Inject()(common: Common)(implicit configuration: Configur
   def clanwar(id: String) = Action.async { implicit request =>
     async {
       val clanwar = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwar.php").withQueryString("id" -> id).get()).body
-      await(renderPhp("/clanwar/")(_.post(
+      await(renderPhp("/clanwar.php")(_.post(
         Map("clanwar" -> Seq(clanwar))
       )))
     }
@@ -60,7 +60,7 @@ class GamesController @Inject()(common: Common)(implicit configuration: Configur
   def clanwars = Action.async { implicit request =>
     async {
       val clanwars = await(wSClient.url("http://woop.ac:81/ActionFPS-PHP-Iterator/api/clanwars.php?count=50").get()).body
-      await(renderPhp("/clanwars/")(_.post(
+      await(renderPhp("/clanwars.php")(_.post(
         Map("clanwars" -> Seq(clanwars))
       )))
     }
@@ -69,7 +69,7 @@ class GamesController @Inject()(common: Common)(implicit configuration: Configur
   def game(id: String) = Action.async { implicit request =>
     async {
       val game = await(wSClient.url(s"${apiPath}/game/").withQueryString("id" -> id).get()).body
-      await(renderPhp("/game/")(_.post(
+      await(renderPhp("/game.php")(_.post(
         Map("game" -> Seq(game))
       )))
     }
@@ -78,7 +78,7 @@ class GamesController @Inject()(common: Common)(implicit configuration: Configur
   def clans = Action.async { implicit request =>
     async {
       val clans = await(wSClient.url(s"${apiPath}/clans/").get()).body
-      await(renderPhp("/clans/")(_.post(
+      await(renderPhp("/clans.php")(_.post(
         Map("clans" -> Seq(clans))
       )))
     }
@@ -87,7 +87,7 @@ class GamesController @Inject()(common: Common)(implicit configuration: Configur
   def players = Action.async { implicit request =>
     async {
       val players = await(wSClient.url(s"${apiPath}/users/").get()).body
-      await(renderPhp("/players/")(_.post(
+      await(renderPhp("/players.php")(_.post(
         Map("players" -> Seq(players))
       )))
     }
@@ -97,7 +97,7 @@ class GamesController @Inject()(common: Common)(implicit configuration: Configur
     async {
       require(id.matches("^[a-z]+$"), "Regex must match")
       val player = await(wSClient.url(s"${apiPath}/user/" + id + "/full/").get()).body
-      await(renderPhp("/player/")(_.withQueryString("id" -> id).post(
+      await(renderPhp("/player.php")(_.withQueryString("id" -> id).post(
         Map("player" -> Seq(player))
       )))
     }

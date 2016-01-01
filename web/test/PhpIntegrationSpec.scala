@@ -3,8 +3,10 @@ import org.openqa.selenium.WebDriver
 import org.scalatest.{Inspectors, OptionValues}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.{HtmlUnitFactory, OneBrowserPerSuite, OneServerPerSuite, PlaySpec}
+import play.api.libs.ws.WS
 import play.api.mvc.Results
 import play.api.test.FakeApplication
+import play.api.test.Helpers._
 
 @RequiresPHP
 class PhpIntegrationSpec
@@ -18,8 +20,15 @@ class PhpIntegrationSpec
   with HtmlUnitFactory
   with Inspectors {
 
-  "Index" must {
-    "Contain some games, events and a clanwar" in {
+  "Web" must {
+    "Provide a master server" in {
+      val result = await(WS.url(s"$root/retrieve.do?abc").get())
+      result.body must include ("1337")
+      result.status mustBe OK
+      val result2 = await(WS.url(s"$root/ms/").get())
+      result2.body mustEqual result.body
+    }
+    "Contain some games, events and a clanwar in the index page" in {
       go to root
       pageTitle mustBe "ActionFPS First Person Shooter"
       withClue("Live events") {
