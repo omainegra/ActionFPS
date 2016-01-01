@@ -3,42 +3,17 @@ package controllers
 import javax.inject._
 
 import play.api.Configuration
-import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, AnyContent, BodyParsers, Controller}
+import play.api.mvc.{Action, Controller}
 import play.twirl.api.Html
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class Main @Inject()(configuration: Configuration)(implicit executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+class GamesController @Inject()(common: Common)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
-  implicit class cleanHtml(html: String) {
-    def cleanupPaths = html
-      .replaceAllLiterally( """/os/main.css""", s"""${mainPath}/os/main.css""")
-      .replaceAllLiterally( """/second.css""", s"""${mainPath}/second.css""")
-      .replaceAllLiterally( """/logo/action%20450px.png""", s"""${mainPath}/logo/action%20450px.png""")
-      .replaceAllLiterally( """/bower_components""", s"""${mainPath}/bower_components""")
-  }
-
-  def mainPath = configuration.underlying.getString("af.render.mainPath")
-
-  def apiPath = configuration.underlying.getString("af.apiPath")
-
-  def forward(path: String, id: String): Action[AnyContent] = forward(path, Option(id))
-
-  def forward(path: String, id: Option[String] = None): Action[AnyContent] = Action.async { request =>
-    request.cookies.get("af_id")
-    request.cookies.get("af_name")
-    wSClient
-      .url(s"$mainPath$path")
-      .withQueryString(id.map(i => "id" -> i).toList: _*)
-      .get()
-      // todo ugly!
-      .map(response => Ok(Html(response.body.cleanupPaths
-    )))
-  }
+  import common._
 
   def index = Action.async { request =>
     async {
@@ -135,40 +110,6 @@ class Main @Inject()(configuration: Configuration)(implicit executionContext: Ex
       )).body
       Ok(Html(render.cleanupPaths))
     }
-  }
-
-  def api = forward("/api/")
-
-  def client = forward("/client/")
-
-  def clientChanges = forward("/client/changes/")
-
-  def questions = forward("/questions/")
-
-  def servers = Action.async { request =>
-    async {
-      val got = await(wSClient.url(s"${apiPath}/servers/").get()).body
-      val render = await(wSClient.url(s"$mainPath/servers/").post(
-        Map("servers" -> Seq(got))
-      )).body
-      Ok(Html(render.cleanupPaths))
-    }
-  }
-
-  def login = forward("/login/")
-
-
-  def sync = Action.async(BodyParsers.parse.json) { request =>
-    wSClient
-      .url(s"$mainPath/sync/")
-      .post(request.body)
-      .map(response => Ok(Html(response.body)))
-  }
-
-  def version = Action {
-    val parsedJson = Json.parse(af.BuildInfo.toJson).asInstanceOf[JsObject]
-    val two = JsObject(CommitDescription.commitDescription.map(d => "gitCommitDescription" -> JsString(d)).toSeq)
-    Ok(parsedJson ++ two)
   }
 
 }

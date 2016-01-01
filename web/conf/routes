@@ -1,18 +1,18 @@
-GET        /                       @controllers.Main.index
-GET        /rankings/              @controllers.Main.rankings
-GET        /clan/                  @controllers.Main.clan(id: String)
-GET        /clanwar/               @controllers.Main.clanwar(id: String)
-GET        /clanwars/              @controllers.Main.clanwars
-GET        /game/                  @controllers.Main.game(id: String)
-GET        /clans/                 @controllers.Main.clans
-GET        /players/               @controllers.Main.players
-GET        /player/                @controllers.Main.player(id: String)
-GET        /api/                   @controllers.Main.api
-GET        /client/                @controllers.Main.client
-GET        /client/changes/        @controllers.Main.clientChanges
-GET        /questions/             @controllers.Main.questions
-GET        /servers/               @controllers.Main.servers
-GET        /login/                 @controllers.Main.login
+GET        /                       @controllers.GamesController.index
+GET        /rankings/              @controllers.GamesController.rankings
+GET        /clan/                  @controllers.GamesController.clan(id: String)
+GET        /clanwar/               @controllers.GamesController.clanwar(id: String)
+GET        /clanwars/              @controllers.GamesController.clanwars
+GET        /game/                  @controllers.GamesController.game(id: String)
+GET        /clans/                 @controllers.GamesController.clans
+GET        /players/               @controllers.GamesController.players
+GET        /player/                @controllers.GamesController.player(id: String)
+GET        /api/                   @controllers.MiscController.api
+GET        /client/                @controllers.MiscController.client
+GET        /client/changes/        @controllers.MiscController.clientChanges
+GET        /questions/             @controllers.MiscController.questions
+GET        /servers/               @controllers.MiscController.servers
+GET        /login/                 @controllers.MiscController.login
 GET        /ms/                    @controllers.Masterserver.ms
 GET        /retrieve.do            @controllers.Masterserver.ms
-GET        /version/               @controllers.Main.version
+GET        /version/               @controllers.MiscController.version
