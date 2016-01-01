@@ -33,7 +33,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
   val st = System.currentTimeMillis()
   Logger.info(s"Loading games from journal ats ${sfs}")
 
-  def getFileGames(file: File) = ProcessJournalApp.parseSource(new FileInputStream(file)).map(_.cg).map(g => g.id -> g).toMap
+  def getFileGames(file: File) = ProcessJournalApp.parseSource(new FileInputStream(file)).map(_.cg).filter(_.validate.isGood).map(g => g.id -> g).toMap
 
   val gamesA = Agent(sfs.par.map(getFileGames).reduce(_ ++ _))
 
@@ -56,7 +56,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
       }
       state = state.process(line)
       PartialFunction.condOpt(state) {
-        case MultipleServerParserFoundGame(fg, _) if !games.contains(fg.id) =>
+        case MultipleServerParserFoundGame(fg, _) if !games.contains(fg.id) && fg.validate.isGood =>
           gamesA.send(_ + (fg.id -> fg))
       }
     case _ =>
