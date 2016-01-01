@@ -1,3 +1,7 @@
+import java.util.Base64
+
+import org.eclipse.jgit.revwalk.RevWalk
+
 name := "actionfps"
 
 lazy val root =
@@ -9,22 +13,26 @@ lazy val root =
       gameParser,
       achievements,
       api,
+      web,
       referenceReader,
       pingerClient,
       interParser,
       demoParser,
       syslogAc,
-      clans
+      accumulation,
+      phpClient
     ).dependsOn(
     achievements,
     gameParser,
     api,
+    web,
     referenceReader,
     pingerClient,
     interParser,
     demoParser,
     syslogAc,
-    clans
+    accumulation,
+    phpClient
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -40,26 +48,85 @@ lazy val root =
   * API
   *
   */
-
 lazy val api =
   Project(
     id = "api",
     base = file("api")
   )
     .enablePlugins(PlayScala)
-    .dependsOn(achievements)
-    .dependsOn(referenceReader)
     .dependsOn(pingerClient)
     .dependsOn(interParser)
+    .dependsOn(accumulation)
+    .dependsOn(phpClient)
     .settings(dontDocument)
-    .settings(libraryDependencies ++= akka("actor", "agent", "slf4j"))
-    .settings(libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
-      "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
-      "commons-io" % "commons-io" % "2.4",
-      filters,
-      ws
-    ))
+    .settings(
+      libraryDependencies ++= akka("actor", "agent", "slf4j"),
+      libraryDependencies ++= Seq(
+        "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
+        "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
+        "commons-io" % "commons-io" % "2.4",
+        filters,
+        ws
+      ),
+      mappings in Universal ++= (baseDirectory.value / "php" * "*" get).map { file =>
+        file -> ("php/" + file.getName)
+      },
+      scriptClasspath := Seq("*")
+    )
+
+lazy val web =
+  Project(
+    id = "web",
+    base = file("web")
+  )
+    .enablePlugins(PlayScala)
+    .enablePlugins(GitVersioning)
+    .enablePlugins(BuildInfoPlugin)
+    .settings(dontDocument)
+    .settings(
+      libraryDependencies ++= akka("actor", "agent", "slf4j"),
+      libraryDependencies ++= Seq(
+        "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
+        "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
+        "commons-io" % "commons-io" % "2.4",
+        filters,
+        ws,
+        async,
+        "org.scalatestplus" %% "play" % "1.4.0-M4" % "test",
+        "org.seleniumhq.selenium" % "selenium-java" % "2.48.2" % "test"
+      ),
+      scriptClasspath := Seq("*"),
+      version := "5.0",
+      buildInfoKeys := Seq[BuildInfoKey](
+        name,
+        version,
+        scalaVersion,
+        sbtVersion,
+        buildInfoBuildNumber,
+        git.gitHeadCommit,
+        gitCommitDescription
+      ),
+      gitCommitDescription := {
+        val gitReader = com.typesafe.sbt.SbtGit.GitKeys.gitReader.value
+        gitReader.withGit { interface =>
+          for {
+            sha <- git.gitHeadCommit.value
+            interface <- Option(interface).collect { case i: com.typesafe.sbt.git.JGit => i }
+            ref <- Option(interface.repo.resolve(sha))
+            message <- {
+              val walk = new RevWalk(interface.repo)
+              try Option(walk.parseCommit(ref.toObjectId)).flatMap(commit => Option(commit.getFullMessage))
+              finally walk.dispose()
+            }
+          } yield message
+        }
+      }.map { str => Base64.getEncoder.encodeToString(str.getBytes("UTF-8")) },
+      buildInfoPackage := "af",
+      buildInfoOptions += BuildInfoOption.ToJson
+    )
+
+lazy val gitCommitDescription = SettingKey[Option[String]]("gitCommitDescription", "Base64-encoded!")
+
 
 lazy val gameParser =
   Project(
@@ -71,8 +138,9 @@ lazy val gameParser =
     .settings(
       rpmVendor := "typesafe",
       libraryDependencies += json,
+      libraryDependencies += scalactic,
       rpmBrpJavaRepackJars := true,
-      version := "4.0",
+      version := "4.1",
       rpmLicense := Some("BSD")
     )
 
@@ -85,7 +153,8 @@ lazy val achievements =
       json,
       "com.maxmind.geoip2" % "geoip2" % "2.3.1",
       "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
-      "commons-net" % "commons-net" % "3.3"
+      "commons-net" % "commons-net" % "3.3",
+      xml
     )
   ).dependsOn(gameParser)
 
@@ -94,7 +163,6 @@ lazy val interParser =
     id = "inter-parser",
     base = file("inter-parser")
   )
-
 
 
 lazy val referenceReader =
@@ -120,8 +188,6 @@ lazy val pingerClient =
   )
 
 
-
-
 /** *
   *
   * MASTER SERVER
@@ -135,7 +201,8 @@ lazy val demoParser =
   )
     .settings(
       libraryDependencies += "commons-io" % "commons-io" % "2.4",
-      libraryDependencies ++= akka("actor")
+      libraryDependencies ++= akka("actor"),
+      libraryDependencies += json4s
     )
 
 lazy val syslogAc =
@@ -162,17 +229,22 @@ lazy val syslogAc =
       bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener""""
     )
 
-lazy val clans =
+lazy val accumulation =
   Project(
-    id = "clans",
-    base = file("clans")
+    id = "accumulation",
+    base = file("accumulation")
   )
-    .dependsOn(gameParser)
+    .dependsOn(achievements)
+    .dependsOn(referenceReader)
+
+
+lazy val phpClient =
+  Project(
+    id = "php-client",
+    base = file("php-client")
+  )
     .settings(
-      libraryDependencies ++= Seq(
-        "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
-        "org.apache.httpcomponents" % "httpmime" % "4.5.1",
-        json
-      ),
-      watchSources += baseDirectory.value.getParentFile / "php-clans-api"
+      resolvers += Resolver.bintrayRepo("scalawilliam", "maven"),
+      libraryDependencies += "com.scalawilliam" %% "scala-fastcgi-client" % "0.3",
+      libraryDependencies += json
     )
