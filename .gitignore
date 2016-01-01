@@ -41,6 +41,8 @@ target
 build
 null
 tmp*
+
+journals/
 test-output
 build.log
 
