@@ -6,7 +6,8 @@ import play.api.Configuration
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import play.twirl.api.Html
-import services.{ClansProvider, GamesProvider}
+import providers.games.GamesProvider
+import providers.{EventsProvider, ClansProvider}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -14,14 +15,15 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class GamesController @Inject()(common: Common,
                                 clansProvider: ClansProvider,
-                                gamesProvider: GamesProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+                                gamesProvider: GamesProvider,
+                                eventsProvider: EventsProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
   import common._
 
   def index = Action.async { implicit request =>
     async {
       val games = await(gamesProvider.getRecent)
-      val events = await(gamesProvider.getEvents)
+      val events = await(eventsProvider.getEvents)
       val latestClanwar = await(clansProvider.latestClanwar)
       await(renderPhp("/")(_.post(
         Map(

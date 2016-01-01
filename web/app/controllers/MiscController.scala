@@ -7,7 +7,7 @@ import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, BodyParsers, Controller}
 import play.twirl.api.Html
-import services.ReferenceProvider
+import providers.ReferenceProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext

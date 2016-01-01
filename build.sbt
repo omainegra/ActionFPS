@@ -94,7 +94,8 @@ lazy val web =
         ws,
         async,
         "org.scalatestplus" %% "play" % "1.4.0-M4" % "test",
-        "org.seleniumhq.selenium" % "selenium-java" % "2.48.2" % "test"
+        "org.seleniumhq.selenium" % "selenium-java" % "2.48.2" % "test",
+        cache
       ),
       scriptClasspath := Seq("*"),
       version := "5.0",

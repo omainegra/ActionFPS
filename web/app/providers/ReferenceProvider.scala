@@ -1,4 +1,4 @@
-package services
+package providers
 
 import javax.inject.Inject
 
@@ -21,7 +21,6 @@ class ReferenceProvider @Inject()()(implicit wSClient: WSClient, executionContex
       _.json.validate[List[Clan]].get
     )
   }
-
 
   def users: Future[List[User]] = wSClient.url("http://api.actionfps.com/users/").get().map { response =>
     response.json.validate[List[User]].get

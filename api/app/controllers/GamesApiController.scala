@@ -9,7 +9,7 @@ import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
 import play.api.mvc.{Action, Controller}
-import services._
+import providers._
 
 import scala.concurrent.ExecutionContext
 

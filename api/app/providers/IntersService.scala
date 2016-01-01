@@ -1,4 +1,4 @@
-package services
+package providers
 
 import java.io.File
 import javax.inject._

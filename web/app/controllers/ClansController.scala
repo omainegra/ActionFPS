@@ -9,7 +9,7 @@ import javax.inject._
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import services.{ClansProvider, ReferenceProvider}
+import providers.{ClansProvider, ReferenceProvider}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext

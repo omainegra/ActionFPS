@@ -6,7 +6,7 @@ import play.api.libs.json.Json
 import javax.inject._
 
 import play.api.mvc.{Action, Controller}
-import services._
+import providers._
 
 import scala.concurrent.ExecutionContext
 

@@ -8,7 +8,7 @@ import javax.inject._
 
 import play.api.Configuration
 import play.api.mvc.{Action, Controller}
-import services.RecordsService
+import providers.RecordsService
 
 @Singleton
 class Admin @Inject()(recordsService: RecordsService, configuration: Configuration)

@@ -4,7 +4,7 @@ import javax.inject._
 
 import play.api.Configuration
 import play.api.mvc.{Action, Controller}
-import services.ReferenceProvider
+import providers.ReferenceProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
