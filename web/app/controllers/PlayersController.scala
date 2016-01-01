@@ -10,7 +10,8 @@ import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import providers.{PlayersProvider, ReferenceProvider}
+import providers.ReferenceProvider
+import providers.players.PlayersProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext

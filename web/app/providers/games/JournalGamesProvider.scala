@@ -57,6 +57,11 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
   var state = MultipleServerParser.empty
   var firstDone = false
 
+  def recentGamesFor(playerId: String): List[JsonGame] = {
+    games.valuesIterator.filter(_.teams.exists(_.players.exists(_.user.contains(playerId))))
+    .toList.sortBy(_.id).takeRight(7).reverse
+  }
+
   val hooks = Agent(Set.empty[JsonGame => Unit])
 
   val tailer = new CallbackTailer(sf, false)({

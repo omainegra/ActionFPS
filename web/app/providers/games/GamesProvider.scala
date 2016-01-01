@@ -13,6 +13,7 @@ import scala.concurrent.Future
 //@ImplementedBy(classOf[ApiAllGamesProvider])
 //@ImplementedBy(classOf[SingleJournalGamesProvider])
 trait GamesProvider {
+  
   def getGame(id: String): Future[Option[JsValue]]
 
   def getRecent: Future[JsValue]

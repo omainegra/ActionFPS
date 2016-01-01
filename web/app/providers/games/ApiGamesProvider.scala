@@ -6,6 +6,7 @@ package providers.games
 
 import javax.inject._
 
+import acleague.enrichers.JsonGame
 import controllers.Common
 import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
