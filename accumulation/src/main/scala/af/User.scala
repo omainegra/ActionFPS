@@ -23,7 +23,7 @@ case class CurrentNickname(nickname: String, countryCode: Option[String], from: 
 
 case class PreviousNickname(nickname: String, countryCode: Option[String], from: ZonedDateTime, to: ZonedDateTime) extends Nickname
 
-case class User(id: String, name: String, countryCode: Option[String], email: String,
+case class User(id: String, name: String, countryCode: Option[String], email: Option[String],
                 registrationDate: ZonedDateTime, nickname: CurrentNickname, previousNicknames: Option[List[PreviousNickname]]) {
   def nicknames: List[Nickname] = List(nickname) ++ previousNicknames.toList.flatten
   def validAt(nickname: String, zonedDateTime: ZonedDateTime) = nicknames.exists(n => n.nickname == nickname && n.validAt(zonedDateTime))
@@ -58,7 +58,7 @@ object User {
           id = registration.id,
           name = registration.name,
           countryCode = None,
-          email = registration.email,
+          email = Option(registration.email).filter(_.nonEmpty),
           registrationDate = registration.registrationDate.atZone(ZoneId.of("UTC")),
           nickname = CurrentNickname(
             nickname = currentNickname.nickname,

@@ -1,13 +1,13 @@
 GET        /                       @controllers.GamesController.index
-GET        /assets/*file           @controllers.Forwarder.getAsset(file: String)
-GET        /rankings/              @controllers.GamesController.rankings
-GET        /clan/                  @controllers.GamesController.clan(id: String)
-GET        /clanwar/               @controllers.GamesController.clanwar(id: String)
-GET        /clanwars/              @controllers.GamesController.clanwars
 GET        /game/                  @controllers.GamesController.game(id: String)
-GET        /clans/                 @controllers.GamesController.clans
-GET        /players/               @controllers.GamesController.players
-GET        /player/                @controllers.GamesController.player(id: String)
+GET        /clans/                 @controllers.ClansController.clans
+GET        /assets/*file           @controllers.Forwarder.getAsset(file: String)
+GET        /rankings/              @controllers.ClansController.rankings
+GET        /clan/                  @controllers.ClansController.clan(id: String)
+GET        /clanwar/               @controllers.ClansController.clanwar(id: String)
+GET        /clanwars/              @controllers.ClansController.clanwars
+GET        /players/               @controllers.PlayersController.players
+GET        /player/                @controllers.PlayersController.player(id: String)
 GET        /api/                   @controllers.MiscController.api
 GET        /client/                @controllers.MiscController.client
 GET        /client/changes/        @controllers.MiscController.clientChanges
