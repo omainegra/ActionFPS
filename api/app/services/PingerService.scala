@@ -2,18 +2,17 @@ package services
 
 import javax.inject._
 
-import akka.actor.ActorDSL._
 import acleague.pinger._
-import akka.actor.{ActorLogging, Props, Kill, ActorSystem}
-import play.api.{Logger, Configuration}
+import akka.actor.ActorDSL._
+import akka.actor.{ActorLogging, ActorSystem, Kill, Props}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
-import play.api.libs.json.{JsString, JsObject, Json}
+import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
+import play.api.{Configuration, Logger}
 
-import scala.concurrent.{Future, ExecutionContext}
-import scala.util.{Success, Failure}
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by William on 07/12/2015.
@@ -21,18 +20,13 @@ import scala.util.{Success, Failure}
 @Singleton
 class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
                               recordsService: RecordsService,
-                              wsClient: WSClient,
-                              configuration: Configuration
+                              gameRenderService: GameRenderService
                              )(implicit actorSystem: ActorSystem,
                                executionContext: ExecutionContext) {
 
   val logger = Logger(getClass)
 
   val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
-  val url = configuration.underlying.getString("af.render.live-fragment")
-  logger.info(s"Pinger service rendering with $url")
-
-
 
   implicit val spw = Json.writes[ServerPlayer]
   implicit val stw = Json.writes[ServerTeam]
@@ -60,16 +54,14 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
         data = Json.toJson(b).toString()
       )
     )
-    wsClient.url(url).post(Json.toJson(b)).foreach {
-      response =>
-        liveGamesChan.push(
-          Event(
-            id = Option(b.now.server.server),
-            name = Option("current-game-status-fragment"),
-            data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(response.body)).toString()
-          )
-        )
-    }
+    val html = gameRenderService.renderGame(Json.toJson(b))
+    liveGamesChan.push(
+      Event(
+        id = Option(b.now.server.server),
+        name = Option("current-game-status-fragment"),
+        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(html)).toString()
+      )
+    )
   }))
 
   import concurrent.duration._

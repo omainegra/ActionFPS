@@ -1,62 +1,41 @@
 package services
 
-import java.io.File
-import java.util.concurrent.Executors
 import javax.inject._
 
 import acleague.enrichers.JsonGame
+import af.EnrichGames
 import akka.agent.Agent
-import lib.clans.Clan
-import lib.users.User
-import org.apache.commons.io.input.{TailerListenerAdapter, Tailer}
-import play.api.Configuration
+import play.api.{Logger, Configuration}
 import play.api.inject.ApplicationLifecycle
-import play.api.libs.json.Json
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.ExecutionContext
+import scala.util.control.NonFatal
 
 @Singleton
-class GamesService @Inject()(configuration: Configuration,
-                             applicationLifecycle: ApplicationLifecycle,
-                             validServersService: ValidServersService,
-                             recordsService: RecordsService)
-                            (implicit executionContext: ExecutionContext) {
+class GamesService @Inject()(val configuration: Configuration,
+                             val applicationLifecycle: ApplicationLifecycle,
+                             val validServersService: ValidServersService,
+                             val recordsService: RecordsService)
+                            (implicit executionContext: ExecutionContext)
+  extends TailsGames {
 
-  applicationLifecycle.addStopHook(() => Future.successful(tailer.shutdown()))
+  val logger = Logger(getClass)
 
-  implicit class withUsersClass(jsonGame: JsonGame) {
-    def withUsersL(users: List[User]) = jsonGame.transformPlayers((_, player) =>
-      player.copy(user = users.find(_.validAt(player.name, jsonGame.gameTime)).map(_.id))
-    )
+  logger.info("Starting games service...")
+  val allGames: Agent[List[JsonGame]] = Agent(List.empty)
 
-    def withUsers: JsonGame = withUsersL(recordsService.users)
-
-    def withClansL(clans: List[Clan]) = {
-      val newGame = jsonGame.transformPlayers((_, player) =>
-        player.copy(clan = clans.find(_.nicknameInClan(player.name)).map(_.id))
-      ).transformTeams { team =>
-        team.copy(
-          clan = PartialFunction.condOpt(team.players.map(_.clan).distinct) {
-            case List(Some(clan)) => clan
-          }
-        )
-      }
-
-      newGame.copy(clangame =
-        PartialFunction.condOpt(newGame.teams.map(_.clan)) {
-          case List(Some(a), Some(b)) if a != b => List(a, b)
-        }
-      )
+  override def processGame(game: JsonGame): Unit = {
+    val er = EnrichGames(recordsService.users, recordsService.clans)
+    import er.withUsersClass
+    try {
+      val newGame = game.withoutHosts.withUsers.flattenPlayers.withClans
+      allGames.alter(list => list :+ newGame)
     }
-
-    def withClans: JsonGame = withClansL(recordsService.clans)
+    catch {
+      case NonFatal(e) =>
+        logger.error(s"Failed to process game $game due to $e", e)
+    }
   }
 
-  val file = new File(configuration.underlying.getString("af.games.path"))
-
-  val allGames: Agent[List[JsonGame]] = Agent(List.empty)
-  val tailer = new GameTailer(validServersService.validServers, file, false)((game) =>
-    allGames.alter(list => list :+ game.withoutHosts.withUsers.flattenPlayers.withClans
-    ))
-
+  initialiseTailer(fromStart = true)
 }

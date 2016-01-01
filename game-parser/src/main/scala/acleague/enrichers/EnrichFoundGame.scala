@@ -8,26 +8,27 @@ import org.joda.time.{DateTimeZone, DateTime}
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json.{Writes, JsValue, Json, JsObject}
 import scala.util.hashing.MurmurHash3
-import scala.xml.UnprefixedAttribute
 
 case class GameJsonFound(jsonGame: JsonGame)
 
 object JsonGame {
-  implicit val vf = ViewFields.DefaultZonedDateTimeWrites
+  implicit val vf = ViewFields.ZonedWrite
   implicit val Af = Json.format[JsonGamePlayer]
   implicit val Bf = Json.format[JsonGameTeam]
   implicit val fmt = Json.format[JsonGame]
 
   def fromJson(string: String): JsonGame = {
-    Json.fromJson[JsonGame](Json.parse(string)).get
+    val g = Json.fromJson[JsonGame](Json.parse(string)).get
+
+    // some weird edge case from NYC/LA servers
+    if ( g.duration == 60 ) g.copy(duration = 15) else g
   }
 
-  def build(foundGame: FoundGame, date: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
-    val fdt = date.format(DateTimeFormatter.ISO_INSTANT)
+  def build(id: String, foundGame: FoundGame, endDate: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
 
     JsonGame(
-      id = fdt,
-      gameTime = date,
+      id = id,
+      endTime = endDate,
       server = serverId,
       duration = duration,
       clangame = None,
@@ -64,60 +65,6 @@ object JsonGame {
   }
 }
 
-object EnrichFoundGame {
-
-  case class GameXmlReady(xml: String)
-
-
-  def apply(foundGame: FoundGame)(date: DateTime, serverId: String, duration: Int): GameXmlReady = {
-    val gameXml = foundGameXml(foundGame)
-    val gameId = Math.abs(MurmurHash3.productHash(serverId, date, 1337))
-    val utcDate = {
-      val utcDatetime = new DateTime(date).withZone(DateTimeZone.forID("UTC"))
-      ISODateTimeFormat.dateTimeNoMillis().print(utcDatetime)
-    }
-
-    val newGameXml = gameXml.copy(attributes =
-      new UnprefixedAttribute("id", s"$gameId",
-        new UnprefixedAttribute("duration", s"$duration",
-          new UnprefixedAttribute("date", utcDate,
-            new UnprefixedAttribute("server", serverId,
-              gameXml.attributes)
-          )
-        )
-      )
-    )
-    GameXmlReady(s"$newGameXml")
-  }
-
-  def foundGameXml(foundGame: FoundGame): scala.xml.Elem = {
-
-
-    <game map={foundGame.header.map} mode={foundGame.header.mode.name} state={foundGame.header.state} winner={(foundGame.game match {
-      case Left(FlagGameBuilder(_, _, _, List(a, b))) if a.flags > b.flags => Option(a.name)
-      case Left(FlagGameBuilder(_, _, _, List(a, b))) if a.flags < b.flags => Option(b.name)
-      case Right(FragGameBuilder(_, _, _, List(a, b))) if a.frags > b.frags => Option(a.teamName)
-      case Right(FragGameBuilder(_, _, _, List(a, b))) if a.frags < b.frags => Option(b.teamName)
-      case _ => None
-    }).orNull}>
-      {val (teams, players) = foundGame.game match {
-      case Left(FlagGameBuilder(_, scores, disconnectedScores, teamScores)) =>
-        teamScores.map(_.project) -> (scores ++ disconnectedScores).map(_.project)
-      case Right(FragGameBuilder(_, scores, disconnectedScores, teamScores)) =>
-        teamScores.map(_.project) -> (scores ++ disconnectedScores).map(_.project)
-    }
-    for {team <- teams.sortBy(team => (team.flags, team.frags)).reverse}
-      yield <team name={team.name} flags={team.flags.map(_.toString).orNull} frags={team.frags.toString}>
-        {for {player <- players.filter(_.team == team.name).sortBy(p => (p.flag, p.frag)).reverse}
-          yield <player name={player.name} host={player.host.orNull}
-                        score={player.score.map(_.toString).orNull} flags={player.flag.map(_.toString).orNull}
-                        frags={player.frag.toString} deaths={player.death.toString}/>}
-      </team>}
-    </game>
-  }
-
-}
-
 case class JsonGamePlayer(name: String, host: Option[String], score: Option[Int],
                           flags: Option[Int], frags: Int, deaths: Int, user: Option[String], clan: Option[String])
 
@@ -127,8 +74,8 @@ case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: L
     */
   def flattenPlayers = {
     var newPlayers = players
-    players.groupBy(_.name).collect{
-      case (playerName, them @ first :: rest) if rest.nonEmpty =>
+    players.groupBy(_.name).collect {
+      case (playerName, them@first :: rest) if rest.nonEmpty =>
         val newPlayer = JsonGamePlayer(
           name = playerName,
           host = first.host,
@@ -148,16 +95,17 @@ case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: L
   }
 }
 
-case class ViewFields(startTime: ZonedDateTime, endTime: ZonedDateTime, winner: Option[String], winnerClan: Option[String]) {
+case class ViewFields(startTime: ZonedDateTime, winner: Option[String], winnerClan: Option[String]) {
   def toJson = Json.toJson(this)(ViewFields.jsonFormat)
 }
 
 object ViewFields {
-  implicit val DefaultZonedDateTimeWrites = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_INSTANT)
+  val DefaultZonedDateTimeWrites = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_INSTANT)
+  implicit val ZonedWrite = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_ZONED_DATE_TIME)
   implicit val jsonFormat = Json.writes[ViewFields]
 }
 
-case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: String, state: String,
+case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: String, state: String,
                     teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[List[String]]) {
 
   def flattenPlayers = transformTeams(_.flattenPlayers)
@@ -194,8 +142,7 @@ case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: Stri
     else None
 
   def viewFields = ViewFields(
-    startTime = gameTime,
-    endTime = gameTime.plusMinutes(duration),
+    startTime = endTime.minusMinutes(duration),
     winner = winner,
     winnerClan = winnerClan
   )
@@ -210,9 +157,11 @@ case class JsonGame(id: String, gameTime: ZonedDateTime, map: String, mode: Stri
     def numberOfPlayers = teams.map(_.players.size).sum
     def averageFrags = teams.flatMap(_.players.map(_.frags)).sum / numberOfPlayers
     if (duration < 10) Bad(s"Duration is $duration, expecting at least 10")
+    else if (duration > 15) Bad(s"Duration is $duration, expecting at most 15")
     else if (numberOfPlayers < 4) Bad(s"Player count is $numberOfPlayers, expecting 4 or more.")
     else if (teams.size < 2) Bad(s"Expected team size >= 2, got ${teams.size}")
     else if (averageFrags < 15) Bad(s"Average frags $averageFrags, expected >= 15 ")
     else Good(this)
   }
+
 }

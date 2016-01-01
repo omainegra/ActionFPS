@@ -12,7 +12,6 @@ import scala.util.Try
   */
 case class VideoRecord(target: String, uri: URI)
 
-
 object VideoRecord {
   def parseRecords(input: Reader): List[VideoRecord] = {
     import collection.JavaConverters._

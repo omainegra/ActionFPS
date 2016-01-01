@@ -1,7 +1,5 @@
 package af.rr
 
-import java.io.InputStreamReader
-
 import org.scalatest.{Matchers, FunSuite}
 
 /**
@@ -12,8 +10,7 @@ class VideoTest
   with Matchers {
 
   test("Should work") {
-    VideoRecord.parseRecords(new InputStreamReader(getClass.getResourceAsStream("videos.csv"))) should have size 1
-
+    VideoRecord.parseRecords(getSample("videos.csv")) should have size 1
   }
 
 }

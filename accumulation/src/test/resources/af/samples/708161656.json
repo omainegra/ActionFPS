@@ -1,0 +1,65 @@
+{
+  "id" : "2015-12-26T15:08:51Z",
+  "endTime" : "2015-12-26T15:21:32Z",
+  "map" : "ac_gothic",
+  "mode" : "ctf",
+  "state" : "open",
+  "teams" : [ {
+    "name" : "RVSF",
+    "flags" : 5,
+    "frags" : 177,
+    "players" : [ {
+      "name" : "w00p|Lozi",
+      "score" : 592,
+      "flags" : 3,
+      "frags" : 52,
+      "deaths" : 59,
+      "user" : "lozi",
+      "clan" : "woop"
+    }, {
+      "name" : "-Bernatix|ESL",
+      "score" : 755,
+      "flags" : 2,
+      "frags" : 61,
+      "deaths" : 59
+    }, {
+      "name" : "iR|Piton",
+      "score" : 833,
+      "flags" : 0,
+      "frags" : 64,
+      "deaths" : 52,
+      "user" : "piton",
+      "clan" : "ir"
+    } ]
+  }, {
+    "name" : "CLA",
+    "flags" : 2,
+    "frags" : 168,
+    "players" : [ {
+      "name" : "*[BRC]*Wallp",
+      "score" : 622,
+      "flags" : 2,
+      "frags" : 53,
+      "deaths" : 63,
+      "clan" : "brc"
+    }, {
+      "name" : "cannonfodder",
+      "score" : 661,
+      "flags" : 0,
+      "frags" : 59,
+      "deaths" : 56,
+      "user" : "abc"
+    }, {
+      "name" : "CR7",
+      "score" : 632,
+      "flags" : 0,
+      "frags" : 56,
+      "deaths" : 57,
+      "user" : "master"
+    } ]
+  } ],
+  "server" : "ny 33333",
+  "duration" : 15,
+  "startTime" : "2015-12-26T15:06:32Z",
+  "winner" : "RVSF"
+}

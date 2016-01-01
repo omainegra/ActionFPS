@@ -1,5 +1,6 @@
 package af
 
+import java.io.InputStreamReader
 import java.time.{LocalDate, LocalDateTime}
 import java.time.format.DateTimeFormatter
 
@@ -17,5 +18,7 @@ package object rr {
     Try(LocalDateTime.parse(s, dtf)).
       orElse(Try(LocalDate.parse(s, dtf2).atStartOfDay())).
       orElse(Try(LocalDate.parse(s).atStartOfDay())).get
+
+  def getSample(name: String) = new InputStreamReader(getClass.getResourceAsStream(s"/af/rr/samples/$name"))
 
 }

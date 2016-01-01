@@ -2,6 +2,7 @@ package services
 
 import javax.inject._
 
+import af.EnrichGames
 import akka.agent.Agent
 import lib.RecordsReader
 import play.api.Logger
@@ -35,7 +36,8 @@ class RecordsService @Inject()(recordsReader: RecordsReader,
     Logger.info(s"Updated users: $updatedUsers")
     updatedUsers.foreach(u => achievementsService.get().updateUser(u))
     val gs = gamesService.get()
-    import gs.withUsersClass
+    val eg = EnrichGames(nu, nc)
+    import eg.withUsersClass
     gs.allGames.send(games =>
       games.map(game => game.withUsersL(nu).withClansL(nc))
     )
