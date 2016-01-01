@@ -19,3 +19,4 @@ GET        /retrieve.do            @controllers.Masterserver.ms
 GET        /version/               @controllers.MiscController.version
 GET        /server-updates/        @controllers.GamesController.serverUpdates
 GET        /new-games/             @controllers.GamesController.newGames
+GET        /all/                   @controllers.ApiController.all

@@ -51,6 +51,10 @@ class FullProvider @Inject()(referenceProvider: ReferenceProvider,
     fullStuff.map(_.get().events).map(i => Json.toJson(i))
   }
 
+  def allGames: Future[List[JsonGame]] = {
+    fullStuff.map(_.get().games.values.toList.sortBy(_.id))
+  }
+
   def game(id: String): Future[Option[JsonGame]] = {
     fullStuff.map(_.get().games.get(id))
   }
