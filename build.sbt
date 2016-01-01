@@ -34,6 +34,15 @@ lazy val root =
     accumulation,
     phpClient
   )
+    .settings(
+      commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
+        val extracted = Project.extract(state)
+        val newSettings = extracted.structure.allProjectRefs map { proj =>
+          testOptions in proj += sbt.Tests.Argument("-l", "af.RequiresPHP")
+        }
+        extracted.append(newSettings, state)
+      }
+    )
 
 /**
   * API
@@ -82,7 +91,9 @@ lazy val web =
         "commons-io" % "commons-io" % "2.4",
         filters,
         ws,
-        async
+        async,
+        "org.scalatestplus" %% "play" % "1.4.0-M4" % "test",
+        "org.seleniumhq.selenium" % "selenium-java" % "2.48.2" % "test"
       ),
       scriptClasspath := Seq("*"),
       version := "5.0",
@@ -109,7 +120,7 @@ lazy val web =
             }
           } yield message
         }
-      }.map{str => Base64.getEncoder.encodeToString(str.getBytes("UTF-8"))},
+      }.map { str => Base64.getEncoder.encodeToString(str.getBytes("UTF-8")) },
       buildInfoPackage := "af",
       buildInfoOptions += BuildInfoOption.ToJson
     )
