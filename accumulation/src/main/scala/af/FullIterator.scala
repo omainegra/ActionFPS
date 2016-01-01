@@ -15,6 +15,19 @@ case class FullIterator
  achievementsIterator: AchievementsIterator) {
   fi =>
 
+  def updateReference(newUsers: Map[String, User], newClans: Map[String, Clan]): FullIterator = {
+    val enricher = EnrichGames(newUsers.values.toList, newClans.values.toList)
+    import enricher.withUsersClass
+    val newGames = games.mapValues(_.withUsers.withClans)
+    val blank = FullIterator(
+      users = newUsers,
+      clans = newClans,
+      games = Map.empty,
+      achievementsIterator = AchievementsIterator.empty
+    )
+    games.valuesIterator.toList.sortBy(_.id).foldLeft(blank)(_.includeGame(_))
+  }
+
   def events = achievementsIterator.events.take(10)
 
   def includeGame(jsonGame: JsonGame) = {

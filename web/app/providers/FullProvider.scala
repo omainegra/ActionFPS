@@ -22,6 +22,12 @@ class FullProvider @Inject()(referenceProvider: ReferenceProvider,
                              applicationLifecycle: ApplicationLifecycle)
                             (implicit executionContext: ExecutionContext) {
 
+  def reloadReference(): Future[FullIterator] = async {
+    val users = await(referenceProvider.users).map(u => u.id -> u).toMap
+    val clans = await(referenceProvider.clans).map(c => c.id -> c).toMap
+    await(await(fullStuff).alter(_.updateReference(users, clans)))
+  }
+
   private val fullStuff = async {
     val users = await(referenceProvider.users)
     val clans = await(referenceProvider.clans)
