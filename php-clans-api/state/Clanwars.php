@@ -11,9 +11,12 @@ class Clanwar implements JsonSerializable
     public $completed = false;
     public $winner = null;
     
+    const MAX_GAME_INTERVAL = 15*60;
+    
     public function __construct($game)
     {
-        $this->id = $this->startTime = $game->gameTime;
+        $this->id = $game->id;
+        $this->startTime = $game->startTime;
         $this->clans = array(new stdClass(), new stdClass());
         $this->server = $game->server;
         
@@ -68,7 +71,7 @@ class Clanwar implements JsonSerializable
     public function timeDiff($game)
     {
         $last_game_end = new DateTime($this->endTime);
-        $game_start = new DateTime($game->gameTime);
+        $game_start = new DateTime($game->startTime);
         return $game_start->getTimestamp() - $last_game_end->getTimestamp();
     }
     
@@ -87,7 +90,7 @@ class Clanwar implements JsonSerializable
         return ($game->server == $this->server
          && $clans == $current_clans
          && $teamsize == $this->teamsize
-         && $interval <= 10*60
+         && $interval <= Clanwar::MAX_GAME_INTERVAL
          && !$this->completed);
 
     }
@@ -104,7 +107,7 @@ class Clanwar implements JsonSerializable
             if($win)
             {
                 $this->clans[$id]->wins++;
-                $this->clans[$id]->won[] = $game->gameTime; // FIXME use ID even if both are = ATM
+                $this->clans[$id]->won[] = $game->id; // FIXME use ID even if both are = ATM
             }
             if(isset($team->flags)) $this->clans[$id]->flags += $team->flags;
             $this->clans[$id]->frags += $team->frags;
@@ -211,7 +214,7 @@ class ClanwarsAccumulator implements ActionFPS\OrderedActionIterator
         for (end($state->incomplete); key($state->incomplete)!==null; prev($state->incomplete))
         {
             $id = key($state->incomplete);
-            if($state->incomplete[$id]->timeDiff($game) >= 10 * 60) break;
+            if($state->incomplete[$id]->timeDiff($game) >= Clanwar::MAX_GAME_INTERVAL) break;
             else if($state->incomplete[$id]->isNext($game))
             {
                 $state->incomplete[$id]->addGame($game);
