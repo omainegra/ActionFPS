@@ -25,7 +25,6 @@ class Common @Inject()(configuration: Configuration)(implicit wsClient: WSClient
       .replaceAllLiterally( """/second.css""", s"""${mainPath}/second.css""")
       .replaceAllLiterally( """/logo/action%20450px.png""", s"""${mainPath}/logo/action%20450px.png""")
       .replaceAllLiterally( """/bower_components""", s"""${mainPath}/bower_components""")
-      .replaceAllLiterally( """/bower_components""", s"""${mainPath}/bower_components""")
       .replaceAllLiterally( """/live/live.js""", s"""${mainPath}/live/live.js""")
       .replaceAllLiterally( """/push/push.js""", s"""${mainPath}/push/push.js""")
   }
