@@ -28,13 +28,12 @@ class MiscController @Inject()(common: Common)(implicit configuration: Configura
 
   def questions = forward("/questions/")
 
-  def servers = Action.async { request =>
+  def servers = Action.async { implicit request =>
     async {
       val got = await(wSClient.url(s"${apiPath}/servers/").get()).body
-      val render = await(wSClient.url(s"$mainPath/servers/").post(
+      await(renderPhp("/servers/")(_.post(
         Map("servers" -> Seq(got))
-      )).body
-      Ok(Html(render.cleanupPaths))
+      )))
     }
   }
 
