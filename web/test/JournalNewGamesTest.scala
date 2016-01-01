@@ -50,7 +50,7 @@ class JournalNewGamesTest
       val js = new JournalGamesProvider(conf, al)
 
       js.getFileGames(tmpFile) must have size 1
-      js.games must have size 1
+      js.gamesS must have size 1
       var calls = 0
       def callback(jsonGame: JsonGame): Unit = {
         calls = calls + 1
@@ -64,7 +64,7 @@ class JournalNewGamesTest
       fw2.close()
       Thread.sleep(2500)
       calls mustEqual 1
-      js.games must have size 2
+      js.gamesS must have size 2
 
     }
   }

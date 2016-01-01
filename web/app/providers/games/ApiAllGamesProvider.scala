@@ -20,7 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ApiAllGamesProvider @Inject()(common: Common)
                                    (implicit executionContext: ExecutionContext,
-                                      wSClient: WSClient) extends GamesProvider {
+                                    wSClient: WSClient) extends GamesProvider {
 
   import common.apiPath
 
@@ -39,13 +39,13 @@ class ApiAllGamesProvider @Inject()(common: Common)
     allGamesFA.map(_.get().get(id).map(_.toJson))
   }
 
-  def getEvents: Future[JsValue] = {
-    wSClient.url(s"$apiPath/events/").get().map(_.json)
-  }
-
   def getRecent: Future[JsValue] = {
     allGamesFA.map(_.get().toList.sortBy(_._1).takeRight(50).reverse.map(_._2.toJson))
       .map(x => JsArray(x))
   }
 
+  override def recentGamesFor(id: String): Future[List[JsonGame]] =
+    allGamesFA.map(_.get().values.filter(_.teams.exists(_.players.exists(_.user.contains(id)))).toList)
+
+  override def games: Future[Map[String, JsonGame]] = allGamesFA.map(_.get())
 }

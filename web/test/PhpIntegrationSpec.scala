@@ -1,4 +1,5 @@
 import af.RequiresPHP
+import akka.util.Timeout
 import org.openqa.selenium.WebDriver
 import org.scalatest.{Inspectors, OptionValues}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -20,9 +21,11 @@ class PhpIntegrationSpec
   with HtmlUnitFactory
   with Inspectors {
 
+  import concurrent.duration._
+
   "Web" must {
     "Provide a master server" in {
-      val result = await(WS.url(s"$root/retrieve.do?abc").get())
+      val result = await(WS.url(s"$root/retrieve.do?abc").get())(20.seconds)
       result.body must include ("1337")
       result.status mustBe OK
       val result2 = await(WS.url(s"$root/ms/").get())

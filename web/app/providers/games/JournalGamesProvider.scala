@@ -45,20 +45,22 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
 
   val gamesA = Agent(buildInitially)
 
-  def games = gamesA.get()
+  def gamesS = gamesA.get()
+
+  override def games = Future(gamesS)
 
   Logger.info(s"Games loaded from journals at ${sfs}; ${System.currentTimeMillis() - st}")
 
-  override def getGame(id: String): Future[Option[JsValue]] = Future.successful(games.get(id).map(_.toJson))
+  override def getGame(id: String): Future[Option[JsValue]] = Future.successful(gamesS.get(id).map(_.toJson))
 
-  override def getRecent: Future[JsValue] = Future.successful(JsArray(games.toList.sortBy(_._1).takeRight(50).reverse.map(_._2).map(_.toJson)))
+  override def getRecent: Future[JsValue] = Future.successful(JsArray(gamesS.toList.sortBy(_._1).takeRight(50).reverse.map(_._2).map(_.toJson)))
 
-  val lastGame = games.toList.sortBy(_._1).lastOption
+  val lastGame = gamesS.toList.sortBy(_._1).lastOption
   var state = MultipleServerParser.empty
   var firstDone = false
 
-  def recentGamesFor(playerId: String): List[JsonGame] = {
-    games.valuesIterator.filter(_.teams.exists(_.players.exists(_.user.contains(playerId))))
+  def recentGamesFor(playerId: String): Future[List[JsonGame]] = Future {
+    gamesS.valuesIterator.filter(_.teams.exists(_.players.exists(_.user.contains(playerId))))
     .toList.sortBy(_.id).takeRight(7).reverse
   }
 
@@ -72,7 +74,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
       }
       state = state.process(line)
       PartialFunction.condOpt(state) {
-        case MultipleServerParserFoundGame(fg, _) if !games.contains(fg.id) && fg.validate.isGood =>
+        case MultipleServerParserFoundGame(fg, _) if !gamesS.contains(fg.id) && fg.validate.isGood =>
           gamesA.send(_ + (fg.id -> fg))
           hooks.get().foreach(f => f(fg))
       }

@@ -7,10 +7,10 @@ import acleague.ranker.achievements.immutable.PlayerStatistics
 import acleague.ranker.achievements.{Jsons, PlayerState}
 import af.User
 import controllers.Common
-import play.api.libs.json.{JsObject, Json, JsValue}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.WSClient
 import providers.ReferenceProvider
-import providers.games.{JournalGamesProvider, GamesProvider}
+import providers.games.GamesProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -21,7 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class PlayersProvider @Inject()(common: Common,
                                 achievementsProvider: AchievementsProvider,
-                                gamesProvider: JournalGamesProvider,
+                                gamesProvider: GamesProvider,
                                 referenceProvider: ReferenceProvider
                                )(implicit executionContext: ExecutionContext, wSClient: WSClient) {
 
@@ -37,7 +37,7 @@ class PlayersProvider @Inject()(common: Common,
               await(achievementsProvider.forPlayer(id)) match {
                 case None => None
                 case Some(pachs) =>
-                  val prgs = gamesProvider.recentGamesFor(id)
+                  val prgs = await(gamesProvider.recentGamesFor(id))
                   Option(fullProfile(user, pachs, prgs))
               }
           }
