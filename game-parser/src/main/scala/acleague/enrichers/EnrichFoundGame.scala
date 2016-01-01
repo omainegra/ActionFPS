@@ -69,6 +69,7 @@ case class JsonGamePlayer(name: String, host: Option[String], score: Option[Int]
                           flags: Option[Int], frags: Int, deaths: Int, user: Option[String], clan: Option[String])
 
 case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer], clan: Option[String]) {
+
   /**
     * A player might disconnect mid-game, get a new IP. Goal here is to sum up their scores properly.
     */
@@ -107,7 +108,6 @@ object ViewFields {
 
 case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: String, state: String,
                     teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[List[String]]) {
-
   def hasUser(user: String) = teams.exists(_.players.exists(_.user.contains(user)))
 
   def flattenPlayers = transformTeams(_.flattenPlayers)

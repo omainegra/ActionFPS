@@ -61,7 +61,8 @@ case class MultipleServerParserProcessing(serverStates: Map[String, ServerState]
                   foundGame = sfg.foundGame,
                   endDate = corrector.apply(date),
                   serverId = server,
-                  duration = sfg.duration
+                  // todo figure out the source of this bug
+                  duration = if (sfg.duration == 60) 15 else sfg.duration
                 )
                 MultipleServerParserFoundGame(
                   cg = jg,

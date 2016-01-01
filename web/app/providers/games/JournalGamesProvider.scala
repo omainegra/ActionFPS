@@ -21,12 +21,15 @@ import scala.concurrent.{ExecutionContext, Future, blocking}
 
 object JournalGamesProvider {
 
-  def getFileGames(file: File) =
-    ProcessJournalApp.parseSource(new FileInputStream(file))
+  def getFileGames(file: File) = {
+    val fis = new FileInputStream(file)
+    try ProcessJournalApp.parseSource(fis)
       .map(_.cg)
       .filter(_.validate.isGood)
       .map(g => g.id -> g)
       .toMap
+    finally fis.close()
+  }
 
   class NewGameCapture(gameAlreadyExists: String => Boolean, afterGame: Option[JsonGame])(registerGame: JsonGame => Unit) {
     var currentState = MultipleServerParser.empty
@@ -57,9 +60,9 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
 
   val hooks = Agent(Set.empty[JsonGame => Unit])
 
-  override def addHook(jsonGame: (JsonGame) => Unit): Unit = hooks.send(_ + jsonGame)
+  override def addHook(f: (JsonGame) => Unit): Unit = hooks.send(_ + f)
 
-  override def removeHook(jsonGame: (JsonGame) => Unit): Unit = hooks.send(_ - jsonGame)
+  override def removeHook(f: (JsonGame) => Unit): Unit = hooks.send(_ - f)
 
   val journalFiles = configuration.underlying.getStringList("af.journal.paths").asScala.map(new File(_))
 

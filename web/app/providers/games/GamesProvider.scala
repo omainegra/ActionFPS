@@ -14,10 +14,10 @@ import scala.concurrent.Future
 //@ImplementedBy(classOf[SingleJournalGamesProvider])
 trait GamesProvider {
 
-  def addHook(jsonGame: JsonGame => Unit): Unit = ()
+  def addHook(hook: JsonGame => Unit): Unit = ()
 
   def games: Future[Map[String, JsonGame]]
 
-  def removeHook(jsonGame: JsonGame => Unit): Unit = ()
+  def removeHook(hook: JsonGame => Unit): Unit = ()
 
 }
