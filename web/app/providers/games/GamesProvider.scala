@@ -9,8 +9,8 @@ import scala.concurrent.Future
 /**
   * Created by William on 01/01/2016.
   */
-//@ImplementedBy(classOf[ApiGamesProvider])
-@ImplementedBy(classOf[ApiAllGamesProvider])
+@ImplementedBy(classOf[ApiGamesProvider])
+//@ImplementedBy(classOf[ApiAllGamesProvider])
 trait GamesProvider {
   def getGame(id: String): Future[Option[JsValue]]
 
