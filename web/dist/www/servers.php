@@ -16,7 +16,7 @@ $groups = array_unique(array_map(function ($server) {
                 <?php foreach ($servers as $server) {
                     if ($server['region'] == $group) {
 
-                        $url = "assaultcube://" . $server['hostname'] . ":" . $server['port'];
+                        $url = "assaultcube://" . $server['hostname'] . ":" . $server['port'] . (isset($server['password']) ? '?password=' . rawurlencode($server['password']) : '');
                         ?>
                         <li><a href="<?php echo $url; ?>">
                                 <?php echo $server['hostname'] . ' ' . $server['port']; ?>

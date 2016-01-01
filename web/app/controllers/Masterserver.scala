@@ -22,7 +22,7 @@ class Masterserver @Inject()(configuration: Configuration,
     async {
       Ok{
         await(referenceProvider.servers).map(serverRecord =>
-          s"addserver ${serverRecord.hostname} ${serverRecord.port}"
+          s"addserver ${serverRecord.hostname} ${serverRecord.port} ${serverRecord.password.getOrElse("")}"
         ).mkString("\n\n")
       }.as("text/plain")
     }
