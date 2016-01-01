@@ -2,7 +2,6 @@ package providers.games
 
 import com.google.inject.ImplementedBy
 import play.api.libs.json.JsValue
-import providers.games.ApiAllGamesProvider
 
 import scala.concurrent.Future
 
