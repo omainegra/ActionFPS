@@ -1,4 +1,5 @@
 GET        /                       @controllers.GamesController.index
+GET        /assets/*file           @controllers.Forwarder.getAsset(file: String)
 GET        /rankings/              @controllers.GamesController.rankings
 GET        /clan/                  @controllers.GamesController.clan(id: String)
 GET        /clanwar/               @controllers.GamesController.clanwar(id: String)

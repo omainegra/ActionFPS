@@ -21,12 +21,6 @@ class Common @Inject()(configuration: Configuration)(implicit wsClient: WSClient
 
   private implicit class cleanHtml(html: String) {
     def cleanupPaths = html
-      .replaceAllLiterally( """/os/main.css""", s"""${mainPath}/os/main.css""")
-      .replaceAllLiterally( """/second.css""", s"""${mainPath}/second.css""")
-      .replaceAllLiterally( """/logo/action%20450px.png""", s"""${mainPath}/logo/action%20450px.png""")
-      .replaceAllLiterally( """/bower_components""", s"""${mainPath}/bower_components""")
-      .replaceAllLiterally( """/live/live.js""", s"""${mainPath}/live/live.js""")
-      .replaceAllLiterally( """/push/push.js""", s"""${mainPath}/push/push.js""")
   }
 
   def renderPhp(path: String)(f: WSRequest => Future[WSResponse])

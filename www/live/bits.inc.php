@@ -3,4 +3,4 @@
 
 
 
-<script src="/live/live.js"></script>
+<script src="/assets/live/live.js"></script>
