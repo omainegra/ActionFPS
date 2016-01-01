@@ -41,7 +41,6 @@ target
 build
 null
 tmp*
-dist
 test-output
 build.log
 
@@ -60,3 +59,4 @@ build.log
 .cache-main
 .classpath
 .project
+buildinfo.properties

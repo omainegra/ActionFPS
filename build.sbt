@@ -1,3 +1,7 @@
+import java.util.Base64
+
+import org.eclipse.jgit.revwalk.RevWalk
+
 name := "actionfps"
 
 lazy val root =
@@ -9,6 +13,7 @@ lazy val root =
       gameParser,
       achievements,
       api,
+      web,
       referenceReader,
       pingerClient,
       interParser,
@@ -20,6 +25,7 @@ lazy val root =
     achievements,
     gameParser,
     api,
+    web,
     referenceReader,
     pingerClient,
     interParser,
@@ -28,6 +34,15 @@ lazy val root =
     accumulation,
     phpClient
   )
+    .settings(
+      commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
+        val extracted = Project.extract(state)
+        val newSettings = extracted.structure.allProjectRefs map { proj =>
+          testOptions in proj += sbt.Tests.Argument("-l", "af.RequiresPHP")
+        }
+        extracted.append(newSettings, state)
+      }
+    )
 
 /**
   * API
@@ -58,6 +73,61 @@ lazy val api =
       },
       scriptClasspath := Seq("*")
     )
+
+lazy val web =
+  Project(
+    id = "web",
+    base = file("web")
+  )
+    .enablePlugins(PlayScala)
+    .enablePlugins(GitVersioning)
+    .dependsOn(accumulation)
+    .enablePlugins(BuildInfoPlugin)
+    .settings(dontDocument)
+    .settings(
+      libraryDependencies ++= akka("actor", "agent", "slf4j"),
+      libraryDependencies ++= Seq(
+        "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
+        "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
+        "commons-io" % "commons-io" % "2.4",
+        filters,
+        ws,
+        async,
+        "org.scalatestplus" %% "play" % "1.4.0-M4" % "test",
+        "org.seleniumhq.selenium" % "selenium-java" % "2.48.2" % "test"
+      ),
+      scriptClasspath := Seq("*"),
+      version := "5.0",
+      buildInfoKeys := Seq[BuildInfoKey](
+        name,
+        version,
+        scalaVersion,
+        sbtVersion,
+        buildInfoBuildNumber,
+        git.gitHeadCommit,
+        gitCommitDescription
+      ),
+      gitCommitDescription := {
+        val gitReader = com.typesafe.sbt.SbtGit.GitKeys.gitReader.value
+        gitReader.withGit { interface =>
+          for {
+            sha <- git.gitHeadCommit.value
+            interface <- Option(interface).collect { case i: com.typesafe.sbt.git.JGit => i }
+            ref <- Option(interface.repo.resolve(sha))
+            message <- {
+              val walk = new RevWalk(interface.repo)
+              try Option(walk.parseCommit(ref.toObjectId)).flatMap(commit => Option(commit.getFullMessage))
+              finally walk.dispose()
+            }
+          } yield message
+        }
+      }.map { str => Base64.getEncoder.encodeToString(str.getBytes("UTF-8")) },
+      buildInfoPackage := "af",
+      buildInfoOptions += BuildInfoOption.ToJson
+    )
+
+lazy val gitCommitDescription = SettingKey[Option[String]]("gitCommitDescription", "Base64-encoded!")
+
 
 lazy val gameParser =
   Project(
@@ -94,7 +164,6 @@ lazy val interParser =
     id = "inter-parser",
     base = file("inter-parser")
   )
-
 
 
 lazy val referenceReader =
