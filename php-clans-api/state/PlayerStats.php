@@ -12,17 +12,28 @@ class PlayerStats implements JsonSerializable
     public $flags = 0;
     public $frags = 0;
     public $deaths = 0;
+
+    const MIN_GAMES_RANK = 5;
     
     public function __construct($id, $name)
     {
         $this->user = $id;
         $this->name = $name;
+        $this->lastGame = new stdClass();
     }
     
     public function jsonSerialize() {
         if(isset($this->contrib)) unset($this->contrib);
         return $this;
     }
+}
+
+function games_to_playerstats($state, $game) {
+    $accum = new PlayerStatsAccumulator();
+    if ( !$state ) {
+        $state = $accum->initialState();
+    }
+    return $accum->reduce(new \ActionFPS\EmptyActionReference(), $state, $game);
 }
 
 class PlayerStatsAccumulator implements ActionFPS\OrderedActionIterator
@@ -38,18 +49,46 @@ class PlayerStatsAccumulator implements ActionFPS\OrderedActionIterator
     {
         return array_key_exists($id, $state);
     }
+
+    public static function sortElo($a, $b)
+    {
+        return -($a->elo <=> $b->elo);
+    }
+    
+    public function sortPlayers(&$players)
+    {
+        uasort($players, 'PlayerStatsAccumulator::sortElo');
+        
+        $i = 1;
+        foreach($players as &$player)
+        {
+            if($player->games >= PlayerStats::MIN_GAMES_RANK)
+            {
+                $player->rank = $i;
+                $i++;
+            }
+            else
+                $playern->rank = null;
+        }
+    }
+
     
     public function reduce(ActionFPS\ActionReference $reference, $state, $game)
     {
-        $tie = isset($game->winner);
-        $count_elo = $game->mode == "ctf" && count($game->teams[0]->players) == count($game->teams[1]->players);
+        $tie = !isset($game->winner);
+        $count_elo = true;
         foreach($game->teams as $n => &$team)
         {
             $win = $n == 0;
             $team->elo = 0;
             $team->score = self::sum_players($team->players, 'score');
-            foreach($team->players as $player) if(isset($player->user))
+            foreach($team->players as $player) 
             {
+                if(!isset($player->user))
+                {
+                    $team->elo += 1000;
+                    continue;
+                }
                 $id = $player->user;
                 if(!$this->playerExists($state, $id)) $state[$id] = new PlayerStats($id, $player->name);
                 $state[$id]->{$win ? 'wins' : 'losses'}++;
@@ -63,17 +102,17 @@ class PlayerStatsAccumulator implements ActionFPS\OrderedActionIterator
                 $state[$id]->deaths += $player->deaths;
                 $team->elo += $state[$id]->elo;
                 $state[$id]->contrib = isset($player->score) ? $player->score / $team->score : 0;
+                $state[$id]->lastGame = $game; 
             }
         }
         if($count_elo)
         {
-            $players_count = (count($game->teams[0]->players) + count($game->teams[1]->players))/2.0;
-            $delta = ($game->teams[0]->elo - $game->teams[1]->elo) / $players_count;
-            $delta = max(min($delta, 400), -400);
+            $players_count = count($game->teams[0]->players) + count($game->teams[1]->players);
+            $delta = 2*($game->teams[0]->elo - $game->teams[1]->elo) / $players_count;
 
             $p = 1/(1+pow(10, -$delta/400)); // probability for the winning team to win
 
-            $k = 40;
+            $k = 40 * $players_count / 2.0;
             $modifier = $tie ? 0.5 : 1;
 
             foreach($game->teams as $n => &$team)
@@ -83,13 +122,14 @@ class PlayerStatsAccumulator implements ActionFPS\OrderedActionIterator
                 {
                     $id = $player->user;
                     $points = ($win ? 1 : -1) * $k * ($modifier - $p);
-                    $state[$id]->elo += $points;
-                    /*$state[$id]->elo += $points >= 0 ?
-                        $state[$id]->contrib * $points * count($team->players):
-                        (1-$state[$id]->contrib) * $points * count($team->players) / (count($team->players) - 1);*/
+                    
+                    $state[$id]->elo += $points >= 0 ?
+                        $state[$id]->contrib * $points :
+                        ((1-$state[$id]->contrib) + 2/count($team->players) - 1) * $points;
                 }
             }
         }
+        $this->sortPlayers($state);
         return $state;
     }
 

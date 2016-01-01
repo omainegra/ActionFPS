@@ -3,6 +3,7 @@
 $processor = new ActionFPS\Processor();
 require_once __DIR__ . "/../state/Clanwars.php";
 require_once __DIR__ . "/../state/ClanStats.php";
+require_once __DIR__ . "/../state/PlayerStats.php";
 
 function sort_function($parameter)
 {
@@ -128,5 +129,20 @@ function get_clanstats($count = 15, $clan = null, $time = false)
         }
     }
     return $stats;
-    
+}
+
+
+function get_playerstats($count = 15, $player = null, $ranked = true)
+{
+    $playerstats_state = new ActionFPS\BasicStateResult([], []);
+    $playerstats_state->loadFromFile(__DIR__ . "/../data/playerstats.json");
+    $playerstats = $playerstats_state->getState();
+    if($player) return $playerstats[$player];
+    $stats = [];
+    foreach($playerstats as $user => $stat)
+    {
+        if(!$ranked || isset($stat->rank)) $stats[$user] = $stat;
+    }
+    if($count) $stats = array_slice($stats, 0, $count);
+    return $stats;
 }
