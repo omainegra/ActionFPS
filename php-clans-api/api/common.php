@@ -4,13 +4,9 @@ $processor = new ActionFPS\Processor();
 require_once __DIR__ . "/../state/Clanwars.php";
 require_once __DIR__ . "/../state/ClanStats.php";
 
-$sort_param = null;
-
-function sort_func($a, $b)
+function sort_function($parameter)
 {
-    global $sort_param;
-    if($a->{$sort_param} == $b->{$sort_param}) return 0;
-    return $a->{$sort_param} > $b->{$sort_param} ? -1 : 1;
+    return create_function('$a,$b', 'return -($a->{"' . $parameter . '"} <=> $b->{"' . $parameter . '"});');
 }
 
 function get_clans()
@@ -31,8 +27,6 @@ function find_clan($id)
 
 function get_clanwars($count = null, $completed = null, $clan = null, $wid = null)
 {
-    global $sort_param;
-    $sort_param = 'startTime';
     $clanwars_state = new ActionFPS\BasicStateResult([], []);
 
     $clanwars_state->loadFromFile(__DIR__ . "/../data/clanwars.json");
@@ -53,7 +47,7 @@ function get_clanwars($count = null, $completed = null, $clan = null, $wid = nul
             if($clan && $clanwar->clans[0]->clan != $clan && $clanwar->clans[1]->clan != $clan) continue;
             $selected[$id] = $clanwar;
         }
-        uasort($selected, 'sort_func');
+        uasort($selected, sort_function('startTime'));
     }
     else
     {
@@ -76,32 +70,18 @@ function get_clanwars($count = null, $completed = null, $clan = null, $wid = nul
 
 function get_clanstats($count = 15, $clan = null, $time = false)
 {
-    global $sort_param;
     $clanstats_state = new ActionFPS\BasicStateResult([], []);
 
     $clanstats_state->loadFromFile(__DIR__ . "/../data/clanstats.json");
     $clanstats = $clanstats_state->getState();
     
-    $sort_param = 'elo';
-    uasort($clanstats->now, 'sort_func');
-    
     $i = 1;
     foreach($clanstats->now as &$_clan)
-    {
-        if($_clan->wars >= ClanStats::MIN_WARS_RANK)
-        {
-            $_clan->rank = $i;
-            $i++;
-        }
-        else
-            $_clan->rank = null;
-        
-        
+    {   
         $_clan->name = find_clan($_clan->clan)->name;
     }
     
-    $sort_param = 'wars';
-    uasort($clanstats->now, 'sort_func');
+    uasort($clanstats->now, sort_function('wars'));
     
     $stats = new stdClass();
     $stats->now = [];
