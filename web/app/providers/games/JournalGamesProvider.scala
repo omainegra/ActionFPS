@@ -8,6 +8,7 @@ import java.io.{File, FileInputStream}
 import javax.inject._
 
 import acleague.ProcessJournalApp
+import acleague.enrichers.JsonGame
 import acleague.mserver.{ExtractMessage, MultipleServerParser, MultipleServerParserFoundGame}
 import akka.agent.Agent
 import lib.CallbackTailer
@@ -48,6 +49,9 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
   val lastGame = games.toList.sortBy(_._1).lastOption
   var state = MultipleServerParser.empty
   var firstDone = false
+
+  val hooks = Agent(Set.empty[JsonGame => Unit])
+
   val tailer = new CallbackTailer(sf, false)({
     case line @ ExtractMessage(date, _, _) if lastGame.isEmpty || date.isAfter(lastGame.get._2.endTime.minusMinutes(20)) =>
       if ( !firstDone ) {
@@ -58,10 +62,18 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
       PartialFunction.condOpt(state) {
         case MultipleServerParserFoundGame(fg, _) if !games.contains(fg.id) && fg.validate.isGood =>
           gamesA.send(_ + (fg.id -> fg))
+          hooks.get().foreach(f => f(fg))
       }
     case _ =>
   })
 
   applicationLifecycle.addStopHook(() => Future.successful(tailer.shutdown()))
 
+  override def addHook(jsonGame: (JsonGame) => Unit): Unit = {
+    hooks.send(_ + jsonGame)
+  }
+
+  override def removeHook(jsonGame: (JsonGame) => Unit): Unit = {
+    hooks.send(_ - jsonGame)
+  }
 }

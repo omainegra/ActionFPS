@@ -5,9 +5,9 @@ import javax.inject._
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import play.twirl.api.Html
-import providers.games.GamesProvider
+import providers.games.{NewGamesProvider, GamesProvider}
 import providers.{EventsProvider, ClansProvider}
+import services.PingerService
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -15,6 +15,8 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class GamesController @Inject()(common: Common,
                                 clansProvider: ClansProvider,
+                                newGamesProvider: NewGamesProvider,
+                                pingerService: PingerService,
                                 gamesProvider: GamesProvider,
                                 eventsProvider: EventsProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
@@ -44,6 +46,18 @@ class GamesController @Inject()(common: Common,
         case None => NotFound("Game not found")
       }
     }
+  }
+
+  def serverUpdates = Action {
+    Ok.feed(
+      content = pingerService.liveGamesEnum
+    ).as("text/event-stream")
+  }
+
+  def newGames = Action {
+    Ok.feed(
+      content = newGamesProvider.newGamesEnum
+    ).as("text/event-stream")
   }
 
 }

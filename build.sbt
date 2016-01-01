@@ -81,6 +81,7 @@ lazy val web =
   )
     .enablePlugins(PlayScala)
     .enablePlugins(GitVersioning)
+    .dependsOn(pingerClient)
     .dependsOn(accumulation)
     .enablePlugins(BuildInfoPlugin)
     .settings(dontDocument)

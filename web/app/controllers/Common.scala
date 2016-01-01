@@ -23,6 +23,10 @@ class Common @Inject()(configuration: Configuration)(implicit wsClient: WSClient
     def cleanupPaths = html
   }
 
+  def renderRaw(path: String)(f: WSRequest => Future[WSResponse]): Future[WSResponse] = {
+    f(wsClient.url(s"$mainPath$path"))
+  }
+
   def renderPhp(path: String)(f: WSRequest => Future[WSResponse])
             (implicit request: RequestHeader): Future[Result] = {
     async {

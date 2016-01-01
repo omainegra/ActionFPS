@@ -1,5 +1,6 @@
 package providers.games
 
+import acleague.enrichers.JsonGame
 import com.google.inject.ImplementedBy
 import play.api.libs.json.JsValue
 
@@ -15,4 +16,9 @@ trait GamesProvider {
   def getGame(id: String): Future[Option[JsValue]]
 
   def getRecent: Future[JsValue]
+
+  def addHook(jsonGame: JsonGame => Unit): Unit = ()
+
+  def removeHook(jsonGame: JsonGame => Unit): Unit = ()
+
 }
