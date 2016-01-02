@@ -3,7 +3,6 @@ package clans
 import java.net.URL
 
 import acleague.enrichers.JsonGame
-import clans.Clans._
 import org.scalatest.{Matchers, FunSuite}
 import play.api.libs.json.Json
 
@@ -22,9 +21,7 @@ class ClansTest
     //    result.complete.toList.sortBy(_.id).foreach(println)
     val lg = result.complete.toList.sortBy(_.id).last
     println(lg)
-    import Clans.ImplicitFormats._
 //    val cg = Conclusion.conclude(lg.games).awardMvps
 //    println(cg)
-    println(lg.toJsonWithConclusion)
   }
 }
