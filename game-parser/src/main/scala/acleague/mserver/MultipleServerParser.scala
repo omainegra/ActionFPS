@@ -56,13 +56,14 @@ case class MultipleServerParserProcessing(serverStates: Map[String, ServerState]
           case Some(corrector) =>
             serverStates.getOrElse(server, ServerState.empty).next(message) match {
               case sfg: ServerFoundGame =>
+                val duration = if (sfg.duration == 60) 15 else sfg.duration
                 val jg = JsonGame.build(
-                  id = date.minusMinutes(sfg.duration).format(DateTimeFormatter.ISO_INSTANT),
+                  id = date.format(DateTimeFormatter.ISO_INSTANT),
                   foundGame = sfg.foundGame,
                   endDate = corrector.apply(date),
                   serverId = server,
                   // todo figure out the source of this bug
-                  duration = if (sfg.duration == 60) 15 else sfg.duration
+                  duration = duration
                 )
                 MultipleServerParserFoundGame(
                   cg = jg,

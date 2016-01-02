@@ -24,7 +24,7 @@ case class ClanwarTeam(clan: String, name: Option[String], score: Int, flags: In
     score = score + other.score,
     flags = flags + other.flags,
     frags = frags + other.frags,
-    players = other.players.map {
+    players = players ++ other.players.map {
       case (playerName, player) if players.contains(playerName) =>
         (playerName, players(playerName) + player)
       case np => np
