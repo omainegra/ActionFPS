@@ -5,6 +5,7 @@ import acleague.ranker.achievements.immutable.PlayerStatistics
 import acleague.ranker.achievements.{Jsons, PlayerState}
 import clans.{CompleteClanwar, Clanstats, Clanwars}
 import play.api.libs.json.{JsObject, Json}
+import players.PlayersStats
 
 /**
   * Created by William on 01/01/2016.
@@ -15,7 +16,8 @@ case class FullIterator
  clans: Map[String, Clan],
  clanwars: Clanwars,
  clanstats: Clanstats,
- achievementsIterator: AchievementsIterator) {
+ achievementsIterator: AchievementsIterator,
+  playersStats: PlayersStats) {
   fi =>
 
   def updateReference(newUsers: Map[String, User], newClans: Map[String, Clan]): FullIterator = {
@@ -27,7 +29,8 @@ case class FullIterator
       games = Map.empty,
       achievementsIterator = AchievementsIterator.empty,
       clanwars = Clanwars.empty,
-      clanstats = Clanstats.empty
+      clanstats = Clanstats.empty,
+      playersStats = PlayersStats.empty
     )
     games.valuesIterator.toList.sortBy(_.id).foldLeft(blank)(_.includeGame(_))
   }
@@ -77,7 +80,8 @@ case class FullIterator
       games = newGames,
       achievementsIterator = newAchievements,
       clanwars = ncw,
-      clanstats = newClanstats
+      clanstats = newClanstats,
+      playersStats = playersStats.includeGame(jsonGame)
     )
   }
 

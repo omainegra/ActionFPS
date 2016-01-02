@@ -8,6 +8,7 @@ import akka.agent.Agent
 import clans.{Clanstats, Clanwars}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.{Json, JsValue}
+import players.PlayersStats
 import providers.games.GamesProvider
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,7 +41,8 @@ class FullProvider @Inject()(referenceProvider: ReferenceProvider,
       games = Map.empty,
       achievementsIterator = AchievementsIterator.empty,
       clanwars = Clanwars.empty,
-      clanstats = Clanstats.empty
+      clanstats = Clanstats.empty,
+      playersStats = PlayersStats.empty
     )
 
     val newIterator = allGames.valuesIterator.toList.sortBy(_.id).foldLeft(initial)(_.includeGame(_))
@@ -63,6 +65,8 @@ class FullProvider @Inject()(referenceProvider: ReferenceProvider,
   def clanwars: Future[Clanwars] = {
     fullStuff.map(_.get().clanwars)
   }
+
+  def playerRanks: Future[PlayersStats] = fullStuff.map(_.get().playersStats)
 
   def clanstats: Future[Clanstats] = {
     fullStuff.map(_.get().clanstats)

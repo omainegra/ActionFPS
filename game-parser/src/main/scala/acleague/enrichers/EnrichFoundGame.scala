@@ -14,6 +14,7 @@ case class GameJsonFound(jsonGame: JsonGame)
 object JsonGame {
 
   case class GameAchievement(user: String, text: String)
+
   implicit val gaf = Json.format[GameAchievement]
   implicit val vf = ViewFields.ZonedWrite
   implicit val Af = Json.format[JsonGamePlayer]
@@ -24,7 +25,7 @@ object JsonGame {
     val g = Json.fromJson[JsonGame](Json.parse(string)).get
 
     // some weird edge case from NYC/LA servers
-    if ( g.duration == 60 ) g.copy(duration = 15) else g
+    if (g.duration == 60) g.copy(duration = 15) else g
   }
 
   def build(id: String, foundGame: FoundGame, endDate: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
@@ -127,6 +128,8 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
     copy(teams = teams.map(team => team.copy(players = team.players.map(player => f(team, player)))))
 
   def transformTeams(f: JsonGameTeam => JsonGameTeam) = copy(teams = teams.map(f))
+
+  def isTie = winner.isEmpty
 
   def winner = {
     for {

@@ -21,7 +21,8 @@ lazy val root =
       syslogAc,
       accumulation,
       phpClient,
-      clans
+      clans,
+      players
     ).dependsOn(
     achievements,
     gameParser,
@@ -34,7 +35,8 @@ lazy val root =
     syslogAc,
     accumulation,
     phpClient,
-    clans
+    clans,
+    players
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -246,6 +248,7 @@ lazy val accumulation =
     .dependsOn(achievements)
     .dependsOn(referenceReader)
     .dependsOn(clans)
+    .dependsOn(players)
 
 
 lazy val phpClient =
@@ -269,3 +272,10 @@ lazy val clans =
     .settings(
       libraryDependencies += "org.cvogt" %% "play-json-extensions" % "0.6.0"
     )
+
+lazy val players =
+  Project(
+    id = "players",
+    base = file("players")
+  )
+    .dependsOn(gameParser)

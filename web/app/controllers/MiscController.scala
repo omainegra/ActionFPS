@@ -32,6 +32,8 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
 
   def questions = forward("/questions/")
 
+  def development = forward("/development.php")
+
   def servers = Action.async { implicit request =>
     async {
       val got = Json.toJson(await(referenceProvider.servers))
