@@ -28,7 +28,7 @@ object ValidServers {
     implicit class validator(jsonGame: JsonGame)(implicit validServers: ValidServers) {
       def validateServer: Boolean = {
         val server = jsonGame.server
-        validServers.items.exists { case (`server`, s) => s.isValid }
+        validServers.items.exists(item => item._1 == server && item._2.isValid)
       }
     }
   }
