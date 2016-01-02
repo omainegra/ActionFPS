@@ -129,9 +129,17 @@ case class PlayersStats(players: Map[String, PlayerStat]) {
     }.toMap
   }
 
+  def updatedElos(game: JsonGame): PlayersStats = {
+    val ea = eloAdditions(game)
+    copy(players =
+      players.map { case (id, ps) =>
+        id -> ps.copy(elo = ps.elo + ea.getOrElse(id, 0.0))
+      }
+    )
+  }
+
   def eloAdditions(game: JsonGame): Map[String, Double] = {
     val playersCount = game.teams.map(_.players.size).sum
-    // team elos sorted by team win state?
     val elos: List[Double] = teamsElo(game).values.toList.sorted.reverse
     val delta = 2.0 * (elos(0) - elos(1)) / playersCount.toDouble
     val p = 1.0 / (1.0 + Math.pow(10, -delta / 400.0))
@@ -153,18 +161,13 @@ case class PlayersStats(players: Map[String, PlayerStat]) {
     } yield user -> eloAddition
   }.toMap
 
-  def includeGame(jsonGame: JsonGame): PlayersStats = {
-    val countElo = jsonGame.teams.forall(_.players.forall(_.score.isDefined))
-    var stuff = includeBaseStats(jsonGame)
-    if (countElo) {
-      val adders = eloAdditions(jsonGame)
-      stuff = stuff.copy(
-        players = players.mapValues { p =>
-          p.copy(elo = p.elo + adders.getOrElse(p.user, 0.0))
-        }
-      )
-    }
-    stuff.updatedRanks
+  def includeGame(game: JsonGame): PlayersStats = {
+    val countElo = game.teams.forall(_.players.forall(_.score.isDefined))
+    if (countElo)
+      includeBaseStats(game)
+        .updatedElos(game)
+        .updatedRanks
+    else includeBaseStats(game).updatedRanks
   }
 }
 

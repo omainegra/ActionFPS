@@ -2,7 +2,7 @@
 require_once("render.inc.php");
 
 $players = json_decode($_POST['ranks'], true)['players'];
-usort($players, function($a, $b) {
+@usort($players, function($a, $b) {
     return $a['rank'] <=> $b['rank'];
 });
 $players = array_slice($players, 0, 40);
@@ -22,7 +22,7 @@ $players = array_slice($players, 0, 40);
                 </tr>
                 <?php foreach($players as $player) : ?>
                     <tr>
-                        <td><?php echo $player['rank'] ?></td>
+                        <td><?php echo @$player['rank'] ?></td>
                         <td><a href="/player/?id=<?php echo rawurlencode($player['user']) ?>"><?php echo htmlspecialchars($player['name']) ?></a></td>
                         <td><?php echo $player['games'] ?></td>
                         <td><?php echo $player['wins'] ?></td>
