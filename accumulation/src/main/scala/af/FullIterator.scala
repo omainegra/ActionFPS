@@ -54,7 +54,7 @@ case class FullIterator
       )
     }
     newClanwarCompleted.foreach{ cw =>
-      newGames = cw.games
+      newGames = newGames ++ cw.games
         .flatMap(game => newGames.get(game.id))
         .map(_.copy(clanwar = Option(cw.id)))
         .map(g => g.id -> g)
