@@ -27,6 +27,7 @@ object JsonGame {
   def build(id: String, foundGame: FoundGame, endDate: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
 
     JsonGame(
+      clanwar = None,
       id = id,
       endTime = endDate,
       server = serverId,
@@ -107,7 +108,8 @@ object ViewFields {
 }
 
 case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: String, state: String,
-                    teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[Set[String]]) {
+                    teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[Set[String]],
+                    clanwar: Option[String]) {
 
   def teamSize = teams.map(_.players.size).min
 

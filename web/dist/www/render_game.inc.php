@@ -139,6 +139,11 @@ function render_game($game)
                 </div>
 
             <?php } ?>
+            <?php if ( isset($game['clanwar'])) { ?>
+                <div class="of-clanwar">Part of <a href="/clanwar/?id=<?php echo rawurlencode($game['clanwar']); ?>">a Clanwar <time is="relative-time" datetime="<?php echo htmlspecialchars($game['clanwar']); ?>">
+                        <?php echo htmlspecialchars($game['clanwar']); ?>
+                    </time></a></div>
+            <?php } ?>
         </div>
 
     </article>
