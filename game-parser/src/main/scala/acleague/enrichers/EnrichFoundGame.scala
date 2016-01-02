@@ -12,6 +12,9 @@ import scala.util.hashing.MurmurHash3
 case class GameJsonFound(jsonGame: JsonGame)
 
 object JsonGame {
+
+  case class GameAchievement(user: String, text: String)
+  implicit val gaf = Json.format[GameAchievement]
   implicit val vf = ViewFields.ZonedWrite
   implicit val Af = Json.format[JsonGamePlayer]
   implicit val Bf = Json.format[JsonGameTeam]
@@ -36,6 +39,7 @@ object JsonGame {
       map = foundGame.header.map,
       mode = foundGame.header.mode.name,
       state = foundGame.header.state,
+      achievements = None,
       teams = {
         val tt = foundGame.game.fold(_.teamScores.map(_.project), _.teamScores.map(_.project))
         val tp = foundGame.game.fold(g => (g.scores ++ g.disconnectedScores).map(_.project),
@@ -109,7 +113,7 @@ object ViewFields {
 
 case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: String, state: String,
                     teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[Set[String]],
-                    clanwar: Option[String]) {
+                    clanwar: Option[String], achievements: Option[List[JsonGame.GameAchievement]]) {
 
   def teamSize = teams.map(_.players.size).min
 

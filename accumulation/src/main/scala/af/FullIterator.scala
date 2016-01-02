@@ -37,7 +37,20 @@ case class FullIterator
   def includeGame(jsonGame: JsonGame) = {
     val enricher = EnrichGames(users.values.toList, clans.values.toList)
     import enricher.withUsersClass
-    val richGame = jsonGame.withoutHosts.withUsers.withClans
+    var richGame = jsonGame.withoutHosts.withUsers.withClans
+    val newAchievements = achievementsIterator.includeGame(fi.users.values.toList)(richGame)
+    PartialFunction.condOpt(newAchievements.events.toSet -- achievementsIterator.events.toSet) {
+      case set if set.nonEmpty =>
+        richGame = richGame.copy(
+          achievements = Option {
+            richGame.achievements.toList.flatten ++ set.map(map =>
+              JsonGame.GameAchievement(
+                user = map("user"),
+                text = map("text")
+              ))
+          }.filter(_.nonEmpty)
+        )
+    }
     val ncw = clanwars.includeFlowing(richGame)
     var newClanwarCompleted: Option[CompleteClanwar] = None
     val newClanstats = (ncw.complete -- clanwars.complete).headOption match {
@@ -62,7 +75,7 @@ case class FullIterator
     }
     copy(
       games = newGames,
-      achievementsIterator = achievementsIterator.includeGame(fi.users.values.toList)(richGame),
+      achievementsIterator = newAchievements,
       clanwars = ncw,
       clanstats = newClanstats
     )

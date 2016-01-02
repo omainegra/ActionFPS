@@ -140,10 +140,23 @@ function render_game($game)
 
             <?php } ?>
             <?php if ( isset($game['clanwar'])) { ?>
-                <div class="of-clanwar">Part of <a href="/clanwar/?id=<?php echo rawurlencode($game['clanwar']); ?>">a Clanwar <time is="relative-time" datetime="<?php echo htmlspecialchars($game['clanwar']); ?>">
+                <div class="of-clanwar">Part of <a href="/clanwar/?id=<?php echo rawurlencode($game['clanwar']); ?>">the Clanwar <time is="relative-time" datetime="<?php echo htmlspecialchars($game['clanwar']); ?>">
                         <?php echo htmlspecialchars($game['clanwar']); ?>
                     </time></a></div>
             <?php } ?>
+            <?php if ( isset($game['achievements']) && !empty($game['achievements'])) {
+                ?>
+                <div class="g-achievements">
+                    <?php foreach($game['achievements'] as $achievement) {
+                        if ( $game['achievements'][0] != $achievement ) { echo "<br/>"; }
+                        ?>
+                        <a href="/player/?id=<?php echo rawurlencode($achievement['user']); ?>"><?php echo htmlspecialchars($achievement['text']); ?></a>
+                    <?php
+                    }
+                    ?>
+                </div>
+            <?php
+            } ?>
         </div>
 
     </article>
