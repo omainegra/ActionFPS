@@ -24,8 +24,8 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
   def players = Action.async { implicit request =>
     async {
       val players = await(referenceProvider.users)
-      await(renderPhp("/players.php")(_.post(
-        Map("players" -> Seq(Json.toJson(players).toString()))
+      await(renderJson("/players.php")(
+        Map("players" -> Json.toJson(players)
       )))
     }
   }
@@ -34,9 +34,9 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     async {
       await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>
-          await(renderPhp("/player.php")(_.withQueryString("id" -> id).post(
-            Map("player" -> Seq(player.toJson.toString()))
-          )))
+          await(renderJsonWR("/player.php")(_.withQueryString("id" -> id))(
+            Map("player" -> player.toJson)
+          ))
         case None =>
           NotFound("Player could not be found")
       }

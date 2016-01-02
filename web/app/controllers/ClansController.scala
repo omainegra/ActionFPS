@@ -35,9 +35,9 @@ class ClansController @Inject()(common: Common,
       }
 
       val stats = await(fullProvider.clanstats).onlyRanked
-      await(renderPhp("/rankings.php")(_.post(
-        Map("rankings" -> Seq(Json.toJson(stats).toString()))
-      )))
+      await(renderJson("/rankings.php")(
+        Map("rankings" -> Json.toJson(stats)
+        )))
     }
   }
 
@@ -61,12 +61,12 @@ class ClansController @Inject()(common: Common,
 
       await(referenceProvider.clans).find(_.id == id) match {
         case Some(clan) =>
-          await(renderPhp("/clan.php")(_.post(
-            Map("clan" -> Seq(Json.toJson(clan).toString()),
-              "clanwars" -> Seq(Json.toJson(ccw).toString())
+          await(renderJson("/clan.php")(
+            Map("clan" -> Json.toJson(clan),
+              "clanwars" -> Json.toJson(ccw)
 
-            ) ++ st.map(stt => "stats" -> Seq(Json.toJson(stt).toString()))
-          )))
+            ) ++ st.map(stt => "stats" -> Json.toJson(stt))
+          ))
         case None => NotFound("Clan could not be found")
       }
     }
@@ -80,9 +80,9 @@ class ClansController @Inject()(common: Common,
       }
       await(fullProvider.clanwars).all.find(_.id == id) match {
         case Some(clanwar) =>
-          await(renderPhp("/clanwar.php")(_.post(
-            Map("clanwar" -> Seq(Json.toJson(clanwar).toString()))
-          )))
+          await(renderJson("/clanwar.php")(
+            Map("clanwar" -> Json.toJson(clanwar))
+          ))
         case None => NotFound("Clanwar could not be found")
       }
     }
@@ -96,19 +96,17 @@ class ClansController @Inject()(common: Common,
       }
       import Clanwar.ImplicitFormats._
       val cws = await(fullProvider.clanwars).all.toList.sortBy(_.id).reverse
-      await(renderPhp("/clanwars.php")(_.post(
-        Map(
-          "clanwars" -> Seq(Json.toJson(cws).toString())
-        )
-      )))
+      await(renderJson("/clanwars.php")(
+        Map("clanwars" -> Json.toJson(cws))
+      ))
     }
   }
 
   def clans = Action.async { implicit request =>
     async {
       val clans = await(referenceProvider.clans)
-      await(renderPhp("/clans.php")(_.post(
-        Map("clans" -> Seq(Json.toJson(clans).toString))
+      await(renderJson("/clans.php")(
+        Map("clans" -> Json.toJson(clans)
       )))
     }
   }

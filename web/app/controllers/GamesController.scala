@@ -38,21 +38,21 @@ class GamesController @Inject()(common: Common,
       val games = await(fullProvider.getRecent)
       val events = await(fullProvider.events)
       val latestClanwar = await(fullProvider.clanwars).complete.toList.sortBy(_.id).lastOption
-      await(renderPhp("/")(_.post(
+      await(renderJson("/")(
         Map(
-          "games" -> Seq(Json.toJson(games.map(_.toJson)).toString()),
-          "events" -> Seq(events.toString())
-        ) ++ latestClanwar.map(lc => "latestClanwar" -> Seq(Json.toJson(latestClanwar).toString())).toMap
-      )))
+          "games" -> Json.toJson(games.map(_.toJson)),
+          "events" -> events
+        ) ++ latestClanwar.map(lc => "latestClanwar" -> Json.toJson(latestClanwar)).toMap
+      ))
     }
   }
 
   def game(id: String) = Action.async { implicit request =>
     async {
       await(fullProvider.game(id)) match {
-        case Some(game) => await(renderPhp("/game.php")(_.post(
-          Map("game" -> Seq(game.toJson.toString()))
-        )))
+        case Some(game) => await(renderJson("/game.php")(
+          Map("game" -> game.toJson)
+        ))
         case None => NotFound("Game not found")
       }
     }

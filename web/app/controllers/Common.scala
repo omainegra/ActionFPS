@@ -8,6 +8,7 @@ import javax.inject._
 
 import play.api.Configuration
 import play.api.http.Writeable
+import play.api.libs.json.{Json, JsValue}
 import play.api.libs.ws.{WSResponse, WSRequest, WSClient}
 import play.api.mvc.{Result, RequestHeader, AnyContent, Action}
 import play.twirl.api.Html
@@ -27,8 +28,22 @@ class Common @Inject()(configuration: Configuration)(implicit wsClient: WSClient
     f(wsClient.url(s"$mainPath$path"))
   }
 
+  def renderJson(path: String)(map: Map[String, JsValue])(implicit requestHeader: RequestHeader) = {
+    if (requestHeader.getQueryString("format").contains("json"))
+      Future.successful(Ok(Json.toJson(map)))
+    else
+      renderPhp(path)(_.withQueryString("supports" -> "json").post(map.mapValues(v => Seq(v.toString()))))
+  }
+
+  def renderJsonWR(path: String)(f: WSRequest => WSRequest)(map: Map[String, JsValue])(implicit requestHeader: RequestHeader) = {
+    if (requestHeader.getQueryString("format").contains("json"))
+      Future.successful(Ok(Json.toJson(map)))
+    else
+      renderPhp(path)(r => f(r).withQueryString("supports" -> "json").post(map.mapValues(v => Seq(v.toString()))))
+  }
+
   def renderPhp(path: String)(f: WSRequest => Future[WSResponse])
-            (implicit request: RequestHeader): Future[Result] = {
+               (implicit request: RequestHeader): Future[Result] = {
     async {
       val extraParams = List("af_id", "af_name").flatMap { key =>
         request.cookies.get(key).map(cookie => key -> cookie.value)
