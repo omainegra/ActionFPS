@@ -18,7 +18,8 @@ import providers.games.JournalGamesProvider.NewGameCapture
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, blocking}
-
+import af.ValidServers.Validator._
+import af.ValidServers.ImplicitValidServers._
 object JournalGamesProvider {
 
   def getFileGames(file: File) = {
@@ -26,6 +27,7 @@ object JournalGamesProvider {
     try ProcessJournalApp.parseSource(fis)
       .map(_.cg)
       .filter(_.validate.isGood)
+      .filter(_.validateServer)
       .map(g => g.id -> g)
       .toMap
     finally fis.close()
@@ -40,7 +42,7 @@ object JournalGamesProvider {
         currentState = currentState.process(line)
         PartialFunction.condOpt(currentState) {
           case MultipleServerParserFoundGame(fg, _)
-            if !gameAlreadyExists(fg.id) && fg.validate.isGood =>
+            if !gameAlreadyExists(fg.id) && fg.validate.isGood && fg.validateServer =>
             registerGame(fg)
         }
       case _ =>

@@ -5,7 +5,7 @@ import javax.inject._
 import acleague.enrichers.JsonGame
 import af.{FullProfile, AchievementsIterator, FullIterator}
 import akka.agent.Agent
-import clans.Clanwars
+import clans.{Clanstats, Clanwars}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.{Json, JsValue}
 import providers.games.GamesProvider
@@ -39,7 +39,8 @@ class FullProvider @Inject()(referenceProvider: ReferenceProvider,
       clans = clans.map(c => c.id -> c).toMap,
       games = Map.empty,
       achievementsIterator = AchievementsIterator.empty,
-      clanwars = Clanwars.empty
+      clanwars = Clanwars.empty,
+      clanstats = Clanstats.empty
     )
 
     val newIterator = allGames.valuesIterator.toList.sortBy(_.id).foldLeft(initial)(_.includeGame(_))
@@ -61,6 +62,10 @@ class FullProvider @Inject()(referenceProvider: ReferenceProvider,
 
   def clanwars: Future[Clanwars] = {
     fullStuff.map(_.get().clanwars)
+  }
+
+  def clanstats: Future[Clanstats] = {
+    fullStuff.map(_.get().clanstats)
   }
 
   def allGames: Future[List[JsonGame]] = {

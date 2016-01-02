@@ -56,6 +56,7 @@ sealed trait Clanwar {
     teamSize = allGames.head.teamSize,
     id = id,
     endTime = allGames.last.endTime,
+    games = allGames.sortBy(_.id),
     completed = this match {
       case cc: CompleteClanwar => true
       case _ => false
@@ -104,9 +105,10 @@ case class TwoGamesNoWinnerClanwar(clans: Set[String], firstGame: JsonGame, seco
 
 }
 
-case class CompleteClanwar(winner: Option[String], clans: Set[String], scores: Map[String, Int], games: List[JsonGame]) extends Clanwar
-
-
+case class CompleteClanwar(winner: Option[String], clans: Set[String], scores: Map[String, Int], games: List[JsonGame]) extends Clanwar {
+  def isTie = winner.isEmpty
+  def loser = (clans -- winner.toSet).headOption
+}
 
 case class NewClanwar(clans: Set[String], firstGame: JsonGame) extends IncompleteClanwar {
   def nextGame(jsonGame: JsonGame): Option[Either[TwoGamesNoWinnerClanwar, CompleteClanwar]] = {

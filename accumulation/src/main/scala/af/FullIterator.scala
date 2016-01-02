@@ -3,7 +3,7 @@ package af
 import acleague.enrichers.JsonGame
 import acleague.ranker.achievements.immutable.PlayerStatistics
 import acleague.ranker.achievements.{Jsons, PlayerState}
-import clans.Clanwars
+import clans.{Clanstats, Clanwars}
 import play.api.libs.json.{JsObject, Json}
 
 /**
@@ -14,6 +14,7 @@ case class FullIterator
  games: Map[String, JsonGame],
  clans: Map[String, Clan],
  clanwars: Clanwars,
+ clanstats: Clanstats,
  achievementsIterator: AchievementsIterator) {
   fi =>
 
@@ -25,7 +26,8 @@ case class FullIterator
       clans = newClans,
       games = Map.empty,
       achievementsIterator = AchievementsIterator.empty,
-      clanwars = Clanwars.empty
+      clanwars = Clanwars.empty,
+      clanstats = Clanstats.empty
     )
     games.valuesIterator.toList.sortBy(_.id).foldLeft(blank)(_.includeGame(_))
   }
@@ -36,13 +38,20 @@ case class FullIterator
     val enricher = EnrichGames(users.values.toList, clans.values.toList)
     import enricher.withUsersClass
     val richGame = jsonGame.withoutHosts.withUsers.withClans
+    val ncw = clanwars.includeFlowing(richGame)
     copy(
       games = fi.games.updated(
         key = jsonGame.id,
         value = richGame
       ),
       achievementsIterator = achievementsIterator.includeGame(fi.users.values.toList)(richGame),
-      clanwars = clanwars.includeFlowing(richGame)
+      clanwars = ncw,
+      clanstats = {
+        (ncw.complete -- clanwars.complete).headOption match {
+          case None => clanstats
+          case Some(completion) => clanstats.include(completion)
+        }
+      }
     )
   }
 

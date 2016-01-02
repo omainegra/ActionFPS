@@ -1,0 +1,263 @@
+{
+  "id": "2016-01-01T15:44:54Z",
+  "startTime": "2016-01-01T15:42:19Z",
+  "endTime": "2016-01-01T16:14:02Z",
+  "clans": [
+    {
+      "clan": "woop",
+      "wins": 2,
+      "won": [
+        "2016-01-01T15:44:54Z",
+        "2016-01-01T15:16:37Z"
+      ],
+      "frags": 366,
+      "flags": 15,
+      "score": 4507,
+      "players": {
+        "1": {
+          "user": "honor",
+          "name": "w00p|Honor",
+          "deaths": 113,
+          "frags": 149,
+          "flags": 7,
+          "score": 2057
+        },
+        "0": {
+          "user": "sanzo",
+          "name": "w00p|Sanzo",
+          "deaths": 108,
+          "frags": 110,
+          "flags": 5,
+          "score": 1269
+        },
+        "2": {
+          "user": "lucas",
+          "name": "w00p|Lucas",
+          "deaths": 106,
+          "frags": 107,
+          "flags": 3,
+          "score": 1181
+        }
+      },
+      "trophies": {
+        "mvp": {
+          "user": "honor",
+          "name": "w00p|Honor"
+        }
+      },
+      "name": "w00p"
+    },
+    {
+      "clan": "brc",
+      "wins": 0,
+      "frags": 318,
+      "flags": 3,
+      "score": 3600,
+      "players": {
+        "0": {
+          "name": "*[BRC]*Wallp@",
+          "deaths": 120,
+          "frags": 116,
+          "flags": 2,
+          "score": 1467
+        },
+        "2": {
+          "name": "*[BRC]*Thug",
+          "deaths": 116,
+          "frags": 86,
+          "flags": 1,
+          "score": 925
+        },
+        "1": {
+          "name": "*[BRC]*Marlboro",
+          "deaths": 134,
+          "frags": 116,
+          "flags": 0,
+          "score": 1208
+        }
+      },
+      "trophies": {
+        "mvp": {
+          "name": "*[BRC]*Wallp@"
+        }
+      },
+      "name": "BRC"
+    }
+  ],
+  "games": [
+    {
+      "id": "2016-01-01T15:44:54Z",
+      "endTime": "2016-01-01T15:57:19Z",
+      "map": "ac_gothic",
+      "mode": "ctf",
+      "state": "match",
+      "teams": [
+        {
+          "name": "CLA",
+          "flags": 8,
+          "frags": 188,
+          "players": [
+            {
+              "name": "w00p|Sanzo",
+              "score": 607,
+              "flags": 4,
+              "frags": 52,
+              "deaths": 50,
+              "user": "sanzo",
+              "clan": "woop"
+            },
+            {
+              "name": "w00p|Honor",
+              "score": 1066,
+              "flags": 2,
+              "frags": 82,
+              "deaths": 58,
+              "user": "honor",
+              "clan": "woop"
+            },
+            {
+              "name": "w00p|Lucas",
+              "score": 600,
+              "flags": 2,
+              "frags": 54,
+              "deaths": 52,
+              "user": "lucas",
+              "clan": "woop"
+            }
+          ],
+          "clan": "woop"
+        },
+        {
+          "name": "RVSF",
+          "flags": 2,
+          "frags": 157,
+          "players": [
+            {
+              "name": "*[BRC]*Wallp@",
+              "score": 793,
+              "flags": 2,
+              "frags": 57,
+              "deaths": 60,
+              "clan": "brc"
+            },
+            {
+              "name": "*[BRC]*Marlboro",
+              "score": 589,
+              "flags": 0,
+              "frags": 56,
+              "deaths": 68,
+              "clan": "brc"
+            },
+            {
+              "name": "*[BRC]*Thug",
+              "score": 497,
+              "flags": 0,
+              "frags": 44,
+              "deaths": 61,
+              "clan": "brc"
+            }
+          ],
+          "clan": "brc"
+        }
+      ],
+      "server": "ny 33333",
+      "duration": 15,
+      "clangame": [
+        "woop",
+        "brc"
+      ],
+      "startTime": "2016-01-01T15:42:19Z",
+      "winner": "CLA",
+      "winnerClan": "woop"
+    },
+    {
+      "id": "2016-01-01T15:16:37Z",
+      "endTime": "2016-01-01T16:14:02Z",
+      "map": "ac_ingress",
+      "mode": "ctf",
+      "state": "match",
+      "teams": [
+        {
+          "name": "CLA",
+          "flags": 7,
+          "frags": 178,
+          "players": [
+            {
+              "name": "w00p|Honor",
+              "score": 991,
+              "flags": 5,
+              "frags": 67,
+              "deaths": 55,
+              "user": "honor",
+              "clan": "woop"
+            },
+            {
+              "name": "w00p|Sanzo",
+              "score": 662,
+              "flags": 1,
+              "frags": 58,
+              "deaths": 58,
+              "user": "sanzo",
+              "clan": "woop"
+            },
+            {
+              "name": "w00p|Lucas",
+              "score": 581,
+              "flags": 1,
+              "frags": 53,
+              "deaths": 54,
+              "user": "lucas",
+              "clan": "woop"
+            }
+          ],
+          "clan": "woop"
+        },
+        {
+          "name": "RVSF",
+          "flags": 1,
+          "frags": 161,
+          "players": [
+            {
+              "name": "*[BRC]*Thug",
+              "score": 428,
+              "flags": 1,
+              "frags": 42,
+              "deaths": 55,
+              "clan": "brc"
+            },
+            {
+              "name": "*[BRC]*Marlboro",
+              "score": 619,
+              "flags": 0,
+              "frags": 60,
+              "deaths": 66,
+              "clan": "brc"
+            },
+            {
+              "name": "*[BRC]*Wallp@",
+              "score": 674,
+              "flags": 0,
+              "frags": 59,
+              "deaths": 60,
+              "clan": "brc"
+            }
+          ],
+          "clan": "brc"
+        }
+      ],
+      "server": "ny 33333",
+      "duration": 15,
+      "clangame": [
+        "woop",
+        "brc"
+      ],
+      "startTime": "2016-01-01T15:59:02Z",
+      "winner": "CLA",
+      "winnerClan": "woop"
+    }
+  ],
+  "server": "ny 33333",
+  "teamsize": 3,
+  "completed": true,
+  "winner": "woop"
+}

@@ -17,9 +17,13 @@ case class ClanwarPlayer(flags: Int, frags: Int, score: Int, name: String, user:
   def award(id: String) = copy(awards = awards + id)
 }
 
-case class ClanwarTeam(clan: String, name: Option[String], score: Int, players: Map[String, ClanwarPlayer], won: Set[String]) {
+case class ClanwarTeam(clan: String, name: Option[String], score: Int, flags: Int,
+                       frags: Int, deaths: Int,
+                       players: Map[String, ClanwarPlayer], won: Set[String]) {
   def +(other: ClanwarTeam) = copy(
     score = score + other.score,
+    flags = flags + other.flags,
+    frags = frags + other.frags,
     players = other.players.map {
       case (playerName, player) if players.contains(playerName) =>
         (playerName, players(playerName) + player)
@@ -30,6 +34,8 @@ case class ClanwarTeam(clan: String, name: Option[String], score: Int, players: 
 }
 
 case class Conclusion(teams: List[ClanwarTeam]) {
+  def team(clan: String) = teams.find(_.clan == clan)
+
   def awardMvps = copy(
     teams = teams.map { team =>
       team.players.maxBy { case (_, player) => player.score } match {
@@ -66,8 +72,11 @@ object Conclusion {
     } yield ClanwarTeam(
       clan = clan,
       name = None,
+      frags = team.frags,
+      deaths = team.players.map(_.deaths).sum,
       score = if (game.winnerClan.contains(clan)) 1 else 0,
       won = Set(game.id),
+      flags = team.flags.getOrElse(0),
       players = {
         for {
           player <- team.players
@@ -98,7 +107,8 @@ case class ClanwarMeta(id: String,
                        conclusion: Conclusion,
                        endTime: ZonedDateTime,
                        completed: Boolean,
-                       teamSize: Int)
+                       teamSize: Int,
+                       games: List[JsonGame])
 
 
 

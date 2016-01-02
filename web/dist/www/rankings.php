@@ -3,7 +3,10 @@ require_once "render.inc.php";
 require "render_game.inc.php";
 
 
-$clans = json_decode($_POST['rankings'], true)['now'];
+$clans = json_decode($_POST['rankings'], true)['clans'];
+usort($clans, function($b, $a) {
+    return $a['wars'] <=> $b['wars'];
+})
 ?>
 <article id="questions">
     <div id="rank">
@@ -17,9 +20,11 @@ $clans = json_decode($_POST['rankings'], true)['now'];
             <td>Score</td>
             <td>Elo Rank</td>
         </tr>
-        <?php foreach($clans as $clan) : ?>
+        <?php foreach($clans as $clan) :
+
+            if ( $clan['wars'] < 10 ) continue; ?>
         <tr>
-            <th><a href="/clan/?id=<?php echo htmlspecialchars($clan['clan']) ?>"><?php echo htmlspecialchars($clan['name']) ?></a></th>
+            <th><a href="/clan/?id=<?php echo htmlspecialchars($clan['id']) ?>"><?php echo htmlspecialchars($clan['name']) ?></a></th>
             <td><?php echo $clan['wars'] ?></td>
             <td><?php echo $clan['wins'] ?></td>
             <td><?php echo $clan['games'] ?></td>

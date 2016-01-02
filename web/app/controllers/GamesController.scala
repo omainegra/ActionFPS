@@ -9,7 +9,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import providers.games.NewGamesProvider
-import providers.{ReferenceProvider, ClansProvider, FullProvider}
+import providers.{ReferenceProvider, FullProvider}
 import services.PingerService
 
 import scala.async.Async._

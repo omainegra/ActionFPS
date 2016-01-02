@@ -3,7 +3,7 @@ require_once("render.inc.php");
 require("render_game.inc.php");
 
 $clan = json_decode($_POST['clan'], true);
-$stats = $clan['stats'];
+$stats = json_decode($_POST['stats'], true);
 $wars = json_decode($_POST['clanwars'], true);
 ?>
 <article id="profile">
@@ -22,7 +22,7 @@ $wars = json_decode($_POST['clanwars'], true);
                     <table class="basic-counts">
                         <tr>
                             <th>Clanwar wins</th><td><?php echo $stats['wins'] ?>/<?php echo $stats['wars'] ?></td>
-                            <th>Game wins</th><td><?php echo $stats['gamewins'] ?>/<?php echo $stats['games'] ?></td>
+                            <th>Game wins</th><td><?php echo $stats['gameWins'] ?>/<?php echo $stats['games'] ?></td>
 
                         </tr>
                         <tr>

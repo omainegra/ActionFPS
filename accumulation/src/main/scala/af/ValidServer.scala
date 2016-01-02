@@ -2,6 +2,7 @@ package af
 
 import java.time.ZoneId
 
+import acleague.enrichers.JsonGame
 import play.api.libs.json.{Reads, JsValue, Json}
 
 /**
@@ -17,6 +18,19 @@ object ValidServers {
   def fromResource = {
     val res = Json.parse(getClass.getResourceAsStream("/af/acc/valid-servers.json"))
     fromJson(res).get
+  }
+
+  object ImplicitValidServers {
+    implicit val fromResourceVS = fromResource
+  }
+
+  object Validator {
+    implicit class validator(jsonGame: JsonGame)(implicit validServers: ValidServers) {
+      def validateServer: Boolean = {
+        val server = jsonGame.server
+        validServers.items.exists { case (`server`, s) => s.isValid }
+      }
+    }
   }
 
 }
