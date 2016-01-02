@@ -8,6 +8,7 @@ GET         /clanwar/                       @controllers.ClansController.clanwar
 GET         /clanwars/                      @controllers.ClansController.clanwars
 GET         /players/                       @controllers.PlayersController.players
 GET         /player/                        @controllers.PlayersController.player(id: String)
+GET         /playerranks/                   @controllers.PlayersController.rankings
 GET         /api/                           @controllers.MiscController.api
 GET         /client/                        @controllers.MiscController.client
 GET         /client/changes/                @controllers.MiscController.clientChanges

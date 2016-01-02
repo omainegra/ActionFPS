@@ -30,6 +30,16 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     }
   }
 
+  def rankings = Action.async { implicit request =>
+    async {
+      import _root_.players.PlayersStats.ImplicitWrites._
+      val ranks = await(fullProvider.playerRanks).onlyRanked
+      await(renderJson("/playerranks.php")(Map(
+        "ranks" -> Json.toJson(ranks)
+      )))
+    }
+  }
+
   def player(id: String) = Action.async { implicit request =>
     async {
       await(fullProvider.getPlayerProfileFor(id)) match {
