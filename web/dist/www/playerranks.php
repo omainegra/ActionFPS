@@ -5,7 +5,7 @@ $players = json_decode($_POST['ranks'], true)['players'];
 @usort($players, function($a, $b) {
     return $a['rank'] <=> $b['rank'];
 });
-$players = array_slice($players, 0, 40);
+$players = array_slice($players, 0, 50);
 ?>
     <article id="questions">
         <div id="rank">
