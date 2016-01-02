@@ -81,7 +81,7 @@ case class FullIterator
       achievementsIterator = newAchievements,
       clanwars = ncw,
       clanstats = newClanstats,
-      playersStats = playersStats.includeGame(jsonGame)
+      playersStats = playersStats.includeGame(richGame)
     )
   }
 
