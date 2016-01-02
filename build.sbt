@@ -20,7 +20,8 @@ lazy val root =
       demoParser,
       syslogAc,
       accumulation,
-      phpClient
+      phpClient,
+      clans
     ).dependsOn(
     achievements,
     gameParser,
@@ -32,7 +33,8 @@ lazy val root =
     demoParser,
     syslogAc,
     accumulation,
-    phpClient
+    phpClient,
+    clans
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -243,6 +245,7 @@ lazy val accumulation =
   )
     .dependsOn(achievements)
     .dependsOn(referenceReader)
+    .dependsOn(clans)
 
 
 lazy val phpClient =
@@ -254,4 +257,15 @@ lazy val phpClient =
       resolvers += Resolver.bintrayRepo("scalawilliam", "maven"),
       libraryDependencies += "com.scalawilliam" %% "scala-fastcgi-client" % "0.3",
       libraryDependencies += json
+    )
+
+
+lazy val clans =
+  Project(
+    id = "clans",
+    base = file("clans")
+  )
+    .dependsOn(gameParser)
+    .settings(
+      libraryDependencies += "org.cvogt" %% "play-json-extensions" % "0.6.0"
     )

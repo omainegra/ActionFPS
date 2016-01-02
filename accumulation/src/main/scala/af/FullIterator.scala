@@ -3,6 +3,7 @@ package af
 import acleague.enrichers.JsonGame
 import acleague.ranker.achievements.immutable.PlayerStatistics
 import acleague.ranker.achievements.{Jsons, PlayerState}
+import clans.Clanwars
 import play.api.libs.json.{JsObject, Json}
 
 /**
@@ -12,18 +13,19 @@ case class FullIterator
 (users: Map[String, User],
  games: Map[String, JsonGame],
  clans: Map[String, Clan],
+ clanwars: Clanwars,
  achievementsIterator: AchievementsIterator) {
   fi =>
 
   def updateReference(newUsers: Map[String, User], newClans: Map[String, Clan]): FullIterator = {
     val enricher = EnrichGames(newUsers.values.toList, newClans.values.toList)
     import enricher.withUsersClass
-    val newGames = games.mapValues(_.withUsers.withClans)
     val blank = FullIterator(
       users = newUsers,
       clans = newClans,
       games = Map.empty,
-      achievementsIterator = AchievementsIterator.empty
+      achievementsIterator = AchievementsIterator.empty,
+      clanwars = Clanwars.empty
     )
     games.valuesIterator.toList.sortBy(_.id).foldLeft(blank)(_.includeGame(_))
   }
@@ -33,12 +35,14 @@ case class FullIterator
   def includeGame(jsonGame: JsonGame) = {
     val enricher = EnrichGames(users.values.toList, clans.values.toList)
     import enricher.withUsersClass
+    val richGame = jsonGame.withoutHosts.withUsers.withClans
     copy(
       games = fi.games.updated(
         key = jsonGame.id,
-        value = jsonGame.withoutHosts.withUsers.withClans
+        value = richGame
       ),
-      achievementsIterator = achievementsIterator.includeGame(fi.users.values.toList)(jsonGame)
+      achievementsIterator = achievementsIterator.includeGame(fi.users.values.toList)(richGame),
+      clanwars = clanwars.includeFlowing(richGame)
     )
   }
 

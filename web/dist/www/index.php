@@ -4,8 +4,7 @@ require("render_game.inc.php");
 
 $games = json_decode($_POST['games'], true);
 $events = json_decode($_POST['events'], true);
-$clanwars = json_decode($_POST['clanwars'], true);
-$latest_clanwar = reset($clanwars);
+$latest_clanwar = json_decode($_POST['latestClanwar'], true);
 ?><div id="live-events">
     <ol class="LiveEvents live-events">
         <?php foreach($events as $i => $event) {

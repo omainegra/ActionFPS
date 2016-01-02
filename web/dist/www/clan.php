@@ -4,6 +4,7 @@ require("render_game.inc.php");
 
 $clan = json_decode($_POST['clan'], true);
 $stats = $clan['stats'];
+$wars = json_decode($_POST['clanwars'], true);
 ?>
 <article id="profile">
     <div class="profile">
@@ -45,7 +46,7 @@ $stats = $clan['stats'];
     <div id="games">
         <h3>Recent Wars</h3>
         <ol class="recent-games">
-        <?php foreach($clan['wars'] as $war) : ?>
+        <?php foreach($wars as $war) : ?>
             <li><?php render_compact_war($war, $clan['id']) ?></li>
         <?php endforeach; ?>
         </ol>

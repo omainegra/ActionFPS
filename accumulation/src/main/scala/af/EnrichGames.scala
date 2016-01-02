@@ -27,7 +27,7 @@ case class EnrichGames(users: List[User], clans: List[Clan]) {
 
       newGame.copy(clangame =
         PartialFunction.condOpt(newGame.teams.map(_.clan)) {
-          case List(Some(a), Some(b)) if a != b => List(a, b)
+          case List(Some(a), Some(b)) if a != b => Set(a, b)
         }
       )
     }

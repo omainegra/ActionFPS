@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_WARNING);
 function render_game_team_player($game, $team, $player, $spectator = false)
 {
     ?>
@@ -158,7 +159,7 @@ function render_war_clan_player($war, $clan, $player)
             <?php } else { ?>
                 <?php echo htmlspecialchars($player['name']); ?>
             <?php } ?>
-            <?php if(isset($clan['trophies']['mvp']) && $clan['trophies']['mvp']['name'] == $player['name']) { ?>
+            <?php if(in_array('mvp', $player['awards'])) { ?>
                 <img src="http://woop.ac:81/html/assets/mvp.png" title="MVP"  />
             <?php } ?>
         </span>
@@ -167,7 +168,7 @@ function render_war_clan_player($war, $clan, $player)
 }?>
 
 <?php
-function render_war_clan($war, $clan, $show_players = false)
+function render_war_team($war, $clan, $show_players = false)
 {
 ?>
     <div class="team">
@@ -175,13 +176,17 @@ function render_war_clan($war, $clan, $show_players = false)
             <h3><a href="/clan/?id=<?php echo rawurlencode($clan['clan']) ?>"><?php clan_logo($clan); ?></a></h3>
 
             <div class="result">
-                <span class="clan"><a href="/clan/?id=<?php echo rawurlencode($clan['clan']) ?>"><?php echo htmlspecialchars($clan['name']) ?></a></span>
-                <span class="score"><?php echo $clan['wins']; ?></span>
+                <span class="clan"><a href="/clan/?id=<?php echo rawurlencode($clan['clan']) ?>"><?php echo htmlspecialchars($clan['name'] ?: $clan['clan']) ?></a></span>
+                <span class="score"><?php echo $clan['score']; ?></span>
             </div>
         </div>
         <?php if($show_players) : ?>
        <div class="players">
-           <ol><?php foreach ($clan['players'] as $player) {
+           <ol><?php
+               uasort($clan['players'], function($b, $a) {
+                   return $a['flags'] <=> $b['flags'];
+               });
+               foreach ($clan['players'] as $player) {
                 render_war_clan_player($war, $clan, $player);
             } ?>
            </ol>
@@ -192,7 +197,6 @@ function render_war_clan($war, $clan, $show_players = false)
 <?php 
 function render_war($war, $show_players = false, $show_as_first = false)
 {
-    $finalgame = $war['games'][count($war['games'])-1];
     ?>
     <article class="GameCard game clanwar" style="background-image: url('http://woop.ac:81/html/assets/clanwar.png')">
         <div class="w">
@@ -219,8 +223,8 @@ function render_war($war, $show_players = false, $show_as_first = false)
              </header>
              
             <div class="teams">
-                <?php foreach($war['clans'] as $clan) { ?>
-                    <?php render_war_clan($war, $clan, $show_players); ?>
+                <?php foreach($war['conclusion']['teams'] as $team) { ?>
+                    <?php render_war_team($war, $team, $show_players); ?>
                 <?php } ?>
              </div>
           </div>
@@ -231,33 +235,33 @@ function render_war($war, $show_players = false, $show_as_first = false)
 <?php 
 function render_compact_war($war, $perspective)
 {
-    if($war['clans'][0]['clan'] == $perspective)
+    if($war['conclusion']['teams'][0]['clan'] == $perspective)
     {
-        $clan = $war['clans'][0];
-        $opponent = $war['clans'][1];
+        $clan = $war['conclusion']['teams'][0];
+        $opponent = $war['conclusion']['teams'][1];
     }
     else
     {
-        $clan = $war['clans'][1];
-        $opponent = $war['clans'][0];
+        $clan = $war['conclusion']['teams'][1];
+        $opponent = $war['conclusion']['teams'][0];
     }
 ?>
     <?php if ( !$war['completed'] ) { ?>
     Incomplete vs
     <?php
         } elseif(!isset($war['winner'])) { ?>
-        Tied <?php echo $clan['wins'] ?> - <?php echo $opponent['wins'] ?> vs
+        Tied <?php echo $clan['score'] ?> - <?php echo $opponent['score'] ?> vs
 <?php } elseif($war['winner'] == $clan['clan']) { ?>
-        Won <?php echo $clan['wins'] ?> - <?php echo $opponent['wins'] ?> vs
+        Won <?php echo $clan['score'] ?> - <?php echo $opponent['score'] ?> vs
 <?php } else { ?>
-        Lost <?php echo $clan['wins'] ?> - <?php echo $opponent['wins'] ?> vs
+        Lost <?php echo $clan['score'] ?> - <?php echo $opponent['score'] ?> vs
 <?php } ?>
         <a href="/clan/?id=<?php echo rawurlencode($opponent['clan']) ?>"><?php echo htmlspecialchars($opponent['name']) ?></a>
         -
         <a href="/clanwar/?id=<?php echo rawurlencode($war['id']); ?>">
              <time is="local-time" datetime="<?php echo htmlspecialchars($war['endTime']); ?>" weekday="short" year="numeric" month="short" day="numeric">
                  <?php echo htmlspecialchars($war['endTime']); ?>
-             </time> (<?php echo $war['teamsize'] ?> vs <?php echo $war['teamsize'] ?>)
+             </time>, <?php echo $war['teamSize'] ?>vs<?php echo $war['teamSize'] ?>
          </a>
         
 <?php } ?>
