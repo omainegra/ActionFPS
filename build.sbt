@@ -1,5 +1,6 @@
 import java.util.Base64
 
+import com.hazelcast.core.Hazelcast
 import org.eclipse.jgit.revwalk.RevWalk
 
 name := "actionfps"
@@ -90,6 +91,7 @@ lazy val web =
     .enablePlugins(BuildInfoPlugin)
     .settings(dontDocument)
     .settings(
+      libraryDependencies += "com.hazelcast" % "hazelcast-client" % "3.6-EA3",
       libraryDependencies += "org.postgresql" % "postgresql" % "9.4.1207",
       libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test",
       libraryDependencies ++= akka("actor", "agent", "slf4j"),
@@ -106,6 +108,13 @@ lazy val web =
         "org.seleniumhq.selenium" % "selenium-java" % "2.48.2" % "test",
         cache
       ),
+      (run in Compile) <<= (run in Compile).dependsOn(startHazelcast),
+      startHazelcast := {
+        println("Starting hazelcast in dev mode...")
+        val cfg = new com.hazelcast.config.Config()
+        cfg.setInstanceName("web")
+        Hazelcast.getOrCreateHazelcastInstance(cfg)
+      },
       scriptClasspath := Seq("*"),
       version := "5.0",
       buildInfoKeys := Seq[BuildInfoKey](
@@ -279,3 +288,5 @@ lazy val players =
     base = file("players")
   )
     .dependsOn(gameParser)
+
+lazy val startHazelcast = TaskKey[Unit]("Start a hazelcast instance")

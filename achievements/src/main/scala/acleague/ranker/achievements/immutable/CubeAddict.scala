@@ -5,7 +5,7 @@ import acleague.enrichers.{JsonGame, JsonGamePlayer}
 /**
   * Created by William on 12/11/2015.
   */
-
+@SerialVersionUID(1001L)
 object CubeAddict extends Incremental {
 
   def hourLevels = List(5, 10, 20, 50, 100, 200)

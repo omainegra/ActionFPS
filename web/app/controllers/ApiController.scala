@@ -8,7 +8,7 @@ import javax.inject._
 
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc.{Controller, Action}
-import providers.FullProvider
+import providers.full.FullProvider
 
 import scala.concurrent.ExecutionContext
 

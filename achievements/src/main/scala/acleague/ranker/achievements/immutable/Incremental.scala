@@ -4,7 +4,7 @@ package acleague.ranker.achievements.immutable
   * Created by William on 12/11/2015.
   */
 
-trait Incremental { inc =>
+trait Incremental extends Serializable { inc =>
   sealed trait CoreType
   type InputType
   def levels: List[Int]

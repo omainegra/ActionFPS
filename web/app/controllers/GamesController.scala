@@ -8,8 +8,9 @@ import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
+import providers.full.FullProvider
 import providers.games.NewGamesProvider
-import providers.{ReferenceProvider, FullProvider}
+import providers.ReferenceProvider
 import services.PingerService
 
 import scala.async.Async._

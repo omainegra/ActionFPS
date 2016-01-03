@@ -5,7 +5,7 @@ import acleague.enrichers.{JsonGame, JsonGamePlayer}
 /**
   * Created by William on 11/11/2015.
   */
-
+@SerialVersionUID(1002L)
 object FlagMaster extends Incremental {
 
   override def levels = List(50, 100, 200, 500, 1000)

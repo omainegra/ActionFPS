@@ -13,7 +13,8 @@ import clans.Conclusion.Namer
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import providers.{FullProvider, ReferenceProvider}
+import providers.full.FullProvider
+import providers.ReferenceProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext

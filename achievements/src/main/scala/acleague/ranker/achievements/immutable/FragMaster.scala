@@ -5,7 +5,7 @@ import acleague.enrichers.JsonGamePlayer
 /**
   * Created by William on 11/11/2015.
   */
-
+@SerialVersionUID(1000L)
 object FragMaster extends Incremental {
 
   override def levels = List(500, 1000, 2000, 5000, 10000)

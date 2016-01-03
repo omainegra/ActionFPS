@@ -9,7 +9,7 @@ import javax.inject._
 import af.FullIterator
 import play.api.Configuration
 import play.api.mvc.{Action, Controller}
-import providers.FullProvider
+import providers.full.FullProvider
 
 @Singleton
 class Admin @Inject()(fullProvider: FullProvider, configuration: Configuration)
