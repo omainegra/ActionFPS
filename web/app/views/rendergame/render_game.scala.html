@@ -1,0 +1,49 @@
+@import views.rendergame.MixedGame
+@(mixedGame: MixedGame)
+<article class="@mixedGame.className"
+    style="@mixedGame.bgStyle">
+    <div class="w">
+        @header(mixedGame, mixedGame.game)
+        <div class="teams">
+        @mixedGame.game.teams.map { team =>
+            @render_team(team, mixedGame.teamSpectators.get(team.name))
+        }
+        </div>
+
+
+        @mixedGame.players.map { players =>
+            <div class="dm-players">
+                <ul>
+                    @players.map { player =>
+                        <li><span>@player</span></li>
+                    }
+                </ul>
+            </div>
+        }
+
+        @mixedGame.spectators.map { spectators =>
+            <div class="spectators">
+                <h4>Spectators:</h4>
+                <ul>
+                    @spectators.map { spectator =>
+                        <li><span>@spectator</span></li>
+                    }
+                </ul>
+            </div>
+        }
+        @mixedGame.game.clanwar.map { clanwar =>
+            <div class="of-clanwar">
+                Part of <a href="/clanwar/?id=@clanwar">
+                the Clanwar <time is="relative-time" datetime="@clanwar">
+            @clanwar
+            </time></a></div>
+        }
+        @mixedGame.game.achievements.map { achievements =>
+            <div class="g-achievements">
+                @achievements.map { achievement =>
+                    <a href="/player/?id=@achievement.user">@achievement.text</a>
+                    <br/>
+                }
+        }
+    </div>
+</article>

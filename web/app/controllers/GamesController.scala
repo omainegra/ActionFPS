@@ -5,13 +5,14 @@ import javax.inject._
 import clans.Clanwar
 import clans.Conclusion.Namer
 import play.api.Configuration
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import providers.full.FullProvider
 import providers.games.NewGamesProvider
 import providers.ReferenceProvider
 import services.PingerService
+import views.rendergame.MixedGame
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -36,24 +37,18 @@ class GamesController @Inject()(common: Common,
         val clans = await(referenceProvider.clans)
         Namer(id => clans.find(_.id == id).map(_.name))
       }
-      val games = await(fullProvider.getRecent)
+      val games = await(fullProvider.getRecent).map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
-      val latestClanwar = await(fullProvider.clanwars).complete.toList.sortBy(_.id).lastOption
-      await(renderJson("/")(
-        Map(
-          "games" -> Json.toJson(games.map(_.toJson)),
-          "events" -> events
-        ) ++ latestClanwar.map(lc => "latestClanwar" -> Json.toJson(latestClanwar)).toMap
-      ))
+      val latestClanwar = await(fullProvider.clanwars).complete.toList.sortBy(_.id).lastOption.map(_.meta.named)
+      Ok(renderTemplate(None, false, None)(views.html.index(games = games, events = events, latestClanwar = latestClanwar)))
     }
   }
 
   def game(id: String) = Action.async { implicit request =>
     async {
       await(fullProvider.game(id)) match {
-        case Some(game) => await(renderJson("/game.php")(
-          Map("game" -> game.toJson)
-        ))
+        case Some(game) =>
+          Ok(renderTemplate(None, false, None)(views.html.game(game)))
         case None => NotFound("Game not found")
       }
     }

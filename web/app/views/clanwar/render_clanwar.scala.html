@@ -1,0 +1,30 @@
+@import clans.ClanwarMeta
+@(clanwar: ClanwarMeta, showPlayers: Boolean)
+@defining(s"/clanwar/?id=${clanwar.id}") { url =>
+
+    <article class="GameCard game clanwar" style="background-image: url('http://woop.ac:81/html/assets/clanwar.png')">
+        <div class="w">
+            <header>
+                <h2>
+                    <a href="@url">
+                        <time is="local-time" datetime="@clanwar.id" weekday="short" year="numeric" month="short" day="numeric">
+                        @clanwar.id
+                        </time>
+                    </a>
+                    @if(!clanwar.completed) {
+                    <a class="lcw" title="Incomplete clanwar" href="/questions/#completed-clanwar"><i class="fa fa-exclamation"></i></a>
+                    }
+                </h2>
+            </header>
+
+            <div class="teams">
+                @clanwar.conclusion.teams.map { team =>
+                    @views.html.clanwar.render_clanwar_team(team, showPlayers)
+                }
+            </div>
+        </div>
+
+    </article>
+<?php
+
+} ?>

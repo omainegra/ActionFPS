@@ -1,0 +1,38 @@
+@import views.rendergame.MixedGame
+@import clans.CompleteClanwar
+@import clans.ClanwarMeta
+@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[ClanwarMeta])
+<div id="live-events">
+    <ol class="LiveEvents live-events">
+        @events.take(7).map { event =>
+            <li><a href="/player/?id=@event("user")">@event("text")</a>
+                <span> </span>
+                <span class="when">
+                    <time is="relative-time" datetime="@event("date")">@event("date")</time>
+                </span>
+            </li>
+        }
+    </ol>
+</div>
+
+<div id="games">
+
+    <div id="dynamic-games">
+
+    </div>
+
+    <div id="new-games"></div>
+    @latestClanwar.map { clanwar =>
+        <div id="latest-clanwar">@views.html.clanwar.render_clanwar(clanwar, false)</div>
+    }
+
+    <div id="existing-games">
+    @games.map { game =>
+        @views.html.rendergame.render_game(game)
+    }
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<script src="/assets/live/live.js"></script>

@@ -32,7 +32,7 @@ object Clanwar {
         implicit val ctww = Json.format[ClanwarTeam]
         Writes[Conclusion](con => Json.format[Conclusion].writes(con.named))
       }
-      val clanwarFormat: Writes[Clanwar] = Writes[Clanwar]{
+      val clanwarFormat: Writes[Clanwar] = Writes[Clanwar] {
         case cc: CompleteClanwar => Json.writes[CompleteClanwar].writes(cc)
         case tw: TwoGamesNoWinnerClanwar => Json.writes[TwoGamesNoWinnerClanwar].writes(tw)
         case nc: NewClanwar => Json.writes[NewClanwar].writes(nc)
@@ -49,6 +49,7 @@ object Clanwar {
 
 sealed trait Clanwar {
   def id: String = allGames.head.id
+
   def clans: Set[String]
 
   def meta: ClanwarMeta = ClanwarMeta(
@@ -87,6 +88,7 @@ sealed trait IncompleteClanwar extends Clanwar {
       tg.nextGame(jsonGame).map(Right.apply)
   }
 }
+
 case class TwoGamesNoWinnerClanwar(clans: Set[String], firstGame: JsonGame, secondGame: JsonGame) extends IncompleteClanwar {
   def nextGame(jsonGame: JsonGame): Option[CompleteClanwar] = {
     if (Clanwar.gamesAreCompatible(previousGame = secondGame, nextGame = jsonGame)) Option {
@@ -107,6 +109,7 @@ case class TwoGamesNoWinnerClanwar(clans: Set[String], firstGame: JsonGame, seco
 
 case class CompleteClanwar(winner: Option[String], clans: Set[String], scores: Map[String, Int], games: List[JsonGame]) extends Clanwar {
   def isTie = winner.isEmpty
+
   def loser = (clans -- winner.toSet).headOption
 }
 

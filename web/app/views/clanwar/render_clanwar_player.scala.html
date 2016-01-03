@@ -1,0 +1,15 @@
+@import clans.ClanwarPlayer
+@(player: ClanwarPlayer)
+<li>
+    <span class="score flags">@player.flags</span>
+    <span class="subscore frags">@player.frags</span>
+    <span class="name">
+        @player.user match {
+            case Some(user) => { <a href="/player/?id=@user">@player.name</a> }
+            case None => { @player.name }
+        }
+        @if(player.awards.contains("mvp")) {
+            <img src="http://woop.ac:81/html/assets/mvp.png" title="MVP" />
+        }
+    </span>
+</li>

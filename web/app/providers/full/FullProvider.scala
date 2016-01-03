@@ -21,8 +21,8 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext) {
   def getRecent =
     fullStuff.map(_.get().recentGames)
 
-  def events: Future[JsValue] = {
-    fullStuff.map(_.get().events).map(i => Json.toJson(i))
+  def events: Future[List[Map[String, String]]] = {
+    fullStuff.map(_.get().events)
   }
 
   def clanwars: Future[Clanwars] = {
