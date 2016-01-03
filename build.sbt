@@ -13,7 +13,6 @@ lazy val root =
     .aggregate(
       gameParser,
       achievements,
-      api,
       web,
       referenceReader,
       pingerClient,
@@ -26,7 +25,6 @@ lazy val root =
     ).dependsOn(
     achievements,
     gameParser,
-    api,
     web,
     referenceReader,
     pingerClient,
@@ -45,35 +43,6 @@ lazy val root =
         }
         extracted.append(newSettings, state)
       }
-    )
-
-/**
-  * API
-  *
-  */
-lazy val api =
-  Project(
-    id = "api",
-    base = file("api")
-  )
-    .enablePlugins(PlayScala)
-    .dependsOn(pingerClient)
-    .dependsOn(interParser)
-    .dependsOn(accumulation)
-    .settings(dontDocument)
-    .settings(
-      libraryDependencies ++= akka("actor", "agent", "slf4j"),
-      libraryDependencies ++= Seq(
-        "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.6.3",
-        "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
-        "commons-io" % "commons-io" % "2.4",
-        filters,
-        ws
-      ),
-      mappings in Universal ++= (baseDirectory.value / "php" * "*" get).map { file =>
-        file -> ("php/" + file.getName)
-      },
-      scriptClasspath := Seq("*")
     )
 
 lazy val web =
