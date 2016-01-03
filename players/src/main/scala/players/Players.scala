@@ -144,15 +144,16 @@ case class PlayersStats(players: Map[String, PlayerStat]) {
     val delta = 2.0 * (elos(0) - elos(1)) / playersCount.toDouble
     val p = 1.0 / (1.0 + Math.pow(10, -delta / 400.0))
     val k = 40 * playersCount / 2.0
-    val modifier = if (game.isTie) 0.5 else 1.0
     val contribs = playerContributions(game)
     for {
       team <- game.teams
       isWin = game.winner.contains(team.name)
       player <- team.players
       user <- player.user
-      winFactor = if (isWin) 1 else -1
-      points = winFactor * k * (modifier - p)
+      firstTeam = game.teams.head == team
+      teamP = if(firstTeam) p else 1-p
+      modifier = if( game.isTie ) 0.5 else { if( isWin ) 1.0 else 0.0 }
+      points = k * (modifier - teamP)
       contribution <- contribs.get(user)
       eloAddition = if (points >= 0)
         (contribution * points)
@@ -162,7 +163,7 @@ case class PlayersStats(players: Map[String, PlayerStat]) {
   }.toMap
 
   def includeGame(game: JsonGame): PlayersStats = {
-    val countElo = game.teams.forall(_.players.forall(_.score.isDefined))
+    val countElo = game.teams.forall(_.players.forall(_.score.isDefined)) && game.teams.head.players.size == game.teams.last.players.size
     if (countElo)
       includeBaseStats(game)
         .updatedElos(game)
