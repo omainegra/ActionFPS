@@ -94,7 +94,7 @@ class ClansController @Inject()(common: Common,
         Namer(id => clans.find(_.id == id).map(_.name))
       }
       import Clanwar.ImplicitFormats._
-      val cws = await(fullProvider.clanwars).all.toList.sortBy(_.id).reverse
+      val cws = await(fullProvider.clanwars).all.toList.sortBy(_.id).reverse.take(50)
       Ok(renderTemplate(None, false, None)(views.html.clanwars(cws.map(_.meta.named))))
     }
   }
