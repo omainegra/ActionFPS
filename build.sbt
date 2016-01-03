@@ -21,7 +21,6 @@ lazy val root =
       demoParser,
       syslogAc,
       accumulation,
-      phpClient,
       clans,
       players
     ).dependsOn(
@@ -35,7 +34,6 @@ lazy val root =
     demoParser,
     syslogAc,
     accumulation,
-    phpClient,
     clans,
     players
   )
@@ -62,7 +60,6 @@ lazy val api =
     .dependsOn(pingerClient)
     .dependsOn(interParser)
     .dependsOn(accumulation)
-    .dependsOn(phpClient)
     .settings(dontDocument)
     .settings(
       libraryDependencies ++= akka("actor", "agent", "slf4j"),
@@ -184,7 +181,6 @@ lazy val interParser =
     base = file("inter-parser")
   )
 
-
 lazy val referenceReader =
   Project(
     id = "reference-reader",
@@ -206,13 +202,6 @@ lazy val pingerClient =
       "joda-time" % "joda-time" % "2.9"
     )
   )
-
-
-/** *
-  *
-  * MASTER SERVER
-  *
-  */
 
 lazy val demoParser =
   Project(
@@ -258,19 +247,6 @@ lazy val accumulation =
     .dependsOn(referenceReader)
     .dependsOn(clans)
     .dependsOn(players)
-
-
-lazy val phpClient =
-  Project(
-    id = "php-client",
-    base = file("php-client")
-  )
-    .settings(
-      resolvers += Resolver.bintrayRepo("scalawilliam", "maven"),
-      libraryDependencies += "com.scalawilliam" %% "scala-fastcgi-client" % "0.3",
-      libraryDependencies += json
-    )
-
 
 lazy val clans =
   Project(
