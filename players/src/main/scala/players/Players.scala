@@ -74,15 +74,15 @@ case class PlayersStats(players: Map[String, PlayerStat]) {
     players = players.filter { case (k, v) => v.rank.isDefined }
   )
 
-  def teamsElo(jsonGame: JsonGame): Map[String, Double] = {
+  def teamsElo(jsonGame: JsonGame): List[Double] = {
     jsonGame.teams.map { team =>
-      team.name -> team.players.map {
+      team.players.map {
         player => player.user
           .flatMap(players.get)
           .map(_.elo)
           .getOrElse(1000: Double)
       }.sum
-    }.toMap
+    }
   }
 
   def includeBaseStats(jsonGame: JsonGame): PlayersStats = {
@@ -140,7 +140,7 @@ case class PlayersStats(players: Map[String, PlayerStat]) {
 
   def eloAdditions(game: JsonGame): Map[String, Double] = {
     val playersCount = game.teams.map(_.players.size).sum
-    val elos: List[Double] = teamsElo(game).values.toList.sorted.reverse
+    val elos: List[Double] = teamsElo(game)
     val delta = 2.0 * (elos(0) - elos(1)) / playersCount.toDouble
     val p = 1.0 / (1.0 + Math.pow(10, -delta / 400.0))
     val k = 40 * playersCount / 2.0
