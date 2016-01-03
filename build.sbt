@@ -57,6 +57,8 @@ lazy val web =
     .enablePlugins(BuildInfoPlugin)
     .settings(dontDocument)
     .settings(
+      libraryDependencies += "org.jsoup" % "jsoup" % "1.8.3",
+      libraryDependencies += "org.codehaus.groovy" % "groovy-all" % "2.4.5",
       libraryDependencies += "com.hazelcast" % "hazelcast-client" % "3.6-EA3",
       libraryDependencies += "org.postgresql" % "postgresql" % "9.4.1207",
       libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test",

@@ -1,0 +1,26 @@
+@import acleague.enrichers.JsonGameTeam
+@import acleague.enrichers.JsonGamePlayer
+@(team: JsonGameTeam, teamSpectators: Option[List[JsonGamePlayer]])
+<div class="@team.name team">
+    <div class="team-header">
+        <h3><img src="http://woop.ac/assets/@(team.name.toLowerCase() + ".png")"/></h3>
+        <div class="result">
+            @team.flags.map { flags =>
+                <span class="score">@flags</span>
+            }
+            <span class="subscore">@team.frags</span>
+        </div>
+    </div>
+    <div class="players">
+        <ol>
+            @team.players.map { player =>
+                @render_game_team_player(player, false)
+            }
+            @teamSpectators.map { spectators =>
+                @spectators.map { spectator =>
+                    @render_game_team_player(spectator, true)
+                }
+            }
+        </ol>
+    </div>
+</div>

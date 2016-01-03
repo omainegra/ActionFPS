@@ -5,13 +5,14 @@ import javax.inject._
 import clans.Clanwar
 import clans.Conclusion.Namer
 import play.api.Configuration
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import providers.full.FullProvider
 import providers.games.NewGamesProvider
 import providers.ReferenceProvider
 import services.PingerService
+import views.rendergame.MixedGame
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -36,15 +37,10 @@ class GamesController @Inject()(common: Common,
         val clans = await(referenceProvider.clans)
         Namer(id => clans.find(_.id == id).map(_.name))
       }
-      val games = await(fullProvider.getRecent)
+      val games = await(fullProvider.getRecent).map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
       val latestClanwar = await(fullProvider.clanwars).complete.toList.sortBy(_.id).lastOption
-      await(renderJson("/")(
-        Map(
-          "games" -> Json.toJson(games.map(_.toJson)),
-          "events" -> events
-        ) ++ latestClanwar.map(lc => "latestClanwar" -> Json.toJson(latestClanwar)).toMap
-      ))
+      Ok(renderTemplate(None, true, None)(views.html.index(games = games, events = events)))
     }
   }
 

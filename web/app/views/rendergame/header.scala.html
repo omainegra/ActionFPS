@@ -1,0 +1,29 @@
+@import acleague.enrichers.JsonGame
+@import views.rendergame.MixedGame
+@(mixedGame: MixedGame, game: JsonGame)
+<header>
+    <h2>
+        <a href=@mixedGame.url>
+            @mixedGame.heading
+            @if(mixedGame.now.isEmpty) {
+                <time is="relative-time" datetime=@game.endTime>@game.endTime</time>
+            }
+        </a>
+        @mixedGame.demoLink.map { demoLink =>
+            <a target="_blank" class="demo-link" href=@demoLink>demo</a>
+        }
+        @mixedGame.acLink.map { acink =>
+            <a class="server-link"
+            href=@acink>on @mixedGame.now.get.server</a>
+        }
+        @mixedGame.now.flatMap(_.minRemain).map { mins =>
+            @defining(
+                mins match {
+                    case 0 => "game finished"
+                    case 1 => "1 minute remains"
+                    case n => s"$n minutes remain"
+                }
+            ) { txt => <p class="time-remain">@txt</p> }
+        }
+    </h2>
+</header>
