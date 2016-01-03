@@ -81,9 +81,7 @@ class ClansController @Inject()(common: Common,
       }
       await(fullProvider.clanwars).all.find(_.id == id) match {
         case Some(clanwar) =>
-          await(renderJson("/clanwar.php")(
-            Map("clanwar" -> Json.toJson(clanwar))
-          ))
+          Ok(renderTemplate(None, false, None)(views.html.clanwar.clanwar(clanwarMeta = clanwar.meta.named, showPlayers = true, showGames = true)))
         case None => NotFound("Clanwar could not be found")
       }
     }
@@ -97,9 +95,7 @@ class ClansController @Inject()(common: Common,
       }
       import Clanwar.ImplicitFormats._
       val cws = await(fullProvider.clanwars).all.toList.sortBy(_.id).reverse
-      await(renderJson("/clanwars.php")(
-        Map("clanwars" -> Json.toJson(cws))
-      ))
+      Ok(renderTemplate(None, false, None)(views.html.clanwars(cws.map(_.meta.named))))
     }
   }
 

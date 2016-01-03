@@ -102,13 +102,16 @@ object Conclusion {
   }
 }
 
-
 case class ClanwarMeta(id: String,
                        conclusion: Conclusion,
                        endTime: ZonedDateTime,
                        completed: Boolean,
                        teamSize: Int,
-                       games: List[JsonGame])
+                       games: List[JsonGame]) {
+  def named(implicit namer: Conclusion.Namer) = copy(
+    conclusion = conclusion.named
+  )
+}
 
 
 

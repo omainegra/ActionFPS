@@ -1,5 +1,7 @@
 @import views.rendergame.MixedGame
-@(games: List[MixedGame], events: List[Map[String, String]])
+@import clans.CompleteClanwar
+@import clans.ClanwarMeta
+@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[ClanwarMeta])
 <div id="live-events">
     <ol class="LiveEvents live-events">
         @events.take(7).map { event =>
@@ -20,8 +22,9 @@
     </div>
 
     <div id="new-games"></div>
-
-    <div id="latest-clanwar"><?php render_war($latest_clanwar, false, true); ?></div>
+    @latestClanwar.map { clanwar =>
+        <div id="latest-clanwar">@views.html.clanwar.render_clanwar(clanwar, false)</div>
+    }
 
     <div id="existing-games">
     @games.map { game =>

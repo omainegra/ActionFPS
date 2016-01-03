@@ -24,17 +24,19 @@ class Common @Inject()(configuration: Configuration)(implicit wsClient: WSClient
                                                      executionContext: ExecutionContext) {
 
 
-  def renderTemplate(title: Option[String], supportsJson: Boolean, login: Option[(String, String)])(html: Html) = {
+  def renderTemplate(title: Option[String], supportsJson: Boolean, login: Option[(String, String)])(html: Html)
+                    (implicit requestHeader: RequestHeader) = {
     import org.jsoup.Jsoup
     val js = Jsoup.parse(new File("web/dist/www/template.html"), "UTF-8")
     title.foreach(js.title)
-    if ( supportsJson ) {
+    if (supportsJson) {
       js.select("#content").attr("data-has-json", "has-json")
     }
-    login.foreach{ case (id, name) =>
-      js.select("#log-in").`val`(name)
-      js.select("#log-in").attr("href", s"/player/?id=$id")
-      js.select("#download-ac-button").remove()
+    PartialFunction.condOpt(requestHeader.cookies.get("af_id").map(_.value) -> requestHeader.cookies.get("af_name").map(_.value)) {
+      case (Some(id), Some(name)) =>
+        js.select("#log-in").first().text(name)
+        js.select("#log-in").attr("href", s"/player/?id=$id")
+        js.select("#download-ac-button").remove()
     }
     js.select("#content").html(html.body)
     Html(js.toString)
@@ -64,13 +66,14 @@ class Common @Inject()(configuration: Configuration)(implicit wsClient: WSClient
         override def configure(templateClassLoader: ClassLoader, configuration: TemplateConfiguration): Unit = {
 
         }
+
         override def resolveTemplate(templatePath: String): URL =
           new File(s"web/dist/www$templatePath").toURI.toURL
       }
       val engine = new MarkupTemplateEngine(getClass.getClassLoader, config, tr)
       val template = engine.createTemplate(engine.resolveTemplate("/index.groovy"))
       val model = new java.util.HashMap[String, Any]()
-      for { (k, v) <- map } model.put(k, new JsonSlurper().parseText(v.toString()))
+      for {(k, v) <- map} model.put(k, new JsonSlurper().parseText(v.toString()))
       val output = template.make(model)
       val sw = new StringWriter()
       output.writeTo(sw)

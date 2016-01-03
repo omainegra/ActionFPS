@@ -1,0 +1,11 @@
+@import clans.ClanwarMeta
+@import views.rendergame.MixedGame
+@(clanwarMeta: ClanwarMeta, showPlayers: Boolean, showGames: Boolean)
+<div id="game">
+    @views.html.clanwar.render_clanwar(clanwarMeta, showPlayers)
+    @if(showGames) {
+        @clanwarMeta.games.map { game =>
+            @views.html.rendergame.render_game(MixedGame.fromJsonGame(game))
+        }
+    }
+</div>
