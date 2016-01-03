@@ -27,7 +27,11 @@ class Common @Inject()(configuration: Configuration)(implicit wsClient: WSClient
   def renderTemplate(title: Option[String], supportsJson: Boolean, login: Option[(String, String)])(html: Html)
                     (implicit requestHeader: RequestHeader) = {
     import org.jsoup.Jsoup
-    val js = Jsoup.parse(new File("web/dist/www/template.html"), "UTF-8")
+    var f = new File("web/dist/www/template.html")
+    if ( !f.exists()) {
+      f = new File("www/template.html")
+    }
+    val js = Jsoup.parse(f, "UTF-8")
     title.foreach(js.title)
     if (supportsJson) {
       js.select("#content").attr("data-has-json", "has-json")
