@@ -51,7 +51,7 @@ case class FullIterator
                 user = map("user"),
                 text = map("text")
               ))
-          }.filter(_.nonEmpty)
+          }.map(_.distinct).filter(_.nonEmpty)
         )
     }
     val ncw = clanwars.includeFlowing(richGame)
