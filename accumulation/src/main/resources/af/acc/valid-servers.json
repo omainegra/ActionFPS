@@ -79,6 +79,26 @@
     "name": "ny 2222",
     "timezone": "UTC"
   },
+  "88.150.168.125 weed-lounge AssaultCube[local#1111]": {
+    "name": "uk 1111",
+    "timezone": "Europe/Paris"
+  },
+  "88.150.168.125 weed-lounge AssaultCube[local#2222]": {
+    "name": "uk 2222",
+    "timezone": "Europe/Paris"
+  },
+  "153.92.126.156 weed-lounge AssaultCube[local#1111]": {
+    "name": "se 1111",
+    "timezone": "America/New_York"
+  },
+  "153.92.126.156 weed-lounge AssaultCube[local#2222]": {
+    "name": "se 2222",
+    "timezone": "America/New_York"
+  },
+  "153.92.126.156 weed-lounge AssaultCube[local#3333]": {
+    "name": "se 3333",
+    "timezone": "America/New_York"
+  },
   "104.255.33.235 la AssaultCube[local#1111]": {
     "name": "la 1111",
     "timezone": "America/New_York"
