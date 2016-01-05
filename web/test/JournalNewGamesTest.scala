@@ -59,7 +59,7 @@ class JournalNewGamesTest
       b.foreach(l => fw2.write(s"$l\n"))
       fw2.flush()
       fw2.close()
-      Thread.sleep(2500)
+      Thread.sleep(5500)
       calls mustEqual 1
       Await.result(js.games, 20.seconds) must have size 2
     }
