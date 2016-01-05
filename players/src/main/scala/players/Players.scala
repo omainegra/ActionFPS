@@ -162,9 +162,12 @@ case class PlayersStats(players: Map[String, PlayerStat]) {
     } yield user -> eloAddition
   }.toMap
 
+  def countElo(game: JsonGame): Boolean = {
+    game.teams.forall(_.players.forall(_.score.isDefined)) && game.teams.head.players.size == game.teams.last.players.size
+  }
+
   def includeGame(game: JsonGame): PlayersStats = {
-    val countElo = game.teams.forall(_.players.forall(_.score.isDefined)) && game.teams.head.players.size == game.teams.last.players.size
-    if (countElo)
+    if (countElo(game))
       includeBaseStats(game)
         .updatedElos(game)
         .updatedRanks
