@@ -5,6 +5,7 @@ require "render_game.inc.php";
 
 
 $user = json_decode($_POST['player'], true);
+$stats = json_decode($_POST['stats'], true);
 $achievements = $user['achievements'];
 
 function capture_master($maps) {
@@ -149,6 +150,14 @@ function none_achievement($achievement)
                         <th>Games played</th><td><?php echo $user['stats']['gamesPlayed']; ?></td>
                         <th>Frags</th><td><?php echo $user['stats']['frags']; ?></td>
                     </tr>
+                    
+                    <?php if($stats['user']) { ?>
+                    <tr>
+                        <th>Elo Rank</th><td><?php echo $stats['rank']; ?></td>
+                        <th>Elo Score</th><td><?php echo round($stats['elo']); ?></td>
+                    </tr>
+                    <?php } ?>
+
                 </table>
             </div>
         <div class="achievements">
