@@ -22,13 +22,13 @@ object ServerRecord {
         hostname <- Option(rec.get(1)).filter(_.nonEmpty)
         port <- Try(rec.get(2).toInt).toOption
         kind <- Option(rec.get(3)).filter(_.nonEmpty)
-        password <- Option(rec.get(4))
+        password = Option(rec.get(4)).filter(_.nonEmpty)
       } yield ServerRecord(
         region = region,
         hostname = hostname,
         port = port,
         kind = kind,
-        password = Option(password)
+        password = password
       )
     }.toList
 

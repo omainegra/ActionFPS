@@ -1,5 +1,4 @@
-@import clans.ClanwarMeta
-@(clanwars: List[ClanwarMeta])
+@(clanwars: List[_root_.clans.ClanwarMeta])
 @clanwars.map { clanwar =>
     @views.html.clanwar.clanwar(clanwar, false, false)
 }

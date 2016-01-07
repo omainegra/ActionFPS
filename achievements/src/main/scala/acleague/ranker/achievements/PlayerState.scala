@@ -4,7 +4,7 @@ import java.time.ZonedDateTime
 
 import acleague.enrichers.{JsonGamePlayer, JsonGameTeam, JsonGame}
 import acleague.ranker.achievements.immutable._
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.{Writes, Json, JsObject}
 
 case class PlayerState(combined: NotAchievedAchievements,
                        playerStatistics: PlayerStatistics, events: Vector[(String, String)], achieved: Vector[(String, immutable.CompletedAchievement)]) {
@@ -33,8 +33,8 @@ case class PlayerState(combined: NotAchievedAchievements,
           title = achievement.title,
           description = achievement.description,
           at = date,
-          extra = PartialFunction.condOpt(achievement) {
-            case captureMaster: CaptureMaster => captureMaster.jsonTable
+          captureMaster = PartialFunction.condOpt(achievement) {
+            case captureMaster: CaptureMaster => captureMaster
           }
         )
       }.toList,
@@ -44,8 +44,8 @@ case class PlayerState(combined: NotAchievedAchievements,
             title = partial.title,
             percent = partial.progress,
             description = partial.description,
-            extra = PartialFunction.condOpt(partial) {
-              case captureMaster: CaptureMaster => captureMaster.jsonTable
+            captureMaster = PartialFunction.condOpt(partial) {
+              case captureMaster: CaptureMaster => captureMaster
             }
           )
       }.sortBy(_.percent).reverse,
@@ -74,15 +74,16 @@ case class AchievementsRepresentation(completedAchievements: List[CompletedAchie
                                       partialAchievements: List[PartialAchievement],
                                       switchNotAchieveds: List[SwitchNotAchieved])
 
-case class CompletedAchievement(title: String, description: String, at: String, extra: Option[JsObject])
+case class CompletedAchievement(title: String, description: String, at: String, captureMaster: Option[CaptureMaster])
 
-case class PartialAchievement(title: String, description: String, percent: Int, extra: Option[JsObject])
+case class PartialAchievement(title: String, description: String, percent: Int, captureMaster: Option[CaptureMaster])
 
 case class SwitchNotAchieved(title: String, description: String)
 
 object Jsons {
-  implicit val caFormats = Json.format[CompletedAchievement]
-  implicit val paFormats = Json.format[PartialAchievement]
-  implicit val saFormats = Json.format[SwitchNotAchieved]
-  implicit val arFormats = Json.format[AchievementsRepresentation]
+  implicit val captureMasterWriter = Writes[CaptureMaster](_.jsonTable)
+  implicit val caFormats = Json.writes[CompletedAchievement]
+  implicit val paFormats = Json.writes[PartialAchievement]
+  implicit val saFormats = Json.writes[SwitchNotAchieved]
+  implicit val arFormats = Json.writes[AchievementsRepresentation]
 }

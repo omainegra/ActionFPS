@@ -1,7 +1,5 @@
 @import views.rendergame.MixedGame
-@import clans.CompleteClanwar
-@import clans.ClanwarMeta
-@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[ClanwarMeta])
+@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[_root_.clans.ClanwarMeta])
 <div id="live-events">
     <ol class="LiveEvents live-events">
         @events.take(7).map { event =>

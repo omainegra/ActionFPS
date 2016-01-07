@@ -31,6 +31,9 @@ class Common @Inject()(configuration: Configuration)(implicit wsClient: WSClient
     if ( !f.exists()) {
       f = new File("www/template.html")
     }
+    if ( !f.exists() ) {
+      f = new File("dist/www/template.html")
+    }
     val js = Jsoup.parse(f, "UTF-8")
     title.foreach(js.title)
     if (supportsJson) {

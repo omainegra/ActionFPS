@@ -1,0 +1,26 @@
+@(servers: List[af.rr.ServerRecord])
+<article id="servers">
+    <h2>AssaultCube</h2>
+    @servers.groupBy(_.region).toList.sortBy(_._1).map { sr =>
+        <h3>@sr._1</h3>
+        <ul>
+        @sr._2.sortBy(s => (s.hostname, s.port)).map { server =>
+            @defining({
+                val pwdBit = server.password.filter(_.nonEmpty).map { password => s"?password=$password" }
+                s"assaultcube://${server.hostname}:${server.port}${pwdBit.getOrElse("")}"
+            }) { url =>
+                <li><a href="@url">
+                @defining(s"${server.hostname} ${server.port}") { name => @name }
+                </a>
+                    @if(server.kind != "Standard") {
+                        (@server.kind)
+                    }
+                </li>
+            }
+
+        }
+        </ul>
+    }
+
+</article>
+

@@ -7,6 +7,23 @@ import play.api.libs.json.Json
   * Created by William on 11/11/2015.
   */
 case class PlayerStatistics(playedGames: List[String], flags: Int, frags: Int, timePlayed: Int, gamesPlayed: Int) {
+  def timePlayedStr = {
+    timePlayed / 60 match {
+      case 0 => "not enough"
+      case tp =>
+        val days = tp / 24 match {
+          case 0 => ""
+          case 1 => "1 day, "
+          case n => s"$n days, "
+        }
+        val hours = tp % 24 match {
+          case 0 => ""
+          case 1 => "1 hour"
+          case n => s"$n hours"
+        }
+        s"$days$hours"
+    }
+  }
   def processGame(jsonGame: JsonGame, jsonGamePlayer: JsonGamePlayer): PlayerStatistics = {
     copy(
       playedGames = playedGames :+ jsonGame.id,

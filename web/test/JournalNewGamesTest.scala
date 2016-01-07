@@ -30,7 +30,8 @@ class JournalNewGamesTest
   }
 
   "Journal new games" should {
-    "Fire off new games" in {
+    /** No need to run it all the time **/
+    "Fire off new games" ignore {
       val fw = new FileWriter(tmpFile, false)
       val (a, b) = getGamesLines
       val fg = a.scanLeft(MultipleServerParser.empty)(_.process(_))

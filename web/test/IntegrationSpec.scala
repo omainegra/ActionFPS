@@ -9,8 +9,8 @@ import play.api.mvc.Results
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 
-@RequiresPHP
-class PhpIntegrationSpec
+//@RequiresPHP
+class IntegrationSpec
   extends PlaySpec
   with OneServerPerSuite
   with ScalaFutures

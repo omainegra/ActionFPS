@@ -25,9 +25,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
   def players = Action.async { implicit request =>
     async {
       val players = await(referenceProvider.users)
-      await(renderJson("/players.php")(
-        Map("players" -> Json.toJson(players)
-      )))
+      Ok(renderTemplate(None, false, None)(views.html.players(players)))
     }
   }
 
@@ -35,26 +33,15 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     async {
       import _root_.players.PlayersStats.ImplicitWrites._
       val ranks = await(fullProvider.playerRanks).onlyRanked
-      await(renderJson("/playerranks.php")(Map(
-        "ranks" -> Json.toJson(ranks)
-      )))
+      Ok(renderTemplate(None, false, None)(views.html.player_ranks(ranks)))
     }
   }
 
   def player(id: String) = Action.async { implicit request =>
     async {
-      import _root_.players.PlayerStat
-      import _root_.players.PlayersStat.ImplicitWrites._
-      val rank = await(fullProvider.playerRanks).onlyRanked.players.get(id)
       await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>
-          val jsonMap = rank match {
-            case Some(actualRank) =>
-              Map("player"-> player.toJson, "rank" -> Json.toJson(actualRank));
-            case None =>
-              Map("player"-> player.toJson)
-          }
-          await(renderJsonWR("/player.php")(_.withQueryString("id" -> id))(jsonMap))
+          Ok(renderTemplate(None, false, None)(views.html.player.player(player)))
         case None =>
           NotFound("Player could not be found")
       }

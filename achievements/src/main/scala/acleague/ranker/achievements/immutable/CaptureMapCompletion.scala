@@ -17,6 +17,7 @@ sealed trait CaptureMapCompletion {
     "cla" -> JsString(s"$cla/${CaptureMapCompletion.targetPerSide}"),
     "rvsf" -> JsString(s"$rvsf/${CaptureMapCompletion.targetPerSide}")
   ))
+  val targetPerSide = CaptureMapCompletion.targetPerSide
 }
 object CaptureMapCompletion {
   val targetPerSide = 3
@@ -26,6 +27,7 @@ object CaptureMapCompletion {
     override def rvsf: Int = targetPerSide
   }
   case class Achieving(map: String, cla: Int, rvsf: Int) extends CaptureMapCompletion {
+
     def include(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer): Option[Either[Achieving, Achieved]] = {
       if ( jsonGame.mode == "ctf" && jsonGame.map.equalsIgnoreCase(map) ) {
         val incrementedTeams =

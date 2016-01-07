@@ -1,6 +1,5 @@
-@import clans.ClanwarMeta
 @import views.rendergame.MixedGame
-@(clanwarMeta: ClanwarMeta, showPlayers: Boolean, showGames: Boolean)
+@(clanwarMeta: _root_.clans.ClanwarMeta, showPlayers: Boolean, showGames: Boolean)
 <div id="game">
     @views.html.clanwar.render_clanwar(clanwarMeta, showPlayers)
     @if(showGames) {

@@ -4,6 +4,8 @@ import acleague.enrichers.JsonGame
 import acleague.ranker.achievements.immutable.PlayerStatistics
 import acleague.ranker.achievements.{Jsons, PlayerState}
 import clans.{CompleteClanwar, Clanstats, Clanwars}
+import players.PlayerStat
+import players.PlayersStat.ImplicitWrites._
 import play.api.libs.json.{JsObject, Json}
 import players.PlayersStats
 
@@ -93,16 +95,18 @@ case class FullIterator
         .collect { case (_, game) if game.hasUser(user.id) => game }
         .toList.sortBy(_.id).takeRight(7).reverse
       val achievements = achievementsIterator.map.get(id)
-      FullProfile(user, recentGames, achievements)
+      val rank = playersStats.onlyRanked.players.get(id)
+      FullProfile(user, recentGames, achievements, rank)
     }
 
 }
 
-case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState]) {
+case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState], rank: Option[PlayerStat]) {
   def toJson = {
     import Jsons._
     import PlayerStatistics.fmts
     import User.WithoutEmailFormat.noEmailUserWrite
+      
     var jsObject = Json.toJson(user).asInstanceOf[JsObject]
     jsObject = jsObject.deepMerge(JsObject(Map("recent-games" -> Json.toJson(recentGames.map(_.toJson)))))
     achievements.foreach { playerState =>
@@ -112,6 +116,12 @@ case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Op
       ))
       jsObject = jsObject.deepMerge(no)
     }
+    
+    rank match {
+        case Some(actualRank) => jsObject ++ JsObject(Map("rank" -> Json.toJson(actualRank)))
+        case None => 
+    }
+        
     jsObject
   }
 }

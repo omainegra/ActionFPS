@@ -35,10 +35,8 @@ class ClansController @Inject()(common: Common,
         Namer(id => clans.find(_.id == id).map(_.name))
       }
 
-      val stats = await(fullProvider.clanstats).onlyRanked
-      await(renderJson("/rankings.php")(
-        Map("rankings" -> Json.toJson(stats)
-        )))
+      val stats = await(fullProvider.clanstats).onlyRanked.named
+      Ok(renderTemplate(None, false, None)(views.html.clan_rankings(stats)))
     }
   }
 
@@ -62,13 +60,9 @@ class ClansController @Inject()(common: Common,
 
       await(referenceProvider.clans).find(_.id == id) match {
         case Some(clan) =>
-          await(renderJson("/clan.php")(
-            Map("clan" -> Json.toJson(clan),
-              "clanwars" -> Json.toJson(ccw)
-
-            ) ++ st.map(stt => "stats" -> Json.toJson(stt))
-          ))
-        case None => NotFound("Clan could not be found")
+          Ok(renderTemplate(None, false, None)(views.html.clan(clan, ccw, st)))
+        case None =>
+          NotFound("Clan could not be found")
       }
     }
   }
@@ -102,9 +96,7 @@ class ClansController @Inject()(common: Common,
   def clans = Action.async { implicit request =>
     async {
       val clans = await(referenceProvider.clans)
-      await(renderJson("/clans.php")(
-        Map("clans" -> Json.toJson(clans)
-      )))
+      Ok(renderTemplate(None, false, None)(views.html.clans(clans)))
     }
   }
 
