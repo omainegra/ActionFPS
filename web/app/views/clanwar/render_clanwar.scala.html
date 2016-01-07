@@ -11,16 +11,17 @@
                         </time>
                     </a>
                     @if(!clanwar.completed) {
-                    <a class="lcw" title="Incomplete clanwar" href="/questions/#completed-clanwar"><i class="fa fa-exclamation"></i></a>
+                        <a class="lcw" title="Incomplete clanwar" href="/questions/#completed-clanwar"><i class="fa fa-exclamation"></i></a>
                     }
                 </h2>
             </header>
 
             <div class="teams">
-                @clanwar.conclusion.teams.map { team =>
-                    @views.html.clanwar.render_clanwar_team(team, showPlayers)
-                }
+            @clanwar.conclusion.teams.map { team =>
+                @views.html.clanwar.render_clanwar_team(team, showPlayers)
+            }
             </div>
         </div>
 
     </article>
+}
