@@ -1,5 +1,4 @@
-@import clans.ClanwarTeam
-@(team: ClanwarTeam, showPlayers: Boolean)
+@(team: _root_.clans.ClanwarTeam, showPlayers: Boolean)
 <div class="team">
     <div class="team-header">
         @defining(s"/clan/?id=${team.clan}") { url =>

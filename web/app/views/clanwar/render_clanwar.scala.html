@@ -1,5 +1,4 @@
-@import clans.ClanwarMeta
-@(clanwar: ClanwarMeta, showPlayers: Boolean)
+@(clanwar: _root_.clans.ClanwarMeta, showPlayers: Boolean)
 @defining(s"/clanwar/?id=${clanwar.id}") { url =>
 
     <article class="GameCard game clanwar" style="background-image: url('http://woop.ac:81/html/assets/clanwar.png')">
