@@ -78,7 +78,7 @@ lazy val web =
       ),
       (run in Compile) <<= (run in Compile).dependsOn(startHazelcast),
       startHazelcast := {
-        println("Starting hazelcast in dev mode...")
+        streams.value.log.info("Starting hazelcast in dev mode...")
         val cfg = new com.hazelcast.config.Config()
         cfg.setInstanceName("web")
         Hazelcast.getOrCreateHazelcastInstance(cfg)
