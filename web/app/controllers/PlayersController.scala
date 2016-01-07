@@ -25,9 +25,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
   def players = Action.async { implicit request =>
     async {
       val players = await(referenceProvider.users)
-      await(renderJson("/players.php")(
-        Map("players" -> Json.toJson(players)
-      )))
+      Ok(renderTemplate(None, false, None)(views.html.players(players)))
     }
   }
 
