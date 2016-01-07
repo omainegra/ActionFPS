@@ -5,7 +5,7 @@ require "render_game.inc.php";
 
 
 $user = json_decode($_POST['player'], true);
-$stats = json_decode($_POST['stats'], true);
+$rank = isset($_POST['rank']) ? json_decode($_POST['rank'], true) : null;
 $achievements = $user['achievements'];
 
 function capture_master($maps) {
@@ -151,10 +151,10 @@ function none_achievement($achievement)
                         <th>Frags</th><td><?php echo $user['stats']['frags']; ?></td>
                     </tr>
                     
-                    <?php if($stats['user']) { ?>
+                    <?php if($rank) { ?>
                     <tr>
-                        <th>Elo Rank</th><td><?php echo $stats['rank']; ?></td>
-                        <th>Elo Score</th><td><?php echo round($stats['elo']); ?></td>
+                        <th>Elo Rank</th><td><?php echo $rank['rank']; ?></td>
+                        <th>Elo Score</th><td><?php echo round($rank['elo']); ?></td>
                     </tr>
                     <?php } ?>
 
