@@ -36,10 +36,9 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
 
   def servers = Action.async { implicit request =>
     async {
-      val got = Json.toJson(await(referenceProvider.servers))
-      await(renderPhp("/servers.php")(_.post(
-        Map("servers" -> Seq(got.toString()))
-      )))
+      val got = await(referenceProvider.servers)
+
+      Ok(renderTemplate(None, false, None)(views.html.servers(got)))
     }
   }
 
