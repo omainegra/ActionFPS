@@ -1,0 +1,12 @@
+@(clans: List[af.Clan])
+<article id="clans">
+    <ol>
+        @clans.map { clan =>
+            <li>
+                <a href="/clan/@clan.id" title="@clan.fullName">
+                @views.html.clan_logo(clan.id)
+                </a>
+            </li>
+        }
+    </ol>
+</article>

@@ -98,9 +98,7 @@ class ClansController @Inject()(common: Common,
   def clans = Action.async { implicit request =>
     async {
       val clans = await(referenceProvider.clans)
-      await(renderJson("/clans.php")(
-        Map("clans" -> Json.toJson(clans)
-      )))
+      Ok(renderTemplate(None, false, None)(views.html.clans(clans)))
     }
   }
 
