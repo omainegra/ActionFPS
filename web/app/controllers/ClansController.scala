@@ -35,10 +35,8 @@ class ClansController @Inject()(common: Common,
         Namer(id => clans.find(_.id == id).map(_.name))
       }
 
-      val stats = await(fullProvider.clanstats).onlyRanked
-      await(renderJson("/rankings.php")(
-        Map("rankings" -> Json.toJson(stats)
-        )))
+      val stats = await(fullProvider.clanstats).onlyRanked.named
+      Ok(renderTemplate(None, false, None)(views.html.clan_rankings(stats)))
     }
   }
 
