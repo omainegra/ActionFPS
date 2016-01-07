@@ -62,13 +62,9 @@ class ClansController @Inject()(common: Common,
 
       await(referenceProvider.clans).find(_.id == id) match {
         case Some(clan) =>
-          await(renderJson("/clan.php")(
-            Map("clan" -> Json.toJson(clan),
-              "clanwars" -> Json.toJson(ccw)
-
-            ) ++ st.map(stt => "stats" -> Json.toJson(stt))
-          ))
-        case None => NotFound("Clan could not be found")
+          Ok(renderTemplate(None, false, None)(views.html.clan(clan, ccw, st)))
+        case None =>
+          NotFound("Clan could not be found")
       }
     }
   }

@@ -1,0 +1,56 @@
+@import clans.Conclusion.Namer
+@(clan: af.Clan, wars: List[clans.Clanwar], stats: Option[clans.Clanstat])(implicit namer: Namer)
+<article id="profile">
+    <div class="profile">
+        <div class="clan-header">
+            @views.html.clan_logo(clan.id)
+        <h1>@clan.fullName</h1>
+            @clan.website.map { website =>
+                - <a href="@website" target="_blank">Website</a>
+            }
+        </div>
+        @stats.map { stats =>
+        <div class="main-info">
+            <div class="basics">
+                <table class="basic-counts">
+                    <tr>
+                        <th>Clanwar wins</th><td>
+                        @stats.wins
+                        / @stats.wars</td>
+                        <th>Game wins</th><td>@stats.gameWins
+                        / @stats.games</td>
+                    </tr>
+                    <tr>
+                        <th>Flags</th><td>@stats.flags</td>
+                        <th>Frags</th><td>@stats.frags</td>
+                    </tr>
+                    @stats.rank match {
+                        case Some(rank) => {
+                            <tr>
+                                <th>Elo Rank</th> <td>@rank</td>
+                                <th>Elo Points</th> <td>@Math.round(stats.elo)</td>
+                            </tr>
+                        }
+                        case _ => {
+                            <tr>
+                                <th>Elo Rank</th> <td>Play more to get ranked</td>
+                            </tr>
+                            <?php
+                        }
+                    }
+                </table>
+            </div>
+        </div>
+        }
+    </div>
+    <div id="games">
+        <h3>Recent Wars</h3>
+        <ol class="recent-games">
+        @wars.map { war =>
+            <li>
+                @views.html.clanwar.compact(war, clan)
+            </li>
+        }
+        </ol>
+    </div>
+</article>
