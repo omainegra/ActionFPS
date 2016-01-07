@@ -10,7 +10,7 @@
                 </time>
                 @if(game.server.contains("aura")) {
                     @defining(s"http://woop.ac:81/find-demo.php?time=${game.id}&map=${game.map}") { demoLink =>
-                        <a target="_blank" class="demo-link" href="<?php echo htmlspecialchars($demo_link) ?>">demo</a>
+                        <a target="_blank" class="demo-link" href="@demoLink">demo</a>
                     }
                 }
             </a>
