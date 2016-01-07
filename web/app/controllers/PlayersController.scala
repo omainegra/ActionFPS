@@ -33,9 +33,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     async {
       import _root_.players.PlayersStats.ImplicitWrites._
       val ranks = await(fullProvider.playerRanks).onlyRanked
-      await(renderJson("/playerranks.php")(Map(
-        "ranks" -> Json.toJson(ranks)
-      )))
+      Ok(renderTemplate(None, false, None)(views.html.player_ranks(ranks)))
     }
   }
 
