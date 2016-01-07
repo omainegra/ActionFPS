@@ -1,0 +1,42 @@
+@import af.FullProfile
+@(fullProfile: FullProfile)
+<article id="profile">
+    <div class="profile">
+        <h1>@fullProfile.user.nickname.nickname</h1>
+        <div class="main-info">
+            <div class="basics">
+                <table class="basic-counts">
+                    <tr>
+                        <th>Time played</th>
+                        <td>@fullProfile.achievements.get.playerStatistics.timePlayedStr</td>
+                        <th>Flags</th><td>@fullProfile.achievements.get.playerStatistics.flags</td>
+
+                    </tr>
+                    <tr>
+                        <th>Games played</th><td>@fullProfile.achievements.get.playerStatistics.gamesPlayed</td>
+                        <th>Frags</th><td>@fullProfile.achievements.get.playerStatistics.frags</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="achievements">
+                <h3>Achievements</h3>
+
+                <div class="achievements">
+                    @fullProfile.achievements.get.buildAchievements.completedAchievements.map { achievement =>
+                        @views.html.player.completed_achievement(achievement)
+                    }
+                    @fullProfile.achievements.get.buildAchievements.partialAchievements.map { achievement =>
+                        @views.html.player.progress_achievement(achievement)
+                    }
+                    @fullProfile.achievements.get.buildAchievements.switchNotAchieveds.map { achievement =>
+                        @views.html.player.none_achievement(achievement)
+                    }
+                </div>
+            </div>
+            @views.html.player.recent_games(fullProfile.recentGames)
+        </div>
+
+    </div>
+
+</article>
+

@@ -41,9 +41,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     async {
       await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>
-          await(renderJsonWR("/player.php")(_.withQueryString("id" -> id))(
-            Map("player" -> player.toJson)
-          ))
+          Ok(renderTemplate(None, false, None)(views.html.player.player(player)))
         case None =>
           NotFound("Player could not be found")
       }
