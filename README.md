@@ -29,12 +29,6 @@ Install SBT: http://www.scala-sbt.org/download.html
 
 Install php7.0: https://bjornjohansen.no/upgrade-to-php7
 
-# Compiling
-
-```
-sbt clean test dist
-```
-
 # Running frontend
 
 ```
@@ -46,6 +40,12 @@ php -S localhost:8888
 
 ```
 sbt web/run
+
+```
+# Running tests
+
+```
+sbt clean test dist
 ```
 
 # Coding it
