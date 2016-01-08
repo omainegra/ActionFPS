@@ -4,7 +4,7 @@
         @clans.map { clan =>
             <li>
                 <a href="/clan/?id=@clan.id" title="@clan.fullName">
-                @views.html.clan_logo(clan.id)
+                @views.html.clan_logo(clan)
                 </a>
             </li>
         }

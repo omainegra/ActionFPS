@@ -1,8 +1,8 @@
-@(team: _root_.clans.ClanwarTeam, showPlayers: Boolean)
+@(team: _root_.clans.ClanwarTeam, clan: _root_.af.Clan, showPlayers: Boolean)
 <div class="team">
     <div class="team-header">
         @defining(s"/clan/?id=${team.clan}") { url =>
-            <h3><a href="@url">@views.html.clan_logo(team.clan)</a></h3>
+            <h3><a href="@url">@views.html.clan_logo(clan)</a></h3>
             <div class="result">
                 <span class="clan"><a href="@url">@team.name.getOrElse(team.clan)</a></span>
                 <span class="score">@team.score</span>

@@ -4,6 +4,7 @@ import javax.inject._
 
 import clans.Clanwar
 import clans.Conclusion.Namer
+import lib.Clanner
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.{JsString, Json}
@@ -39,6 +40,10 @@ class GamesController @Inject()(common: Common,
       implicit val namer = {
         val clans = await(referenceProvider.clans)
         Namer(id => clans.find(_.id == id).map(_.name))
+      }
+      implicit val clanner = {
+        val clans = await(referenceProvider.clans)
+        Clanner(id => clans.find(_.id == id))
       }
       val games = await(fullProvider.getRecent).map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
