@@ -32,16 +32,11 @@ Install php7.0: https://bjornjohansen.no/upgrade-to-php7
 # Running frontend
 
 ```
+sbt web/run
 cd web/dist/www
 php -S localhost:8888
 ```
 
-# Running backend
-
-```
-sbt web/run
-
-```
 # Running tests
 
 ```
