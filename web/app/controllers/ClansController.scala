@@ -95,8 +95,13 @@ class ClansController @Inject()(common: Common,
 
   def clans = Action.async { implicit request =>
     async {
-      val clans = await(referenceProvider.clans)
-      Ok(renderTemplate(None, false, None)(views.html.clans(clans)))
+      request.getQueryString("format") match {
+        case Some("csv") =>
+          Ok(await(referenceProvider.Clans.csv)).as("text/csv")
+        case _ =>
+          val clans = await(referenceProvider.clans)
+          Ok(renderTemplate(None, false, None)(views.html.clans(clans)))
+      }
     }
   }
 

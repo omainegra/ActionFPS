@@ -40,9 +40,9 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
   }
 
   object Clans {
-    def raw: Future[String] = fetch("clans")
+    def csv: Future[String] = fetch("clans")
 
-    def clans: Future[List[Clan]] = raw.map { bdy =>
+    def clans: Future[List[Clan]] = csv.map { bdy =>
       val sr = new StringReader(bdy)
       try af.rr.ClanRecord.parseRecords(sr).map(Clan.fromClanRecord)
       finally sr.close()

@@ -37,7 +37,7 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
   def servers = Action.async { implicit request =>
     async {
       request.getQueryString("format") match {
-        case Some("raw") =>
+        case Some("csv") =>
           Ok(await(referenceProvider.Servers.raw)).as("text/csv")
         case _ =>
           val got = await(referenceProvider.servers)
