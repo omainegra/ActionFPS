@@ -5,6 +5,7 @@ import javax.inject.{Inject, Singleton}
 import acleague.enrichers.JsonGame
 import akka.agent.Agent
 import controllers.Common
+import play.api.Configuration
 import play.api.libs.json.{JsArray, JsValue}
 import play.api.libs.ws.WSClient
 
@@ -18,13 +19,13 @@ import scala.concurrent.{ExecutionContext, Future}
   * TODO caching / indexing
   */
 @Singleton
-class ApiAllGamesProvider @Inject()(common: Common)
+class ApiAllGamesProvider @Inject()(configuration: Configuration)
                                    (implicit executionContext: ExecutionContext,
                                     wSClient: WSClient) extends GamesProvider {
 
-  import common.apiPath
+  def allPath = configuration.underlying.getString("af.reference.games")
 
-  def fetchAllGames = wSClient.url(s"${apiPath}/all/").get().map(response =>
+  def fetchAllGames = wSClient.url(allPath).get().map(response =>
     response.body.split("\n").toIterator.map { line =>
       line.split("\t").toList match {
         case List(id, json) =>

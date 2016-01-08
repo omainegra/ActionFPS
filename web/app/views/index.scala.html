@@ -1,5 +1,6 @@
 @import views.rendergame.MixedGame
-@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[_root_.clans.ClanwarMeta])
+@import lib.Clanner
+@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[_root_.clans.ClanwarMeta])(implicit clanner: Clanner)
 <div id="live-events">
     <ol class="LiveEvents live-events">
         @events.take(7).map { event =>

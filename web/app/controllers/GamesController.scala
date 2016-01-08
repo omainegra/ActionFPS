@@ -4,10 +4,13 @@ import javax.inject._
 
 import clans.Clanwar
 import clans.Conclusion.Namer
+import lib.Clanner
 import play.api.Configuration
+import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
+import play.filters.gzip.{Gzip, GzipFilter}
 import providers.full.FullProvider
 import providers.games.NewGamesProvider
 import providers.ReferenceProvider
@@ -22,7 +25,8 @@ class GamesController @Inject()(common: Common,
                                 newGamesProvider: NewGamesProvider,
                                 pingerService: PingerService,
                                 referenceProvider: ReferenceProvider,
-                                fullProvider: FullProvider)
+                                fullProvider: FullProvider,
+                                gzipFilter: GzipFilter)
                                (implicit configuration: Configuration,
                                 executionContext: ExecutionContext,
                                 wSClient: WSClient) extends Controller {
@@ -36,6 +40,10 @@ class GamesController @Inject()(common: Common,
       implicit val namer = {
         val clans = await(referenceProvider.clans)
         Namer(id => clans.find(_.id == id).map(_.name))
+      }
+      implicit val clanner = {
+        val clans = await(referenceProvider.clans)
+        Clanner(id => clans.find(_.id == id))
       }
       val games = await(fullProvider.getRecent).map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
@@ -64,6 +72,19 @@ class GamesController @Inject()(common: Common,
     Ok.feed(
       content = newGamesProvider.newGamesEnum
     ).as("text/event-stream")
+  }
+
+  def all = Action.async {
+    async {
+      val allGames = await(fullProvider.allGames)
+      val enumerator = Enumerator
+        .enumerate(allGames)
+        .map(game => s"${game.id}\t${game.toJson}\n")
+      val gzEnum = enumerator.map(_.getBytes("UTF-8")).&>(Gzip.gzip(123))
+      Ok.chunked(gzEnum)
+        .as("text/tab-separated-values")
+        .withHeaders("Content-Encoding" -> "gzip")
+    }
   }
 
 }

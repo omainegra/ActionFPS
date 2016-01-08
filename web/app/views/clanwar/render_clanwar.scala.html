@@ -1,4 +1,4 @@
-@(clanwar: _root_.clans.ClanwarMeta, showPlayers: Boolean)
+@(clanwar: _root_.clans.ClanwarMeta, showPlayers: Boolean)(implicit clanner: _root_.lib.Clanner)
 @defining(s"/clanwar/?id=${clanwar.id}") { url =>
 
     <article class="GameCard game clanwar" style="background-image: url('http://woop.ac:81/html/assets/clanwar.png')">
@@ -17,8 +17,8 @@
             </header>
 
             <div class="teams">
-            @clanwar.conclusion.teams.map { team =>
-                @views.html.clanwar.render_clanwar_team(team, showPlayers)
+            @clanwar.conclusion.teams.flatMap(team => clanner.get(team.clan).map(c => team -> c)).map { case (team, clan) =>
+                @views.html.clanwar.render_clanwar_team(team, clan, showPlayers)
             }
             </div>
         </div>

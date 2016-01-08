@@ -10,6 +10,7 @@ import _root_.clans.Clanstats.ImplicitWrites._
 import clans.Clanwar
 import clans.Clanwar.ImplicitFormats._
 import clans.Conclusion.Namer
+import lib.Clanner
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -73,6 +74,10 @@ class ClansController @Inject()(common: Common,
         val clans = await(referenceProvider.clans)
         Namer(id => clans.find(_.id == id).map(_.name))
       }
+      implicit val clanner = {
+        val clans = await(referenceProvider.clans)
+        Clanner(id => clans.find(_.id == id))
+      }
       await(fullProvider.clanwars).all.find(_.id == id) match {
         case Some(clanwar) =>
           Ok(renderTemplate(None, false, None)(views.html.clanwar.clanwar(clanwarMeta = clanwar.meta.named, showPlayers = true, showGames = true)))
@@ -87,6 +92,10 @@ class ClansController @Inject()(common: Common,
         val clans = await(referenceProvider.clans)
         Namer(id => clans.find(_.id == id).map(_.name))
       }
+      implicit val clanner = {
+        val clans = await(referenceProvider.clans)
+        Clanner(id => clans.find(_.id == id))
+      }
       import Clanwar.ImplicitFormats._
       val cws = await(fullProvider.clanwars).all.toList.sortBy(_.id).reverse.take(50)
       Ok(renderTemplate(None, false, None)(views.html.clanwars(cws.map(_.meta.named))))
@@ -95,8 +104,15 @@ class ClansController @Inject()(common: Common,
 
   def clans = Action.async { implicit request =>
     async {
-      val clans = await(referenceProvider.clans)
-      Ok(renderTemplate(None, false, None)(views.html.clans(clans)))
+      request.getQueryString("format") match {
+        case Some("csv") =>
+          Ok(await(referenceProvider.Clans.csv)).as("text/csv")
+        case Some("json") =>
+          Ok(Json.toJson(await(referenceProvider.Clans.clans)))
+        case _ =>
+          val clans = await(referenceProvider.clans)
+          Ok(renderTemplate(None, supportsJson = true, None)(views.html.clans(clans)))
+      }
     }
   }
 

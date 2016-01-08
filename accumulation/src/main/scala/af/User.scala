@@ -58,7 +58,7 @@ object User {
           id = registration.id,
           name = registration.name,
           countryCode = None,
-          email = Option(registration.email).filter(_.nonEmpty),
+          email = registration.email,
           registrationDate = registration.registrationDate.atZone(ZoneId.of("UTC")),
           nickname = CurrentNickname(
             nickname = currentNickname.nickname,

@@ -59,7 +59,6 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
           |Game status: hunt the flag on ac_depot, 14 minutes remaining, open, 4 clients
           |Game status: team deathmatch on ac_aqueous, game finished, open, 6 clients
         """.stripMargin.split("\r?\n")
-      println(inputSequence.size)
       val outputSequence = inputSequence.scanLeft(NoDurationFound: GameDuration)(_.next(_)).toList
       val List(_, _, first, second, third, fourth, fifth, _) = outputSequence
       first shouldBe NoDurationFound
@@ -101,7 +100,6 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
 
       val outputs = inputSequence.scanLeft(NothingFound: ParserState)(_.next(_))
 
-      outputs foreach println
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
 
       inside(foundGame) {
@@ -261,9 +259,7 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
       """.stripMargin.split("\r?\n")
       val outputs = inputSequence.scanLeft(NothingFound: ParserState)(_.next(_))
 
-      outputs foreach println
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
-      println(foundGame)
     }
 
 
@@ -289,7 +285,6 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
 
       val outputs = inputSequence.scanLeft(NothingFound: ParserState)(_.next(_))
 
-      outputs foreach println
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
 
 

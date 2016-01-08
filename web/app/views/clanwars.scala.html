@@ -1,4 +1,5 @@
-@(clanwars: List[_root_.clans.ClanwarMeta])
+@import lib.Clanner
+@(clanwars: List[_root_.clans.ClanwarMeta])(implicit clanner: Clanner)
 @clanwars.map { clanwar =>
     @views.html.clanwar.clanwar(clanwar, false, false)
 }

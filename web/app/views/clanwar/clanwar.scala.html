@@ -1,5 +1,6 @@
 @import views.rendergame.MixedGame
-@(clanwarMeta: _root_.clans.ClanwarMeta, showPlayers: Boolean, showGames: Boolean)
+@import lib.Clanner
+@(clanwarMeta: _root_.clans.ClanwarMeta, showPlayers: Boolean, showGames: Boolean)(implicit clanner: Clanner)
 <div id="game">
     @views.html.clanwar.render_clanwar(clanwarMeta, showPlayers)
     @if(showGames) {

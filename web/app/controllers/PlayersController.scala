@@ -24,8 +24,15 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
 
   def players = Action.async { implicit request =>
     async {
-      val players = await(referenceProvider.users)
-      Ok(renderTemplate(None, false, None)(views.html.players(players)))
+      request.getQueryString("format") match {
+        case Some("registrations-csv") =>
+          Ok(await(referenceProvider.Users(withEmails = false).rawRegistrations)).as("text/csv")
+        case Some("nicknames-csv") =>
+          Ok(await(referenceProvider.Users(withEmails = false).rawNicknames)).as("text/csv")
+        case _ =>
+          val players = await(referenceProvider.users)
+          Ok(renderTemplate(None, false, None)(views.html.players(players)))
+      }
     }
   }
 
