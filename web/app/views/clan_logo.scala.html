@@ -1,4 +1,2 @@
 @(cln: af.Clan)
-@defining(cln.logo.getOrElse(s"http://woop.ac:81/html/clan_picture.php?name=${cln.name}&id=${cln.id}")) { url =>
-    <img class="clan-logo" src="@url" width="64" height="64"/>
-}
+<img class="clan-logo" src="@cln.logo" width="64" height="64"/>
