@@ -16,6 +16,20 @@
                         <th>Games played</th><td>@fullProfile.achievements.get.playerStatistics.gamesPlayed</td>
                         <th>Frags</th><td>@fullProfile.achievements.get.playerStatistics.frags</td>
                     </tr>
+                    
+                    @fullProfile.rank match {
+                        case Some(rank) => {
+                            <tr>
+                                <th>Elo Rank</th> <td>@rank.rank</td>
+                                <th>Elo Points</th> <td>@Math.round(rank.elo)</td>
+                            </tr>
+                        }
+                        case _ => {
+                            <tr>
+                                <th>Elo Rank</th> <td>Play more</td>
+                            </tr>
+                        }
+                    }
                 </table>
             </div>
             <div class="achievements">

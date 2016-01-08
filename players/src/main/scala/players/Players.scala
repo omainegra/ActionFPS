@@ -46,6 +46,10 @@ object PlayersStat {
     lastGame = lastGame,
     rank = None
   )
+  
+  object ImplicitWrites {
+    implicit val psw = Json.writes[PlayerStat]
+  }
 }
 
 object PlayersStats {
