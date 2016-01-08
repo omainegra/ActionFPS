@@ -21,7 +21,7 @@ class ClansTest
       website = Some(new URI("http://woop.us/")),
       tag = "w00p|*",
       tag2 = None,
-      logo = Some(new URI("http://i.imgur.com/AnsEc0M.png"))
+      logo = new URI("http://i.imgur.com/AnsEc0M.png")
     ))
     recs.find(_.id == "rc").value.website.value.toString shouldBe "http://585437.xobor.com/"
   }
