@@ -7,12 +7,13 @@ package controllers
 import javax.inject._
 
 import _root_.clans.Clanstats.ImplicitWrites._
-import clans.Clanwar
+import af.Clan
+import clans.{Clanstat, Clanwar}
 import clans.Clanwar.ImplicitFormats._
 import clans.Conclusion.Namer
 import lib.Clanner
 import play.api.Configuration
-import play.api.libs.json.Json
+import play.api.libs.json.{Writes, Json}
 import play.api.mvc.{Action, Controller}
 import providers.full.FullProvider
 import providers.ReferenceProvider
@@ -37,16 +38,25 @@ class ClansController @Inject()(common: Common,
       }
 
       val stats = await(fullProvider.clanstats).onlyRanked.named
-      Ok(renderTemplate(None, false, None)(views.html.clan_rankings(stats)))
+      if (request.getQueryString("format").contains("json"))
+        Ok(Json.toJson(stats))
+      else
+        Ok(renderTemplate(None, supportsJson = true, None)(views.html.clan_rankings(stats)))
     }
   }
 
+  case class ClanView(clan: Clan, recentClanwars: List[Clanwar], stats: Option[Clanstat])
+
   def clan(id: String) = Action.async { implicit request =>
     async {
-
       implicit val namer = {
         val clans = await(referenceProvider.clans)
         Namer(id => clans.find(_.id == id).map(_.name))
+      }
+
+      implicit val cww = {
+        implicit val cstw = Json.writes[Clanstat]
+        Json.writes[ClanView]
       }
 
       val ccw = await(fullProvider.clanwars)
@@ -59,9 +69,13 @@ class ClansController @Inject()(common: Common,
 
       val st = await(fullProvider.clanstats).clans.get(id)
 
+
       await(referenceProvider.clans).find(_.id == id) match {
         case Some(clan) =>
-          Ok(renderTemplate(None, false, None)(views.html.clan(clan, ccw, st)))
+          if (request.getQueryString("format").contains("json")) {
+            Ok(Json.toJson(ClanView(clan, ccw, st)))
+          } else
+            Ok(renderTemplate(None, supportsJson = true, None)(views.html.clan(clan, ccw, st)))
         case None =>
           NotFound("Clan could not be found")
       }
@@ -80,7 +94,14 @@ class ClansController @Inject()(common: Common,
       }
       await(fullProvider.clanwars).all.find(_.id == id) match {
         case Some(clanwar) =>
-          Ok(renderTemplate(None, false, None)(views.html.clanwar.clanwar(clanwarMeta = clanwar.meta.named, showPlayers = true, showGames = true)))
+          if (request.getQueryString("format").contains("json"))
+            Ok(Json.toJson(clanwar))
+          else
+            Ok(renderTemplate(None, supportsJson = false, None)(views.html.clanwar.clanwar(
+              clanwarMeta = clanwar.meta.named,
+              showPlayers = true,
+              showGames = true
+            )))
         case None => NotFound("Clanwar could not be found")
       }
     }
@@ -98,7 +119,11 @@ class ClansController @Inject()(common: Common,
       }
       import Clanwar.ImplicitFormats._
       val cws = await(fullProvider.clanwars).all.toList.sortBy(_.id).reverse.take(50)
-      Ok(renderTemplate(None, false, None)(views.html.clanwars(cws.map(_.meta.named))))
+      request.getQueryString("format") match {
+        case Some("json") =>
+          Ok(Json.toJson(cws))
+        case _ => Ok(renderTemplate(None, supportsJson = true, None)(views.html.clanwars(cws.map(_.meta.named))))
+      }
     }
   }
 
