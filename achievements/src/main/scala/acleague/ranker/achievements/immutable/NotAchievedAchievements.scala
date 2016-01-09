@@ -113,7 +113,7 @@ case class NotAchievedAchievements
           case Right(completed) =>
             achievedAchievements += completed
             me = me.copy(fragMaster = None)
-            newEvents += "became Flag Master"
+            newEvents += "became Frag Master"
         }
     }
 
