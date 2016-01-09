@@ -22,19 +22,24 @@
 ## DevOps
 We have Travis CI. We also have Continuous Deployment from master to our dedicated CentOS 7 server via Amazon SQS and GitHub Web Hooks. We are targeting a monolothic deployment with highly modular code. We use SBT for building everything. It is the superior tool of choice.
 
-# Compiling
+
+# Prerequisite
 
 Install SBT: http://www.scala-sbt.org/download.html
 
-```
-sbt clean test dist
-```
+Install php7.0: https://bjornjohansen.no/upgrade-to-php7
 
 # Running frontend
 
 ```
-cd www/
-php -S localhost:8888
+sbt web/run &
+cd web/dist/www && php -S localhost:8888
+```
+
+# Running tests
+
+```
+sbt clean test dist
 ```
 
 # Coding it
