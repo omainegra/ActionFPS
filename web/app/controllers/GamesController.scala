@@ -2,7 +2,8 @@ package controllers
 
 import javax.inject._
 
-import clans.Clanwar
+import acleague.enrichers.JsonGame
+import clans._
 import clans.Conclusion.Namer
 import lib.Clanner
 import play.api.Configuration
@@ -48,15 +49,30 @@ class GamesController @Inject()(common: Common,
       val games = await(fullProvider.getRecent).map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
       val latestClanwar = await(fullProvider.clanwars).complete.toList.sortBy(_.id).lastOption.map(_.meta.named)
-      Ok(renderTemplate(None, false, None)(views.html.index(games = games, events = events, latestClanwar = latestClanwar)))
+      implicit val fmt = {
+        implicit val d = Json.writes[ClanwarPlayer]
+        implicit val c = Json.writes[ClanwarTeam]
+        implicit val b = Json.writes[Conclusion]
+        implicit val a = Json.writes[ClanwarMeta]
+        Json.writes[IndexContents]
+      }
+      if (request.getQueryString("format").contains("json"))
+        Ok(Json.toJson(IndexContents(games.map(_.game), events, latestClanwar)))
+      else
+        Ok(renderTemplate(None, supportsJson = true, None)(views.html.index(games = games, events = events, latestClanwar = latestClanwar)))
     }
   }
+
+  case class IndexContents(recentGames: List[JsonGame], recentEvents: List[Map[String, String]], latestClanwr: Option[ClanwarMeta])
 
   def game(id: String) = Action.async { implicit request =>
     async {
       await(fullProvider.game(id)) match {
         case Some(game) =>
-          Ok(renderTemplate(None, false, None)(views.html.game(game)))
+          if (request.getQueryString("format").contains("json"))
+            Ok(Json.toJson(game))
+          else
+            Ok(renderTemplate(None, supportsJson = true, None)(views.html.game(game)))
         case None => NotFound("Game not found")
       }
     }
