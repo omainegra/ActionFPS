@@ -1,12 +1,9 @@
 package af
 
 import acleague.enrichers.JsonGame
-import acleague.ranker.achievements.immutable.PlayerStatistics
-import acleague.ranker.achievements.{Jsons, PlayerState}
-import clans.{CompleteClanwar, Clanstats, Clanwars}
-import players.PlayerStat
-import play.api.libs.json.{JsObject, Json}
-import players.PlayersStats
+import acleague.ranker.achievements.{AchievementsRepresentation, PlayerState}
+import clans.{Clanstats, Clanwars, CompleteClanwar}
+import players.{PlayerStat, PlayersStats}
 
 /**
   * Created by William on 01/01/2016.
@@ -18,12 +15,11 @@ case class FullIterator
  clanwars: Clanwars,
  clanstats: Clanstats,
  achievementsIterator: AchievementsIterator,
-  playersStats: PlayersStats) {
+ playersStats: PlayersStats) {
   fi =>
 
   def updateReference(newUsers: Map[String, User], newClans: Map[String, Clan]): FullIterator = {
     val enricher = EnrichGames(newUsers.values.toList, newClans.values.toList)
-    import enricher.withUsersClass
     val blank = FullIterator(
       users = newUsers,
       clans = newClans,
@@ -100,4 +96,10 @@ case class FullIterator
 
 }
 
-case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState], rank: Option[PlayerStat])
+case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState], rank: Option[PlayerStat]) {
+  def build = BuiltProfile(
+    user, recentGames, achievements.map(_.buildAchievements), rank
+  )
+}
+
+case class BuiltProfile(user: User, recentGames: List[JsonGame], achievements: Option[AchievementsRepresentation], rank: Option[PlayerStat])

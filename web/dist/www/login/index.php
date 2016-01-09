@@ -21,13 +21,14 @@ function onSignIn(googleUser) {
       $.cookie("af_id", x.id, { path:'/', expires: 10 });
       $.cookie("af_name", x.name, { path:'/', expires: 10 });
       $('#login_welcome a').attr("href", "/player/?id=" + x.id).text(x.name);
+      $('#welcome-user, #log-in').attr("href", "/player/?id=" + x.id).text(x.name);
       $('#login_welcome').css("display", "block");
 	  }
   })
 }
 </script>
 <div style="display:none" id="login_welcome">
-  <p>Welcome, <a href=""></a></p>
+  <p>Welcome, <a href="" id="welcome-user"></a></p>
   <p>We're still developing the software, so new profiles don't appear to be working just yet.</p>
   </div>
 <form style="display:none" id="reg_form" method="post" enctype="multipart/form-data" action="https://script.google.com/macros/s/AKfycbw2na0_P4atptBWe_AXn2TJECge8POwV-3ai5QGJ2hd25TffWtY/exec">

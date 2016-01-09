@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject._
 
+import af.rr.ServerRecord
 import play.api.Configuration
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
@@ -39,9 +40,11 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
       request.getQueryString("format") match {
         case Some("csv") =>
           Ok(await(referenceProvider.Servers.raw)).as("text/csv")
+        case Some("json") =>
+          Ok(Json.toJson(await(referenceProvider.Servers.servers)))
         case _ =>
           val got = await(referenceProvider.servers)
-          Ok(renderTemplate(None, false, None)(views.html.servers(got)))
+          Ok(renderTemplate(None, supportsJson = true, None)(views.html.servers(got)))
       }
     }
   }

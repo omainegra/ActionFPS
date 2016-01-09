@@ -6,10 +6,13 @@ package controllers
 
 import javax.inject._
 
+import acleague.ranker.achievements.PlayerState
+import af.{BuiltProfile, FullProfile}
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
+import players.PlayerStat
 import providers.full.FullProvider
 import providers.ReferenceProvider
 
@@ -29,9 +32,11 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
           Ok(await(referenceProvider.Users(withEmails = false).rawRegistrations)).as("text/csv")
         case Some("nicknames-csv") =>
           Ok(await(referenceProvider.Users(withEmails = false).rawNicknames)).as("text/csv")
+        case Some("json") =>
+          Ok(Json.toJson(await(referenceProvider.Users(withEmails = false).users)))
         case _ =>
           val players = await(referenceProvider.users)
-          Ok(renderTemplate(None, false, None)(views.html.players(players)))
+          Ok(renderTemplate(None, supportsJson = true, None)(views.html.players(players)))
       }
     }
   }
@@ -40,7 +45,10 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     async {
       import _root_.players.PlayersStats.ImplicitWrites._
       val ranks = await(fullProvider.playerRanks).onlyRanked
-      Ok(renderTemplate(None, false, None)(views.html.player_ranks(ranks)))
+      if (request.getQueryString("format").contains("json"))
+        Ok(Json.toJson(ranks))
+      else
+        Ok(renderTemplate(None, supportsJson = true, None)(views.html.player_ranks(ranks)))
     }
   }
 
@@ -48,7 +56,14 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     async {
       await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>
-          Ok(renderTemplate(None, false, None)(views.html.player.player(player)))
+          if (request.getQueryString("format").contains("json")) {
+            import acleague.ranker.achievements.Jsons._
+            implicit val spw = Json.writes[PlayerStat]
+            implicit val fpw = Json.writes[BuiltProfile]
+            Ok(Json.toJson(player.build))
+          } else {
+            Ok(renderTemplate(None, supportsJson = true, None)(views.html.player.player(player)))
+          }
         case None =>
           NotFound("Player could not be found")
       }
