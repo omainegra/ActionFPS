@@ -36,8 +36,6 @@ require("../render.inc.php");
       <li>Install the required dependencies :<br />
       For <b>Debian</b> based systems :
       <pre>sudo apt-get install libsdl1.2debian libsdl-image1.2 zlib1g libogg0 libvorbis0a libopenal1 libcurl3</pre>
-      For <b>RedHat</b> based systems :
-      <pre>sudo yum install SDL SDL_image zlib libogg libvorbis openal-soft libcurl</pre>
       </li>
       <li>Run <b>assaultcube.sh</b></li>
   </ul>
