@@ -28,6 +28,7 @@ object JournalGamesProvider {
       .map(_.cg)
       .filter(_.validate.isGood)
       .filter(_.validateServer)
+      .map(_.flattenPlayers)
       .map(g => g.id -> g)
       .toMap
     finally fis.close()
