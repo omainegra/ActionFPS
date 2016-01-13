@@ -29,7 +29,7 @@ class ApiAllGamesProvider @Inject()(configuration: Configuration)
     response.body.split("\n").toIterator.map { line =>
       line.split("\t").toList match {
         case List(id, json) =>
-          id -> JsonGame.fromJson(json)
+          id -> JsonGame.fromJson(json).flattenPlayers
       }
     }.toMap
   )

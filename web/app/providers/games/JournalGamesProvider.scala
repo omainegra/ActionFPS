@@ -43,7 +43,7 @@ object JournalGamesProvider {
         PartialFunction.condOpt(currentState) {
           case MultipleServerParserFoundGame(fg, _)
             if !gameAlreadyExists(fg.id) && fg.validate.isGood && fg.validateServer =>
-            registerGame(fg)
+            registerGame(fg.flattenPlayers)
         }
       case _ =>
     }
