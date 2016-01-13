@@ -20,17 +20,33 @@ package object inter {
       Try(input.toInt).toOption
   }
 
+  case class InterMessage(ip: String, nickname: String) {
+    def toCall(time: ZonedDateTime, server: String) = InterCall(
+      time = time,
+      server = server,
+      ip = ip,
+      nickname = nickname
+    )
+  }
+
+  object InterMessage {
+    val matcher = s"""\\[([^ ]+)\\] ([^ ]+) says: '(.*)'""".r
+
+    def unapply(input: String): Option[InterMessage] = PartialFunction.condOpt(input) {
+      case matcher(ip, nickname, "!inter") =>
+        InterMessage(ip, nickname)
+    }
+  }
+
   object InterCall {
-    val matcher = """Date: ([^ ]+), Server: [^ ]+ aura AssaultCube\[local#(\d+)\], Payload: \[([^ ]+)\] ([^ ]+) says: '(.*)'""".r
+    val matcher = """Date: ([^ ]+), Server: [^ ]+ aura AssaultCube\[local#(\d+)\], Payload: (.*)""".r
 
     def unapply(input: String): Option[InterCall] = {
       PartialFunction.condOpt(input) {
-        case matcher(ZDT(time), IntValue(port), ip, nickname, "!inter") =>
-          InterCall(
+        case matcher(ZDT(time), IntValue(port), InterMessage(interMessage)) =>
+          interMessage.toCall(
             time = time,
-            server = s"aura.woop.ac:$port",
-            ip = ip,
-            nickname = nickname
+            server = s"aura.woop.ac:$port"
           )
       }
     }

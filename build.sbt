@@ -54,6 +54,7 @@ lazy val web =
     .enablePlugins(GitVersioning)
     .dependsOn(pingerClient)
     .dependsOn(accumulation)
+    .dependsOn(interParser)
     .enablePlugins(BuildInfoPlugin)
     .settings(dontDocument)
     .settings(
