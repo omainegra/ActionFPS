@@ -34,7 +34,7 @@ require("../render.inc.php");
   <ul>
       <li>Download and extract the <a href="http://woop.ac:81/linux_client_1202.2.tar.bz2">linux package</a>.</li>
       <li>Install the required dependencies :<br />
-      For <b>Debian</b> based systems :
+      For <b>Ubuntu/Debian</b> :
       <pre>sudo apt-get install libsdl1.2debian libsdl-image1.2 zlib1g libogg0 libvorbis0a libopenal1 libcurl3</pre>
       </li>
       <li>Run <b>assaultcube.sh</b></li>
