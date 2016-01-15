@@ -5,7 +5,7 @@ package inter
   */
 case class InterState(lastCalls: List[InterCall]) {
   def canAdd(interCall: InterCall): Boolean = {
-    lastCalls.filter(_.time.plusMinutes(10).isAfter(interCall.time)) match {
+    lastCalls.filter(_.time.plusMinutes(5).isAfter(interCall.time)) match {
       case Nil => true
       case l =>
         val clashes = l.exists(oc =>
