@@ -9,7 +9,6 @@
 * Previously known as http://woop.ac/
 * Also see http://duel.gg/
 * Contributors very much welcome. Start with Issues.
-* We also have an API here: http://actionfps.com/api/ - feel free to build on top.
 
 [![Throughput Graph](https://graphs.waffle.io/ScalaWilliam/actionfps/throughput.svg)](https://waffle.io/ScalaWilliam/actionfps/metrics) 
 
@@ -45,9 +44,4 @@ sbt clean test dist
 # Coding it
 
 Use IntelliJ: https://www.jetbrains.com/idea/download/
-
-The most important module is 'api', which you start with:
-
-```
-sbt api/run
-```
+Import the build.sbt file from Import Project from Existing Sources... menu
