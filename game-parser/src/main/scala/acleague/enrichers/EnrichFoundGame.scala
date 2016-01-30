@@ -174,7 +174,7 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
     else if (duration > 15) Bad(s"Duration is $duration, expecting at most 15")
     else if (minTeamPlayers < 2) Bad(s"One team has $minTeamPlayers players, expecting 2 or more.")
     else if (teams.size < 2) Bad(s"Expected team size >= 2, got ${teams.size}")
-    else if (minTeamAverageFrags < 15) Bad(s"One team has average frags $minTeamAverageFrags, expected >= 15 ")
+    else if (minTeamAverageFrags < 12) Bad(s"One team has average frags $minTeamAverageFrags, expected >= 12 ")
     else Good(this)
   }
 
