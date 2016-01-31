@@ -1,7 +1,7 @@
-@(clanwar: _root_.clans.Clanwar, clan: af.Clan)(implicit namer: _root_.clans.Conclusion.Namer)
+@(clanwar: com.actionfps.clans.Clanwar, clan: com.actionfps.accumulation.Clan)(implicit namer: com.actionfps.clans.Conclusion.Namer)
 @defining({
     clanwar match {
-        case cc: _root_.clans.CompleteClanwar =>
+        case cc: com.actionfps.clans.CompleteClanwar =>
             val resultTitle = if(cc.isTie) "Tied"
             else if(cc.winner.contains(clan.id)) "Won"
                 else "Lost"

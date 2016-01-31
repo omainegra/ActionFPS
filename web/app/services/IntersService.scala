@@ -7,11 +7,11 @@ package services
 import java.io.File
 import javax.inject._
 
-import acleague.mserver.ExtractMessage
-import af.ValidServers
+import com.actionfps.gameparser.mserver.ExtractMessage
 import akka.actor.ActorSystem
 import akka.agent.Agent
-import inter.{InterMessage, InterCall, InterState}
+import com.actionfps.accumulation.ValidServers
+import com.actionfps.inter.{InterMessage, InterState}
 import lib.CallbackTailer
 import play.api.libs.json.Json
 import play.api.{Logger, Configuration}

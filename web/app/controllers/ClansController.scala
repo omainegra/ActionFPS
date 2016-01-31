@@ -6,11 +6,11 @@ package controllers
 
 import javax.inject._
 
-import _root_.clans.Clanstats.ImplicitWrites._
-import af.Clan
-import clans.{Clanstat, Clanwar}
-import clans.Clanwar.ImplicitFormats._
-import clans.Conclusion.Namer
+import com.actionfps.accumulation.Clan
+import com.actionfps.clans.Clanstats.ImplicitWrites._
+import com.actionfps.clans.{Clanstat, Clanwar}
+import com.actionfps.clans.Clanwar.ImplicitFormats._
+import com.actionfps.clans.Conclusion.Namer
 import lib.Clanner
 import play.api.Configuration
 import play.api.libs.json.{Writes, Json}

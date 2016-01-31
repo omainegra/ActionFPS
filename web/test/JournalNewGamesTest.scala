@@ -1,7 +1,7 @@
 import java.io._
 
-import acleague.enrichers.JsonGame
-import acleague.mserver.{MultipleServerParser, MultipleServerParserFoundGame}
+import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.mserver.{MultipleServerParser, MultipleServerParserFoundGame}
 import com.typesafe.config.ConfigFactory
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, OptionValues}

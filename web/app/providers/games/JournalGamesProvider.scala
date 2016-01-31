@@ -6,11 +6,11 @@ package providers.games
 
 import java.io.{File, FileInputStream}
 import javax.inject._
-
-import acleague.ProcessJournalApp
-import acleague.enrichers.JsonGame
-import acleague.mserver.{ExtractMessage, MultipleServerParser, MultipleServerParserFoundGame}
+import com.actionfps.gameparser.ProcessJournalApp
+import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.mserver.{ExtractMessage, MultipleServerParser, MultipleServerParserFoundGame}
 import akka.agent.Agent
+import com.actionfps.accumulation.ValidServers
 import lib.CallbackTailer
 import play.api.Configuration
 import play.api.inject.ApplicationLifecycle
@@ -18,8 +18,8 @@ import providers.games.JournalGamesProvider.NewGameCapture
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, blocking}
-import af.ValidServers.Validator._
-import af.ValidServers.ImplicitValidServers._
+import ValidServers.Validator._
+import ValidServers.ImplicitValidServers._
 object JournalGamesProvider {
 
   def getFileGames(file: File) = {

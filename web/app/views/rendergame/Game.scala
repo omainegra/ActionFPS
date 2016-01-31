@@ -1,6 +1,6 @@
 package views.rendergame
 
-import acleague.enrichers.{JsonGamePlayer, JsonGame}
+import com.actionfps.gameparser.enrichers.{JsonGamePlayer, JsonGame}
 
 case class NowServer(server: String)
 

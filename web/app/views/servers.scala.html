@@ -1,4 +1,4 @@
-@(servers: List[af.rr.ServerRecord])
+@(servers: List[com.actionfps.reference.ServerRecord])
 <article id="servers">
     <h2>AssaultCube</h2>
     @servers.groupBy(_.region).toList.sortBy(_._1).map { sr =>

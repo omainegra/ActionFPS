@@ -2,12 +2,12 @@ package providers.full
 
 import javax.inject.{Inject, Singleton}
 
-import acleague.enrichers.JsonGame
-import af.{AchievementsIterator, FullIterator}
+import com.actionfps.gameparser.enrichers.JsonGame
 import akka.agent.Agent
-import clans.{Clanstats, Clanwars}
+import com.actionfps.clans.{Clanstats, Clanwars}
+import com.actionfps.accumulation.{FullIterator, AchievementsIterator}
+import com.actionfps.players.PlayersStats
 import play.api.inject.ApplicationLifecycle
-import players.PlayersStats
 import providers.ReferenceProvider
 import providers.games.GamesProvider
 

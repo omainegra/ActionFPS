@@ -1,4 +1,3 @@
-import af.RequiresPHP
 import akka.util.Timeout
 import org.openqa.selenium.WebDriver
 import org.scalatest.{Inspectors, OptionValues}

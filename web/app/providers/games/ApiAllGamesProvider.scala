@@ -2,7 +2,7 @@ package providers.games
 
 import javax.inject.{Inject, Singleton}
 
-import acleague.enrichers.JsonGame
+import com.actionfps.gameparser.enrichers.JsonGame
 import akka.agent.Agent
 import controllers.Common
 import play.api.Configuration

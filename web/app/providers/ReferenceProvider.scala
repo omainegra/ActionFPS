@@ -2,9 +2,8 @@ package providers
 
 import java.io.{StringWriter, StringReader}
 import javax.inject.Inject
-
-import af.rr.{NicknameRecord, Registration, ServerRecord}
-import af.{User, Clan}
+import com.actionfps.accumulation.{User, Clan}
+import com.actionfps.reference.{NicknameRecord, Registration, ServerRecord, ClanRecord}
 import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.libs.json.Json
@@ -44,7 +43,7 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
 
     def clans: Future[List[Clan]] = csv.map { bdy =>
       val sr = new StringReader(bdy)
-      try af.rr.ClanRecord.parseRecords(sr).map(Clan.fromClanRecord)
+      try ClanRecord.parseRecords(sr).map(Clan.fromClanRecord)
       finally sr.close()
     }
   }

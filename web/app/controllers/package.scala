@@ -1,5 +1,5 @@
-import af.Clan
-import af.rr.ServerRecord
+import com.actionfps.accumulation.Clan
+import com.actionfps.reference.ServerRecord
 import play.api.libs.json.Json
 
 /**

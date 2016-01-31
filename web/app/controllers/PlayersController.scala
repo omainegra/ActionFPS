@@ -6,13 +6,12 @@ package controllers
 
 import javax.inject._
 
-import acleague.ranker.achievements.PlayerState
-import af.{BuiltProfile, FullProfile}
+import com.actionfps.accumulation.BuiltProfile
+import com.actionfps.players.{PlayerStat, PlayersStats}
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import players.PlayerStat
 import providers.full.FullProvider
 import providers.ReferenceProvider
 
@@ -43,7 +42,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
 
   def rankings = Action.async { implicit request =>
     async {
-      import _root_.players.PlayersStats.ImplicitWrites._
+      import PlayersStats.ImplicitWrites._
       val ranks = await(fullProvider.playerRanks).onlyRanked
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(ranks))
@@ -57,7 +56,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
       await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>
           if (request.getQueryString("format").contains("json")) {
-            import acleague.ranker.achievements.Jsons._
+            import com.actionfps.achievements.Jsons._
             implicit val spw = Json.writes[PlayerStat]
             implicit val fpw = Json.writes[BuiltProfile]
             Ok(Json.toJson(player.build))

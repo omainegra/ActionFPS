@@ -2,9 +2,9 @@ package controllers
 
 import javax.inject._
 
-import acleague.enrichers.JsonGame
-import clans._
-import clans.Conclusion.Namer
+import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.clans._
+import com.actionfps.clans.Conclusion.Namer
 import lib.Clanner
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator

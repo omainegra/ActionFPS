@@ -2,7 +2,6 @@ package controllers
 
 import javax.inject._
 
-import af.rr.ServerRecord
 import play.api.Configuration
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient

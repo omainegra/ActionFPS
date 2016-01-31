@@ -1,4 +1,5 @@
-@(clan: af.Clan, wars: List[_root_.clans.Clanwar], stats: Option[_root_.clans.Clanstat])(implicit namer: _root_.clans.Conclusion.Namer)
+@import com.actionfps.accumulation.Clan
+@(clan: Clan, wars: List[com.actionfps.clans.Clanwar], stats: Option[com.actionfps.clans.Clanstat])(implicit namer: com.actionfps.clans.Conclusion.Namer)
 <article id="profile">
     <div class="profile">
         <div class="clan-header">

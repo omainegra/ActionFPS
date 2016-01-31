@@ -6,9 +6,9 @@ package services
 
 import javax.inject._
 
-import acleague.pinger._
 import akka.actor.ActorDSL._
 import akka.actor.{ActorLogging, ActorSystem, Kill, Props}
+import com.actionfps.pinger._
 import controllers.Common
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event

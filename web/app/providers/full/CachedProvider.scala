@@ -3,9 +3,9 @@ package providers.full
 import java.io.InvalidClassException
 import javax.inject.{Inject, Singleton}
 
-import acleague.enrichers.JsonGame
-import af.FullIterator
+import com.actionfps.gameparser.enrichers.JsonGame
 import akka.agent.Agent
+import com.actionfps.accumulation.FullIterator
 import com.hazelcast.client.HazelcastClient
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle

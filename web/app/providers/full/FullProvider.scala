@@ -1,14 +1,11 @@
 package providers.full
 
-import acleague.enrichers.JsonGame
-import af.{FullIterator, FullProfile}
 import akka.agent.Agent
-import clans.{Clanstats, Clanwars}
+import com.actionfps.accumulation.{FullIterator, FullProfile}
+import com.actionfps.clans.{Clanstats, Clanwars}
+import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.players.PlayersStats
 import com.google.inject.ImplementedBy
-import play.api.inject.ApplicationLifecycle
-import play.api.libs.json.{JsValue, Json}
-import players.PlayersStats
-import providers.games.GamesProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 

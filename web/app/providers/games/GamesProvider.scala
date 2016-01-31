@@ -1,6 +1,6 @@
 package providers.games
 
-import acleague.enrichers.JsonGame
+import com.actionfps.gameparser.enrichers.JsonGame
 import com.google.inject.ImplementedBy
 import play.api.libs.json.JsValue
 

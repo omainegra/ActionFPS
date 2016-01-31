@@ -3,9 +3,9 @@ package games
 
 import javax.inject.{Inject, Singleton}
 
-import acleague.enrichers.JsonGame
-import af.EnrichGames
+import com.actionfps.gameparser.enrichers.JsonGame
 import akka.actor.ActorSystem
+import com.actionfps.accumulation.EnrichGames
 import controllers.Common
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
@@ -40,7 +40,7 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
   logger.info("Starting new games provider")
 
   def processGame(game: JsonGame): Unit = {
-    //    val er = EnrichGames(recordsService.users, recordsService.clans)
+    //    val er = EnrichGames(recordsService.users, recordsService.com.actionfps.clans)
     //    import er.withUsersClass
     //    val b = game.withoutHosts.withUsers.flattenPlayers.withClans.toJson.+("isNew" -> JsBoolean(true))
     val b = game.withoutHosts.toJson.+("isNew" -> JsBoolean(true))
