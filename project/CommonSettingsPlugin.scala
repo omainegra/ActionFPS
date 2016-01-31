@@ -10,8 +10,7 @@ object CommonSettingsPlugin extends AutoPlugin {
 
   override def projectSettings = Seq(
     scalaVersion := "2.11.7",
-    organization := "ac.woop",
-    version := "4.0-SNAPSHOT",
+    organization := "com.actionfps",
     updateOptions := updateOptions.value.withCachedResolution(true),
     scalacOptions := Seq(
       "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
@@ -23,7 +22,9 @@ object CommonSettingsPlugin extends AutoPlugin {
     resolvers += Resolver.mavenLocal,
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "2.2.5" % "test"
-    )
+    ),
+    licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
+    publishMavenStyle := false
   )
 
   object autoImport {

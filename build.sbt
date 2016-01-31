@@ -85,7 +85,6 @@ lazy val web =
         Hazelcast.getOrCreateHazelcastInstance(cfg)
       },
       scriptClasspath := Seq("*"),
-      version := "5.0",
       buildInfoKeys := Seq[BuildInfoKey](
         name,
         version,
@@ -129,23 +128,26 @@ lazy val gameParser =
       libraryDependencies += json,
       libraryDependencies += scalactic,
       rpmBrpJavaRepackJars := true,
-      version := "4.1",
-      rpmLicense := Some("BSD")
+      rpmLicense := Some("BSD"),
+      git.useGitDescribe := true
     )
 
 lazy val achievements =
   Project(
     id = "achievements",
     base = file("achievements")
-  ).settings(
-    libraryDependencies ++= Seq(
-      json,
-      "com.maxmind.geoip2" % "geoip2" % "2.3.1",
-      "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
-      "commons-net" % "commons-net" % "3.3",
-      xml
-    )
-  ).dependsOn(gameParser)
+  )
+    .enablePlugins(GitVersioning)
+    .settings(
+      libraryDependencies ++= Seq(
+        json,
+        "com.maxmind.geoip2" % "geoip2" % "2.3.1",
+        "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
+        "commons-net" % "commons-net" % "3.3",
+        xml
+      ),
+      git.useGitDescribe := true
+    ).dependsOn(gameParser)
 
 lazy val interParser =
   Project(
@@ -158,7 +160,8 @@ lazy val referenceReader =
     id = "reference-reader",
     base = file("reference-reader")
   ).settings(
-    libraryDependencies += "org.apache.commons" % "commons-csv" % "1.1"
+    libraryDependencies += "org.apache.commons" % "commons-csv" % "1.1",
+    git.useGitDescribe := true
   )
 
 lazy val pingerClient =
@@ -172,7 +175,8 @@ lazy val pingerClient =
       "com.typesafe.akka" %% "akka-testkit" % "2.4.0" % "test",
       "commons-net" % "commons-net" % "3.3",
       "joda-time" % "joda-time" % "2.9"
-    )
+    ),
+    git.useGitDescribe := true
   )
 
 lazy val demoParser =
@@ -183,7 +187,8 @@ lazy val demoParser =
     .settings(
       libraryDependencies += "commons-io" % "commons-io" % "2.4",
       libraryDependencies ++= akka("actor"),
-      libraryDependencies += json4s
+      libraryDependencies += json4s,
+      git.useGitDescribe := true
     )
 
 lazy val syslogAc =
@@ -197,7 +202,6 @@ lazy val syslogAc =
       rpmVendor := "typesafe",
       libraryDependencies += json,
       rpmBrpJavaRepackJars := true,
-      version := "4.0",
       rpmLicense := Some("BSD"),
       libraryDependencies ++= Seq(
         "org.syslog4j" % "syslog4j" % "0.9.30",
@@ -207,7 +211,8 @@ lazy val syslogAc =
         "joda-time" % "joda-time" % "2.9.1",
         "org.joda" % "joda-convert" % "1.8.1"
       ),
-      bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener""""
+      bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"""",
+      git.useGitDescribe := true
     )
 
 lazy val accumulation =
@@ -219,6 +224,9 @@ lazy val accumulation =
     .dependsOn(referenceReader)
     .dependsOn(clans)
     .dependsOn(players)
+    .settings(
+      git.useGitDescribe := true
+    )
 
 lazy val clans =
   Project(
@@ -227,7 +235,8 @@ lazy val clans =
   )
     .dependsOn(gameParser)
     .settings(
-      libraryDependencies += "org.cvogt" %% "play-json-extensions" % "0.6.0"
+      libraryDependencies += "org.cvogt" %% "play-json-extensions" % "0.6.0",
+      git.useGitDescribe := true
     )
 
 lazy val players =
@@ -236,5 +245,8 @@ lazy val players =
     base = file("players")
   )
     .dependsOn(gameParser)
+    .settings(
+      git.useGitDescribe := true
+    )
 
 lazy val startHazelcast = TaskKey[Unit]("Start a hazelcast instance")
