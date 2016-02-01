@@ -32,7 +32,7 @@ Install php7.0: https://bjornjohansen.no/upgrade-to-php7
 
 ```
 sbt web/run &
-cd web/dist/www && php -S localhost:8888
+cd web/dist/www && php -S 127.0.0.1:8888
 ```
 
 # Running tests
