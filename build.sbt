@@ -51,7 +51,6 @@ lazy val web =
     base = file("web")
   )
     .enablePlugins(PlayScala)
-    .enablePlugins(GitVersioning)
     .dependsOn(pingerClient)
     .dependsOn(accumulation)
     .dependsOn(interParser)
@@ -109,6 +108,7 @@ lazy val web =
           } yield message
         }
       }.map { str => Base64.getEncoder.encodeToString(str.getBytes("UTF-8")) },
+      version := "5.0",
       buildInfoPackage := "af",
       buildInfoOptions += BuildInfoOption.ToJson
     )
