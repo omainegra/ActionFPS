@@ -50,6 +50,10 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
 
   def login = forward("/login/")
 
+  def registerPlay = forward("/register-play/")
+
+  def play = forward("/play.php")
+
   def sync = Action.async(BodyParsers.parse.json) { request =>
     wSClient
       .url(s"$mainPath/sync/")

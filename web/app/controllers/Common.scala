@@ -44,6 +44,9 @@ class Common @Inject()(configuration: Configuration)(implicit wsClient: WSClient
         js.select("#log-in").first().text(name)
         js.select("#log-in").attr("href", s"/player/?id=$id")
         js.select("#download-ac-button").remove()
+        js.select("#reg-menu-reg-play").parents().first().remove()
+      case _ =>
+        js.select("#reg-menu-play").parents().first().remove()
     }
     js.select("#content").html(html.body)
     Html(js.toString)

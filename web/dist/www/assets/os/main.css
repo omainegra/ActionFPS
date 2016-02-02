@@ -8,7 +8,7 @@ body {
   overflow-y: scroll;
 }
 div[role='main'] {
-  width: 46em;
+  width: 52em;
   margin-left: auto;
   margin-right: auto;
   background-image: url('http://woop.ac/assets/Metallic_Grunge_Texture_by_dirtygentlemen.jpg');
@@ -501,7 +501,7 @@ code {
   text-align: right;
 }
 .LiveEvents.live-events li a {
-  width: 26em;
+  width: 32em;
   display: inline-block;
   color: wheat;
   text-decoration: none;
@@ -664,4 +664,21 @@ img.clan-logo {
 
 pre {
     white-space: pre-wrap;
+}
+
+input {
+  color:#333;
+}
+
+#reg-form {
+
+}
+#reg-form.signed-in #register-waiting {
+  display:none;
+}
+#reg-form #register-signedin {
+  display:none;
+}
+#reg-form.signed-in #register-signedin {
+  display:block;
 }

@@ -17,9 +17,49 @@
     margin: 0 0.2em;
     padding: 0;
 }
-.LiveEvents.live-events li a  {
-    width:!important 26em;
+
+
+
+
+.button-success,
+.button-error,
+.button-warning,
+.button-secondary {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
+
+.button-success {
+    background: rgb(28, 184, 65); /* this is a green */
+}
+
+.button-error {
+    background: rgb(202, 60, 60); /* this is a maroon */
+}
+
+.button-warning {
+    background: rgb(223, 117, 20); /* this is an orange */
+}
+
+.button-secondary {
+    background: rgb(66, 184, 221); /* this is a light blue */
+}
+
+
+#register-play-button {
+    text-align:center;
+}
+
+#reg-menu {
+
+}
+#reg-menu li {
+margin-left:auto;
+    margin-right:auto;
+}
+
+
         h2:target {
             -webkit-animation: highlighter 5s 2; /* Safari 4+ */
             -moz-animation:    highlighter 5s 2; /* Fx 5+ */
@@ -41,3 +81,10 @@
             0%   { text-shadow:1px 1px 1px gold, -1px 1px 1px gold, 1px -1px 1px gold, -1px -1px 1px gold; }
             100% { text-shadow:0 0 2px white; }
         }
+
+
+
+
+
+                                                                                                                                                                               <button class="button-secondary pure-button">Secondary Button</button>
+                                                                                                                                                                                                                                              </div>
