@@ -61,7 +61,9 @@ require("../render.inc.php");
 
         <p><a href="http://woop.ac/client/windows_client_1202.2.exe" class="button-error pure-button">Download ActionFPS
                 Match Client</a></p>
-        <p>Windows, 44MB download</li>
+        <p>Windows, 44MB download</p>
+
+        <p><img src="https://cloud.githubusercontent.com/assets/2464813/12762693/4e9df7dc-c9e8-11e5-8a2c-704f4af9a25f.png"/></p>
 
         <h2>4. Play it</h2>
         <p><a href="/servers/" class="button-info pure-button">Server list</a></p>
