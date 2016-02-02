@@ -51,13 +51,20 @@
     text-align:center;
 }
 
-#reg-menu {
-
+/*#reg-menu {*/
+    /*background:rgba(40,40,40,0.6);*/
+    /*padding:0.1em;*/
+    /*font-size:1.2em;*/
+/*}*/
+#reg-menu ul {
+display:flex;
+    list-style-type: none;
 }
 #reg-menu li {
-margin-left:auto;
+    margin-left:auto;
     margin-right:auto;
 }
+
 
 
         h2:target {
