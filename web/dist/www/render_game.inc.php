@@ -20,10 +20,13 @@ function render_game_team_player($game, $team, $player, $spectator = false)
 
 function render_game_team($game, $team)
 {
+
+    $team_png = strtolower($team['name']) == "CLA" ? "https://cloud.githubusercontent.com/assets/5359646/12695180/369c86da-c745-11e5-817f-46d8c4c42376.png"
+        : "https://cloud.githubusercontent.com/assets/5359646/12695181/369cda90-c745-11e5-96eb-3f3669f80aed.png";
     ?>
 <div class="<?php echo htmlspecialchars($team['name']); ?> team">
     <div class="team-header">
-        <h3><img src="http://woop.ac/assets/<?php echo htmlspecialchars(strtolower($team['name'])); ?>.png"/></h3>
+        <h3><img src="<?php echo $team_png; ?>"/></h3>
 
         <div class="result">
             <?php if (isset($team['flags'])) { ?>
@@ -179,7 +182,7 @@ function render_war_clan_player($war, $clan, $player)
                 <?php echo htmlspecialchars($player['name']); ?>
             <?php } ?>
             <?php if(in_array('mvp', $player['awards'])) { ?>
-                <img src="http://woop.ac:81/html/assets/mvp.png" title="MVP"  />
+                <img src="https://cloud.githubusercontent.com/assets/2464813/12814236/6717aab2-cb35-11e5-822a-c9ad283b27df.png" title="MVP"  />
             <?php } ?>
         </span>
     </li>
@@ -217,7 +220,7 @@ function render_war_team($war, $clan, $show_players = false)
 function render_war($war, $show_players = false, $show_as_first = false)
 {
     ?>
-    <article class="GameCard game clanwar" style="background-image: url('http://woop.ac:81/html/assets/clanwar.png')">
+    <article class="GameCard game clanwar" style="background-image: url('https://cloud.githubusercontent.com/assets/2464813/12814159/d5a55016-cb34-11e5-9eca-2321924b0b4a.png')">
         <div class="w">
             <header>
                 <h2>
