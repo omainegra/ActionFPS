@@ -8,6 +8,8 @@ import play.api.mvc.Results
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 
+import scala.util.Try
+
 //@RequiresPHP
 class IntegrationSpec
   extends PlaySpec
@@ -29,6 +31,9 @@ class IntegrationSpec
       result.status mustBe OK
       val result2 = await(WS.url(s"$root/ms/").get())
       result2.body mustEqual result.body
+    }
+    "Load up" in {
+      info(s"${Try(go to root)}")
     }
     "Contain some games, events and a clanwar in the index page" in {
       go to root
