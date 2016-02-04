@@ -3,6 +3,7 @@ package com.actionfps.gameparser.enrichers
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.{Date}
+import com.actionfps.gameparser.Maps
 import com.actionfps.gameparser.ingesters.{FlagGameBuilder, FoundGame, FragGameBuilder}
 import org.joda.time.{DateTimeZone, DateTime}
 import org.joda.time.format.ISODateTimeFormat
@@ -170,7 +171,8 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
   def validate: JsonGame Or ErrorMessage = {
     def minTeamPlayers = teams.map(_.players.size).min
     def minTeamAverageFrags = teams.map(x => x.players.map(_.frags).sum.toFloat/x.players.size).min
-    if (duration < 10) Bad(s"Duration is $duration, expecting at least 10")
+    if ( !Maps.fromResource.maps.contains(map)) Bad(s"Map $map not in whitelist")
+    else if (duration < 10) Bad(s"Duration is $duration, expecting at least 10")
     else if (duration > 15) Bad(s"Duration is $duration, expecting at most 15")
     else if (minTeamPlayers < 2) Bad(s"One team has $minTeamPlayers players, expecting 2 or more.")
     else if (teams.size < 2) Bad(s"Expected team size >= 2, got ${teams.size}")
