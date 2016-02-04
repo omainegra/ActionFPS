@@ -1,5 +1,6 @@
 package views.rendergame
 
+import com.actionfps.gameparser.Maps
 import com.actionfps.gameparser.enrichers.{JsonGamePlayer, JsonGame}
 
 case class NowServer(server: String)
@@ -34,9 +35,9 @@ case class MixedGame(isNew: Boolean, game: JsonGame, now: Option[Now], players: 
 
   def heading = s"$mode @ $map"
 
-  def bgImage = s"http://woop.ac/assets/maps/$map.jpg"
+  def bgImage = Maps.resource.maps.get(map).map(_.image)
 
-  def bgStyle = s"background-image: url('$bgImage')"
+  def bgStyle = bgImage.map(i => s"background-image: url('$i')").getOrElse("")
 
   def className = s"GameCard game " + (if (now.isDefined) "isLive" else if (isNew) "isNew" else "")
 }
