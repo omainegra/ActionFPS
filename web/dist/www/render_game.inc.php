@@ -21,7 +21,7 @@ function render_game_team_player($game, $team, $player, $spectator = false)
 function render_game_team($game, $team)
 {
 
-    $team_png = strtolower($team['name']) == "CLA" ? "https://cloud.githubusercontent.com/assets/5359646/12695180/369c86da-c745-11e5-817f-46d8c4c42376.png"
+    $team_png = strtolower($team['name']) == "cla" ? "https://cloud.githubusercontent.com/assets/5359646/12695180/369c86da-c745-11e5-817f-46d8c4c42376.png"
         : "https://cloud.githubusercontent.com/assets/5359646/12695181/369cda90-c745-11e5-96eb-3f3669f80aed.png";
     ?>
 <div class="<?php echo htmlspecialchars($team['name']); ?> team">
