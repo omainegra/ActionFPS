@@ -3,6 +3,7 @@ package games
 
 import javax.inject.{Inject, Singleton}
 
+import com.actionfps.gameparser.Maps
 import com.actionfps.gameparser.enrichers.JsonGame
 import akka.actor.ActorSystem
 import com.actionfps.accumulation.EnrichGames
@@ -45,7 +46,8 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
     //    val b = game.withoutHosts.withUsers.flattenPlayers.withClans.toJson.+("isNew" -> JsBoolean(true))
     val b = game.withoutHosts.toJson.+("isNew" -> JsBoolean(true))
 
-    common.renderRaw("/live/render-fragment.php")(_.post(b)).foreach(response =>
+    val jsonMap = Map("game" -> Seq(b.toString()), "maps" -> Seq(Json.toJson(Maps.resource.maps.mapValues(_.image)).toString()))
+    common.renderRaw("/live/render-fragment.php")(_.post(jsonMap)).foreach(response =>
       thing.push(
         Event(
           id = Option(game.id),

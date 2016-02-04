@@ -45,16 +45,17 @@ function render_game_team($game, $team)
 
 }
 
-function render_game($game)
+function render_game($game, $maps)
 {
     if (isset($game['now'])) {
         $ac_link = "assaultcube://" . $game['now']['server']['server'];
-
-
     }
+
     if ( !isset($game['now']) && isset($game['server']) && strpos($game['server'], 'aura') > -1 ) {
         $demo_link = 'http://woop.ac:81/find-demo.php?time=' . rawurlencode($game['id']) . '&map=' . rawurlencode($game['map']);
     }
+
+    $style = "background-image: url('".$maps[$game['map']]."')";
 
     ?>
     <article
@@ -63,7 +64,7 @@ function render_game($game)
         } ?>  <?php if (isset($game['isNew']) && $game['isNew']) {
             echo "isNew";
         } ?> "
-        style="background-image: url('http://woop.ac/assets/maps/<?php echo htmlspecialchars($game['map']); ?>.jpg');">
+        style="<?php echo $style; ?>">
         <div class="w">
             <header>
                 <h2>

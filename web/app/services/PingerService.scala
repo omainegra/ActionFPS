@@ -8,6 +8,7 @@ import javax.inject._
 
 import akka.actor.ActorDSL._
 import akka.actor.{ActorLogging, ActorSystem, Kill, Props}
+import com.actionfps.gameparser.Maps
 import com.actionfps.pinger._
 import controllers.Common
 import play.api.inject.ApplicationLifecycle
@@ -57,7 +58,8 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
         data = Json.toJson(b).toString()
       )
     )
-    common.renderRaw("/live/render-fragment.php")(_.post(Json.toJson(b))).foreach(resp =>
+    val jsonMap = Map("game" -> Seq(Json.toJson(b).toString()), "maps" -> Seq(Json.toJson(Maps.resource.maps.mapValues(_.image)).toString()))
+    common.renderRaw("/live/render-fragment.php")(_.post(jsonMap)).foreach(resp =>
       liveGamesChan.push(
         Event(
           id = Option(b.now.server.server),
