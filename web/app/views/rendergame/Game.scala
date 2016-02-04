@@ -35,7 +35,7 @@ case class MixedGame(isNew: Boolean, game: JsonGame, now: Option[Now], players: 
 
   def heading = s"$mode @ $map"
 
-  def bgImage = Maps.fromResource.maps.get(map).map(_.image)
+  def bgImage = Maps.resource.maps.get(map).map(_.image)
 
   def bgStyle = bgImage.map(i => s"background-image: url('$i')").getOrElse("")
 

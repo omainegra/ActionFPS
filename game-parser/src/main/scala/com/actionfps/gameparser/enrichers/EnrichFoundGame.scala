@@ -171,7 +171,7 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
   def validate: JsonGame Or ErrorMessage = {
     def minTeamPlayers = teams.map(_.players.size).min
     def minTeamAverageFrags = teams.map(x => x.players.map(_.frags).sum.toFloat/x.players.size).min
-    if ( !Maps.fromResource.maps.contains(map)) Bad(s"Map $map not in whitelist")
+    if ( !Maps.resource.maps.contains(map)) Bad(s"Map $map not in whitelist")
     else if (duration < 10) Bad(s"Duration is $duration, expecting at least 10")
     else if (duration > 15) Bad(s"Duration is $duration, expecting at most 15")
     else if (minTeamPlayers < 2) Bad(s"One team has $minTeamPlayers players, expecting 2 or more.")

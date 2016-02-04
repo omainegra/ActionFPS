@@ -10,10 +10,12 @@ case class AcMap(name: String, image: String)
 case class Maps(maps: Map[String, AcMap])
 
 object Maps {
+
   def fromMap(input: Map[String, String]): Maps = {
     Maps(input.map { case (name, image) => name -> AcMap(name, image) })
   }
 
-  lazy val fromResource = Json.fromJson[Map[String, String]](Json.parse(getClass.getResourceAsStream("maps.json")))
+  val resource = Json.fromJson[Map[String, String]](Json.parse(getClass.getResourceAsStream("maps.json")))
     .map(map => Maps.fromMap(map)).get
+
 }
