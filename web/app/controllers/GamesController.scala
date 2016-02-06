@@ -80,7 +80,7 @@ class GamesController @Inject()(common: Common,
 
   def serverUpdates = Action {
     Ok.feed(
-      content = pingerService.liveGamesEnum
+      content = Enumerator.enumerate(pingerService.status.get().valuesIterator).andThen(pingerService.liveGamesEnum)
     ).as("text/event-stream")
   }
 
