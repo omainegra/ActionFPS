@@ -8,6 +8,7 @@ import javax.inject._
 
 import akka.actor.ActorDSL._
 import akka.actor.{ActorLogging, ActorSystem, Kill, Props}
+import akka.agent.Agent
 import com.actionfps.gameparser.Maps
 import com.actionfps.pinger._
 import controllers.Common
@@ -41,6 +42,8 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
   implicit val cgnsw = Json.writes[CurrentGameNowServer]
   implicit val cgnw = Json.writes[CurrentGameNow]
   implicit val cgsw = Json.writes[CurrentGameStatus]
+
+  val status = Agent(Map.empty[String, Event])
   val listenerActor = actor(factory = actorSystem, name = "pinger")(new PingerService.ListenerActor({
     a =>
       liveGamesChan.push(
@@ -51,23 +54,28 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
         ))
 
   }, { b =>
-    liveGamesChan.push(
+
+    val cgse =
       Event(
         id = Option(b.now.server.server),
         name = Option("current-game-status"),
         data = Json.toJson(b).toString()
       )
-    )
+    liveGamesChan.push(cgse)
+
+    status.alter(m => m.updated(s"${cgse.id}${cgse.name}", cgse))
+
     val jsonMap = Map("game" -> Seq(Json.toJson(b).toString()), "maps" -> Seq(Json.toJson(Maps.resource.maps.mapValues(_.image)).toString()))
-    common.renderRaw("/live/render-fragment.php")(_.post(jsonMap)).foreach(resp =>
-      liveGamesChan.push(
+    common.renderRaw("/live/render-fragment.php")(_.post(jsonMap)).map(resp =>
         Event(
           id = Option(b.now.server.server),
           name = Option("current-game-status-fragment"),
           data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(resp.body)).toString()
         )
-      )
-    )
+    ).foreach{event =>
+      liveGamesChan.push(event)
+      status.alter(m => m.updated(s"${event.id}${event.name}", event))
+    }
   }))
 
   import concurrent.duration._
