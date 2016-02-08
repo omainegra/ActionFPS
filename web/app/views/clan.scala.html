@@ -6,10 +6,10 @@
             @views.html.clan_logo(clan)
             <h1>@clan.fullName</h1>
             @clan.website.map { website =>
-            <span> - <a href="@website" target="_blank">Website</a></span>
+                <span> - <a href="@website" target="_blank">Website</a></span>
             }
             @clan.teamspeak.map { teamspeak =>
-            <span>    - <a href="@clan.teamspeak">Teamspeak</a></span>
+                <span>    - <a href="@clan.teamspeak">Teamspeak</a></span>
             }
         </div>
         @stats.map { stats =>

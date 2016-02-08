@@ -589,7 +589,7 @@ code {
     margin-right: 0.25em;
 }
 
-.clan-header h1, span {
+.clan-header h1, .clan-header span {
     margin: 0 0.25em;
 }
 
