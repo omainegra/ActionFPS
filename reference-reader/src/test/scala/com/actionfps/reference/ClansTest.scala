@@ -13,7 +13,7 @@ class ClansTest
   with OptionValues {
   test("It should work") {
     val recs = ClanRecord.parseRecords(getSample("clans.csv"))
-    recs should have size 30
+    recs should have size 29
     recs should contain(ClanRecord(
       id = "woop",
       shortName = "w00p",
@@ -21,7 +21,8 @@ class ClansTest
       website = Some(new URI("http://woop.us/")),
       tag = "w00p|*",
       tag2 = None,
-      logo = new URI("http://i.imgur.com/AnsEc0M.png")
+      logo = new URI("https://i.imgur.com/AnsEc0M.png"),
+      teamspeak = Some(new URI("ts3server://abc.def:123"))
     ))
     recs.find(_.id == "rc").value.website.value.toString shouldBe "http://585437.xobor.com/"
   }
