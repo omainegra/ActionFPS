@@ -40,18 +40,4 @@ package object inter {
     }
   }
 
-  object InterCall {
-    val matcher = """Date: ([^ ]+), Server: [^ ]+ aura AssaultCube\[local#(\d+)\], Payload: (.*)""".r
-
-    def unapply(input: String): Option[InterCall] = {
-      PartialFunction.condOpt(input) {
-        case matcher(ZDT(time), IntValue(port), InterMessage(interMessage)) =>
-          interMessage.toCall(
-            time = time,
-            server = s"aura.woop.ac:$port"
-          )
-      }
-    }
-  }
-
 }

@@ -68,47 +68,34 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
   def acceptLine(line: String): Unit = {
     val validServers = ValidServers.fromResource
     PartialFunction.condOpt(line) {
-      case ExtractMessage(zdt, validServers.FromLog(server), InterMessage(interMessage)) =>
+      case ExtractMessage(zdt, validServers.FromLog(server), InterMessage(interMessage)) if server.address.isDefined =>
         val interCall = interMessage.toCall(
           time = zdt,
           server = server.name
         )
         async {
-          await(referenceProvider.servers).find(sr => server.address.contains(sr.address)) match {
-            case Some(referenceServer) =>
-              val allowed = {
-                val userIsRegistered = await(referenceProvider.users).exists(_.nickname.nickname == interCall.nickname)
-                val isNotExpired = interStateAgent.get().canAdd(interCall)
-                userIsRegistered && isNotExpired
-              }
-              interStateAgent.send { oldState =>
-                logger.info(s"Received $interCall. Allowed? $allowed")
-                if (allowed) {
-                  intersChannel.push(Event(
-                    id = Option(interCall.time.toString),
-                    name = Option("inter"),
-                    data = Json.toJson(Map(
-                      "playerName" -> interCall.nickname,
-                      "serverName" -> server.name,
-                      "serverConnect" -> referenceServer.connectAddress
-                    )).toString
-                  ))
-                  oldState + interCall
-                } else oldState
-              }
-            case None =>
+          val allowed = {
+            val userIsRegistered = await(referenceProvider.users).exists(_.nickname.nickname == interCall.nickname)
+            val isNotExpired = interStateAgent.get().canAdd(interCall)
+            userIsRegistered && isNotExpired
+          }
+          interStateAgent.send { oldState =>
+            logger.info(s"Received $interCall. Allowed? $allowed")
+            if (allowed) {
+              intersChannel.push(Event(
+                id = Option(interCall.time.toString),
+                name = Option("inter"),
+                data = Json.toJson(Map(
+                  "playerName" -> interCall.nickname,
+                  "serverName" -> server.name,
+                  "serverConnect" -> server.address.get
+                )).toString
+              ))
+              oldState + interCall
+            } else oldState
           }
         }
     }
   }
-
-  def sampleInter = Event(
-    id = Option("1234"),
-    name = Option("inter"),
-    data = Json.toJson(Map(
-      "name" -> "Drakas",
-      "server" -> "aura.woop.ac:1337"
-    )).toString
-  )
 
 }
