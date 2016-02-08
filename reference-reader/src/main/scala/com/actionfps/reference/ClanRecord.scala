@@ -8,7 +8,7 @@ import org.apache.commons.csv.CSVFormat
 import scala.util.Try
 
 case class ClanRecord(id: String, shortName: String, longName: String, website: Option[URI], tag: String, tag2: Option[String],
-                      logo: URI)
+                      logo: URI, teamspeak: Option[URI])
 
 object ClanRecord {
 
@@ -24,9 +24,10 @@ object ClanRecord {
         tag2 = Try(rec.get(5)).toOption.filter(_ != null).filter(_.nonEmpty)
         logo <- Try(Option(new URI(rec.get(6)))
           .filter(u => u.getPath.endsWith(".png") || u.getPath.endsWith(".svg") || u.getHost.contains("github"))
-          .filter(u => u.getScheme == "http" || u.getScheme == "https")
+          .filter(u => u.getScheme == "https")
         )
           .toOption.flatten
+        teamspeak = Try(Option(new URI(rec.get(7)))).toOption.flatten.filter(_.getScheme == "ts3server")
       } yield ClanRecord(
         id = id,
         shortName = shortName,
@@ -34,7 +35,8 @@ object ClanRecord {
         website = website,
         tag = tag,
         tag2 = tag2,
-        logo = logo
+        logo = logo,
+        teamspeak = teamspeak
       )
     }.flatten.toList
 
