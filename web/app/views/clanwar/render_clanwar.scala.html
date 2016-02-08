@@ -21,7 +21,18 @@
                 @views.html.clanwar.render_clanwar_team(team, clan, showPlayers)
             }
             </div>
+            @if(!showPlayers) {
+                @clanwar.achievements.map { achievements =>
+                    <div class="g-achievements">
+                        @achievements.map { achievement =>
+                            <a href="/player/?id=@achievement.user">@achievement.text</a>
+                            <br/>
+                        }
+                    </div>
+                }
+            }
         </div>
 
     </article>
 }
+
