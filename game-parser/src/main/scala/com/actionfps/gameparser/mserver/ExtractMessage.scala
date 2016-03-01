@@ -40,7 +40,10 @@ object ExtractMessage {
     }
   }
   // Joda appears to be much faster than JUT, approx 40% or so.
-  private val zones = Map("CET" -> DateTimeZone.forID("CET"))
+  private val zones = Map(
+    "CET" -> DateTimeZone.forID("CET"),
+    "UTC" -> DateTimeZone.forID("UTC")
+  )
   import collection.JavaConverters._
   val parsers = Array( // Joda ZZZ == JUT VV
     /// Sat Dec 13 19:36:16 CET 2014
