@@ -43,7 +43,7 @@ object CommonSettingsPlugin extends AutoPlugin {
     )
 
     def akka(stuff: String*) = stuff.map { k =>
-      "com.typesafe.akka" %% s"akka-$k" % "2.4.0"
+      "com.typesafe.akka" %% s"akka-$k" % "2.4.2"
     }
   }
 
