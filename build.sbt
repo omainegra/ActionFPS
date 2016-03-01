@@ -174,7 +174,7 @@ lazy val pingerClient =
       "com.typesafe.akka" %% "akka-slf4j" % "2.4.0",
       "com.typesafe.akka" %% "akka-testkit" % "2.4.0" % "test",
       "commons-net" % "commons-net" % "3.3",
-      "joda-time" % "joda-time" % "2.9"
+      "joda-time" % "joda-time" % "2.9.2"
     ),
     git.useGitDescribe := true
   )
@@ -205,10 +205,10 @@ lazy val syslogAc =
       rpmLicense := Some("BSD"),
       libraryDependencies ++= Seq(
         "org.syslog4j" % "syslog4j" % "0.9.30",
-        "org.scalatest" %% "scalatest" % "2.2.5" % "test",
+        "org.scalatest" %% "scalatest" % "2.2.6" % "test",
         "ch.qos.logback" % "logback-classic" % "1.1.3",
         "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-        "joda-time" % "joda-time" % "2.9.1",
+        "joda-time" % "joda-time" % "2.9.2",
         "org.joda" % "joda-convert" % "1.8.1"
       ),
       bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"""",

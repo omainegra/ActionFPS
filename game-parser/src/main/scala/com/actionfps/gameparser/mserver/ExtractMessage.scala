@@ -1,6 +1,7 @@
 package com.actionfps.gameparser.mserver
 
 import java.time.{Instant, ZoneId, ZonedDateTime}
+import java.util.Locale
 
 import org.joda.time.DateTimeZone
 import org.joda.time.format.{ISODateTimeFormat, DateTimeFormatterBuilder, DateTimeFormat}
@@ -39,8 +40,12 @@ object ExtractMessage {
     }
   }
   // Joda appears to be much faster than JUT, approx 40% or so.
+  private val zones = Map("CET" -> DateTimeZone.forID("CET"))
+  import collection.JavaConverters._
   val parsers = Array( // Joda ZZZ == JUT VV
-    DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss ZZZ yyyy").getParser,
+    /// Sat Dec 13 19:36:16 CET 2014
+    new DateTimeFormatterBuilder().appendPattern("EEE MMM dd HH:mm:ss ").appendTimeZoneShortName(zones.asJava)
+        .appendPattern(" yyyy").toParser,
     ISODateTimeFormat.dateTimeNoMillis().getParser,
     ISODateTimeFormat.dateTime().getParser
   )
@@ -48,8 +53,8 @@ object ExtractMessage {
 
   def unapply(line: String): Option[(ZonedDateTime, String, String)] = {
     PartialFunction.condOpt(line) {
-
-      case matcher(date, serverId, message) => try {
+      case matcher(date, serverId, message) =>
+        try {
         val dat = {
           val jdt = dateFmt.parseDateTime(date).withZone(DateTimeZone.UTC).getMillis
           ZonedDateTime.ofInstant(Instant.ofEpochMilli(jdt), ZoneId.of("UTC")).withNano(0)

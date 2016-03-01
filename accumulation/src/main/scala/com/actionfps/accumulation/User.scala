@@ -37,7 +37,7 @@ object User {
     import play.api.libs.json._
     import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
-    implicit val noEmailUserWrite = Json.writes[User].transform(jv => jv.validate((__ \ 'email).json.prune).get)
+    implicit val noEmailUserWrite = Json.writes[User].transform((jv: JsObject) => jv.validate((__ \ 'email).json.prune).get)
   }
 
   def fromRegistration(registration: Registration, nicknames: List[NicknameRecord]): Option[User] = {

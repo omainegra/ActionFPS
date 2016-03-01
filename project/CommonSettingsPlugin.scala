@@ -21,7 +21,7 @@ object CommonSettingsPlugin extends AutoPlugin {
     javaOptions in run += "-Duser.timezone=UTC",
     resolvers += Resolver.mavenLocal,
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+      "org.scalatest" %% "scalatest" % "2.2.6" % "test"
     ),
     licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
     publishMavenStyle := false
@@ -29,11 +29,11 @@ object CommonSettingsPlugin extends AutoPlugin {
 
   object autoImport {
     val json4s = "org.json4s" %% "json4s-jackson" % "3.3.0"
-    val scalactic = "org.scalactic" %% "scalactic" % "2.2.5"
+    val scalactic = "org.scalactic" %% "scalactic" % "2.2.6"
     val async = "org.scala-lang.modules" %% "scala-async" % "0.9.5"
     val xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
     val joda = Seq(
-      "joda-time" % "joda-time" % "2.9.1",
+      "joda-time" % "joda-time" % "2.9.2",
       "org.joda" % "joda-convert" % "1.8.1"
     )
     val dontDocument = Seq(
