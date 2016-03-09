@@ -9,7 +9,7 @@ object CommonSettingsPlugin extends AutoPlugin {
   )
 
   override def projectSettings = Seq(
-    scalaVersion := "2.11.7",
+    scalaVersion := "2.11.8",
     organization := "com.actionfps",
     updateOptions := updateOptions.value.withCachedResolution(true),
     scalacOptions := Seq(
