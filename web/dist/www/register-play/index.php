@@ -105,8 +105,8 @@ require("../render.inc.php");
                 $.get(queryUrl).then(function (x) {
                     if (x === false) {
                     } else if ("id" in x) {
-                        $.cookie("af_id", x.id, {path: '/', expires: 10});
-                        $.cookie("af_name", x.name, {path: '/', expires: 10});
+                        $.cookie("af_id", x.id, {path: '/', expires: 0});
+                        $.cookie("af_name", x.name, {path: '/', expires: 0});
                         $('#login_welcome a').attr("href", "/player/?id=" + x.id).text(x.name);
                         $('#welcome-user, #log-in').attr("href", "/player/?id=" + x.id).text(x.name);
                         $('#login_welcome').css("display", "block");

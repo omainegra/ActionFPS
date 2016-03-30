@@ -12,7 +12,7 @@
                 <td>Score</td>
                 <td>Last played</td>
             </tr>
-            @playersStats.onlyRanked.players.values.toList.sortBy(_.rank).take(50).map { player =>
+            @playersStats.onlyRanked.players.values.toList.sortBy(_.rank).map { player =>
                 <tr>
                     <td>@player.rank.getOrElse("-")</td>
                     <td><a href="/player/?id=@player.user">@player.name</a></td>
