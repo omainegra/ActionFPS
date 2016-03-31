@@ -37,7 +37,7 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
 
   def headings = Action.async { request =>
     async {
-      request.getQueryString("foramt") match {
+      request.getQueryString("format") match {
         case Some("csv") =>
           Ok(await(referenceProvider.Headings.csv))
         case Some("latest") =>
