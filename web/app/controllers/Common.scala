@@ -60,44 +60,6 @@ class Common @Inject()(configuration: Configuration)(implicit wsClient: WSClient
     f(wsClient.url(s"$mainPath$path"))
   }
 
-  def renderJson(path: String)(map: Map[String, JsValue])(implicit requestHeader: RequestHeader) = {
-    if (requestHeader.getQueryString("format").contains("json"))
-      Future.successful(Ok(Json.toJson(map)))
-    else
-      renderPhp(path)(_.withQueryString("supports" -> "json").post(map.mapValues(v => Seq(v.toString()))))
-  }
-
-  def renderJsonGroovy(path: String)(map: Map[String, JsValue])(implicit requestHeader: RequestHeader) = {
-    if (requestHeader.getQueryString("format").contains("json"))
-      Future.successful(Ok(Json.toJson(map)))
-    else {
-      val config = new TemplateConfiguration()
-      val tr = new TemplateResolver {
-        override def configure(templateClassLoader: ClassLoader, configuration: TemplateConfiguration): Unit = {
-
-        }
-
-        override def resolveTemplate(templatePath: String): URL =
-          new File(s"web/dist/www$templatePath").toURI.toURL
-      }
-      val engine = new MarkupTemplateEngine(getClass.getClassLoader, config, tr)
-      val template = engine.createTemplate(engine.resolveTemplate("/index.groovy"))
-      val model = new java.util.HashMap[String, Any]()
-      for {(k, v) <- map} model.put(k, new JsonSlurper().parseText(v.toString()))
-      val output = template.make(model)
-      val sw = new StringWriter()
-      output.writeTo(sw)
-      Future.successful(Ok(Html(sw.toString)))
-    }
-  }
-
-  def renderJsonWR(path: String)(f: WSRequest => WSRequest)(map: Map[String, JsValue])(implicit requestHeader: RequestHeader) = {
-    if (requestHeader.getQueryString("format").contains("json"))
-      Future.successful(Ok(Json.toJson(map)))
-    else
-      renderPhp(path)(r => f(r).withQueryString("supports" -> "json").post(map.mapValues(v => Seq(v.toString()))))
-  }
-
   def renderPhp(path: String)(f: WSRequest => Future[WSResponse])
                (implicit request: RequestHeader): Future[Result] = {
     async {

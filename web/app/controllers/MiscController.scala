@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject._
 
+import com.actionfps.reference.HeadingsRecord
 import play.api.Configuration
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
@@ -33,6 +34,23 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
   def questions = forward("/questions/")
 
   def development = forward("/development.php")
+
+  def headings = Action.async { request =>
+    async {
+      request.getQueryString("foramt") match {
+        case Some("csv") =>
+          Ok(await(referenceProvider.Headings.csv))
+        case Some("latest") =>
+          await(referenceProvider.bulletin).map(_.html.body) match {
+            case Some(html) => Ok(html)
+            case None => NotFound("Latest bulletin could not be found")
+          }
+        case _ =>
+          implicit val wrHr = Json.writes[HeadingsRecord]
+          Ok(Json.toJson(await(referenceProvider.Headings.headings)))
+      }
+    }
+  }
 
   def servers = Action.async { implicit request =>
     async {

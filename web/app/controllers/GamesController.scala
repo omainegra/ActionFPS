@@ -49,6 +49,7 @@ class GamesController @Inject()(common: Common,
       val games = await(fullProvider.getRecent).map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
       val latestClanwar = await(fullProvider.clanwars).complete.toList.sortBy(_.id).lastOption.map(_.meta.named)
+      val headingO = await(referenceProvider.bulletin)
       implicit val fmt = {
         implicit val d = Json.writes[ClanwarPlayer]
         implicit val c = Json.writes[ClanwarTeam]
@@ -59,11 +60,16 @@ class GamesController @Inject()(common: Common,
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(IndexContents(games.map(_.game), events, latestClanwar)))
       else
-        Ok(renderTemplate(None, supportsJson = true, None)(views.html.index(games = games, events = events, latestClanwar = latestClanwar)))
+        Ok(renderTemplate(None, supportsJson = true, None)(views.html.index(games = games, events = events, latestClanwar = latestClanwar,
+          bulletin = headingO.map(_.html)
+        )))
     }
   }
 
-  case class IndexContents(recentGames: List[JsonGame], recentEvents: List[Map[String, String]], latestClanwr: Option[ClanwarMeta])
+  case class IndexContents(recentGames: List[JsonGame],
+                           recentEvents: List[Map[String, String]],
+                           latestClanwr: Option[ClanwarMeta]
+                          )
 
   def game(id: String) = Action.async { implicit request =>
     async {

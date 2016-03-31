@@ -1,6 +1,11 @@
 @import views.rendergame.MixedGame
 @import lib.Clanner
-@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[com.actionfps.clans.ClanwarMeta])(implicit clanner: Clanner)
+@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[com.actionfps.clans.ClanwarMeta], bulletin: Option[Html])(implicit clanner: Clanner)
+@bulletin.map { html =>
+    <div id="bulletin">
+        @html
+    </div>
+}
 <div id="live-events">
     <ol class="LiveEvents live-events">
         @events.take(7).map { event =>

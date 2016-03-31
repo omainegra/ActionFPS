@@ -1,13 +1,15 @@
 package providers
 
 import java.io.{StringWriter, StringReader}
+import java.time.ZoneOffset
 import javax.inject.Inject
 import com.actionfps.accumulation.{User, Clan}
-import com.actionfps.reference.{NicknameRecord, Registration, ServerRecord, ClanRecord}
+import com.actionfps.reference._
 import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
+import play.twirl.api.{HtmlFormat, Html}
 
 
 import scala.async.Async._
@@ -25,7 +27,7 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
   import controllers.cf
 
   def unCache(): Unit = {
-    List("clans", "servers", "registrations", "nicknames").foreach(cacheApi.remove)
+    List("clans", "servers", "registrations", "nicknames", "headings").foreach(cacheApi.remove)
   }
 
   private def fetch(key: String) = async {
@@ -47,6 +49,30 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
       finally sr.close()
     }
   }
+
+  object Headings {
+    def csv: Future[String] = fetch("headings")
+
+    def headings: Future[List[HeadingsRecord]] = csv.map { bdy =>
+      val sr = new StringReader(bdy)
+      try HeadingsRecord.parseRecords(sr)
+      finally sr.close()
+    }
+
+    def latest: Future[Option[Heading]] = async {
+      val hs = await(headings).filter(_.text.startsWith("http://"))
+      if ( hs.isEmpty ) None
+      else {
+        val heading = hs.maxBy(_.from.toEpochSecond(ZoneOffset.UTC))
+        val html = if ( heading.text.contains("<") ) HtmlFormat.raw(heading.text)
+        else HtmlFormat.escape(heading.text)
+        Option(Heading(html = html))
+      }
+    }
+
+    case class Heading(html: Html)
+  }
+  case class Headings(headings: List[Headings.Heading])
 
   object Servers {
     def raw: Future[String] = fetch("servers")
@@ -91,5 +117,7 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
   implicit val serverRecordRead = Json.reads[ServerRecord]
 
   def servers: Future[List[ServerRecord]] = Servers.servers
+
+  def bulletin: Future[Option[Headings.Heading]] = Headings.latest
 
 }
