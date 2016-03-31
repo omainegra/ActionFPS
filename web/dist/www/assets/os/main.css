@@ -161,6 +161,7 @@ a:hover {
 #clans,
 #live-events,
 article#videos,
+#bulletin,
 #settings {
   margin: 2em;
   margin-left: 4em;
@@ -681,4 +682,9 @@ input {
 }
 #reg-form.signed-in #register-signedin {
   display:block;
+}
+#bulletin .when {
+  padding-right:2em;
+}
+#bulletin {display:flex;
 }

@@ -1,7 +1,7 @@
 package providers
 
 import java.io.{StringWriter, StringReader}
-import java.time.ZoneOffset
+import java.time.{ZoneId, ZonedDateTime, ZoneOffset}
 import javax.inject.Inject
 import com.actionfps.accumulation.{User, Clan}
 import com.actionfps.reference._
@@ -10,6 +10,7 @@ import play.api.cache.CacheApi
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.twirl.api.{HtmlFormat, Html}
+import providers.ReferenceProvider.Heading
 
 
 import scala.async.Async._
@@ -60,19 +61,19 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
     }
 
     def latest: Future[Option[Heading]] = async {
-      val hs = await(headings).filter(_.text.startsWith("http://"))
+      val hs = await(headings).filterNot(_.text.startsWith("http://"))
       if ( hs.isEmpty ) None
       else {
         val heading = hs.maxBy(_.from.toEpochSecond(ZoneOffset.UTC))
         val html = if ( heading.text.contains("<") ) HtmlFormat.raw(heading.text)
         else HtmlFormat.escape(heading.text)
-        Option(Heading(html = html))
+        Option(Heading(at = ZonedDateTime.of(heading.from, ZoneId.of("UTC")), html = html))
       }
     }
 
-    case class Heading(html: Html)
+
   }
-  case class Headings(headings: List[Headings.Heading])
+  case class Headings(headings: List[ReferenceProvider.Heading])
 
   object Servers {
     def raw: Future[String] = fetch("servers")
@@ -118,6 +119,9 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
 
   def servers: Future[List[ServerRecord]] = Servers.servers
 
-  def bulletin: Future[Option[Headings.Heading]] = Headings.latest
+  def bulletin: Future[Option[Heading]] = Headings.latest
 
+}
+object ReferenceProvider {
+  case class Heading(at: ZonedDateTime, html: Html)
 }

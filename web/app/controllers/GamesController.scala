@@ -60,9 +60,13 @@ class GamesController @Inject()(common: Common,
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(IndexContents(games.map(_.game), events, latestClanwar)))
       else
-        Ok(renderTemplate(None, supportsJson = true, None)(views.html.index(games = games, events = events, latestClanwar = latestClanwar,
-          bulletin = headingO.map(_.html)
-        )))
+        Ok(renderTemplate(None, supportsJson = true, None)(
+          views.html.index(
+            games = games,
+            events = events,
+            latestClanwar = latestClanwar,
+            bulletin = headingO
+          )))
     }
   }
 
