@@ -684,7 +684,8 @@ input {
   display:block;
 }
 #bulletin .when {
-  padding-right:2em;
+  min-width:6em;
+  padding-right:1em;
 }
 #bulletin {display:flex;
 }
