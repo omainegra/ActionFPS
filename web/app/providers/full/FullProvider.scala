@@ -1,7 +1,7 @@
 package providers.full
 
 import akka.agent.Agent
-import com.actionfps.accumulation.{FullIterator, FullProfile}
+import com.actionfps.accumulation.{HOF, FullIterator, FullProfile}
 import com.actionfps.clans.{Clanstats, Clanwars}
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
@@ -32,6 +32,10 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext) {
 
   def clanstats: Future[Clanstats] = {
     fullStuff.map(_.get().clanstats)
+  }
+
+  def hof: Future[HOF] = {
+    fullStuff.map(_.get().hof)
   }
 
   def allGames: Future[List[JsonGame]] = {

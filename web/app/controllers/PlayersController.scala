@@ -40,6 +40,12 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     }
   }
 
+  def hof = Action.async { implicit request =>
+    async {
+      Ok(renderTemplate(None, false, None)(views.html.hof.hof(await(fullProvider.hof))))
+    }
+  }
+
   def rankings = Action.async { implicit request =>
     async {
       import PlayersStats.ImplicitWrites._

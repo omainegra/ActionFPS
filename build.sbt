@@ -1,6 +1,6 @@
 import java.util.Base64
 
-import com.hazelcast.core.Hazelcast
+import com.hazelcast.core.{HazelcastInstance, Hazelcast}
 import org.eclipse.jgit.revwalk.RevWalk
 
 name := "actionfps"
@@ -81,6 +81,9 @@ lazy val web =
         val cfg = new com.hazelcast.config.Config()
         cfg.setInstanceName("web")
         Hazelcast.getOrCreateHazelcastInstance(cfg)
+      },
+      stopHazelcast := {
+        startHazelcast.value.shutdown()
       },
       scriptClasspath := Seq("*"),
       buildInfoKeys := Seq[BuildInfoKey](
@@ -248,4 +251,5 @@ lazy val players =
       git.useGitDescribe := true
     )
 
-lazy val startHazelcast = TaskKey[Unit]("Start a hazelcast instance")
+lazy val startHazelcast = TaskKey[HazelcastInstance]("Start the web hazelcast instance")
+lazy val stopHazelcast = TaskKey[Unit]("Stop the web hazelcast instance")

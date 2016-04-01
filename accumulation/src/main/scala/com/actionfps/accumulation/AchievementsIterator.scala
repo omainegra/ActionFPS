@@ -1,6 +1,6 @@
 package com.actionfps.accumulation
 
-import com.actionfps.achievements.PlayerState
+import com.actionfps.achievements.{CompletedAchievement, PlayerState}
 import com.actionfps.gameparser.enrichers.JsonGame
 
 /**
@@ -12,6 +12,16 @@ object AchievementsIterator {
 }
 
 case class AchievementsIterator(map: Map[String, PlayerState], events: List[Map[String, String]]) {
+  /**
+    * List of user --> Set[game --> achievement]
+    */
+  def newAchievements(previous: AchievementsIterator): List[(String, scala.collection.immutable.Set[(String, com.actionfps.achievements.immutable.CompletedAchievement)])] = {
+    val updatedPlayers = (map.toSet -- previous.map.toSet).toMap
+    (for {
+      (user, state) <- updatedPlayers
+      newAch = state.achieved.toSet -- previous.map.get(user).map(_.achieved).getOrElse(Vector.empty).toSet
+    } yield user -> newAch.toSet).toList
+  }
   def includeGame(users: List[User])(jsonGame: JsonGame): AchievementsIterator = {
     val oEvents = scala.collection.mutable.Buffer.empty[Map[String, String]]
     var nComb = map

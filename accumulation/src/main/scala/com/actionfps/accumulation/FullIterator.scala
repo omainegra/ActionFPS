@@ -15,6 +15,7 @@ case class FullIterator
  clanwars: Clanwars,
  clanstats: Clanstats,
  achievementsIterator: AchievementsIterator,
+ hof: HOF,
  playersStats: PlayersStats) {
   fi =>
 
@@ -27,7 +28,8 @@ case class FullIterator
       achievementsIterator = AchievementsIterator.empty,
       clanwars = Clanwars.empty,
       clanstats = Clanstats.empty,
-      playersStats = PlayersStats.empty
+      playersStats = PlayersStats.empty,
+      hof = HOF.empty
     )
     games.valuesIterator.toList.sortBy(_.id).foldLeft(blank)(_.includeGame(_))
   }
@@ -39,6 +41,11 @@ case class FullIterator
     import enricher.withUsersClass
     var richGame = jsonGame.withoutHosts.withUsers.withClans
     val newAchievements = achievementsIterator.includeGame(fi.users.values.toList)(richGame)
+
+    val nhof = newAchievements.newAchievements(achievementsIterator).foldLeft(hof){
+      case (ahof, (user, items)) =>
+        items.foldLeft(ahof){case (xhof, (game, ach)) => xhof.includeAchievement(user, game, ach)}
+    }
     PartialFunction.condOpt(newAchievements.events.toSet -- achievementsIterator.events.toSet) {
       case set if set.nonEmpty =>
         richGame = richGame.copy(
@@ -77,6 +84,7 @@ case class FullIterator
       games = newGames,
       achievementsIterator = newAchievements,
       clanwars = ncw,
+      hof = nhof,
       clanstats = newClanstats,
       playersStats = playersStats.includeGame(richGame)
     )

@@ -9,4 +9,4 @@ trait PartialAchievement extends Achievement with IncompleteAchievement {
   def progress: Int
 }
 trait AwaitingAchievement extends Achievement with IncompleteAchievement
-trait CompletedAchievement extends Achievement with IncompleteAchievement
+trait CompletedAchievement extends Achievement
