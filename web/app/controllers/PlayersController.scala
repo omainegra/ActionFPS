@@ -6,10 +6,11 @@ package controllers
 
 import javax.inject._
 
-import com.actionfps.accumulation.BuiltProfile
+import com.actionfps.accumulation.{HOF, BuiltProfile}
+import com.actionfps.achievements.immutable.Achievement
 import com.actionfps.players.{PlayerStat, PlayersStats}
 import play.api.Configuration
-import play.api.libs.json.Json
+import play.api.libs.json.{Writes, JsObject, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import providers.full.FullProvider
@@ -42,7 +43,15 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
 
   def hof = Action.async { implicit request =>
     async {
-      Ok(renderTemplate(None, false, None)(views.html.hof.hof(await(fullProvider.hof))))
+      val h = await(fullProvider.hof)
+      implicit val hofarpW = Json.writes[HOF.AchievementRecordPlayer]
+      implicit val achW = Writes[Achievement](ach => Json.toJson(Map("title" -> ach.title, "description" -> ach.description)))
+      implicit val hofarW = Json.writes[HOF.AchievementRecord]
+      implicit val hofW = Json.writes[HOF]
+      if (request.getQueryString("format").contains("json"))
+        Ok(Json.toJson(h))
+      else
+        Ok(renderTemplate(None, supportsJson = true, None)(views.html.hof.hof(h)))
     }
   }
 

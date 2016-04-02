@@ -5,27 +5,27 @@ import com.actionfps.achievements.immutable._
 /**
   * Created by me on 01/04/2016.
   */
-case class HOF(list: List[HOF.AchievementRecord]) {
+case class HOF(achievements: List[HOF.AchievementRecord]) {
   def includeAchievement(user: String, game: String, achievement: CompletedAchievement): HOF = {
-    val nl = list.map {
+    val nl = achievements.map {
       case ar if ar.achievement.title == achievement.title =>
         ar.copy(players = ar.players :+ HOF.AchievementRecordPlayer(
           user = user,
-          game = game
+          atGame = game
         ))
       case o => o
     }
     copy(
-      list = nl
+      achievements = nl
     )
   }
-  def reversed = copy(list = list.map(ar => ar.reversed))
+  def reversed = copy(achievements = achievements.map(ar => ar.reversed))
 }
 
 object HOF {
 
   def empty = HOF(
-    list = achievements.map(achievement =>
+    achievements = achievements.map(achievement =>
       AchievementRecord(
         achievement = achievement,
         players = List.empty
@@ -49,6 +49,6 @@ object HOF {
     def reversed = copy(players = players.reverse)
   }
 
-  case class AchievementRecordPlayer(user: String, game: String)
+  case class AchievementRecordPlayer(user: String, atGame: String)
 
 }
