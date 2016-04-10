@@ -111,5 +111,10 @@
     "name": "bonza 1999",
     "timezone": "UTC",
     "address": "bonza.actionfps.com:1999"
+  },
+  "191.96.4.147 legal AssaultCube[local#1999]": {
+    "name": "legal 1999",
+    "timezone": "UTC",
+    "address": "legal.actionfps.com:1999"
   }
 }
