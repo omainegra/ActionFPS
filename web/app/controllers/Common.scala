@@ -46,6 +46,10 @@ class Common @Inject()(configuration: Configuration
     js.select(s"#reg-menu-reg-play").first().text(Messages("menu.register-play"))
     js.select(s"#reg-menu-play").first().text(Messages("menu.play"))
 
+    Set("clan-ranks", "clan-wars", "official-clans", "player-ranks", "hall-of-fame", "servers", "faq", "forum", "login").foreach {
+      id => js.select(s"#menu-${id} a").first().text(Messages(s"menu.${id}"))
+    }
+
     PartialFunction.condOpt(requestHeader.cookies.get("af_id").map(_.value) -> requestHeader.cookies.get("af_name").map(_.value)) {
       case (Some(id), Some(name)) =>
         js.select("#log-in").first().text(name)
@@ -57,9 +61,6 @@ class Common @Inject()(configuration: Configuration
     }
     js.select("#content").html(html.body)
 
-    Set("clan-ranks", "clan-wars", "official-clans", "player-ranks", "hall-of-fame", "servers", "faq", "forum", "login").foreach {
-      id => js.select(s"#menu-${id} a").first().text(Messages(s"menu.${id}"))
-    }
     Html(js.toString)
   }
 
