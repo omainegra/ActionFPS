@@ -689,3 +689,7 @@ input {
 }
 #bulletin {display:flex;
 }
+#reg-menu #log-in {
+  display:inline-block;
+  margin-top:0.5em;
+}
