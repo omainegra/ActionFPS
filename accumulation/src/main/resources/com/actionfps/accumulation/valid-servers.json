@@ -101,5 +101,10 @@
   "153.92.126.156 weed-lounge AssaultCube[local#3333]": {
     "name": "se 3333",
     "timezone": "America/New_York"
+  },
+  "unassigned.psychz.net califa AssaultCube[local#1999]": {
+    "name": "califa 1999",
+    "timezone": "UTC",
+    "address": "califa.actionfps.com:1999"
   }
 }
