@@ -85,7 +85,7 @@ lazy val web =
       stopHazelcast := {
         startHazelcast.value.shutdown()
       },
-      scriptClasspath := Seq("*"),
+      scriptClasspath := Seq("*", "../conf/*"),
       buildInfoKeys := Seq[BuildInfoKey](
         name,
         version,
