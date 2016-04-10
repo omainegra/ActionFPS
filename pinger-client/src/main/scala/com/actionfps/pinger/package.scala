@@ -31,8 +31,8 @@ package object pinger {
   val playerStates = List("alive", "dead", "spawning", "lagged", "editing", "spectate").zipWithIndex.map(_.swap).toMap
   val guns = List("knife", "pistol", "carbine", "shotgun", "subgun", "sniper", "assault", "cpistol", "grenade", "pistol").zipWithIndex.map(_.swap).toMap
 
-  val connects = Map("62.210.131.155" -> "aura.woop.ac", "104.219.54.14" -> "tyr.woop.ac", "104.236.35.55" -> "ny.weed-lounge.me", "104.255.33.235" -> "la.weed-lounge.me")
-  val shortName = Map("62.210.131.155" -> "Aura", "104.219.54.14" -> "Tyr", "104.236.35.55" -> "NY Lounge", "104.255.33.235" -> "LA Lounge")
+  val connects = Map("62.210.131.155" -> "aura.woop.ac", "104.219.54.14" -> "tyr.woop.ac", "104.236.35.55" -> "ny.weed-lounge.me", "104.255.33.235" -> "la.weed-lounge.me", "192.184.63.69" -> "califa.actionfps.com")
+  val shortName = Map("62.210.131.155" -> "Aura", "104.219.54.14" -> "Tyr", "104.236.35.55" -> "NY Lounge", "104.255.33.235" -> "LA Lounge", "192.184.63.69" -> "Califa")
 
 
   case class GotParsedResponse(from: (String, Int), stuff: ParsedResponse)
