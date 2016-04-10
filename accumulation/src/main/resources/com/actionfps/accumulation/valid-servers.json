@@ -106,5 +106,10 @@
     "name": "califa 1999",
     "timezone": "UTC",
     "address": "califa.actionfps.com:1999"
+  },
+  "nordfinsh.com bonza AssaultCube[local#1999]": {
+    "name": "bonza 1999",
+    "timezone": "UTC",
+    "address": "bonza.actionfps.com:1999"
   }
 }
