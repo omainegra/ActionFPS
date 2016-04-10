@@ -10,35 +10,50 @@
     "frags" : 141,
     "players" : [ {
       "name" : "|DnC|madcatz",
+      "host" : "94.41.154.190",
       "score" : 705,
       "flags" : 4,
       "frags" : 41,
       "deaths" : 48,
       "user" : "madcatz",
-      "clan" : "dnc"
+      "clan" : "dnc",
+      "countryCode" : "RU",
+      "countryName" : "Russian Federation",
+      "timezone" : "Europe/Samara"
     }, {
       "name" : "*[BRC]*Wallp",
+      "host" : "179.254.32.117",
       "score" : 557,
       "flags" : 4,
       "frags" : 31,
       "deaths" : 21,
-      "clan" : "brc"
+      "clan" : "brc",
+      "countryCode" : "BR",
+      "countryName" : "Brazil"
     }, {
       "name" : "|DnC|Subjective",
+      "host" : "86.92.93.88",
       "score" : 746,
       "flags" : 2,
       "frags" : 51,
       "deaths" : 34,
       "user" : "subjective",
-      "clan" : "dnc"
+      "clan" : "dnc",
+      "countryCode" : "NL",
+      "countryName" : "Netherlands",
+      "timezone" : "Europe/Amsterdam"
     }, {
       "name" : "*[BRC]*.Robaum!",
+      "host" : "186.228.116.141",
       "score" : 333,
       "flags" : 1,
       "frags" : 18,
       "deaths" : 14,
       "user" : "robaum",
-      "clan" : "brc"
+      "clan" : "brc",
+      "countryCode" : "BR",
+      "countryName" : "Brazil",
+      "timezone" : "America/Sao_Paulo"
     } ]
   }, {
     "name" : "CLA",
@@ -46,26 +61,38 @@
     "frags" : 122,
     "players" : [ {
       "name" : "w00p|Lozi",
+      "host" : "179.210.232.30",
       "score" : 658,
       "flags" : 4,
       "frags" : 45,
       "deaths" : 47,
       "user" : "lozi",
-      "clan" : "woop"
+      "clan" : "woop",
+      "countryCode" : "BR",
+      "countryName" : "Brazil",
+      "timezone" : "America/Sao_Paulo"
     }, {
       "name" : "IMNT.$tOuN3*",
+      "host" : "105.158.167.159",
       "score" : 491,
       "flags" : 4,
       "frags" : 30,
       "deaths" : 47,
-      "clan" : "imnt"
+      "clan" : "imnt",
+      "countryCode" : "MA",
+      "countryName" : "Morocco",
+      "timezone" : "Africa/Casablanca"
     }, {
       "name" : "CR7",
+      "host" : "93.102.72.84",
       "score" : 660,
       "flags" : 0,
       "frags" : 47,
       "deaths" : 48,
-      "user" : "master"
+      "user" : "master",
+      "countryCode" : "PT",
+      "countryName" : "Portugal",
+      "timezone" : "Europe/Lisbon"
     } ]
   } ],
   "server" : "aura 2999",

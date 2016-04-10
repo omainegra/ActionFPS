@@ -227,7 +227,8 @@ lazy val accumulation =
     .dependsOn(clans)
     .dependsOn(players)
     .settings(
-      git.useGitDescribe := true
+      git.useGitDescribe := true,
+      libraryDependencies += "com.maxmind.geoip" % "geoip-api" % "1.3.1"
     )
 
 lazy val clans =

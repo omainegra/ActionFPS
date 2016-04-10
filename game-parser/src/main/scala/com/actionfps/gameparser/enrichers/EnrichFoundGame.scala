@@ -63,7 +63,10 @@ object JsonGame {
                   frags = player.frag,
                   deaths = player.death,
                   user = None,
-                  clan = None
+                  clan = None,
+                  countryCode = None,
+                  countryName = None,
+                  timezone = None
                 )
             }
           )
@@ -72,10 +75,44 @@ object JsonGame {
   }
 }
 
+object IpLookup {
+
+  case class IpLookupResult(countryCode: Option[String], countryName: Option[String],
+                            timezone: Option[String])
+  object IpLookupResult {
+    def empty: IpLookupResult = IpLookupResult(
+      countryCode = None,
+      countryName = None,
+      timezone = None
+    )
+  }
+
+}
+
+trait IpLookup {
+  def lookup(ip: String): IpLookup.IpLookupResult
+}
+
 case class JsonGamePlayer(name: String, host: Option[String], score: Option[Int],
-                          flags: Option[Int], frags: Int, deaths: Int, user: Option[String], clan: Option[String])
+                          flags: Option[Int], frags: Int, deaths: Int, user: Option[String], clan: Option[String],
+                          countryCode: Option[String], countryName: Option[String], timezone: Option[String]) {
+  def addIpLookupResult(ipLookup: IpLookup.IpLookupResult): JsonGamePlayer = {
+    copy(
+      countryCode = ipLookup.countryCode orElse countryCode,
+      countryName = ipLookup.countryName orElse countryName,
+      timezone = ipLookup.timezone orElse timezone
+    )
+  }
+
+  def withCountry(implicit lookup: IpLookup): JsonGamePlayer = {
+    host.map(lookup.lookup).map(this.addIpLookupResult).getOrElse(this)
+  }
+}
 
 case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer], clan: Option[String]) {
+  def withGeo(implicit lookup: IpLookup): JsonGameTeam = {
+    copy(players = players.map(_.withCountry))
+  }
 
   /**
     * A player might disconnect mid-game, get a new IP. Goal here is to sum up their scores properly.
@@ -92,7 +129,10 @@ case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: L
           frags = them.map(_.frags).sum,
           deaths = them.map(_.frags).sum,
           user = first.user,
-          clan = first.clan
+          clan = first.clan,
+          countryCode = None,
+          countryName = None,
+          timezone = None
         )
         (playerName, newPlayer)
     }.foreach { case (playerName, newPlayer) =>
@@ -116,6 +156,14 @@ object ViewFields {
 case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: String, state: String,
                     teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[Set[String]],
                     clanwar: Option[String], achievements: Option[List[JsonGame.GameAchievement]]) {
+
+  def testHash = {
+    Math.abs(MurmurHash3.stringHash(id)).toString
+  }
+
+  def withGeo(implicit lookup: IpLookup): JsonGame = {
+    copy(teams = teams.map(_.withGeo))
+  }
 
   def teamSize = teams.map(_.players.size).min
 
@@ -170,8 +218,8 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
 
   def validate: JsonGame Or ErrorMessage = {
     def minTeamPlayers = teams.map(_.players.size).min
-    def minTeamAverageFrags = teams.map(x => x.players.map(_.frags).sum.toFloat/x.players.size).min
-    if ( !Maps.resource.maps.contains(map)) Bad(s"Map $map not in whitelist")
+    def minTeamAverageFrags = teams.map(x => x.players.map(_.frags).sum.toFloat / x.players.size).min
+    if (!Maps.resource.maps.contains(map)) Bad(s"Map $map not in whitelist")
     else if (duration < 10) Bad(s"Duration is $duration, expecting at least 10")
     else if (duration > 15) Bad(s"Duration is $duration, expecting at most 15")
     else if (minTeamPlayers < 2) Bad(s"One team has $minTeamPlayers players, expecting 2 or more.")
