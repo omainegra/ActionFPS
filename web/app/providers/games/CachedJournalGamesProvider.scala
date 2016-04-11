@@ -41,7 +41,7 @@ class CachedJournalGamesProvider @Inject()(configuration: Configuration,
                                           (implicit executionContext: ExecutionContext)
   extends GamesProvider {
 
-  Logger.info(s"Using Cached Journal Games Provider")
+  Logger.info(s"Using ${getClass.getSimpleName}")
 
   def targetFile = "cache.tmp"
 
