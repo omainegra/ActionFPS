@@ -1,6 +1,5 @@
 package providers.full
 
-import java.io.InvalidClassException
 import javax.inject.{Inject, Singleton}
 
 import com.actionfps.gameparser.enrichers.JsonGame

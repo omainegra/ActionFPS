@@ -62,3 +62,4 @@ build.log
 .classpath
 .project
 buildinfo.properties
+cache.tmp
