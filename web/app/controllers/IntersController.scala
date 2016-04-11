@@ -12,8 +12,8 @@ import services.IntersService
 class IntersController @Inject()(intersService: IntersService) extends Controller {
 
   def inters = Action {
-    Ok.feed(
-      content = intersService.intersEnum
+    Ok.chunked(
+      content = intersService.intersSource
     ).as("text/event-stream")
   }
 

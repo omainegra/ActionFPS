@@ -9,6 +9,7 @@ import javax.inject._
 import akka.actor.ActorDSL._
 import akka.actor.{ActorLogging, ActorSystem, Kill, Props}
 import akka.agent.Agent
+import akka.stream.scaladsl.Source
 import com.actionfps.gameparser.Maps
 import com.actionfps.pinger._
 import controllers.Common
@@ -16,6 +17,7 @@ import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.{JsObject, JsString, Json}
+import play.api.libs.streams.Streams
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
@@ -32,6 +34,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
   val logger = Logger(getClass)
 
   val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
+  val liveGamesSource = Source.fromPublisher(Streams.enumeratorToPublisher(liveGamesEnum))
 
   implicit val spw = Json.writes[ServerPlayer]
   implicit val stw = Json.writes[ServerTeam]

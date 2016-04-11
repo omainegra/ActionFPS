@@ -3,6 +3,7 @@ package games
 
 import javax.inject.{Inject, Singleton}
 
+import akka.stream.scaladsl.Source
 import com.actionfps.gameparser.Maps
 import com.actionfps.gameparser.enrichers.JsonGame
 import akka.actor.ActorSystem
@@ -12,6 +13,7 @@ import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.{JsBoolean, JsString, JsObject, Json}
+import play.api.libs.streams.Streams
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import providers._
@@ -35,6 +37,7 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
   applicationLifecycle.addStopHook(() => Future(gamesProvider.removeHook(processFn)))
 
   val (newGamesEnum, thing) = Concurrent.broadcast[Event]
+  val newGamesSource = Source.fromPublisher(Streams.enumeratorToPublisher(newGamesEnum))
   val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(thing.push(Event("")))
 
   val logger = Logger(getClass)

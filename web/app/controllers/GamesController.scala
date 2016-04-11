@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject._
 
+import akka.stream.scaladsl.Source
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.clans._
 import com.actionfps.clans.Conclusion.Namer
@@ -9,6 +10,7 @@ import lib.Clanner
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.{JsString, Json}
+import play.api.libs.streams.Streams
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import play.filters.gzip.{Gzip, GzipFilter}
@@ -89,14 +91,17 @@ class GamesController @Inject()(common: Common,
   }
 
   def serverUpdates = Action {
-    Ok.feed(
-      content = Enumerator.enumerate(pingerService.status.get().valuesIterator).andThen(pingerService.liveGamesEnum)
+    Ok.chunked(
+      content = {
+        Source(iterable = pingerService.status.get().valuesIterator.toList)
+          .concat(pingerService.liveGamesSource)
+      }
     ).as("text/event-stream")
   }
 
   def newGames = Action {
-    Ok.feed(
-      content = newGamesProvider.newGamesEnum
+    Ok.chunked(
+      content = newGamesProvider.newGamesSource
     ).as("text/event-stream")
   }
 
@@ -106,8 +111,8 @@ class GamesController @Inject()(common: Common,
       val enumerator = Enumerator
         .enumerate(allGames)
         .map(game => s"${game.id}\t${game.toJson}\n")
-      val gzEnum = enumerator.map(_.getBytes("UTF-8")).&>(Gzip.gzip(123))
-      Ok.chunked(gzEnum)
+      val gzEnum = enumerator.map(_.getBytes("UTF-8")).&>(Gzip.gzip())
+      Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(gzEnum)))
         .as("text/tab-separated-values")
         .withHeaders("Content-Encoding" -> "gzip")
     }

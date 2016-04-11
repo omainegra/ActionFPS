@@ -7,6 +7,7 @@ package services
 import java.io.File
 import javax.inject._
 
+import akka.stream.scaladsl.Source
 import com.actionfps.gameparser.mserver.ExtractMessage
 import akka.actor.ActorSystem
 import akka.agent.Agent
@@ -14,6 +15,7 @@ import com.actionfps.accumulation.ValidServers
 import com.actionfps.inter.{InterMessage, InterState}
 import lib.CallbackTailer
 import play.api.libs.json.Json
+import play.api.libs.streams.Streams
 import play.api.{Logger, Configuration}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
@@ -38,6 +40,7 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
   val logger = Logger(getClass)
 
   val (intersEnum, intersChannel) = Concurrent.broadcast[Event]
+  val intersSource = Source.fromPublisher(Streams.enumeratorToPublisher(intersEnum))
 
   val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(intersChannel.push(Event("")))
   applicationLifecycle.addStopHook(() => Future(keepAlive.cancel()))
