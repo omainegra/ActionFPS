@@ -9,6 +9,7 @@ import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.Json
 
 import scala.concurrent.{Promise, Future, ExecutionContext}
+import scala.util.Success
 
 object CachedJournalGamesProvider {
 
@@ -89,7 +90,10 @@ class CachedJournalGamesProvider @Inject()(configuration: Configuration,
 
   override def games: Future[Map[String, JsonGame]] = {
     loadNewerGames
-    Future.firstCompletedOf(List(journalGamesProvider.games, reloadedGames))
+    journalGamesProvider.games.value match {
+      case Some(Success(g)) => Future.successful(g)
+      case _ => Future.firstCompletedOf(List(journalGamesProvider.games, reloadedGames))
+    }
   }
 
   def addWriteShutdownHook(): Unit = {
