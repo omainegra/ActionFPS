@@ -95,7 +95,7 @@ class CachedJournalGamesProvider @Inject()(configuration: Configuration,
   def addWriteShutdownHook(): Unit = {
     applicationLifecycle.addStopHook(() => Future {
       concurrent.blocking {
-        Logger.info(s"Shutting down ${getClass.getSimpleName}")
+        Logger.info(s"Shutting down ${getClass.getSimpleName}: have games ${games.value.flatMap(_.toOption).map(_.size)}")
         games.value.flatMap(_.toOption).foreach { result =>
           Logger.info(s"Saving game cache for ${result.size} games...")
           val fos = new FileOutputStream(targetFile)
