@@ -1,0 +1,21 @@
+@import com.actionfps.achievements.PartialAchievement
+@(achievement: PartialAchievement)
+<div class="AchievementCard achievement notAchieved">
+    <div class="cont">
+        <div class="achievement-left">
+            <div class="progress-radial" style="background-image: @views.player.progress_val(achievement.percent)">
+                <div class="overlay">@achievement.percent%</div>
+            </div>
+        </div>
+        <div class="achievement-description">
+            <header>
+                <h3>@achievement.title</h3>
+
+                <p>@achievement.description</p>
+            </header>
+            @achievement.captureMaster.map { cm =>
+                @views.html.player.capture_master(cm)
+            }
+        </div>
+    </div>
+</div>

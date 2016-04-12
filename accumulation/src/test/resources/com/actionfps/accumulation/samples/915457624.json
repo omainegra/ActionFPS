@@ -1,0 +1,72 @@
+{
+  "id" : "2015-12-26T12:25:47Z",
+  "endTime" : "2015-12-26T13:23:28+01:00",
+  "map" : "ac_shine",
+  "mode" : "ctf",
+  "state" : "match",
+  "teams" : [ {
+    "name" : "RVSF",
+    "flags" : 8,
+    "frags" : 86,
+    "players" : [ {
+      "name" : "w00p|Sanzo",
+      "host" : "2.9.164.214",
+      "score" : 804,
+      "flags" : 6,
+      "frags" : 40,
+      "deaths" : 36,
+      "user" : "sanzo",
+      "clan" : "woop",
+      "countryCode" : "FR",
+      "countryName" : "France",
+      "timezone" : "Europe/Paris"
+    }, {
+      "name" : "w00p|Honor",
+      "host" : "80.9.211.167",
+      "score" : 703,
+      "flags" : 2,
+      "frags" : 46,
+      "deaths" : 54,
+      "user" : "honor",
+      "clan" : "woop",
+      "countryCode" : "FR",
+      "countryName" : "France",
+      "timezone" : "Europe/Paris"
+    } ],
+    "clan" : "woop"
+  }, {
+    "name" : "CLA",
+    "flags" : 5,
+    "frags" : 89,
+    "players" : [ {
+      "name" : "w00p|Lucas",
+      "host" : "78.235.22.104",
+      "score" : 639,
+      "flags" : 3,
+      "frags" : 36,
+      "deaths" : 43,
+      "user" : "lucas",
+      "clan" : "woop",
+      "countryCode" : "FR",
+      "countryName" : "France",
+      "timezone" : "Europe/Paris"
+    }, {
+      "name" : "w00p|.ech0",
+      "host" : "82.244.167.9",
+      "score" : 796,
+      "flags" : 2,
+      "frags" : 53,
+      "deaths" : 44,
+      "user" : "echo",
+      "clan" : "woop",
+      "countryCode" : "FR",
+      "countryName" : "France",
+      "timezone" : "Europe/Paris"
+    } ],
+    "clan" : "woop"
+  } ],
+  "server" : "aura 1999",
+  "duration" : 15,
+  "startTime" : "2015-12-26T13:08:28+01:00",
+  "winner" : "RVSF"
+}

@@ -1,0 +1,89 @@
+{
+  "id" : "2015-12-26T13:44:19Z",
+  "endTime" : "2015-12-26T14:41:04+01:00",
+  "map" : "ac_ingress",
+  "mode" : "ctf",
+  "state" : "match",
+  "teams" : [ {
+    "name" : "CLA",
+    "flags" : 10,
+    "frags" : 152,
+    "players" : [ {
+      "name" : "w00p|Lozi",
+      "host" : "179.210.232.30",
+      "score" : 629,
+      "flags" : 6,
+      "frags" : 41,
+      "deaths" : 40,
+      "user" : "lozi",
+      "clan" : "woop",
+      "countryCode" : "BR",
+      "countryName" : "Brazil",
+      "timezone" : "America/Sao_Paulo"
+    }, {
+      "name" : "BouZ3BaL",
+      "host" : "105.158.167.159",
+      "score" : 735,
+      "flags" : 4,
+      "frags" : 54,
+      "deaths" : 47,
+      "countryCode" : "MA",
+      "countryName" : "Morocco",
+      "timezone" : "Africa/Casablanca"
+    }, {
+      "name" : "*[BRC]*Wallp",
+      "host" : "179.254.32.117",
+      "score" : 621,
+      "flags" : 0,
+      "frags" : 57,
+      "deaths" : 49,
+      "clan" : "brc",
+      "countryCode" : "BR",
+      "countryName" : "Brazil"
+    } ]
+  }, {
+    "name" : "RVSF",
+    "flags" : 0,
+    "frags" : 135,
+    "players" : [ {
+      "name" : "|DnC|Subjective",
+      "host" : "86.92.93.88",
+      "score" : 772,
+      "flags" : 0,
+      "frags" : 64,
+      "deaths" : 39,
+      "user" : "subjective",
+      "clan" : "dnc",
+      "countryCode" : "NL",
+      "countryName" : "Netherlands",
+      "timezone" : "Europe/Amsterdam"
+    }, {
+      "name" : "IMNT.$tOuN3*",
+      "host" : "105.158.167.159",
+      "score" : 315,
+      "flags" : 0,
+      "frags" : 36,
+      "deaths" : 56,
+      "clan" : "imnt",
+      "countryCode" : "MA",
+      "countryName" : "Morocco",
+      "timezone" : "Africa/Casablanca"
+    }, {
+      "name" : "|DnC|madcatz",
+      "host" : "94.41.154.190",
+      "score" : 276,
+      "flags" : 0,
+      "frags" : 35,
+      "deaths" : 58,
+      "user" : "madcatz",
+      "clan" : "dnc",
+      "countryCode" : "RU",
+      "countryName" : "Russian Federation",
+      "timezone" : "Europe/Samara"
+    } ]
+  } ],
+  "server" : "aura 2999",
+  "duration" : 15,
+  "startTime" : "2015-12-26T14:26:04+01:00",
+  "winner" : "CLA"
+}

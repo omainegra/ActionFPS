@@ -1,7 +1,7 @@
 import java.io._
 
-import acleague.enrichers.JsonGame
-import acleague.mserver.{MultipleServerParser, MultipleServerParserFoundGame}
+import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.mserver.{MultipleServerParser, MultipleServerParserFoundGame}
 import com.typesafe.config.ConfigFactory
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
@@ -30,7 +30,8 @@ class JournalNewGamesTest
   }
 
   "Journal new games" should {
-    "Fire off new games" in {
+    /** No need to run it all the time **/
+    "Fire off new games" ignore {
       val fw = new FileWriter(tmpFile, false)
       val (a, b) = getGamesLines
       val fg = a.scanLeft(MultipleServerParser.empty)(_.process(_))

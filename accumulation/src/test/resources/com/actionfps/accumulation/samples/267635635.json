@@ -1,0 +1,90 @@
+{
+  "id" : "2015-12-26T14:52:31Z",
+  "endTime" : "2015-12-26T15:50:11+01:00",
+  "map" : "ac_mines",
+  "mode" : "ctf",
+  "state" : "match",
+  "teams" : [ {
+    "name" : "RVSF",
+    "flags" : 12,
+    "frags" : 115,
+    "players" : [ {
+      "name" : "*[BRC]*Wallp",
+      "host" : "179.254.32.117",
+      "score" : 856,
+      "flags" : 6,
+      "frags" : 47,
+      "deaths" : 35,
+      "clan" : "brc",
+      "countryCode" : "BR",
+      "countryName" : "Brazil"
+    }, {
+      "name" : "*[BRC]*.Robaum!",
+      "host" : "186.228.116.141",
+      "score" : 604,
+      "flags" : 4,
+      "frags" : 38,
+      "deaths" : 40,
+      "user" : "robaum",
+      "clan" : "brc",
+      "countryCode" : "BR",
+      "countryName" : "Brazil",
+      "timezone" : "America/Sao_Paulo"
+    }, {
+      "name" : "w00p|Lozi",
+      "host" : "179.210.232.30",
+      "score" : 378,
+      "flags" : 2,
+      "frags" : 30,
+      "deaths" : 45,
+      "user" : "lozi",
+      "clan" : "woop",
+      "countryCode" : "BR",
+      "countryName" : "Brazil",
+      "timezone" : "America/Sao_Paulo"
+    } ]
+  }, {
+    "name" : "CLA",
+    "flags" : 6,
+    "frags" : 123,
+    "players" : [ {
+      "name" : "w00p|Sanzo",
+      "host" : "2.9.164.214",
+      "score" : 813,
+      "flags" : 3,
+      "frags" : 55,
+      "deaths" : 33,
+      "user" : "sanzo",
+      "clan" : "woop",
+      "countryCode" : "FR",
+      "countryName" : "France",
+      "timezone" : "Europe/Paris"
+    }, {
+      "name" : "CR7",
+      "host" : "93.102.72.84",
+      "score" : 576,
+      "flags" : 2,
+      "frags" : 37,
+      "deaths" : 44,
+      "user" : "master",
+      "countryCode" : "PT",
+      "countryName" : "Portugal",
+      "timezone" : "Europe/Lisbon"
+    }, {
+      "name" : "IMNT.$tOuN3*",
+      "host" : "105.158.167.159",
+      "score" : 290,
+      "flags" : 1,
+      "frags" : 31,
+      "deaths" : 35,
+      "clan" : "imnt",
+      "countryCode" : "MA",
+      "countryName" : "Morocco",
+      "timezone" : "Africa/Casablanca"
+    } ]
+  } ],
+  "server" : "aura 2999",
+  "duration" : 15,
+  "startTime" : "2015-12-26T15:35:11+01:00",
+  "winner" : "RVSF"
+}

@@ -1,0 +1,34 @@
+@import com.actionfps.achievements.immutable.CaptureMaster
+@import com.actionfps.achievements.immutable.CaptureMapCompletion.Achieved
+@import com.actionfps.achievements.immutable.CaptureMapCompletion.Achieving
+@(captureMaster: CaptureMaster)
+<section class="content">
+
+    <div class="master">
+        <table class="map-master">
+            <thead><tr><th>Map</th><th>CLA</th><th>RVSF</th></tr></thead>
+            <tbody>
+                @captureMaster.all.map {
+                    case a@Achieved(map) => {
+                        <tr class="complete">
+                            <th>ctf @@ @map</th>
+                            @defining(s"${a.cla}/${a.cla}", s"${a.rvsf}/${a.rvsf}") { case (cla, rvsf) =>
+                            <td class="cla complete">@cla</td>
+                            <td class="rvsf complete">@rvsf</td>
+                            }
+                        </tr>
+                    }
+                    case a@Achieving(map, cla, rvsf) => {
+                        <tr class="incomplete">
+                            <th>ctf @@ @map</th>
+                            @defining(s"$cla/${a.targetPerSide}", s"$rvsf/${a.targetPerSide}") { case (cla, rvsf) =>
+                            <td class="cla partial">@cla</td>
+                            <td class="rvsf partial">@rvsf</td>
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

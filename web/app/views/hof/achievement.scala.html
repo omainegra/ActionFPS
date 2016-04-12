@@ -1,0 +1,32 @@
+@import com.actionfps.achievements.immutable.Achievement
+@(achievement: Achievement, players: List[(String, String)])
+<div class="AchievementCard achievement achieved">
+    <div class="cont">
+        <div class="achievement-left">
+            <div class="progress-radial progress-100">
+                <div class="overlay">✔</div>
+            </div>
+        </div>
+        <div class="achievement-description">
+            <header>
+                <h3>@achievement.title</h3>
+                <p>@achievement.description</p>
+            </header>
+            <section class="content">
+                <table><tbody>
+                @players.map { p =>
+                    <tr>
+                        <th><a href="/player/?id=@p._1">@p._1</a></th>
+                        <td><a href="/game/?id=@p._2">
+                            <time is="relative-time" datetime="@p._2">
+                            @p._2
+                            </time></a></td>
+                    </tr>
+
+                }
+                </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+</div>

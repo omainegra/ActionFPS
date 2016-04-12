@@ -1,0 +1,92 @@
+{
+  "id" : "2015-12-26T14:33:28Z",
+  "endTime" : "2015-12-26T15:31:08+01:00",
+  "map" : "ac_gothic",
+  "mode" : "ctf",
+  "state" : "open",
+  "teams" : [ {
+    "name" : "RVSF",
+    "flags" : 20,
+    "frags" : 176,
+    "players" : [ {
+      "name" : "*[BRC]*.Robaum!",
+      "host" : "186.228.116.141",
+      "score" : 1188,
+      "flags" : 8,
+      "frags" : 59,
+      "deaths" : 44,
+      "user" : "robaum",
+      "clan" : "brc",
+      "countryCode" : "BR",
+      "countryName" : "Brazil",
+      "timezone" : "America/Sao_Paulo"
+    }, {
+      "name" : "|DnC|Subjective",
+      "host" : "86.92.93.88",
+      "score" : 1285,
+      "flags" : 6,
+      "frags" : 73,
+      "deaths" : 37,
+      "user" : "subjective",
+      "clan" : "dnc",
+      "countryCode" : "NL",
+      "countryName" : "Netherlands",
+      "timezone" : "Europe/Amsterdam"
+    }, {
+      "name" : "|DnC|madcatz",
+      "host" : "94.41.154.190",
+      "score" : 1021,
+      "flags" : 6,
+      "frags" : 44,
+      "deaths" : 46,
+      "user" : "madcatz",
+      "clan" : "dnc",
+      "countryCode" : "RU",
+      "countryName" : "Russian Federation",
+      "timezone" : "Europe/Samara"
+    } ]
+  }, {
+    "name" : "CLA",
+    "flags" : 3,
+    "frags" : 126,
+    "players" : [ {
+      "name" : "CR7",
+      "host" : "93.102.72.84",
+      "score" : 749,
+      "flags" : 1,
+      "frags" : 55,
+      "deaths" : 63,
+      "user" : "master",
+      "countryCode" : "PT",
+      "countryName" : "Portugal",
+      "timezone" : "Europe/Lisbon"
+    }, {
+      "name" : "w00p|Lozi",
+      "host" : "179.210.232.30",
+      "score" : 448,
+      "flags" : 1,
+      "frags" : 40,
+      "deaths" : 61,
+      "user" : "lozi",
+      "clan" : "woop",
+      "countryCode" : "BR",
+      "countryName" : "Brazil",
+      "timezone" : "America/Sao_Paulo"
+    }, {
+      "name" : "IMNT.$tOuN3*",
+      "host" : "105.158.167.159",
+      "score" : 405,
+      "flags" : 1,
+      "frags" : 31,
+      "deaths" : 52,
+      "clan" : "imnt",
+      "countryCode" : "MA",
+      "countryName" : "Morocco",
+      "timezone" : "Africa/Casablanca"
+    } ]
+  } ],
+  "server" : "aura 2999",
+  "duration" : 15,
+  "startTime" : "2015-12-26T15:16:08+01:00",
+  "winner" : "RVSF"
+}

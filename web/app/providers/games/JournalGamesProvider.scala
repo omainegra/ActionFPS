@@ -6,11 +6,11 @@ package providers.games
 
 import java.io.{File, FileInputStream}
 import javax.inject._
-
-import acleague.ProcessJournalApp
-import acleague.enrichers.JsonGame
-import acleague.mserver.{ExtractMessage, MultipleServerParser, MultipleServerParserFoundGame}
+import com.actionfps.gameparser.ProcessJournalApp
+import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.mserver.{ExtractMessage, MultipleServerParser, MultipleServerParserFoundGame}
 import akka.agent.Agent
+import com.actionfps.accumulation.{GeoIpLookup, ValidServers}
 import lib.CallbackTailer
 import play.api.Configuration
 import play.api.inject.ApplicationLifecycle
@@ -18,8 +18,9 @@ import providers.games.JournalGamesProvider.NewGameCapture
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, blocking}
-import af.ValidServers.Validator._
-import af.ValidServers.ImplicitValidServers._
+import ValidServers.Validator._
+import ValidServers.ImplicitValidServers._
+
 object JournalGamesProvider {
 
   def getFileGames(file: File) = {
@@ -28,6 +29,7 @@ object JournalGamesProvider {
       .map(_.cg)
       .filter(_.validate.isGood)
       .filter(_.validateServer)
+      .map(_.flattenPlayers)
       .map(g => g.id -> g)
       .toMap
     finally fis.close()
@@ -43,7 +45,7 @@ object JournalGamesProvider {
         PartialFunction.condOpt(currentState) {
           case MultipleServerParserFoundGame(fg, _)
             if !gameAlreadyExists(fg.id) && fg.validate.isGood && fg.validateServer =>
-            registerGame(fg)
+            registerGame(fg.flattenPlayers)
         }
       case _ =>
     }
@@ -68,15 +70,22 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
 
   val journalFiles = configuration.underlying.getStringList("af.journal.paths").asScala.map(new File(_))
 
+  implicit private val geoIp = GeoIpLookup
+
   val gamesA = Future {
     blocking {
-      val initialGames = journalFiles.par.map(JournalGamesProvider.getFileGames).reduce(_ ++ _)
+      val initialGames = journalFiles
+        .par
+        .map(JournalGamesProvider.getFileGames)
+        .map(_.mapValues(_.withGeo).toMap)
+        .reduce(_ ++ _)
       val gamesAgent = Agent(initialGames)
       val lastGame = initialGames.toList.sortBy(_._1).lastOption.map(_._2)
       val ngc = new NewGameCapture(
         gameAlreadyExists = id => gamesAgent.get().contains(id),
         afterGame = lastGame
-      )((game) => {
+      )((ggame) => {
+        val game = ggame.withGeo
         gamesAgent.send(_ + (game.id -> game))
         hooks.get().foreach(f => f(game))
       })

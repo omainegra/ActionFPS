@@ -1,4 +1,2 @@
-@(id: String)
-@defining(s"http://woop.ac:81/html/clan_picture.php?name=&id=$id") { url =>
-    <img class="clan-logo" src="@url" width="64" height="64"/>
-}
+@(cln: com.actionfps.accumulation.Clan)
+<img class="clan-logo" src="@cln.logo" width="64" height="64"/>

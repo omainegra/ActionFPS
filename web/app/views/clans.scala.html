@@ -1,0 +1,12 @@
+@(clans: List[com.actionfps.accumulation.Clan])
+<article id="clans">
+    <ol>
+        @clans.map { clan =>
+            <li>
+                <a href="/clan/?id=@clan.id" title="@clan.fullName">
+                @views.html.clan_logo(clan)
+                </a>
+            </li>
+        }
+    </ol>
+</article>

@@ -1,6 +1,7 @@
 package views.rendergame
 
-import acleague.enrichers.{JsonGamePlayer, JsonGame}
+import com.actionfps.gameparser.Maps
+import com.actionfps.gameparser.enrichers.{JsonGamePlayer, JsonGame}
 
 case class NowServer(server: String)
 
@@ -26,17 +27,17 @@ case class MixedGame(isNew: Boolean, game: JsonGame, now: Option[Now], players: 
 
   def onServer = now.map(_.server.server)
 
-  def demoLink = if (now.nonEmpty && server.contains("aura"))
-    Option( s"""http://woop.ac:81/find-demo.php?time=$id&map=$map""")
+  def demoLink = if (now.isEmpty && server.contains("aura"))
+    id.map(i => s"""http://woop.ac:81/find-demo.php?time=$i&map=$map""")
   else None
 
   def url = id.map(i => s"/game/?id=$i")
 
   def heading = s"$mode @ $map"
 
-  def bgImage = s"http://woop.ac/assets/maps/$map.jpg"
+  def bgImage = Maps.resource.maps.get(map).map(_.image)
 
-  def bgStyle = s"background-image: url('$bgImage')"
+  def bgStyle = bgImage.map(i => s"background-image: url('$i')").getOrElse("")
 
   def className = s"GameCard game " + (if (now.isDefined) "isLive" else if (isNew) "isNew" else "")
 }

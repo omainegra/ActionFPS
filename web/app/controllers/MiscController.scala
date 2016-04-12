@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject._
 
+import com.actionfps.reference.HeadingsRecord
 import play.api.Configuration
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
@@ -34,16 +35,42 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
 
   def development = forward("/development.php")
 
+  def headings = Action.async { request =>
+    async {
+      request.getQueryString("format") match {
+        case Some("csv") =>
+          Ok(await(referenceProvider.Headings.csv))
+        case Some("latest") =>
+          await(referenceProvider.bulletin).map(_.html.body) match {
+            case Some(html) => Ok(html)
+            case None => NotFound("Latest bulletin could not be found")
+          }
+        case _ =>
+          implicit val wrHr = Json.writes[HeadingsRecord]
+          Ok(Json.toJson(await(referenceProvider.Headings.headings)))
+      }
+    }
+  }
+
   def servers = Action.async { implicit request =>
     async {
-      val got = Json.toJson(await(referenceProvider.servers))
-      await(renderPhp("/servers.php")(_.post(
-        Map("servers" -> Seq(got.toString()))
-      )))
+      request.getQueryString("format") match {
+        case Some("csv") =>
+          Ok(await(referenceProvider.Servers.raw)).as("text/csv")
+        case Some("json") =>
+          Ok(Json.toJson(await(referenceProvider.Servers.servers)))
+        case _ =>
+          val got = await(referenceProvider.servers)
+          Ok(renderTemplate(None, supportsJson = true, None)(views.html.servers(got)))
+      }
     }
   }
 
   def login = forward("/login/")
+
+  def registerPlay = forward("/register-play/")
+
+  def play = forward("/play.php")
 
   def sync = Action.async(BodyParsers.parse.json) { request =>
     wSClient

@@ -1,0 +1,9 @@
+menu.official-clans=Clans officiels
+menu.player-ranks=Joueurs
+menu.clan-ranks=Rangs Clans
+menu.clan-wars=Clans Guerres
+menu.hall-of-fame=Champions
+menu.servers=Serveurs
+menu.login=S''identifier
+menu.play=Jouer!
+menu.register-play=Registre et Jouer!

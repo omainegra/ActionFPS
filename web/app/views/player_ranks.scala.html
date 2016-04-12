@@ -1,0 +1,29 @@
+@(playersStats: com.actionfps.players.PlayersStats)
+<article id="questions">
+    <div id="rank">
+        <h2>Player Ranks</h2>
+        <table style="width: 480px ;">
+            <tr>
+                <td>Rank</td>
+                <td>Player</td>
+                <td>Games</td>
+                <td>Won</td>
+                <td>Elo</td>
+                <td>Score</td>
+                <td>Last played</td>
+            </tr>
+            @playersStats.onlyRanked.players.values.toList.sortBy(_.rank).map { player =>
+                <tr>
+                    <td>@player.rank.getOrElse("-")</td>
+                    <td><a href="/player/?id=@player.user">@player.name</a></td>
+                    <td>@player.games</td>
+                    <td>@player.wins</td>
+                    <td>@Math.round(player.elo)</td>
+                    <td>@player.score</td>
+                    <td><a href="/game/?id=@player.lastGame"><time is="relative-time" datetime="@player.lastGame">@player.lastGame</time></a>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</article>

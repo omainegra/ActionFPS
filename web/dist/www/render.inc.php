@@ -30,8 +30,13 @@ if ( isset($_COOKIE['af_name'], $_COOKIE['af_id'])) {
     $log_in->replaceChild($player_name, $log_in->childNodes->item(0));
     $log_in->setAttribute("href", "/player/?id=".rawurlencode($_COOKIE['af_id']));
     // remove log in link, it's getting on my nerves now with accidental clicking :D
-    $dac = $domdoc->getElementById("download-ac-button");
-    $dac->parentNode->removeChild($dac);
+//    $dac = $domdoc->getElementById("download-ac-button");
+//    $dac->parentNode->removeChild($dac);
+    $rp = $domdoc->getElementById("reg-menu-reg-play")->parentNode;
+    $rp->parentNode->removeChild($rp);
+} else {
+    $rp = $domdoc->getElementById("reg-menu-play")->parentNode;
+    $rp->parentNode->removeChild($rp);
 }
 list($head, $foot) = explode($split_text, $domdoc->saveHTML());
 if (!isset($skip_head) || $skip_head === false) {

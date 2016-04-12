@@ -1,0 +1,26 @@
+@(clanstats: com.actionfps.clans.Clanstats)
+<article id="questions">
+    <div id="rank">
+        <h2>Clan Ranks</h2>
+        <table style="width: 480px;">
+            <tr>
+                <th>Clan</th>
+                <td>Wars</td>
+                <td>Won</td>
+                <td>Games</td>
+                <td>Score</td>
+                <td>Elo Rank</td>
+            </tr>
+            @clanstats.onlyRanked.clans.values.toList.sortBy(_.wars).reverse.take(10).map { clan =>
+                <tr>
+                    <th><a href="/clan/?id=@clan.id">@clan.name</a></th>
+                    <td>@clan.wars</td>
+                    <td>@clan.wins</td>
+                    <td>@clan.games</td>
+                    <td>@clan.score</td>
+                    <td>@clan.rank</td>
+                </tr>
+            }
+        </table>
+    </div>
+</article>

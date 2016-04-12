@@ -1,0 +1,58 @@
+@import com.actionfps.accumulation.Clan
+@(clan: Clan, wars: List[com.actionfps.clans.Clanwar], stats: Option[com.actionfps.clans.Clanstat])(implicit namer: com.actionfps.clans.Conclusion.Namer)
+<article id="profile">
+    <div class="profile">
+        <div class="clan-header">
+            @views.html.clan_logo(clan)
+            <h1>@clan.fullName</h1>
+            @clan.website.map { website =>
+                <span> - <a href="@website" target="_blank">Website</a></span>
+            }
+            @clan.teamspeak.map { teamspeak =>
+                <span>    - <a href="@clan.teamspeak">Teamspeak</a></span>
+            }
+        </div>
+        @stats.map { stats =>
+            <div class="main-info">
+                <div class="basics">
+                    <table class="basic-counts">
+                        <tr>
+                            <th>Clanwar wins</th><td>
+                            @stats.wins
+                            / @stats.wars</td>
+                            <th>Game wins</th><td>@stats.gameWins
+                            / @stats.games</td>
+                        </tr>
+                        <tr>
+                            <th>Flags</th><td>@stats.flags</td>
+                            <th>Frags</th><td>@stats.frags</td>
+                        </tr>
+                        @stats.rank match {
+                            case Some(rank) => {
+                                <tr>
+                                    <th>Elo Rank</th> <td>@rank</td>
+                                    <th>Elo Points</th> <td>@Math.round(stats.elo)</td>
+                                </tr>
+                            }
+                            case _ => {
+                                <tr>
+                                    <th>Elo Rank</th> <td>Play more to get ranked</td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+    <div id="games">
+        <h3>Recent Wars</h3>
+        <ol class="recent-games">
+        @wars.map { war =>
+            <li>
+                @views.html.clanwar.compact(war, clan)
+            </li>
+        }
+        </ol>
+    </div>
+</article>

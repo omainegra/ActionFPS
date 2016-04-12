@@ -1,0 +1,27 @@
+@import com.actionfps.achievements.CompletedAchievement
+@(achievement: CompletedAchievement)
+
+<div class="AchievementCard achievement achieved">
+    <div class="cont">
+        <div class="achievement-left">
+            <div class="progress-radial progress-100">
+                <div class="overlay">✔</div>
+            </div>
+        </div>
+        <div class="achievement-description">
+            <header>
+                <h3>@achievement.title</h3>
+
+                <p>@achievement.description</p>
+            </header>
+            @achievement.captureMaster.map { cm =>
+                @views.html.player.capture_master(cm)
+            }
+            <p class="achieved-on">
+                <a href="/game/?id=@achievement.at"><time is="relative-time" datetime="@achievement.at">
+                    @achievement.at
+                </time></a>
+            </p>
+        </div>
+    </div>
+</div>

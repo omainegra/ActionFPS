@@ -1,0 +1,19 @@
+@import com.actionfps.gameparser.enrichers.JsonGame
+@(recent: List[JsonGame])
+<h2>Recent games</h2>
+<ol class="recent-games">
+    @recent.map { game =>
+        <li>
+            <a href="/game/?id=@game.id">@game.mode @@ @game.map,
+                <time is="relative-time" datetime="@game.endTime">
+                @game.endTime
+                </time>
+                @if(game.server.contains("aura")) {
+                    @defining(s"http://woop.ac:81/find-demo.php?time=${game.id}&map=${game.map}") { demoLink =>
+                        <a target="_blank" class="demo-link" href="@demoLink">demo</a>
+                    }
+                }
+            </a>
+        </li>
+    }
+</ol>

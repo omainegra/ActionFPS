@@ -1,14 +1,24 @@
-@import acleague.enrichers.JsonGameTeam
-@import acleague.enrichers.JsonGamePlayer
+@import com.actionfps.gameparser.enrichers.JsonGameTeam
+@import com.actionfps.gameparser.enrichers.JsonGamePlayer
 @(team: JsonGameTeam, teamSpectators: Option[List[JsonGamePlayer]])
 <div class="@team.name team">
     <div class="team-header">
-        <h3><img src="http://woop.ac/assets/@(team.name.toLowerCase() + ".png")"/></h3>
+        @defining(if (team.name.equalsIgnoreCase("cla"))
+        "https://cloud.githubusercontent.com/assets/5359646/12695180/369c86da-c745-11e5-817f-46d8c4c42376.png"
+        else "https://cloud.githubusercontent.com/assets/5359646/12695181/369cda90-c745-11e5-96eb-3f3669f80aed.png"
+        ){url =>
+        <h3><img src="@url"/></h3>
+        }
         <div class="result">
-            @team.flags.map { flags =>
-                <span class="score">@flags</span>
+            @team.flags match {
+                case Some(flags) => {
+                    <span class="score">@flags</span>
+                    <span class="subscore">@team.frags</span>
+                }
+                case None => {
+                    <span class="score">@team.frags</span>
+                }
             }
-            <span class="subscore">@team.frags</span>
         </div>
     </div>
     <div class="players">

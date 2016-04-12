@@ -1,0 +1,7 @@
+@import com.actionfps.accumulation.User
+@(players: List[User])
+<article id="players"><ol>
+@players.sortBy(_.name.toLowerCase()).map { user =>
+    <li><a href="/player/?id=@user.id">@user.name</a></li>
+}
+</ol></article>

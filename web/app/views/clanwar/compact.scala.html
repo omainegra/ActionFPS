@@ -1,0 +1,27 @@
+@(clanwar: com.actionfps.clans.Clanwar, clan: com.actionfps.accumulation.Clan)(implicit namer: com.actionfps.clans.Conclusion.Namer)
+@defining({
+    clanwar match {
+        case cc: com.actionfps.clans.CompleteClanwar =>
+            val resultTitle = if(cc.isTie) "Tied"
+            else if(cc.winner.contains(clan.id)) "Won"
+                else "Lost"
+            val score = cc.meta.conclusion.teams.sortBy(_.clan == clan.id).reverse match {
+                case List(a, b) => s"${a.score} - ${b.score}"
+            }
+            s"$resultTitle $score"
+        case other => "Incomplete"
+    }
+}) { heading =>
+    @heading
+    @defining(clanwar.conclusion.named.teams.find(_.clan != clan.id).get) { enemy =>
+    vs <a href="/clan/?id=@enemy.clan">@enemy.name</a> -
+    }
+<a href="/clanwar/?id=@clanwar.id">
+    <time is="local-time" datetime="@clanwar.meta.endTime" weekday="short" year="numeric" month="short" day="numeric">
+    @clanwar.meta.endTime
+    </time>,
+    @clanwar.meta.teamSize
+    vs
+    @clanwar.meta.teamSize
+</a>
+}

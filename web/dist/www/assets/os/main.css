@@ -8,10 +8,10 @@ body {
   overflow-y: scroll;
 }
 div[role='main'] {
-  width: 46em;
+  width: 52em;
   margin-left: auto;
   margin-right: auto;
-  background-image: url('http://woop.ac/assets/Metallic_Grunge_Texture_by_dirtygentlemen.jpg');
+  background-image: url('https://cloud.githubusercontent.com/assets/2464813/12016400/3d163802-ad42-11e5-829b-57dc96397d02.png');
   padding-bottom: 2em;
   box-shadow: #f5f5f5 1px 1px 3px, #f5f5f5 -1px -1px 3px, #f5f5f5 1px -1px 2px, #f5f5f5 -1px 1px 3px;
 }
@@ -161,6 +161,7 @@ a:hover {
 #clans,
 #live-events,
 article#videos,
+#bulletin,
 #settings {
   margin: 2em;
   margin-left: 4em;
@@ -501,7 +502,7 @@ code {
   text-align: right;
 }
 .LiveEvents.live-events li a {
-  width: 26em;
+  width: 32em;
   display: inline-block;
   color: wheat;
   text-decoration: none;
@@ -589,7 +590,7 @@ code {
     margin-right: 0.25em;
 }
 
-.clan-header h1 {
+.clan-header h1, .clan-header span {
     margin: 0 0.25em;
 }
 
@@ -625,4 +626,70 @@ img.clan-logo {
 .g-achievements {
   text-align:center;
   margin-top:0.6em;
+}
+
+.download-buttons {
+    display: flex;
+}
+
+.download-button {
+    float: left;
+    margin-right: 1em;
+    width: 9em;
+    background-color: #FF6347;
+    background-image: linear-gradient(to bottom, #FF6347 0px, #FF6347 100%);
+    box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2) inset, 0px 0px 2px rgba(255, 255, 255, 0.2) inset, 0px 1px 2px rgba(0, 0, 0, 0.29);
+    border-radius: 0.238em;
+    border: 1px solid #1D0706;
+    color: #FFF;
+    display: inline-block;
+    font-size: 1.1em;
+    padding: 0.4em 2%;
+    text-align: center;
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.4);
+    display: flex;
+}
+
+.download-button .os-icon img {
+    width: 2.2em;
+    height: 2.2em;
+}
+
+.download-button .download-content {
+    width: 100%;
+}
+
+.download-button .download-content .version {
+    font-size: 0.8em;
+}
+
+pre {
+    white-space: pre-wrap;
+}
+
+input {
+  color:#333;
+}
+
+#reg-form {
+
+}
+#reg-form.signed-in #register-waiting {
+  display:none;
+}
+#reg-form #register-signedin {
+  display:none;
+}
+#reg-form.signed-in #register-signedin {
+  display:block;
+}
+#bulletin .when {
+  min-width:6em;
+  padding-right:1em;
+}
+#bulletin {display:flex;
+}
+#reg-menu #log-in {
+  display:inline-block;
+  margin-top:0.5em;
 }

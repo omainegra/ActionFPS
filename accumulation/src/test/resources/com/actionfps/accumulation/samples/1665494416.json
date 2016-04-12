@@ -1,0 +1,89 @@
+{
+  "id" : "2015-12-26T14:00:25Z",
+  "endTime" : "2015-12-26T14:58:06+01:00",
+  "map" : "ac_desert3",
+  "mode" : "ctf",
+  "state" : "open",
+  "teams" : [ {
+    "name" : "RVSF",
+    "flags" : 7,
+    "frags" : 146,
+    "players" : [ {
+      "name" : "*[BRC]*Wallp",
+      "host" : "179.254.32.117",
+      "score" : 583,
+      "flags" : 3,
+      "frags" : 37,
+      "deaths" : 47,
+      "clan" : "brc",
+      "countryCode" : "BR",
+      "countryName" : "Brazil"
+    }, {
+      "name" : "BouZ3BaL",
+      "host" : "105.158.167.159",
+      "score" : 856,
+      "flags" : 2,
+      "frags" : 55,
+      "deaths" : 43,
+      "countryCode" : "MA",
+      "countryName" : "Morocco",
+      "timezone" : "Africa/Casablanca"
+    }, {
+      "name" : "w00p|Lozi",
+      "host" : "179.210.232.30",
+      "score" : 620,
+      "flags" : 2,
+      "frags" : 54,
+      "deaths" : 36,
+      "user" : "lozi",
+      "clan" : "woop",
+      "countryCode" : "BR",
+      "countryName" : "Brazil",
+      "timezone" : "America/Sao_Paulo"
+    } ]
+  }, {
+    "name" : "CLA",
+    "flags" : 6,
+    "frags" : 129,
+    "players" : [ {
+      "name" : "IMNT.$tOuN3*",
+      "host" : "105.158.167.159",
+      "score" : 616,
+      "flags" : 3,
+      "frags" : 43,
+      "deaths" : 49,
+      "clan" : "imnt",
+      "countryCode" : "MA",
+      "countryName" : "Morocco",
+      "timezone" : "Africa/Casablanca"
+    }, {
+      "name" : "|DnC|madcatz",
+      "host" : "94.41.154.190",
+      "score" : 553,
+      "flags" : 2,
+      "frags" : 38,
+      "deaths" : 45,
+      "user" : "madcatz",
+      "clan" : "dnc",
+      "countryCode" : "RU",
+      "countryName" : "Russian Federation",
+      "timezone" : "Europe/Samara"
+    }, {
+      "name" : "|DnC|Subjective",
+      "host" : "86.92.93.88",
+      "score" : 493,
+      "flags" : 1,
+      "frags" : 48,
+      "deaths" : 41,
+      "user" : "subjective",
+      "clan" : "dnc",
+      "countryCode" : "NL",
+      "countryName" : "Netherlands",
+      "timezone" : "Europe/Amsterdam"
+    } ]
+  } ],
+  "server" : "aura 2999",
+  "duration" : 15,
+  "startTime" : "2015-12-26T14:43:06+01:00",
+  "winner" : "RVSF"
+}

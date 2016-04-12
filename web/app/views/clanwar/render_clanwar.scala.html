@@ -1,8 +1,7 @@
-@import clans.ClanwarMeta
-@(clanwar: ClanwarMeta, showPlayers: Boolean)
+@(clanwar: com.actionfps.clans.ClanwarMeta, showPlayers: Boolean)(implicit clanner: _root_.lib.Clanner)
 @defining(s"/clanwar/?id=${clanwar.id}") { url =>
 
-    <article class="GameCard game clanwar" style="background-image: url('http://woop.ac:81/html/assets/clanwar.png')">
+    <article class="GameCard game clanwar" style="background-image: url('https://cloud.githubusercontent.com/assets/2464813/12814159/d5a55016-cb34-11e5-9eca-2321924b0b4a.png')">
         <div class="w">
             <header>
                 <h2>
@@ -12,19 +11,28 @@
                         </time>
                     </a>
                     @if(!clanwar.completed) {
-                    <a class="lcw" title="Incomplete clanwar" href="/questions/#completed-clanwar"><i class="fa fa-exclamation"></i></a>
+                        <a class="lcw" title="Incomplete clanwar" href="/questions/#completed-clanwar"><i class="fa fa-exclamation"></i></a>
                     }
                 </h2>
             </header>
 
             <div class="teams">
-                @clanwar.conclusion.teams.map { team =>
-                    @views.html.clanwar.render_clanwar_team(team, showPlayers)
-                }
+            @clanwar.conclusion.teams.flatMap(team => clanner.get(team.clan).map(c => team -> c)).map { case (team, clan) =>
+                @views.html.clanwar.render_clanwar_team(team, clan, showPlayers)
+            }
             </div>
+            @if(!showPlayers) {
+                @clanwar.achievements.map { achievements =>
+                    <div class="g-achievements">
+                        @achievements.map { achievement =>
+                            <a href="/player/?id=@achievement.user">@achievement.text</a>
+                            <br/>
+                        }
+                    </div>
+                }
+            }
         </div>
 
     </article>
-<?php
+}
 
-} ?>

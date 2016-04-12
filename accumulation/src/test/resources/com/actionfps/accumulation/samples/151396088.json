@@ -1,0 +1,87 @@
+{
+  "id" : "2015-12-26T15:23:51Z",
+  "endTime" : "2015-12-26T15:21:32Z",
+  "map" : "ac_gothic",
+  "mode" : "ctf",
+  "state" : "open",
+  "teams" : [ {
+    "name" : "RVSF",
+    "flags" : 5,
+    "frags" : 177,
+    "players" : [ {
+      "name" : "w00p|Lozi",
+      "host" : "179.210.232.30",
+      "score" : 592,
+      "flags" : 3,
+      "frags" : 52,
+      "deaths" : 59,
+      "user" : "lozi",
+      "clan" : "woop",
+      "countryCode" : "BR",
+      "countryName" : "Brazil",
+      "timezone" : "America/Sao_Paulo"
+    }, {
+      "name" : "-Bernatix|ESL",
+      "host" : "191.203.65.178",
+      "score" : 755,
+      "flags" : 2,
+      "frags" : 61,
+      "deaths" : 59,
+      "countryCode" : "BR",
+      "countryName" : "Brazil"
+    }, {
+      "name" : "iR|Piton",
+      "host" : "85.138.51.106",
+      "score" : 833,
+      "flags" : 0,
+      "frags" : 64,
+      "deaths" : 52,
+      "user" : "piton",
+      "clan" : "ir",
+      "countryCode" : "PT",
+      "countryName" : "Portugal",
+      "timezone" : "Europe/Lisbon"
+    } ]
+  }, {
+    "name" : "CLA",
+    "flags" : 2,
+    "frags" : 168,
+    "players" : [ {
+      "name" : "*[BRC]*Wallp",
+      "host" : "179.254.32.117",
+      "score" : 622,
+      "flags" : 2,
+      "frags" : 53,
+      "deaths" : 63,
+      "clan" : "brc",
+      "countryCode" : "BR",
+      "countryName" : "Brazil"
+    }, {
+      "name" : "cannonfodder",
+      "host" : "47.64.65.74",
+      "score" : 661,
+      "flags" : 0,
+      "frags" : 59,
+      "deaths" : 56,
+      "user" : "abc",
+      "countryCode" : "DE",
+      "countryName" : "Germany",
+      "timezone" : "Europe/Berlin"
+    }, {
+      "name" : "CR7",
+      "host" : "93.102.72.84",
+      "score" : 632,
+      "flags" : 0,
+      "frags" : 56,
+      "deaths" : 57,
+      "user" : "master",
+      "countryCode" : "PT",
+      "countryName" : "Portugal",
+      "timezone" : "Europe/Lisbon"
+    } ]
+  } ],
+  "server" : "ny 33333",
+  "duration" : 15,
+  "startTime" : "2015-12-26T15:06:32Z",
+  "winner" : "RVSF"
+}

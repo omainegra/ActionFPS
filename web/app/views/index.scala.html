@@ -1,7 +1,18 @@
 @import views.rendergame.MixedGame
-@import clans.CompleteClanwar
-@import clans.ClanwarMeta
-@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[ClanwarMeta])
+@import lib.Clanner
+@import providers.ReferenceProvider
+@import java.time.format.DateTimeFormatter
+@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[com.actionfps.clans.ClanwarMeta], bulletin: Option[providers.ReferenceProvider.Heading])(implicit clanner: Clanner)
+@bulletin.map { h =>
+    <div id="bulletin">
+        <div class="when">
+            <time is="relative-time" datetime="@h.at.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)">@h.at.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)</time>
+        </div>
+        <div class="cnt">
+            @h.html
+        </div>
+    </div>
+}
 <div id="live-events">
     <ol class="LiveEvents live-events">
         @events.take(7).map { event =>

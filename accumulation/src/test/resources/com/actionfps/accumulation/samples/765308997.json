@@ -1,0 +1,89 @@
+{
+  "id" : "2015-12-26T12:04:59Z",
+  "endTime" : "2015-12-26T13:02:03+01:00",
+  "map" : "ac_desert3",
+  "mode" : "ctf",
+  "state" : "match",
+  "teams" : [ {
+    "name" : "RVSF",
+    "flags" : 10,
+    "frags" : 144,
+    "players" : [ {
+      "name" : "Brett",
+      "host" : "83.192.157.195",
+      "score" : 803,
+      "flags" : 5,
+      "frags" : 36,
+      "deaths" : 36,
+      "user" : "brett",
+      "countryCode" : "FR",
+      "countryName" : "France",
+      "timezone" : "Europe/Paris"
+    }, {
+      "name" : "w00p|Sanzo",
+      "host" : "2.9.164.214",
+      "score" : 947,
+      "flags" : 4,
+      "frags" : 68,
+      "deaths" : 41,
+      "user" : "sanzo",
+      "clan" : "woop",
+      "countryCode" : "FR",
+      "countryName" : "France",
+      "timezone" : "Europe/Paris"
+    }, {
+      "name" : "quico",
+      "host" : "84.122.29.87",
+      "score" : 583,
+      "flags" : 1,
+      "frags" : 40,
+      "deaths" : 42,
+      "user" : "quico",
+      "countryCode" : "ES",
+      "countryName" : "Spain"
+    } ]
+  }, {
+    "name" : "CLA",
+    "flags" : 7,
+    "frags" : 119,
+    "players" : [ {
+      "name" : "grenadier",
+      "host" : "159.205.4.255",
+      "score" : 320,
+      "flags" : 5,
+      "frags" : 13,
+      "deaths" : 55,
+      "countryCode" : "PL",
+      "countryName" : "Poland",
+      "timezone" : "Europe/Warsaw"
+    }, {
+      "name" : "w00p|.ech0",
+      "host" : "82.244.167.9",
+      "score" : 802,
+      "flags" : 2,
+      "frags" : 56,
+      "deaths" : 40,
+      "user" : "echo",
+      "clan" : "woop",
+      "countryCode" : "FR",
+      "countryName" : "France",
+      "timezone" : "Europe/Paris"
+    }, {
+      "name" : "w00p|Lucas",
+      "host" : "78.235.22.104",
+      "score" : 750,
+      "flags" : 0,
+      "frags" : 50,
+      "deaths" : 46,
+      "user" : "lucas",
+      "clan" : "woop",
+      "countryCode" : "FR",
+      "countryName" : "France",
+      "timezone" : "Europe/Paris"
+    } ]
+  } ],
+  "server" : "aura 1999",
+  "duration" : 15,
+  "startTime" : "2015-12-26T12:47:03+01:00",
+  "winner" : "RVSF"
+}

@@ -6,14 +6,18 @@ package services
 
 import javax.inject._
 
-import acleague.pinger._
 import akka.actor.ActorDSL._
 import akka.actor.{ActorLogging, ActorSystem, Kill, Props}
+import akka.agent.Agent
+import akka.stream.scaladsl.Source
+import com.actionfps.gameparser.Maps
+import com.actionfps.pinger._
 import controllers.Common
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.{JsObject, JsString, Json}
+import play.api.libs.streams.Streams
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
@@ -30,6 +34,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
   val logger = Logger(getClass)
 
   val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
+  val liveGamesSource = Source.fromPublisher(Streams.enumeratorToPublisher(liveGamesEnum))
 
   implicit val spw = Json.writes[ServerPlayer]
   implicit val stw = Json.writes[ServerTeam]
@@ -40,6 +45,8 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
   implicit val cgnsw = Json.writes[CurrentGameNowServer]
   implicit val cgnw = Json.writes[CurrentGameNow]
   implicit val cgsw = Json.writes[CurrentGameStatus]
+
+  val status = Agent(Map.empty[String, Event])
   val listenerActor = actor(factory = actorSystem, name = "pinger")(new PingerService.ListenerActor({
     a =>
       liveGamesChan.push(
@@ -50,22 +57,28 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
         ))
 
   }, { b =>
-    liveGamesChan.push(
+
+    val cgse =
       Event(
         id = Option(b.now.server.server),
         name = Option("current-game-status"),
         data = Json.toJson(b).toString()
       )
-    )
-    common.renderRaw("/live/render-fragment.php")(_.post(Json.toJson(b))).foreach(resp =>
-      liveGamesChan.push(
+    liveGamesChan.push(cgse)
+
+    status.alter(m => m.updated(s"${cgse.id}${cgse.name}", cgse))
+
+    val jsonMap = Map("game" -> Seq(Json.toJson(b).toString()), "maps" -> Seq(Json.toJson(Maps.resource.maps.mapValues(_.image)).toString()))
+    common.renderRaw("/live/render-fragment.php")(_.post(jsonMap)).map(resp =>
         Event(
           id = Option(b.now.server.server),
           name = Option("current-game-status-fragment"),
           data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(resp.body)).toString()
         )
-      )
-    )
+    ).foreach{event =>
+      liveGamesChan.push(event)
+      status.alter(m => m.updated(s"${event.id}${event.name}", event))
+    }
   }))
 
   import concurrent.duration._

@@ -1,0 +1,18 @@
+@import com.actionfps.accumulation.HOF
+@(hall: HOF)
+<article id="profile">
+    <div class="profile">
+        <h1>Hall of Fame</h1>
+
+        <div class="main-info">
+                <div class="achievements">
+                    <div class="achievements">
+                        @hall.reversed.achievements.map { ar =>
+                            @views.html.hof.achievement(achievement = ar.achievement, players = ar.players.map(rp => (rp.user, rp.atGame)))
+                        }
+                    </div>
+                </div>
+        </div>
+    </div>
+
+</article>

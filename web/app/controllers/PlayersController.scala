@@ -6,8 +6,11 @@ package controllers
 
 import javax.inject._
 
+import com.actionfps.accumulation.{HOF, BuiltProfile}
+import com.actionfps.achievements.immutable.Achievement
+import com.actionfps.players.{PlayerStat, PlayersStats}
 import play.api.Configuration
-import play.api.libs.json.Json
+import play.api.libs.json.{Writes, JsObject, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import providers.full.FullProvider
@@ -24,20 +27,42 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
 
   def players = Action.async { implicit request =>
     async {
-      val players = await(referenceProvider.users)
-      await(renderJson("/players.php")(
-        Map("players" -> Json.toJson(players)
-      )))
+      request.getQueryString("format") match {
+        case Some("registrations-csv") =>
+          Ok(await(referenceProvider.Users(withEmails = false).rawRegistrations)).as("text/csv")
+        case Some("nicknames-csv") =>
+          Ok(await(referenceProvider.Users(withEmails = false).rawNicknames)).as("text/csv")
+        case Some("json") =>
+          Ok(Json.toJson(await(referenceProvider.Users(withEmails = false).users)))
+        case _ =>
+          val players = await(referenceProvider.users)
+          Ok(renderTemplate(None, supportsJson = true, None)(views.html.players(players)))
+      }
+    }
+  }
+
+  def hof = Action.async { implicit request =>
+    async {
+      val h = await(fullProvider.hof)
+      implicit val hofarpW = Json.writes[HOF.AchievementRecordPlayer]
+      implicit val achW = Writes[Achievement](ach => Json.toJson(Map("title" -> ach.title, "description" -> ach.description)))
+      implicit val hofarW = Json.writes[HOF.AchievementRecord]
+      implicit val hofW = Json.writes[HOF]
+      if (request.getQueryString("format").contains("json"))
+        Ok(Json.toJson(h))
+      else
+        Ok(renderTemplate(None, supportsJson = true, None)(views.html.hof.hof(h)))
     }
   }
 
   def rankings = Action.async { implicit request =>
     async {
-      import _root_.players.PlayersStats.ImplicitWrites._
+      import PlayersStats.ImplicitWrites._
       val ranks = await(fullProvider.playerRanks).onlyRanked
-      await(renderJson("/playerranks.php")(Map(
-        "ranks" -> Json.toJson(ranks)
-      )))
+      if (request.getQueryString("format").contains("json"))
+        Ok(Json.toJson(ranks))
+      else
+        Ok(renderTemplate(None, supportsJson = true, None)(views.html.player_ranks(ranks)))
     }
   }
 
@@ -45,9 +70,14 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     async {
       await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>
-          await(renderJsonWR("/player.php")(_.withQueryString("id" -> id))(
-            Map("player" -> player.toJson)
-          ))
+          if (request.getQueryString("format").contains("json")) {
+            import com.actionfps.achievements.Jsons._
+            implicit val spw = Json.writes[PlayerStat]
+            implicit val fpw = Json.writes[BuiltProfile]
+            Ok(Json.toJson(player.build))
+          } else {
+            Ok(renderTemplate(None, supportsJson = true, None)(views.html.player.player(player)))
+          }
         case None =>
           NotFound("Player could not be found")
       }

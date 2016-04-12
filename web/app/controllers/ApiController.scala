@@ -6,6 +6,7 @@ package controllers
 
 import javax.inject._
 
+import akka.stream.scaladsl.Source
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc.{Controller, Action}
 import providers.full.FullProvider
@@ -16,10 +17,9 @@ class ApiController @Inject()(fullProvider: FullProvider)
                              (implicit executionContext: ExecutionContext) extends Controller {
   def all = Action.async {
     fullProvider.allGames.map { games =>
-      val enumerator = Enumerator
-        .enumerate(games)
+      val gamesSource = Source(games)
         .map(game => s"${game.id}\t${game.toJson}\n")
-      Ok.chunked(enumerator).as("text/tab-separated-values")
+      Ok.chunked(gamesSource).as("text/tab-separated-values")
     }
   }
 }

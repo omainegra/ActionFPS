@@ -30,7 +30,7 @@ class CallbackTailer(file: File, endOnly: Boolean)(callback: String => Unit) {
 
   def shutdown(): Unit = {
     logger.info("Shutting down tailer")
-    thread.interrupt()
+    tailer.stop()
     logger.info("Shut down tailer")
   }
 }
