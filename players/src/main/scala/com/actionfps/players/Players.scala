@@ -167,7 +167,7 @@ case class PlayersStats(players: Map[String, PlayerStat]) {
   }.toMap
 
   def countElo(game: JsonGame): Boolean = {
-    game.teams.forall(_.players.forall(_.score.isDefined)) && game.teams.head.players.size == game.teams.last.players.size
+    game.teams.forall(_.players.forall(_.score.isDefined)) && game.teams.map(_.players.size).toSet.size == 1
   }
 
   def includeGame(game: JsonGame): PlayersStats = {
