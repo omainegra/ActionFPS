@@ -6,4 +6,4 @@ menu.hall-of-fame=Champions
 menu.servers=Serveurs
 menu.login=S''identifier
 menu.play=Jouer!
-menu.register-play=Registre et Jouer!
+menu.register-play=M'inscrire et Jouer!
