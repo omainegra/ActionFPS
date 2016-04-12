@@ -5,10 +5,9 @@
 [![Workflow](https://badge.waffle.io/ScalaWilliam/actionfps.png?label=ready&title=Ready)](https://waffle.io/ScalaWilliam/actionfps)
 
 * Now open source.
-* http://actionfps.com/
+* https://actionfps.com/
 * Previously known as http://woop.ac/
 * Also see http://duel.gg/
-* Contributors very much welcome. Start with Issues.
 
 [![Throughput Graph](https://graphs.waffle.io/ScalaWilliam/actionfps/throughput.svg)](https://waffle.io/ScalaWilliam/actionfps/metrics) 
 
@@ -22,11 +21,11 @@
 We have Travis CI. We also have Continuous Deployment from master to our dedicated CentOS 7 server via Amazon SQS and GitHub Web Hooks. We are targeting a monolothic deployment with highly modular code. We use SBT for building everything. It is the superior tool of choice.
 
 
-# Prerequisite
+# Prerequisites
 
 Install SBT: http://www.scala-sbt.org/download.html
 
-Install php7.0: https://bjornjohansen.no/upgrade-to-php7
+Install PHP7: https://bjornjohansen.no/upgrade-to-php7
 
 # Running frontend
 
