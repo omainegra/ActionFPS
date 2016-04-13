@@ -63,3 +63,4 @@ build.log
 .project
 buildinfo.properties
 cache.tmp
+*.dat
