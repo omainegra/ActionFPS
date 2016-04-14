@@ -6,7 +6,7 @@ package controllers
 
 import javax.inject._
 
-import com.actionfps.accumulation.{HOF, BuiltProfile}
+import com.actionfps.accumulation.{LocationInfo, HOF, BuiltProfile}
 import com.actionfps.achievements.immutable.Achievement
 import com.actionfps.players.{PlayerStat, PlayersStats}
 import play.api.Configuration
@@ -71,9 +71,12 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
       await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>
           if (request.getQueryString("format").contains("json")) {
-            import com.actionfps.achievements.Jsons._
-            implicit val spw = Json.writes[PlayerStat]
-            implicit val fpw = Json.writes[BuiltProfile]
+            implicit val fpw = {
+              import com.actionfps.achievements.Jsons._
+              implicit val spw = Json.writes[PlayerStat]
+              implicit val lif = Json.writes[LocationInfo]
+              Json.writes[BuiltProfile]
+            }
             Ok(Json.toJson(player.build))
           } else {
             Ok(renderTemplate(None, supportsJson = true, None)(views.html.player.player(player)))

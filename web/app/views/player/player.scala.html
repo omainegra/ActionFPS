@@ -8,6 +8,12 @@
                 @fullProfile.achievements.map { achievements =>
                 <div class="basics">
                     <table class="basic-counts">
+                        @fullProfile.locationInfo.flatMap(_.countryName).map { cn =>
+                            <tr>
+                                <th>Country</th>
+                                <td colspan="3">@cn</td>
+                            </tr>
+                        }
                         <tr>
                             <th>Time played</th>
                             <td>@achievements.playerStatistics.timePlayedStr</td>

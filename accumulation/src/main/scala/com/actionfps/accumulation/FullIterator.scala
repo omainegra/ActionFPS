@@ -42,9 +42,9 @@ case class FullIterator
     var richGame = jsonGame.withoutHosts.withUsers.withClans
     val newAchievements = achievementsIterator.includeGame(fi.users.values.toList)(richGame)
 
-    val nhof = newAchievements.newAchievements(achievementsIterator).foldLeft(hof){
+    val nhof = newAchievements.newAchievements(achievementsIterator).foldLeft(hof) {
       case (ahof, (user, items)) =>
-        items.foldLeft(ahof){case (xhof, (game, ach)) => xhof.includeAchievement(user, game, ach)}
+        items.foldLeft(ahof) { case (xhof, (game, ach)) => xhof.includeAchievement(user, game, ach) }
     }
     PartialFunction.condOpt(newAchievements.events.toSet -- achievementsIterator.events.toSet) {
       case set if set.nonEmpty =>
@@ -106,8 +106,28 @@ case class FullIterator
 
 case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState], rank: Option[PlayerStat]) {
   def build = BuiltProfile(
-    user, recentGames, achievements.map(_.buildAchievements), rank
+    user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo
   )
+  def locationInfo: Option[LocationInfo] = if ( recentGames.isEmpty) None else {
+    val myPlayers = recentGames
+      .flatMap(_.teams)
+      .flatMap(_.players)
+      .filter(_.user.contains(user.id))
+    val recentTimezones = myPlayers.flatMap(_.timezone).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
+    val recentCountryCodes = myPlayers.flatMap(_.countryCode).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
+    val recentCountryNames = myPlayers.flatMap(_.countryName).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
+    Some(LocationInfo(
+      timezone = recentTimezones.lastOption.map(_._1),
+      countryCode = recentCountryCodes.lastOption.map(_._1),
+      countryName = recentCountryNames.lastOption.map(_._1)
+    ))
+  }
 }
 
-case class BuiltProfile(user: User, recentGames: List[JsonGame], achievements: Option[AchievementsRepresentation], rank: Option[PlayerStat])
+case class LocationInfo(timezone: Option[String], countryCode: Option[String], countryName: Option[String])
+
+case class BuiltProfile(user: User, recentGames: List[JsonGame],
+                        achievements: Option[AchievementsRepresentation], rank: Option[PlayerStat],
+                        location: Option[LocationInfo]) {
+
+}
