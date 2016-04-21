@@ -4,22 +4,22 @@
 
     this.stater = function (d3) {
         return function (datums) {
+            var dds = displayDates();
+
             return {
                 displayDates: displayDates(),
-                mappings: mappings()
+                mappings: mappings(),
+                render: render
             };
 
-            function dates() {
-                return datums.map(function (x) {
-                    return new Date(x);
-                });
-            }
-
             function displayDates() {
-                return d3.time.scale
-                    .utc()
-                    .domain([d3.min(dates()), d3.max(dates())])
-                    .ticks(d3.time.days, 1)
+                return Object.keys(datums.map(function (id) {
+                        return id.substr(0, 10);
+                    }).reduce(function (accum, n) {
+                        accum[n] = true;
+                        return accum;
+                    }, {}))
+                    .sort()
                     .reverse();
             }
 
@@ -27,15 +27,35 @@
              * Return index corresponding to date field
              */
             function mappings() {
-                var scl = d3.time.scale()
-                    .domain([d3.min(dates()), d3.max(dates())])
-                    .nice()
-                    .range([displayDates().length, 0]);
-                return dates().map(scl).map(function (k) {
-                    /** Ugly but works - how do we do this in d3? **/
-                    return Math.floor(k);
+                return datums.map(function (val) {
+                    return displayDates().indexOf(val.substr(0, 10));
                 });
             }
+
+            function dayOfDate(date) {
+                return date.substr(0, 10);
+            }
+
+            function timeOfDate(date) {
+                return ((new Date(date).getTime()) - (new Date(date.substring(0, 10)).getTime())) / 1000
+            }
+
+
+            function render(width, height, itemHeight) {
+                var scaleX = d3.scale.linear()
+                    .domain([0, 3600 * 24])
+                    .range([0, width]);
+                return {
+                    yPosition: function (id) {
+                        return itemHeight * dds.indexOf(dayOfDate(id));
+                    },
+                    xPosition: function (id) {
+                        return Math.round(scaleX(timeOfDate(id)));
+                    }
+                }
+            }
+
+
         };
     };
 }).call(this);

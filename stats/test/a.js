@@ -12,23 +12,23 @@ describe("k", function () {
         "2016-04-12T18:11:29Z",
         "2016-04-21T18:11:29Z"
     ];
+
     it("Should show proper mapping", function () {
         stater(data).displayDates.should.eql([
-            new Date("2016-04-21T16:00:00Z"),
-            new Date("2016-04-20T16:00:00Z"),
-            new Date("2016-04-19T16:00:00Z"),
-            new Date("2016-04-18T16:00:00Z"),
-            new Date("2016-04-17T16:00:00Z"),
-            new Date("2016-04-16T16:00:00Z"),
-            new Date("2016-04-15T16:00:00Z"),
-            new Date("2016-04-14T16:00:00Z"),
-            new Date("2016-04-13T16:00:00Z"),
-            new Date("2016-04-12T16:00:00Z"),
-            new Date("2016-04-11T16:00:00Z"),
-            new Date("2016-04-10T16:00:00Z")
+            "2016-04-21",
+            "2016-04-12",
+            "2016-04-10"
         ]);
     });
+
     it("Should get stuff out properly", function () {
-        stater(data).mappings.should.eql([11, 11, 9, 0]);
+        stater(data).mappings.should.eql([2, 2, 1, 0]);
     });
+
+    it("Should do a proper rendering", function() {
+        var thing = stater(data).render(2400, 200, 100);
+        data.map(thing.xPosition).should.eql([519, 636, 1819, 1819]);
+        data.map(thing.yPosition).should.eql([200, 200, 100, 0]);
+    })
+
 });
