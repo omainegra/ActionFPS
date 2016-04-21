@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    path {
+        fill: none;
+        stroke-linejoin: round;
+    }
+
+    .land {
+        fill: #ddd;
+    }
+
+    .states,
+    .hexagons path {
+        stroke: #fff;
+    }
+
+</style>
+<body>
+<script src="stater.js"></script>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+
+    var data = [
+        "2016-04-10T05:11:29Z",
+        "2016-04-10T06:21:29Z",
+        "2016-04-12T18:11:29Z"
+    ];
+
+    var width = 960,
+        height = 500,
+        parseDate = d3.time.format("%x").parse;
+
+    var color = d3.scale.linear()
+            .domain([0, 3600 * 24])
+            .range([0, width]);
+
+    var svg = d3
+            .select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+    render(data);
+
+    function render(datums) {
+
+        var s = stater(d3)(datums);
+
+        var times = datums.map(function (date) {
+            return {
+                timeOfDay: ((new Date(date).getTime()) - (new Date(date.substring(0, 10)).getTime())) / 1000,
+                day: new Date(date).getDay(),
+                id: date,
+                date: new Date(date)
+            }
+        });
+
+        var dates = times.map(function (x) {
+            return x.date;
+        });
+
+        var dateScale = d3.time.scale()
+                .domain([d3.min(dates), d3.max(dates)]);
+
+        var displayDates = dateScale
+                .ticks(d3.time.days, 1);
+
+        var z = dateScale
+                .nice()
+                .range(0, displayDates.length, 1);
+
+        console.log(times);
+
+        svg.append("g")
+                .attr("class", "dates")
+                .selectAll("text")
+                .data(s.displayDates)
+                .enter()
+                .append("text")
+                .attr("transform", function (x, i) {
+                    return "translate(0, " + (i * 20 + 30) + ")";
+                })
+                .text(d3.time.format("%b %e"));
+
+        svg.append("g")
+                .attr("class", "thingies")
+                .selectAll("circle")
+                .data(times)
+                .enter()
+                .append("circle")
+                .attr("cx", function (d) {
+                    return color(d.timeOfDay);
+                })
+                .attr("cy", function (d) {
+                    console.log("X", d.date, z, z(d.date));
+                    return 20 * (z(d.date));
+                })
+                .attr("fill", "purple")
+                .attr("r", 5);
+    }
+
+</script>
