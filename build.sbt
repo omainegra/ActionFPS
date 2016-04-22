@@ -21,7 +21,8 @@ lazy val root =
       syslogAc,
       accumulation,
       clans,
-      players
+      players,
+      stats
     ).dependsOn(
     achievements,
     gameParser,
@@ -33,7 +34,8 @@ lazy val root =
     syslogAc,
     accumulation,
     clans,
-    players
+    players,
+    stats
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -254,3 +256,10 @@ lazy val players =
 
 lazy val startHazelcast = TaskKey[HazelcastInstance]("Start the web hazelcast instance")
 lazy val stopHazelcast = TaskKey[Unit]("Stop the web hazelcast instance")
+
+lazy val stats =
+  Project(
+    id = "stats",
+    base = file("stats")
+  )
+    .dependsOn(accumulation)
