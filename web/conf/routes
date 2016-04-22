@@ -28,3 +28,4 @@ GET         /new-games/                     @controllers.GamesController.newGame
 GET         /all/                           @controllers.ApiController.all
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
 GET         /inters/                        @controllers.IntersController.inters
+GET         /stats/                         @controllers.StatsController.stats

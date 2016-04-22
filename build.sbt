@@ -56,6 +56,7 @@ lazy val web =
     .dependsOn(pingerClient)
     .dependsOn(accumulation)
     .dependsOn(interParser)
+    .dependsOn(stats)
     .enablePlugins(BuildInfoPlugin)
     .settings(dontDocument)
     .settings(

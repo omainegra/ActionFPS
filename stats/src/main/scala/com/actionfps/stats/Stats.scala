@@ -10,36 +10,34 @@ import scala.xml.Elem
   */
 object Stats {
 
-  def idsToTableRows(ids: List[String]): List[Elem] = {
+  def idsToTableRows(ids: List[String], width: Double, height: Double, r: Double): List[Elem] = {
+    implicit val ordering = Ordering.by[ZonedDateTime, Double](_.toEpochSecond)
+    val horizontalPadding = r
     ids.map(ZonedDateTime.parse)
       .groupBy(_.withHour(0).withMinute(0).withSecond(0).withNano(0))
       .toList.sortBy(_._1).reverse
       .map { case (header, items) =>
         <tr>
           <th>
-            {header.format(DateTimeFormatter.ofPattern("e MMM"))}
+            {header.format(DateTimeFormatter.ofPattern("d MMM yy"))}
           </th>
           <td>
-            <svg width="900" height="20">
+            <svg width={s"${width + 2 * horizontalPadding}"} height={s"$height"}>
               <g>
                 {items.map { item =>
-                val cx = 900f * (item.toEpochSecond - header.toEpochSecond) / (1000 * 24 * 3600)
-                  <circle cy="10" r="5" cx={s"$cx"}/>
+                val cx = width * (item.toEpochSecond - header.toEpochSecond) / (24 * 3600)
+                <a xlink:href={s"/game/?id=$item"}
+                   xhref:title={s"Game $item"}>
+                  <circle
+                  cy={s"${height / 2}"} r={s"$r"}
+                  cx={s"${cx + horizontalPadding}"}/>
+                </a>
               }}
               </g>
             </svg>
           </td>
         </tr>
       }
-  }
-
-  def main(args: Array[String]): Unit = {
-    idsToTableRows(
-      ids = scala.io.Source.fromInputStream(System.in).getLines().map { line =>
-        if (line.contains("\t")) line.substring(0, line.indexOf("\t"))
-        else line
-      }.toList
-    )
   }
 
 }
