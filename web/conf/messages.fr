@@ -1,7 +1,7 @@
 menu.official-clans=Clans officiels
 menu.player-ranks=Rang individuel
 menu.clan-ranks=Rang par équipe
-menu.clan-wars=Matches d'équipe
+menu.clan-wars=Matches par équipes
 menu.hall-of-fame=Trophées
 menu.servers=Serveurs
 menu.login=Se connecter
