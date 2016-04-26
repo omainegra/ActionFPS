@@ -21,7 +21,8 @@ lazy val root =
       syslogAc,
       accumulation,
       clans,
-      players
+      players,
+      stats
     ).dependsOn(
     achievements,
     gameParser,
@@ -33,7 +34,8 @@ lazy val root =
     syslogAc,
     accumulation,
     clans,
-    players
+    players,
+    stats
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -54,25 +56,24 @@ lazy val web =
     .dependsOn(pingerClient)
     .dependsOn(accumulation)
     .dependsOn(interParser)
+    .dependsOn(stats)
     .enablePlugins(BuildInfoPlugin)
     .settings(dontDocument)
     .settings(
       libraryDependencies += "org.jsoup" % "jsoup" % "1.8.3",
       libraryDependencies += "org.codehaus.groovy" % "groovy-all" % "2.4.6",
-      libraryDependencies += "com.hazelcast" % "hazelcast-client" % "3.6.1",
+      libraryDependencies += "com.hazelcast" % "hazelcast-client" % "3.6.2",
       libraryDependencies += "org.postgresql" % "postgresql" % "9.4.1208",
       libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test",
       libraryDependencies ++= akka("actor", "agent", "slf4j"),
       libraryDependencies ++= Seq(
-        "com.typesafe.play" %% "play-slick" % "1.1.1",
-        "com.typesafe.play" %% "play-slick-evolutions" % "1.1.1",
         "org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
         "commons-io" % "commons-io" % "2.4",
         filters,
         ws,
         async,
         "org.scalatestplus" %% "play" % "1.4.0" % "test",
-        "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test",
+        "org.seleniumhq.selenium" % "selenium-java" % "2.53.0" % "test",
         cache
       ),
       (run in Compile) <<= (run in Compile).dependsOn(startHazelcast),
@@ -143,7 +144,7 @@ lazy val achievements =
     .settings(
       libraryDependencies ++= Seq(
         json,
-        "com.maxmind.geoip2" % "geoip2" % "2.6.0",
+        "com.maxmind.geoip2" % "geoip2" % "2.7.0",
         "org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
         "commons-net" % "commons-net" % "3.4",
         xml
@@ -171,12 +172,11 @@ lazy val pingerClient =
     id = "pinger-client",
     base = file("pinger-client")
   ).settings(
+    libraryDependencies ++= akka("actor", "slf4j"),
+    libraryDependencies ++= akka("testkit").map(_ % "test"),
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor" % "2.4.2",
-      "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
-      "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test",
       "commons-net" % "commons-net" % "3.4",
-      "joda-time" % "joda-time" % "2.9.2"
+      "joda-time" % "joda-time" % "2.9.3"
     ),
     git.useGitDescribe := true
   )
@@ -208,9 +208,9 @@ lazy val syslogAc =
       libraryDependencies ++= Seq(
         "org.syslog4j" % "syslog4j" % "0.9.30",
         "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-        "ch.qos.logback" % "logback-classic" % "1.1.6",
-        "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-        "joda-time" % "joda-time" % "2.9.2",
+        "ch.qos.logback" % "logback-classic" % "1.1.7",
+        "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0",
+        "joda-time" % "joda-time" % "2.9.3",
         "org.joda" % "joda-convert" % "1.8.1"
       ),
       bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"""",
@@ -238,7 +238,6 @@ lazy val clans =
   )
     .dependsOn(gameParser)
     .settings(
-      libraryDependencies += "org.cvogt" %% "play-json-extensions" % "0.6.1",
       git.useGitDescribe := true
     )
 
@@ -254,3 +253,10 @@ lazy val players =
 
 lazy val startHazelcast = TaskKey[HazelcastInstance]("Start the web hazelcast instance")
 lazy val stopHazelcast = TaskKey[Unit]("Stop the web hazelcast instance")
+
+lazy val stats =
+  Project(
+    id = "stats",
+    base = file("stats")
+  )
+    .dependsOn(accumulation)

@@ -154,6 +154,7 @@ a:hover {
 }
 #sprs,
 #questions,
+#stats,
 #servers,
 #create-profile,
 #profile,
@@ -692,4 +693,11 @@ input {
 #reg-menu #log-in {
   display:inline-block;
   margin-top:0.5em;
+}
+
+#stats circle {
+  fill: darkred;
+}
+#stats a:hover circle {
+  fill: orangered;
 }

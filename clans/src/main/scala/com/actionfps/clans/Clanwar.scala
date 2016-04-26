@@ -2,7 +2,6 @@ package com.actionfps.clans
 
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.clans.Conclusion.Namer
-import org.cvogt.play.json.Jsonx
 import play.api.libs.json.{JsObject, Writes, Format, Json}
 
 /**
