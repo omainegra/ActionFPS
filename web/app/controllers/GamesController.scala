@@ -7,6 +7,7 @@ import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.clans._
 import com.actionfps.clans.Conclusion.Namer
 import lib.Clanner
+import org.apache.commons.csv.{CSVFormat, CSVPrinter}
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.{JsString, Json}
@@ -105,16 +106,53 @@ class GamesController @Inject()(common: Common,
     ).as("text/event-stream")
   }
 
-  def all = Action.async {
+  def allTsv = Action.async {
     async {
       val allGames = await(fullProvider.allGames)
       val enumerator = Enumerator
         .enumerate(allGames)
         .map(game => s"${game.id}\t${game.toJson}\n")
-      val gzEnum = enumerator.map(_.getBytes("UTF-8")).&>(Gzip.gzip())
-      Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(gzEnum)))
+      Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)))
         .as("text/tab-separated-values")
-        .withHeaders("Content-Encoding" -> "gzip")
+        .withHeaders("Content-Disposition" -> "attachment; filename=games.tsv")
+    }
+  }
+
+  def allCsv = Action.async {
+    async {
+      val allGames = await(fullProvider.allGames)
+      val enumerator = Enumerator
+        .enumerate(allGames)
+        .map(game => CSVFormat.DEFAULT.format(game.id, game.toJson) + "\n")
+      Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)))
+        .as("text/csv")
+    }
+  }
+
+  def allTxt = Action.async {
+    async {
+      val allGames = await(fullProvider.allGames)
+      val enumerator = Enumerator
+        .enumerate(allGames)
+        .map(game => game.toJson.toString() + "\n")
+      Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)))
+        .as("text/plain")
+    }
+  }
+
+
+  def allJson = Action.async {
+    async {
+      val allGames = await(fullProvider.allGames)
+      val enum = allGames match {
+        case head :: rest =>
+          Enumerator(s"[\n  ${head.toJson}").andThen {
+            Enumerator.enumerate(rest).map(game => ",\n  " + game.toJson.toString())
+          }.andThen(Enumerator("\n]"))
+        case Nil => Enumerator("[]")
+      }
+      Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enum)))
+        .as("application/json")
     }
   }
 

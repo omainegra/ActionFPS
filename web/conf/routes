@@ -25,6 +25,10 @@ GET         /retrieve.do                    @controllers.Masterserver.ms
 GET         /version/                       @controllers.MiscController.version
 GET         /server-updates/                @controllers.GamesController.serverUpdates
 GET         /new-games/                     @controllers.GamesController.newGames
-GET         /all/                           @controllers.ApiController.all
+GET         /all/                           @controllers.GamesController.allTsv
+GET         /all/games.txt                  @controllers.GamesController.allTxt
+GET         /all/games.json                 @controllers.GamesController.allJson
+GET         /all/games.tsv                  @controllers.GamesController.allTsv
+GET         /all/games.csv                  @controllers.GamesController.allCsv
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
 GET         /inters/                        @controllers.IntersController.inters
