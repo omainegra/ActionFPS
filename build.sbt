@@ -254,3 +254,12 @@ lazy val players =
 
 lazy val startHazelcast = TaskKey[HazelcastInstance]("Start the web hazelcast instance")
 lazy val stopHazelcast = TaskKey[Unit]("Stop the web hazelcast instance")
+
+lazy val ladderParser =
+  Project(
+    id = "ladder-parser",
+    base = file("ladder-parser")
+  )
+    .settings(
+      git.useGitDescribe := true
+    )
