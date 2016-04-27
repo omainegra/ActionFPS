@@ -14,6 +14,8 @@ object LadderParser {
     def gib = copy(gibs = gibs + 1)
 
     def flag = copy(flags = flags + 1)
+
+    def points = (2 * frags) + (3 * gibs) + (15 * flags)
   }
 
   object UserStatistics {
