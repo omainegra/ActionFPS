@@ -4,14 +4,9 @@ import sbt.Keys._
 object CommonSettingsPlugin extends AutoPlugin {
   override def trigger = allRequirements
 
-  override def buildSettings = Seq(
-    updateOptions := updateOptions.value.withCachedResolution(true)
-  )
-
   override def projectSettings = Seq(
     scalaVersion := "2.11.8",
     organization := "com.actionfps",
-    updateOptions := updateOptions.value.withCachedResolution(true),
     scalacOptions := Seq(
       "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
       "-language:existentials", "-language:implicitConversions",
