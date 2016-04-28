@@ -6,7 +6,7 @@ import com.actionfps.gameparser.enrichers.JsonGame
 import akka.agent.Agent
 import com.actionfps.clans.{Clanstats, Clanwars}
 import com.actionfps.accumulation.{HOF, FullIterator, AchievementsIterator}
-import com.actionfps.players.PlayersStats
+import com.actionfps.players.{UsersTimeCounter, PlayersStats}
 import play.api.inject.ApplicationLifecycle
 import providers.ReferenceProvider
 import providers.games.GamesProvider
@@ -52,7 +52,8 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
       clanwars = Clanwars.empty,
       clanstats = Clanstats.empty,
       playersStats = PlayersStats.empty,
-      hof = HOF.empty
+      hof = HOF.empty,
+      usersTimeCounter = UsersTimeCounter.empty(maxCount = 50)
     )
 
     val newIterator = allGames.valuesIterator.toList.sortBy(_.id).foldLeft(initial)(_.includeGame(_))

@@ -3,7 +3,7 @@ package com.actionfps.accumulation
 import com.actionfps.achievements.{AchievementsRepresentation, PlayerState}
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.clans.{Clanstats, Clanwars, CompleteClanwar}
-import com.actionfps.players.{PlayerStat, PlayersStats}
+import com.actionfps.players.{UsersTimeCounter, PlayerStat, PlayersStats}
 
 /**
   * Created by William on 01/01/2016.
@@ -15,6 +15,7 @@ case class FullIterator
  clanwars: Clanwars,
  clanstats: Clanstats,
  achievementsIterator: AchievementsIterator,
+ usersTimeCounter: UsersTimeCounter,
  hof: HOF,
  playersStats: PlayersStats) {
   fi =>
@@ -29,7 +30,8 @@ case class FullIterator
       clanwars = Clanwars.empty,
       clanstats = Clanstats.empty,
       playersStats = PlayersStats.empty,
-      hof = HOF.empty
+      hof = HOF.empty,
+      usersTimeCounter = UsersTimeCounter.empty(maxCount = usersTimeCounter.maxCount)
     )
     games.valuesIterator.toList.sortBy(_.id).foldLeft(blank)(_.includeGame(_))
   }
@@ -81,6 +83,7 @@ case class FullIterator
         .toMap
     }
     copy(
+      usersTimeCounter = usersTimeCounter.includeGame(richGame),
       games = newGames,
       achievementsIterator = newAchievements,
       clanwars = ncw,
@@ -99,14 +102,21 @@ case class FullIterator
         .toList.sortBy(_.id).takeRight(7).reverse
       val achievements = achievementsIterator.map.get(id)
       val rank = playersStats.onlyRanked.players.get(id)
-      FullProfile(user = user, recentGames = recentGames, achievements = achievements, rank = rank)
+      FullProfile(
+        user = user,
+        recentGames = recentGames,
+        achievements = achievements,
+        rank = rank,
+        times = usersTimeCounter.counts.get(id).map(_.counts).getOrElse(Map.empty)
+      )
     }
 
 }
 
-case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState], rank: Option[PlayerStat]) {
+case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState], rank: Option[PlayerStat],
+                       times: Map[Int, Int]) {
   def build = BuiltProfile(
-    user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo
+    user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo, times.map{ case (x, y) => s"$x" -> y }
   )
   def locationInfo: Option[LocationInfo] = if ( recentGames.isEmpty) None else {
     val myPlayers = recentGames
@@ -128,6 +138,6 @@ case class LocationInfo(timezone: Option[String], countryCode: Option[String], c
 
 case class BuiltProfile(user: User, recentGames: List[JsonGame],
                         achievements: Option[AchievementsRepresentation], rank: Option[PlayerStat],
-                        location: Option[LocationInfo]) {
+                        location: Option[LocationInfo], userTimes: Map[String, Int]) {
 
 }

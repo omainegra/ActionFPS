@@ -157,6 +157,8 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
                     teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[Set[String]],
                     clanwar: Option[String], achievements: Option[List[JsonGame.GameAchievement]]) {
 
+  def users = teams.flatMap(_.players.flatMap(_.user))
+
   def testHash = {
     Math.abs(MurmurHash3.stringHash(id)).toString
   }
