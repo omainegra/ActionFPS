@@ -60,21 +60,23 @@ lazy val web =
     .enablePlugins(BuildInfoPlugin)
     .settings(dontDocument)
     .settings(
-      libraryDependencies += "org.jsoup" % "jsoup" % "1.8.3",
-      libraryDependencies += "org.codehaus.groovy" % "groovy-all" % "2.4.6",
-      libraryDependencies += "com.hazelcast" % "hazelcast-client" % "3.6.2",
-      libraryDependencies += "org.postgresql" % "postgresql" % "9.4.1208",
-      libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test",
-      libraryDependencies ++= akka("actor", "agent", "slf4j"),
       libraryDependencies ++= Seq(
-        "org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
-        "commons-io" % "commons-io" % "2.4",
+        akkaActor,
+        akkaAgent,
+        akkaslf,
+        jsoup,
+        groovy,
+        hazelcastClient,
+        fluentHc,
+        commonsIo,
         filters,
         ws,
         async,
-        "org.scalatestplus" %% "play" % "1.4.0" % "test",
-        "org.seleniumhq.selenium" % "selenium-java" % "2.53.0" % "test",
-        cache
+        scalatestPlus,
+        seleniumHtmlUnit,
+        seleniumJava,
+        cache,
+        mockito
       ),
       (run in Compile) <<= (run in Compile).dependsOn(startHazelcast),
       startHazelcast := {
@@ -142,13 +144,6 @@ lazy val achievements =
   )
     .enablePlugins(GitVersioning)
     .settings(
-      libraryDependencies ++= Seq(
-        json,
-        "com.maxmind.geoip2" % "geoip2" % "2.7.0",
-        "org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
-        "commons-net" % "commons-net" % "3.4",
-        xml
-      ),
       git.useGitDescribe := true
     ).dependsOn(gameParser)
 
@@ -163,7 +158,7 @@ lazy val referenceReader =
     id = "reference-reader",
     base = file("reference-reader")
   ).settings(
-    libraryDependencies += "org.apache.commons" % "commons-csv" % "1.2",
+    libraryDependencies += commonsCsv,
     git.useGitDescribe := true
   )
 
@@ -172,11 +167,12 @@ lazy val pingerClient =
     id = "pinger-client",
     base = file("pinger-client")
   ).settings(
-    libraryDependencies ++= akka("actor", "slf4j"),
-    libraryDependencies ++= akka("testkit").map(_ % "test"),
     libraryDependencies ++= Seq(
-      "commons-net" % "commons-net" % "3.4",
-      "joda-time" % "joda-time" % "2.9.3"
+      akkaActor,
+      akkaslf,
+      akkaTestkit,
+      commonsNet,
+      jodaTime
     ),
     git.useGitDescribe := true
   )
@@ -187,9 +183,11 @@ lazy val demoParser =
     base = file("demo-parser")
   )
     .settings(
-      libraryDependencies += "commons-io" % "commons-io" % "2.4",
-      libraryDependencies ++= akka("actor"),
-      libraryDependencies += json4s,
+      libraryDependencies ++= Seq(
+        commonsIo,
+        json4s,
+        akkaActor
+      ),
       git.useGitDescribe := true
     )
 
@@ -202,16 +200,15 @@ lazy val syslogAc =
     .enablePlugins(RpmPlugin)
     .settings(
       rpmVendor := "typesafe",
-      libraryDependencies += json,
       rpmBrpJavaRepackJars := true,
       rpmLicense := Some("BSD"),
       libraryDependencies ++= Seq(
-        "org.syslog4j" % "syslog4j" % "0.9.30",
-        "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-        "ch.qos.logback" % "logback-classic" % "1.1.7",
-        "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0",
-        "joda-time" % "joda-time" % "2.9.3",
-        "org.joda" % "joda-convert" % "1.8.1"
+        json,
+        syslog4j,
+        logbackClassic,
+        scalaLogging,
+        jodaTime,
+        jodaConvert
       ),
       bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"""",
       git.useGitDescribe := true
@@ -228,7 +225,7 @@ lazy val accumulation =
     .dependsOn(players)
     .settings(
       git.useGitDescribe := true,
-      libraryDependencies += "com.maxmind.geoip" % "geoip-api" % "1.3.1"
+      libraryDependencies += geoipApi
     )
 
 lazy val clans =
@@ -260,3 +257,6 @@ lazy val stats =
     base = file("stats")
   )
     .dependsOn(accumulation)
+    .settings(
+      libraryDependencies += xml
+    )
