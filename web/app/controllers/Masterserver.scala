@@ -14,13 +14,13 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class Masterserver @Inject()(configuration: Configuration,
-                            referenceProvider: ReferenceProvider)
+                             referenceProvider: ReferenceProvider)
                             (implicit executionContext: ExecutionContext)
   extends Controller {
 
   def ms = Action.async {
     async {
-      Ok{
+      Ok {
         await(referenceProvider.servers).map(serverRecord =>
           s"addserver ${serverRecord.hostname} ${serverRecord.port} ${serverRecord.password.getOrElse("")}"
         ).mkString("\n\n")

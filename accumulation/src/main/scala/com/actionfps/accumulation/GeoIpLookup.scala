@@ -13,7 +13,7 @@ object GeoIpLookup extends IpLookup {
     val A = new File("resources/GeoLiteCityv6.dat")
     val B = new File("web/resources/GeoLiteCityv6.dat")
     val C = new File("../resources/GeoLiteCityv6.dat")
-    if ( B.exists() ) B else if ( C.exists()) C else A
+    if (B.exists()) B else if (C.exists()) C else A
   }
 
   lazy val ls = new LookupService(file, LookupService.GEOIP_MEMORY_CACHE)

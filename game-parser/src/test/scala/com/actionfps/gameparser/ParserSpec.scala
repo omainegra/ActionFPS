@@ -36,7 +36,7 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
 
       forExactly(1, outputs) {
         output =>
-          output shouldBe a [DemoWrittenCollected]
+          output shouldBe a[DemoWrittenCollected]
           inside(output) {
             case DemoWrittenCollected(DemoRecorded(dateTime, mode, map, sizeRecorded), DemoWritten(filename, sizeWritten)) =>
               dateTime shouldBe "Sun Dec 14 16:47:14 2014"
@@ -164,27 +164,28 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
 
     }
     "Not fail for an HTF game" in {
-      val inputSequence = """
-                            |Status at 12-12-2014 20:41:07: 1 remote clients, 0.0 send, 0.3 rec (K/sec)
-                            |
-                            |Game status: hunt the flag on ac_depot, game finished, open, 2 clients
-                            |cn name             team flag score frag death tk ping role    host
-                            | 0 Drakas           RVSF    0   9  0     0  0   12 normal  127.0.0.1
-                            | 5 Srakas           SPEC    0   9  0     0  0   12 normal  127.0.0.1
-                            |   w00p|Sanzo       RVSF    8   33    35  -    - disconnected
-                            |   w00p|Sanzr       SPEC    8   33    35  -    - disconnected
-                            |Team  CLA:  0 players,    0 frags,    0 flags
-                            |Team RVSF:  1 players,    0 frags,    0 flags
-                            |
-                            |x
-                            |""".stripMargin.split("\r?\n")
+      val inputSequence =
+        """
+          |Status at 12-12-2014 20:41:07: 1 remote clients, 0.0 send, 0.3 rec (K/sec)
+          |
+          |Game status: hunt the flag on ac_depot, game finished, open, 2 clients
+          |cn name             team flag score frag death tk ping role    host
+          | 0 Drakas           RVSF    0   9  0     0  0   12 normal  127.0.0.1
+          | 5 Srakas           SPEC    0   9  0     0  0   12 normal  127.0.0.1
+          |   w00p|Sanzo       RVSF    8   33    35  -    - disconnected
+          |   w00p|Sanzr       SPEC    8   33    35  -    - disconnected
+          |Team  CLA:  0 players,    0 frags,    0 flags
+          |Team RVSF:  1 players,    0 frags,    0 flags
+          |
+          |x
+          | """.stripMargin.split("\r?\n")
 
-      for { t <- inputSequence } info(s"Line: $t")
+      for {t <- inputSequence} info(s"Line: $t")
       val outputs = inputSequence.scanLeft(NothingFound: ParserState)(_.next(_))
 
-      for { o <- outputs } info(s"Output item: $o")
+      for {o <- outputs} info(s"Output item: $o")
 
-      inside(outputs(outputs.size-2)) {
+      inside(outputs(outputs.size - 2)) {
         case FoundGame(header, Left(flagGame)) =>
           inside(header) {
             case GameFinishedHeader(mode, map, state) =>
@@ -239,25 +240,25 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
 
     "Not fail for this game" in {
       val inputSequence =
-      """
-        |Status at 23-01-2015 16:53:02: 4 remote clients, 4.3 send, 2.2 rec (K/sec); Ping: #43|2108|74; CSL: #24|2280|72 (bytes)
-        |
-        |
-        |Game status: ctf on ac_depot, game finished, match, 4 clients
-        |cn name             team flag  score frag death tk ping role    host
-        |1 w00p|Lucas       RVSF    1    514   45    42  0  112 normal  138.231.142.200
-        |2 STK#holmes       CLA     1    427   42    33  1  278 normal  189.30.232.75
-        |3 .45|Chill        CLA     2    520   43    32  0  157 normal  188.192.135.226
-        |4 w00p|Drakas      RVSF    0    176   26    40  0  150 admin   77.44.45.26
-        |cUb3             SPEC    0    0     0  -    - disconnected
-        |Team  CLA:  2 players,   85 frags,    3 flags
-        |Team RVSF:  2 players,   71 frags,    1 flags
-        |
-        |
-        |Demo "Fri Jan 23 16:53:05 2015: ctf, ac_depot, 676.82kB" recorded.
-        |demo written to file "/home/tyr/ac/demos/1999/20150123_2153_local_ac_depot_15min_CTF.dmo" (6|93067 bytes)
-        |
-      """.stripMargin.split("\r?\n")
+        """
+          |Status at 23-01-2015 16:53:02: 4 remote clients, 4.3 send, 2.2 rec (K/sec); Ping: #43|2108|74; CSL: #24|2280|72 (bytes)
+          |
+          |
+          |Game status: ctf on ac_depot, game finished, match, 4 clients
+          |cn name             team flag  score frag death tk ping role    host
+          |1 w00p|Lucas       RVSF    1    514   45    42  0  112 normal  138.231.142.200
+          |2 STK#holmes       CLA     1    427   42    33  1  278 normal  189.30.232.75
+          |3 .45|Chill        CLA     2    520   43    32  0  157 normal  188.192.135.226
+          |4 w00p|Drakas      RVSF    0    176   26    40  0  150 admin   77.44.45.26
+          |cUb3             SPEC    0    0     0  -    - disconnected
+          |Team  CLA:  2 players,   85 frags,    3 flags
+          |Team RVSF:  2 players,   71 frags,    1 flags
+          |
+          |
+          |Demo "Fri Jan 23 16:53:05 2015: ctf, ac_depot, 676.82kB" recorded.
+          |demo written to file "/home/tyr/ac/demos/1999/20150123_2153_local_ac_depot_15min_CTF.dmo" (6|93067 bytes)
+          |
+        """.stripMargin.split("\r?\n")
       val outputs = inputSequence.scanLeft(NothingFound: ParserState)(_.next(_))
 
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
@@ -289,13 +290,13 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
 
 
-      inside(outputs(outputs.size-2)) {
+      inside(outputs(outputs.size - 2)) {
         case FoundGame(header, Left(flagGame)) =>
           inside(flagGame) {
             case FlagGameBuilder(_, scores, disconnectedScores, teamScores) =>
               val teamPlayers = scores.groupBy(_.team).mapValues(_.map(_.name))
-              teamPlayers("RVSF") should contain only ("w00p|Sanzouille", "w00p|RedBull")
-              teamPlayers("CLA") should contain only ("w00p|Drakas", "w00p|LiFe.")
+              teamPlayers("RVSF") should contain only("w00p|Sanzouille", "w00p|RedBull")
+              teamPlayers("CLA") should contain only("w00p|Drakas", "w00p|LiFe.")
               teamPlayers should have size 2
               val teamPlayersDisconnected = disconnectedScores.groupBy(_.team).mapValues(_.map(_.name))
               teamPlayersDisconnected should have size 1

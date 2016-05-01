@@ -8,7 +8,7 @@ import org.scalatest.{FunSuite, Matchers}
   */
 class ServerStatusParserTest
   extends FunSuite
-  with Matchers {
+    with Matchers {
 
   test("server Status parser works") {
     val message = """Status at 22-05-2015 15:14:59: 4 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"""
@@ -40,10 +40,11 @@ class ServerStatusParserTest
   }
 
   test("Uglier format is good") {
-//    val A = java.time.format.DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss VV yyyy")
+    //    val A = java.time.format.DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss VV yyyy")
     // EEE MMM dd HH:mm:ss zzz yyyy
-//    ZonedDateTime.parse("Sat Dec 13 19:36:16 CET 2014", A)
-    val fullMessage = """Date: Sat Dec 13 19:36:16 CET 2014, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#1999], Payload: Status at 22-05-2015 15:14:59: 4 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"""
+    //    ZonedDateTime.parse("Sat Dec 13 19:36:16 CET 2014", A)
+    val fullMessage =
+      """Date: Sat Dec 13 19:36:16 CET 2014, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#1999], Payload: Status at 22-05-2015 15:14:59: 4 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"""
     val ExtractMessage(d, _, _) = fullMessage
   }
 

@@ -9,9 +9,11 @@ import com.actionfps.gameparser.ingesters.{GameDuration, ParserState, FoundGame}
 sealed trait ServerState {
   def next(line: String): ServerState
 }
+
 case class ServerFoundGame(foundGame: FoundGame, duration: Int) extends ServerState {
   def next(line: String): ServerState = ServerState.empty
 }
+
 case class ServerStateProcessing(parserState: ParserState, gameDuration: GameDuration) extends ServerState {
   def next(line: String): ServerState = {
     parserState.next(line) match {

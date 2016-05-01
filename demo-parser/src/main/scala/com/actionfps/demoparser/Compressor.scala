@@ -11,19 +11,23 @@ object Compressor {
   object ExtractString {
     def unapply(bs: ByteString) = shiftString(bs)
   }
+
   object ExtractInt {
     def unapply(bs: ByteString) = shiftInt(bs)
   }
+
   object ExtractUInt {
     def unapply(bs: ByteString) = shiftUInt(bs)
   }
+
   object ExtractLong {
     def unapply(bs: ByteString) = shiftLong(bs)
   }
+
   val #:: = ExtractInt
   val #:::: = ExtractUInt
   val #::: = ExtractLong
-  val ##:: =  ExtractString
+  val ##:: = ExtractString
 
   def shiftString(byteString: ByteString): Option[(String, ByteString)] = {
     @tailrec
@@ -36,6 +40,7 @@ object Compressor {
     }
     go("", byteString)
   }
+
   def shiftInt(byteString: ByteString): Option[(Int, ByteString)] = {
     byteString.headOption.collect {
       case x if x != -128 && x != -127 =>
@@ -57,6 +62,7 @@ object Compressor {
         (n, byteString.drop(5))
     }
   }
+
   def shiftLong(byteString: ByteString): Option[(Long, ByteString)] = {
     byteString.headOption.collect {
       case x if x != -128 && x != -127 =>
@@ -84,9 +90,10 @@ object Compressor {
     else if (n < 0x8000 && n >= -0x8000) {
       ByteString(0x80.toByte, n.toByte, (n >> 8).toByte)
     } else {
-      ByteString(0x81, n.toByte, (n>>8).toByte, (n>>16).toByte, (n>>24).toByte)
+      ByteString(0x81, n.toByte, (n >> 8).toByte, (n >> 16).toByte, (n >> 24).toByte)
     }
   }
+
   def stringToByteString(str: String) = {
     val first = str.map(_.toInt).map(intToByteString).flatten.toArray
     val second = first ++ Array(0.toByte)
@@ -104,14 +111,16 @@ object Compressor {
       byteString = newByteString
       v
     }
+
     def getstring = {
       val Some((v, newByteString)) = shiftString(byteString)
       byteString = newByteString
       v
     }
+
     def getuint = {
       var n = getbyte.toChar & 0xff
-      if ( (n & 0x80) != 0 ) {
+      if ((n & 0x80) != 0) {
         n = n + ((getbyte & 0xff) << 7) - 0x80
         if ((n & (1 << 14)) != 0) {
           n = n + ((getbyte.toChar & 0xff) << 14) - (1 << 14)
@@ -125,15 +134,15 @@ object Compressor {
       }
       n
     }
+
     def getbyte = {
       val firstByte = byteString.head
       byteString = byteString.tail
       firstByte
     }
+
     def rest = byteString
   }
-
-
 
 
   // from demo-parser
@@ -166,15 +175,17 @@ object Compressor {
 
   class BitQueue2(bytes: Array[Byte]) {
     def this(byteString: ByteString) = this(byteString.toArray)
+
     val initialSize = bytes.length
     var rembits = 0
     val bitSet = java.util.BitSet.valueOf(bytes)
     var cursor: Int = 0
+
     def getbits(num: Int) = {
       var cn = 0
       var intValue = 0
-      while ( cn < num ) {
-        if ( bitSet.get(cursor) ) {
+      while (cn < num) {
+        if (bitSet.get(cursor)) {
           intValue = intValue | (1 << cn)
         }
         cn = cn + 1
@@ -183,13 +194,15 @@ object Compressor {
       rembits = (rembits - num + 16) % 8
       intValue
     }
+
     def rest = {
-      if ( cursor >= initialSize * 8 )
+      if (cursor >= initialSize * 8)
         ByteString.empty
       else
         ByteString(bitSet.get(cursor + (if (rembits == 0) 8 else rembits), initialSize * 8).toByteArray)
     }
   }
+
   class BitQueue(var bits: Vector[Boolean]) {
     val initialBitsSize = bits.size
     var tookbits = 0
@@ -215,7 +228,7 @@ object Compressor {
       //      if ( bits.take(skipBits + 8).forall(_ == false) ) {
       //        bits.drop(skipBits + 8).zipWithIndex.foreach { case (b, i) => bs.set(i, b)}
       //      } else {
-      bits.drop(skipBits).zipWithIndex.foreach { case (b, i) => bs.set(i, b)}
+      bits.drop(skipBits).zipWithIndex.foreach { case (b, i) => bs.set(i, b) }
       //      }
       ByteString(bs.toByteArray)
     }

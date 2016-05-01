@@ -10,7 +10,7 @@ import org.scalatest.{FunSuite, Matchers}
   */
 class RegistrationsTest
   extends FunSuite
-  with Matchers {
+    with Matchers {
   test("it should work") {
     Registration.parseRecords(getSample("registrations.csv")) should have size 96
   }

@@ -14,6 +14,7 @@ case class Clan(id: String, name: String, fullName: String,
     (tag.toList ++ tags.toList.flatten).exists(NicknameMatcher.apply(_)(nickname))
   }
 }
+
 object Clan {
   def fromClanRecord(clanRecord: ClanRecord): Clan = {
     Clan(

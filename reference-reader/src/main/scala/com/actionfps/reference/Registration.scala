@@ -22,14 +22,14 @@ object Registration {
       import collection.JavaConverters._
       val emailColumn: Int = parser.getHeaderMap.get("E-mail")
       val headers = parser.getHeaderMap.asScala.toList.sortBy(_._2).map(_._1)
-      val cp = new CSVPrinter(sw, CSVFormat.EXCEL.withHeader(headers :_*))
+      val cp = new CSVPrinter(sw, CSVFormat.EXCEL.withHeader(headers: _*))
       try {
         parser.getRecords.asScala.foreach { csvRecord =>
           val row = csvRecord.iterator().asScala.zipWithIndex.map {
             case (value, `emailColumn`) => ""
             case (value, _) => value
           }.toList
-          cp.printRecord(row :_*)
+          cp.printRecord(row: _*)
         }
         sw.toString
       } finally cp.close()

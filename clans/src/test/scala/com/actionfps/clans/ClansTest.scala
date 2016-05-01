@@ -11,7 +11,7 @@ import play.api.libs.json.Json
   */
 class ClansTest
   extends FunSuite
-  with Matchers {
+    with Matchers {
   ignore("It works") {
     val jsn = Json.parse(new URL("http://api.actionfps.com/recent/clangames/").openConnection().getInputStream)
     val games = Json.fromJson[List[JsonGame]](jsn).get
@@ -21,7 +21,7 @@ class ClansTest
     //    result.complete.toList.sortBy(_.id).foreach(println)
     val lg = result.complete.toList.sortBy(_.id).last
     println(lg)
-//    val cg = Conclusion.conclude(lg.games).awardMvps
-//    println(cg)
+    //    val cg = Conclusion.conclude(lg.games).awardMvps
+    //    println(cg)
   }
 }

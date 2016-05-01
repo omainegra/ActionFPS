@@ -41,6 +41,7 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
   val logger = Logger(getClass)
 
   val (intersEnum, intersChannel) = Concurrent.broadcast[Event]
+
   def intersSource = Source.fromPublisher(Streams.enumeratorToPublisher(intersEnum))
 
   val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(intersChannel.push(Event("")))

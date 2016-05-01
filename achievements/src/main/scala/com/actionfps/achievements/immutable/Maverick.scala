@@ -7,6 +7,7 @@ import com.actionfps.gameparser.enrichers.{JsonGame, JsonGamePlayer}
   */
 sealed trait Maverick {
   def title = "Maverick"
+
   def description = "Achieve all winning team's flags, 5 minimum"
 }
 
@@ -36,7 +37,7 @@ object Maverick {
     }.headOption
   }
 
-  case class Achieved(flags: Int) extends Maverick  with CompletedAchievement
+  case class Achieved(flags: Int) extends Maverick with CompletedAchievement
 
 }
 

@@ -62,10 +62,10 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
 
     def latest: Future[Option[Heading]] = async {
       val hs = await(headings).filterNot(_.text.startsWith("http://"))
-      if ( hs.isEmpty ) None
+      if (hs.isEmpty) None
       else {
         val heading = hs.maxBy(_.from.toEpochSecond(ZoneOffset.UTC))
-        val html = if ( heading.text.contains("<") ) HtmlFormat.raw(heading.text)
+        val html = if (heading.text.contains("<")) HtmlFormat.raw(heading.text)
         else HtmlFormat.escape(heading.text)
         Option(Heading(at = ZonedDateTime.of(heading.from, ZoneId.of("UTC")), html = html))
       }
@@ -73,6 +73,7 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
 
 
   }
+
   case class Headings(headings: List[ReferenceProvider.Heading])
 
   object Servers {
@@ -104,6 +105,7 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
       try NicknameRecord.parseRecords(sr)
       finally sr.close()
     }
+
     def users: Future[List[User]] = async {
       val regs = await(registrations)
       val nicks = await(nicknames)
@@ -122,6 +124,9 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
   def bulletin: Future[Option[Heading]] = Headings.latest
 
 }
+
 object ReferenceProvider {
+
   case class Heading(at: ZonedDateTime, html: Html)
+
 }

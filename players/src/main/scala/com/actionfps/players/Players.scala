@@ -46,10 +46,11 @@ object PlayersStat {
     lastGame = lastGame,
     rank = None
   )
-  
+
   object ImplicitWrites {
     implicit val psw = Json.writes[PlayerStat]
   }
+
 }
 
 object PlayersStats {
@@ -155,8 +156,11 @@ case class PlayersStats(players: Map[String, PlayerStat]) {
       player <- team.players
       user <- player.user
       firstTeam = game.teams.head == team
-      teamP = if(firstTeam) p else 1-p
-      modifier = if( game.isTie ) 0.5 else { if( isWin ) 1.0 else 0.0 }
+      teamP = if (firstTeam) p else 1 - p
+      modifier = if (game.isTie) 0.5
+      else {
+        if (isWin) 1.0 else 0.0
+      }
       points = k * (modifier - teamP)
       contribution <- contribs.get(user)
       eloAddition = if (points >= 0)

@@ -24,6 +24,7 @@ case class PlayerStatistics(playedGames: List[String], flags: Int, frags: Int, t
         s"$days$hours"
     }
   }
+
   def processGame(jsonGame: JsonGame, jsonGamePlayer: JsonGamePlayer): PlayerStatistics = {
     copy(
       playedGames = playedGames :+ jsonGame.id,
@@ -35,7 +36,8 @@ case class PlayerStatistics(playedGames: List[String], flags: Int, frags: Int, t
   }
 }
 
-object PlayerStatistics{
+object PlayerStatistics {
   def empty = PlayerStatistics(playedGames = List.empty, flags = 0, frags = 0, timePlayed = 0, gamesPlayed = 0)
+
   implicit val fmts = Json.format[PlayerStatistics]
 }

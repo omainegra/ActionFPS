@@ -14,21 +14,28 @@ import scala.util.Success
 object CachedJournalGamesProvider {
 
   sealed trait JournaledCacheState
+
   case object NoCache extends JournaledCacheState {
     def withGames(games: Map[String, JsonGame]) = LoadedOnlyGames(games)
   }
+
   case object LoadingCache extends JournaledCacheState {
     def withGames(games: Map[String, JsonGame]) = LoadedOnlyGames(games)
+
     def withCachedGames(games: Map[String, JsonGame]) = LoadedCache(games)
   }
+
   case class LoadedCache(games: Map[String, JsonGame]) extends JournaledCacheState {
     def withResults(newGames: Map[String, JsonGame]) =
       LoadedCacheAndResults(cached = games, games = newGames)
   }
+
   case class LoadedCacheAndResults(cached: Map[String, JsonGame], games: Map[String, JsonGame]) extends JournaledCacheState {
     def diff: List[JsonGame] = (games.keySet -- cached.keySet).toList.map(games)
   }
+
   case class LoadedOnlyGames(games: Map[String, JsonGame]) extends JournaledCacheState
+
 }
 
 /**
@@ -47,9 +54,9 @@ class CachedJournalGamesProvider @Inject()(configuration: Configuration,
 
   lazy val reloadedGames: Future[Map[String, JsonGame]] = {
     addWriteShutdownHook()
-    if ( CommitDescription.commitDescription.exists(_.contains("#reset-cache")) ) {
+    if (CommitDescription.commitDescription.exists(_.contains("#reset-cache"))) {
       Promise[Map[String, JsonGame]]().future
-    } else if ( !new File(targetFile).exists ) {
+    } else if (!new File(targetFile).exists) {
       Promise[Map[String, JsonGame]]().future
     }
     else {
@@ -77,7 +84,7 @@ class CachedJournalGamesProvider @Inject()(configuration: Configuration,
       case newGames if reloadedGames.isCompleted =>
         reloadedGames.value.flatMap(_.toOption).foreach { oldGames =>
           val notSeenGames = (newGames.keySet -- oldGames.keySet).toList.sorted
-          if ( notSeenGames.isEmpty )
+          if (notSeenGames.isEmpty)
             Logger.info(s"Loaded no unseen games")
           else
             Logger.info(s"Loaded ${notSeenGames.size} unseen games - running hooks on each of them")

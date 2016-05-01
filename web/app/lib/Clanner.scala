@@ -8,6 +8,7 @@ import com.actionfps.accumulation.Clan
 trait Clanner {
   def get(id: String): Option[Clan]
 }
+
 object Clanner {
   def apply(f: String => Option[Clan]) = new Clanner {
     override def get(id: String): Option[Clan] = f(id)

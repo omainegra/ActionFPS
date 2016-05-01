@@ -8,15 +8,17 @@ case class NowServer(server: String)
 case class Now(server: NowServer, minRemain: Option[Int])
 
 case class GDA(text: String, user: String)
+
 object MixedGame {
   def fromJsonGame(jsonGame: JsonGame) = {
     MixedGame(isNew = false, game = jsonGame, now = None, players = None, spectators = None, clanwar = jsonGame.clanwar,
-    achievements = None, teamSpectators = Map.empty)
+      achievements = None, teamSpectators = Map.empty)
   }
 }
+
 case class MixedGame(isNew: Boolean, game: JsonGame, now: Option[Now], players: Option[List[String]]
-                    , spectators: Option[List[String]],
-                    clanwar: Option[String], achievements: Option[List[GDA]], teamSpectators: Map[String, List[JsonGamePlayer]]) {
+                     , spectators: Option[List[String]],
+                     clanwar: Option[String], achievements: Option[List[GDA]], teamSpectators: Map[String, List[JsonGamePlayer]]) {
   mg =>
 
   import game._

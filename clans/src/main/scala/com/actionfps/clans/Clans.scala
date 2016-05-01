@@ -111,6 +111,7 @@ case class ClanwarMeta(id: String,
   def named(implicit namer: Conclusion.Namer) = copy(
     conclusion = conclusion.named
   )
+
   def achievements = {
     Option(games.sortBy(_.id).reverse.flatMap(_.achievements).flatten).filter(_.nonEmpty)
   }

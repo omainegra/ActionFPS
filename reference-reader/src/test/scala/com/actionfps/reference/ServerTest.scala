@@ -7,7 +7,7 @@ import org.scalatest.{Matchers, FunSuite}
   */
 class ServerTest
   extends FunSuite
-  with Matchers {
+    with Matchers {
   test("Should work") {
     ServerRecord.parseRecords(getSample("servers.csv")) should have size 8
   }

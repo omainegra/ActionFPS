@@ -79,6 +79,7 @@ object IpLookup {
 
   case class IpLookupResult(countryCode: Option[String], countryName: Option[String],
                             timezone: Option[String])
+
   object IpLookupResult {
     def empty: IpLookupResult = IpLookupResult(
       countryCode = None,

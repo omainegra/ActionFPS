@@ -10,15 +10,19 @@ import org.json4s.NoTypeHints
 object DemoToJson {
 
   implicit val formats = org.json4s.jackson.Serialization.formats(NoTypeHints)
+
   import org.json4s.jackson.Serialization.writePretty
-  val headerSize = 428 // 16 + 4 + 4 + 80 + 322
+
+  val headerSize = 428
+
+  // 16 + 4 + 4 + 80 + 322
 
   implicit class writeToOs(val outputStream: OutputStream) extends AnyVal {
     def write(str: String) = {
       outputStream.write(str.getBytes)
     }
   }
-  
+
   // very impure!
   // reduce footprint by capturing gamestate after every 30ms.
   def reduceFootprint(input: Iterator[GameState]): Iterator[GameState] = {
@@ -29,7 +33,7 @@ object DemoToJson {
         stt
     }
   }
-  
+
   def demoToJson(inputFile: File, outputFile: File) = {
     val bs = ByteString {
       val fis = new FileInputStream(inputFile)

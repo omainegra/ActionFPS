@@ -31,7 +31,7 @@ class SkippersParserSpec
           inside(flagGame) {
             case FlagGameBuilder(_, scores, disconnectedScores, teamScores) =>
               val teamPlayers = scores.groupBy(_.team).mapValues(_.map(_.name))
-              teamPlayers("RVSF") should contain only("un")
+              teamPlayers("RVSF") should contain only ("un")
               teamPlayers("CLA") should contain only("ZZ|CR7", "Morry=MyS=")
               teamPlayers should have size 2
               val teamPlayersDisconnected = disconnectedScores.groupBy(_.team).mapValues(_.map(_.name))
