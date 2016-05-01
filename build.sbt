@@ -21,7 +21,8 @@ lazy val root =
       syslogAc,
       accumulation,
       clans,
-      players
+      players,
+      stats
     ).dependsOn(
     achievements,
     gameParser,
@@ -33,7 +34,8 @@ lazy val root =
     syslogAc,
     accumulation,
     clans,
-    players
+    players,
+    stats
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -45,78 +47,74 @@ lazy val root =
       }
     )
 
-lazy val web =
-  Project(
-    id = "web",
-    base = file("web")
+lazy val web = project
+  .enablePlugins(PlayScala)
+  .dependsOn(pingerClient)
+  .dependsOn(accumulation)
+  .dependsOn(interParser)
+  .dependsOn(stats)
+  .dependsOn(ladderParser)
+  .enablePlugins(BuildInfoPlugin)
+  .settings(dontDocument)
+  .settings(
+    libraryDependencies ++= Seq(
+      akkaActor,
+      akkaAgent,
+      akkaslf,
+      jsoup,
+      groovy,
+      hazelcastClient,
+      fluentHc,
+      commonsIo,
+      filters,
+      ws,
+      async,
+      scalatestPlus,
+      seleniumHtmlUnit,
+      seleniumJava,
+      cache,
+      mockito
+    ),
+    (run in Compile) <<= (run in Compile).dependsOn(startHazelcast),
+    startHazelcast := {
+      streams.value.log.info("Starting hazelcast in dev mode...")
+      val cfg = new com.hazelcast.config.Config()
+      cfg.setInstanceName("web")
+      Hazelcast.getOrCreateHazelcastInstance(cfg)
+    },
+    stopHazelcast := {
+      startHazelcast.value.shutdown()
+    },
+    scriptClasspath := Seq("*", "../conf/"),
+    buildInfoKeys := Seq[BuildInfoKey](
+      name,
+      version,
+      scalaVersion,
+      sbtVersion,
+      buildInfoBuildNumber,
+      git.gitHeadCommit,
+      gitCommitDescription
+    ),
+    gitCommitDescription := {
+      com.typesafe.sbt.SbtGit.GitKeys.gitReader.value.withGit { interface =>
+        for {
+          sha <- git.gitHeadCommit.value
+          interface <- Option(interface).collect { case i: com.typesafe.sbt.git.JGit => i }
+          ref <- Option(interface.repo.resolve(sha))
+          message <- {
+            val walk = new RevWalk(interface.repo)
+            try Option(walk.parseCommit(ref.toObjectId)).flatMap(commit => Option(commit.getFullMessage))
+            finally walk.dispose()
+          }
+        } yield message
+      }
+    }.map { str => Base64.getEncoder.encodeToString(str.getBytes("UTF-8")) },
+    version := "5.0",
+    buildInfoPackage := "af",
+    buildInfoOptions += BuildInfoOption.ToJson
   )
-    .enablePlugins(PlayScala)
-    .dependsOn(pingerClient)
-    .dependsOn(accumulation)
-    .dependsOn(interParser)
-    .enablePlugins(BuildInfoPlugin)
-    .settings(dontDocument)
-    .settings(
-      libraryDependencies += "org.jsoup" % "jsoup" % "1.8.3",
-      libraryDependencies += "org.codehaus.groovy" % "groovy-all" % "2.4.6",
-      libraryDependencies += "com.hazelcast" % "hazelcast-client" % "3.6.1",
-      libraryDependencies += "org.postgresql" % "postgresql" % "9.4.1208",
-      libraryDependencies += "org.mockito" % "mockito-all" % "1.10.19" % "test",
-      libraryDependencies ++= akka("actor", "agent", "slf4j"),
-      libraryDependencies ++= Seq(
-        "com.typesafe.play" %% "play-slick" % "1.1.1",
-        "com.typesafe.play" %% "play-slick-evolutions" % "1.1.1",
-        "org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
-        "commons-io" % "commons-io" % "2.4",
-        filters,
-        ws,
-        async,
-        "org.scalatestplus" %% "play" % "1.4.0" % "test",
-        "org.seleniumhq.selenium" % "selenium-java" % "2.52.0" % "test",
-        cache
-      ),
-      (run in Compile) <<= (run in Compile).dependsOn(startHazelcast),
-      startHazelcast := {
-        streams.value.log.info("Starting hazelcast in dev mode...")
-        val cfg = new com.hazelcast.config.Config()
-        cfg.setInstanceName("web")
-        Hazelcast.getOrCreateHazelcastInstance(cfg)
-      },
-      stopHazelcast := {
-        startHazelcast.value.shutdown()
-      },
-      scriptClasspath := Seq("*", "../conf/"),
-      buildInfoKeys := Seq[BuildInfoKey](
-        name,
-        version,
-        scalaVersion,
-        sbtVersion,
-        buildInfoBuildNumber,
-        git.gitHeadCommit,
-        gitCommitDescription
-      ),
-      gitCommitDescription := {
-        val gitReader = com.typesafe.sbt.SbtGit.GitKeys.gitReader.value
-        gitReader.withGit { interface =>
-          for {
-            sha <- git.gitHeadCommit.value
-            interface <- Option(interface).collect { case i: com.typesafe.sbt.git.JGit => i }
-            ref <- Option(interface.repo.resolve(sha))
-            message <- {
-              val walk = new RevWalk(interface.repo)
-              try Option(walk.parseCommit(ref.toObjectId)).flatMap(commit => Option(commit.getFullMessage))
-              finally walk.dispose()
-            }
-          } yield message
-        }
-      }.map { str => Base64.getEncoder.encodeToString(str.getBytes("UTF-8")) },
-      version := "5.0",
-      buildInfoPackage := "af",
-      buildInfoOptions += BuildInfoOption.ToJson
-    )
 
 lazy val gitCommitDescription = SettingKey[Option[String]]("gitCommitDescription", "Base64-encoded!")
-
 
 lazy val gameParser =
   Project(
@@ -134,22 +132,11 @@ lazy val gameParser =
       git.useGitDescribe := true
     )
 
-lazy val achievements =
-  Project(
-    id = "achievements",
-    base = file("achievements")
-  )
-    .enablePlugins(GitVersioning)
-    .settings(
-      libraryDependencies ++= Seq(
-        json,
-        "com.maxmind.geoip2" % "geoip2" % "2.6.0",
-        "org.apache.httpcomponents" % "fluent-hc" % "4.5.2",
-        "commons-net" % "commons-net" % "3.4",
-        xml
-      ),
-      git.useGitDescribe := true
-    ).dependsOn(gameParser)
+lazy val achievements = project
+  .enablePlugins(GitVersioning)
+  .settings(
+    git.useGitDescribe := true
+  ).dependsOn(gameParser)
 
 lazy val interParser =
   Project(
@@ -162,7 +149,7 @@ lazy val referenceReader =
     id = "reference-reader",
     base = file("reference-reader")
   ).settings(
-    libraryDependencies += "org.apache.commons" % "commons-csv" % "1.2",
+    libraryDependencies += commonsCsv,
     git.useGitDescribe := true
   )
 
@@ -172,11 +159,11 @@ lazy val pingerClient =
     base = file("pinger-client")
   ).settings(
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor" % "2.4.2",
-      "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
-      "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test",
-      "commons-net" % "commons-net" % "3.4",
-      "joda-time" % "joda-time" % "2.9.2"
+      akkaActor,
+      akkaslf,
+      akkaTestkit,
+      commonsNet,
+      jodaTime
     ),
     git.useGitDescribe := true
   )
@@ -187,9 +174,11 @@ lazy val demoParser =
     base = file("demo-parser")
   )
     .settings(
-      libraryDependencies += "commons-io" % "commons-io" % "2.4",
-      libraryDependencies ++= akka("actor"),
-      libraryDependencies += json4s,
+      libraryDependencies ++= Seq(
+        commonsIo,
+        json4s,
+        akkaActor
+      ),
       git.useGitDescribe := true
     )
 
@@ -202,55 +191,41 @@ lazy val syslogAc =
     .enablePlugins(RpmPlugin)
     .settings(
       rpmVendor := "typesafe",
-      libraryDependencies += json,
       rpmBrpJavaRepackJars := true,
       rpmLicense := Some("BSD"),
       libraryDependencies ++= Seq(
-        "org.syslog4j" % "syslog4j" % "0.9.30",
-        "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-        "ch.qos.logback" % "logback-classic" % "1.1.6",
-        "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-        "joda-time" % "joda-time" % "2.9.2",
-        "org.joda" % "joda-convert" % "1.8.1"
+        json,
+        syslog4j,
+        logbackClassic,
+        scalaLogging,
+        jodaTime,
+        jodaConvert
       ),
       bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"""",
       git.useGitDescribe := true
     )
 
-lazy val accumulation =
-  Project(
-    id = "accumulation",
-    base = file("accumulation")
+lazy val accumulation = project
+  .dependsOn(achievements)
+  .dependsOn(referenceReader)
+  .dependsOn(clans)
+  .dependsOn(players)
+  .settings(
+    git.useGitDescribe := true,
+    libraryDependencies += geoipApi
   )
-    .dependsOn(achievements)
-    .dependsOn(referenceReader)
-    .dependsOn(clans)
-    .dependsOn(players)
-    .settings(
-      git.useGitDescribe := true,
-      libraryDependencies += "com.maxmind.geoip" % "geoip-api" % "1.3.1"
-    )
 
-lazy val clans =
-  Project(
-    id = "clans",
-    base = file("clans")
+lazy val clans = project
+  .dependsOn(gameParser)
+  .settings(
+    git.useGitDescribe := true
   )
-    .dependsOn(gameParser)
-    .settings(
-      libraryDependencies += "org.cvogt" %% "play-json-extensions" % "0.6.1",
-      git.useGitDescribe := true
-    )
 
-lazy val players =
-  Project(
-    id = "players",
-    base = file("players")
+lazy val players = project
+  .dependsOn(gameParser)
+  .settings(
+    git.useGitDescribe := true
   )
-    .dependsOn(gameParser)
-    .settings(
-      git.useGitDescribe := true
-    )
 
 lazy val startHazelcast = TaskKey[HazelcastInstance]("Start the web hazelcast instance")
 lazy val stopHazelcast = TaskKey[Unit]("Stop the web hazelcast instance")
@@ -263,3 +238,11 @@ lazy val ladderParser =
     .settings(
       git.useGitDescribe := true
     )
+
+lazy val stats = project
+  .dependsOn(accumulation)
+  .settings(
+    libraryDependencies += xml
+  )
+
+updateOptions in Global := (updateOptions in Global).value.withCachedResolution(true)

@@ -7,7 +7,7 @@ import org.scalatest.{Matchers, FunSuite}
   */
 class VideoTest
   extends FunSuite
-  with Matchers {
+    with Matchers {
 
   test("Should work") {
     VideoRecord.parseRecords(getSample("videos.csv")) should have size 1

@@ -18,9 +18,9 @@ import scala.io.Codec
   */
 class JournalNewGamesTest
   extends PlaySpec
-  with MockitoSugar
-  with OptionValues
-  with BeforeAndAfterAll {
+    with MockitoSugar
+    with OptionValues
+    with BeforeAndAfterAll {
 
   val tmpFile = File.createTempFile("actionfps-journal", ".log")
 

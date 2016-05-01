@@ -70,12 +70,12 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
     val jsonMap = Map("game" -> Seq(Json.toJson(b).toString()), "maps" -> Seq(Json.toJson(Maps.resource.maps.mapValues(_.image)).toString()))
     common.renderRaw("/live/render-fragment.php")(_.post(jsonMap)).map(resp =>
-        Event(
-          id = Option(b.now.server.server),
-          name = Option("current-game-status-fragment"),
-          data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(resp.body)).toString()
-        )
-    ).foreach{event =>
+      Event(
+        id = Option(b.now.server.server),
+        name = Option("current-game-status-fragment"),
+        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(resp.body)).toString()
+      )
+    ).foreach { event =>
       liveGamesChan.push(event)
       status.alter(m => m.updated(s"${event.id}${event.name}", event))
     }

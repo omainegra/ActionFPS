@@ -5,8 +5,11 @@ import play.api.libs.json.{JsArray, JsObject}
 
 sealed trait CaptureMaster {
   def title = "Capture Master"
+
   def description = "Complete the selected CTF maps, each sides, 3 times"
+
   def all: List[CaptureMapCompletion]
+
   def jsonTable: JsObject = JsObject(Map(
     "maps" -> JsArray(all.sortBy(_.map).map(_.asJson))
   ))
@@ -27,16 +30,17 @@ object CaptureMaster {
         achieving = withIncluded.flatMap(_.left.toSeq),
         achieved = achieved ++ withIncluded.flatMap(_.right.toSeq)
       )
-      if ( nextMe == this ) Option.empty else Option {
+      if (nextMe == this) Option.empty
+      else Option {
         val newlyCompleted = (nextMe.achieved.toSet -- achieved.toSet).headOption
         val myNextIteration =
-          if ( nextMe.achieving.isEmpty ) Right(Achieved(nextMe.achieved))
+          if (nextMe.achieving.isEmpty) Right(Achieved(nextMe.achieved))
           else Left(nextMe)
         myNextIteration -> newlyCompleted
       }
     }
 
-    override def progress: Int = if ( achieved.isEmpty ) 0 else 100 * achieved.length / (achieved.length + achieving.length)
+    override def progress: Int = if (achieved.isEmpty) 0 else 100 * achieved.length / (achieved.length + achieving.length)
 
     override def all: List[CaptureMapCompletion] = (achieving ++ achieved)
   }

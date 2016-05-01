@@ -19,7 +19,7 @@ object DemoAnalysis {
 
     def defaultFlagPosition(team: Int) = {
       for {MapDefCtfFlag(x, y, _) <- mapDefs.flags.find(_.tn == team)}
-      yield mapDefs.dims.pixelToPosition(x, y)
+        yield mapDefs.dims.pixelToPosition(x, y)
     }
 
     def defaultFlagPixels(team: Int) = {
@@ -51,6 +51,7 @@ object DemoAnalysis {
       case None => accum
     }
   }
+
   val extractBasicsz =
     Function.unlift(PositionResults.parse) orElse
       Function.unlift(SvClients.parse) orElse
@@ -105,9 +106,11 @@ object DemoAnalysis {
 
   object MapDefs {
     val cache = scala.collection.mutable.Map.empty[String, MapDefs]
+
     def get(map: String) = {
       cache.getOrElseUpdate(map, load(map))
     }
+
     def load(map: String) = {
       val filename = scala.util.Properties.userDir + java.io.File.separator + "ui" + java.io.File.separator + "mapshots" + java.io.File.separator + map + ".txt"
       val lines = scala.io.Source.fromFile(filename).getLines().toVector
@@ -121,26 +124,26 @@ object DemoAnalysis {
     val teams = for {
       team <- Vector(0, 1)
     } yield team -> TeamState(
-        flagAway = None,
-        flags = 0,
-        flagCarriedBy = None,
-        players = {
-          for {
-            client <- welcome.resume.clients
-            if client.team == team
-            player <- welcome.resume.players
-            if client.cn == player.cn
-            cn = client.cn
-            gc = GameClient(
-              name = client.name,
-              position = PositionVector.empty,
-              yaw = 0.0f,
-              alive = false,
-              shooting = false
-            )
-          } yield cn -> gc
-        }.toMap
-      )
+      flagAway = None,
+      flags = 0,
+      flagCarriedBy = None,
+      players = {
+        for {
+          client <- welcome.resume.clients
+          if client.team == team
+          player <- welcome.resume.players
+          if client.cn == player.cn
+          cn = client.cn
+          gc = GameClient(
+            name = client.name,
+            position = PositionVector.empty,
+            yaw = 0.0f,
+            alive = false,
+            shooting = false
+          )
+        } yield cn -> gc
+      }.toMap
+    )
     GameState(
       map = welcome.mapChange.name,
       teams = teams.toMap,
@@ -160,113 +163,113 @@ object DemoAnalysis {
   }
 
   def flowState(input: ByteString) = {
-    val initialState = go(input).flatMap(bs => Welcome.parse(bs.data)).head._1 : GameState
+    val initialState = go(input).flatMap(bs => Welcome.parse(bs.data)).head._1: GameState
     go(input).flatMap(e => parsePacket(e.data).map(r => e.millis -> r)).scanLeft(initialState) {
-    case (state, (millis, Died(actor, victim, _, _, _))) =>
-      val updatedTeams = for {
-        (tid, t) <- state.teams
-        p <- t.players.get(victim)
-      } yield tid -> t.copy(players = t.players.updated(victim, p.copy(alive = false, shooting = false)))
-      state.copy(millis = millis, teams = state.teams ++ updatedTeams)
-    case (s, (millis, FlagCount(cn, _))) =>
-      // player scored flag
-      val updatedTeams = for {
-        (tid, t) <- s.teams
-        if t.players.contains(cn)
-      } yield tid -> t.copy(flags = t.flags + 1)
-      s.copy(millis = millis, teams = s.teams ++ updatedTeams)
-    case (s, (millis, FlagUpdates(fis))) =>
-      fis.foldLeft(s) {
-        case (state, fu@FlagUpdate(tid, flagState, carrying, dropped)) =>
-          val teamUpdateO = Option(fu).flatMap {
-            case _ if fu.inBase =>
-              for {
-                t <- state.teams.get(tid)
-              } yield tid -> t.copy(flagAway = None, flagCarriedBy = None)
-            case _ if fu.stolen =>
-              for {
-                t <- state.teams.get(tid)
-                cn <- carrying
-                carryPosition <- (for {
-                  (ttid, tt) <- state.teams
-                  (`cn`, p) <- tt.players
-                } yield p.position).headOption
-              } yield tid -> t.copy(flagAway = Option(carryPosition), flagCarriedBy = Option(cn))
-            case _ if fu.wasDropped =>
-              for {
-                t <- state.teams.get(tid)
-                d <- dropped
-              } yield tid -> t.copy(flagAway = Option(d), flagCarriedBy = None)
-            case _ if fu.idle => None
-          }
-          state.copy(millis = millis, teams = state.teams ++ teamUpdateO.toVector)
-      }
-    case (state, (millis, PositionResults(pres))) =>
-      pres.foldLeft(state) {
-        case (s, PositionResult(cn, _, pos, _, yaw, _, _, _, _, shooting)) =>
-          val updatedTeam = for {
-            (teamnum, team) <- s.teams
-            (`cn`, player) <- team.players
-          } yield teamnum -> team.copy(players = team.players.updated(cn, player.copy(position = pos, yaw = yaw, shooting = shooting)))
-          val A = s.copy(teams = s.teams ++ updatedTeam)
-          val updatedFlagPosition = for {
-            (teamnum, team) <- A.teams
-            cb <- team.flagCarriedBy
-            if cb == cn
-          } yield teamnum -> team.copy(flagAway = Option(pos))
-          A.copy(teams = A.teams ++ updatedFlagPosition)
-      }.copy(millis = millis)
-    case (state, (millis, ClientDisconnected(cn))) =>
-      val updatedTeam = for {
-        (teamnum, team) <- state.teams
-      } yield teamnum -> team.copy(players = team.players - cn)
-      state.copy(teams = state.teams ++ updatedTeam)
-    case (state, (millis, SvClients(stuffs))) =>
-      val spawnedPlayers = for {
-        SvClient(cn, svs) <- stuffs
-        it <- svs
-        if it.isInstanceOf[SvSpawn]
-      } yield cn
-      val switchedNames = for {
-        SvClient(cn, svg) <- stuffs
-        SwitchName(newName) <- svg
-      } yield cn -> newName
-      val switchedTeams = (for {
-        SvClient(cn, svg) <- stuffs
-        SwitchTeam(team) <- svg
-      } yield cn -> team) ++ (
-        for {
-          SvClient(_, svg) <- stuffs
-          SvSetteam(cn, toteam) <- svg
-        } yield cn -> toteam
-        )
-      val withSwitchedTeamsState = switchedTeams.foldLeft(state) {
-        case (s, (cn, targetTeamNum)) =>
-          val updatedTeams = for {
-            targetTeam <- s.teams.get(targetTeamNum).toVector
-            otherTeamNum = 1 - targetTeamNum
-            otherTeam <- s.teams.get(otherTeamNum).toVector
-            thePlayer <- otherTeam.players.get(cn).toVector
-            newTargetTeam = targetTeam.copy(players = targetTeam.players.updated(cn, thePlayer))
-            newSourceTeam = otherTeam.copy(players = otherTeam.players - cn)
-            (tid, t) <- Vector(targetTeamNum -> newTargetTeam, otherTeamNum -> newSourceTeam)
-          } yield tid -> t
-          s.copy(teams = s.teams ++ updatedTeams)
-      }
-      val withSwitchedNamesState = switchedNames.foldLeft(withSwitchedTeamsState) {
-        case (s, (cn, newName)) =>
-          val updatedTeams = for {(tid, t) <- s.teams; p <- t.players.get(cn)}
-          yield tid -> t.copy(players = t.players.updated(cn, p.copy(name = newName)))
-          s.copy(teams = s.teams ++ updatedTeams)
-      }
-      val withSpawnedPlayersState = spawnedPlayers.foldLeft(withSwitchedNamesState) {
-        case (s, cn) =>
-          val updatedTeams = for {(tid, t) <- s.teams; p <- t.players.get(cn)}
-          yield tid -> t.copy(players = t.players.updated(cn, p.copy(alive = true)))
-          s.copy(teams = s.teams ++ updatedTeams)
-      }
-      withSpawnedPlayersState.copy(millis = millis)
+      case (state, (millis, Died(actor, victim, _, _, _))) =>
+        val updatedTeams = for {
+          (tid, t) <- state.teams
+          p <- t.players.get(victim)
+        } yield tid -> t.copy(players = t.players.updated(victim, p.copy(alive = false, shooting = false)))
+        state.copy(millis = millis, teams = state.teams ++ updatedTeams)
+      case (s, (millis, FlagCount(cn, _))) =>
+        // player scored flag
+        val updatedTeams = for {
+          (tid, t) <- s.teams
+          if t.players.contains(cn)
+        } yield tid -> t.copy(flags = t.flags + 1)
+        s.copy(millis = millis, teams = s.teams ++ updatedTeams)
+      case (s, (millis, FlagUpdates(fis))) =>
+        fis.foldLeft(s) {
+          case (state, fu@FlagUpdate(tid, flagState, carrying, dropped)) =>
+            val teamUpdateO = Option(fu).flatMap {
+              case _ if fu.inBase =>
+                for {
+                  t <- state.teams.get(tid)
+                } yield tid -> t.copy(flagAway = None, flagCarriedBy = None)
+              case _ if fu.stolen =>
+                for {
+                  t <- state.teams.get(tid)
+                  cn <- carrying
+                  carryPosition <- (for {
+                    (ttid, tt) <- state.teams
+                    (`cn`, p) <- tt.players
+                  } yield p.position).headOption
+                } yield tid -> t.copy(flagAway = Option(carryPosition), flagCarriedBy = Option(cn))
+              case _ if fu.wasDropped =>
+                for {
+                  t <- state.teams.get(tid)
+                  d <- dropped
+                } yield tid -> t.copy(flagAway = Option(d), flagCarriedBy = None)
+              case _ if fu.idle => None
+            }
+            state.copy(millis = millis, teams = state.teams ++ teamUpdateO.toVector)
+        }
+      case (state, (millis, PositionResults(pres))) =>
+        pres.foldLeft(state) {
+          case (s, PositionResult(cn, _, pos, _, yaw, _, _, _, _, shooting)) =>
+            val updatedTeam = for {
+              (teamnum, team) <- s.teams
+              (`cn`, player) <- team.players
+            } yield teamnum -> team.copy(players = team.players.updated(cn, player.copy(position = pos, yaw = yaw, shooting = shooting)))
+            val A = s.copy(teams = s.teams ++ updatedTeam)
+            val updatedFlagPosition = for {
+              (teamnum, team) <- A.teams
+              cb <- team.flagCarriedBy
+              if cb == cn
+            } yield teamnum -> team.copy(flagAway = Option(pos))
+            A.copy(teams = A.teams ++ updatedFlagPosition)
+        }.copy(millis = millis)
+      case (state, (millis, ClientDisconnected(cn))) =>
+        val updatedTeam = for {
+          (teamnum, team) <- state.teams
+        } yield teamnum -> team.copy(players = team.players - cn)
+        state.copy(teams = state.teams ++ updatedTeam)
+      case (state, (millis, SvClients(stuffs))) =>
+        val spawnedPlayers = for {
+          SvClient(cn, svs) <- stuffs
+          it <- svs
+          if it.isInstanceOf[SvSpawn]
+        } yield cn
+        val switchedNames = for {
+          SvClient(cn, svg) <- stuffs
+          SwitchName(newName) <- svg
+        } yield cn -> newName
+        val switchedTeams = (for {
+          SvClient(cn, svg) <- stuffs
+          SwitchTeam(team) <- svg
+        } yield cn -> team) ++ (
+          for {
+            SvClient(_, svg) <- stuffs
+            SvSetteam(cn, toteam) <- svg
+          } yield cn -> toteam
+          )
+        val withSwitchedTeamsState = switchedTeams.foldLeft(state) {
+          case (s, (cn, targetTeamNum)) =>
+            val updatedTeams = for {
+              targetTeam <- s.teams.get(targetTeamNum).toVector
+              otherTeamNum = 1 - targetTeamNum
+              otherTeam <- s.teams.get(otherTeamNum).toVector
+              thePlayer <- otherTeam.players.get(cn).toVector
+              newTargetTeam = targetTeam.copy(players = targetTeam.players.updated(cn, thePlayer))
+              newSourceTeam = otherTeam.copy(players = otherTeam.players - cn)
+              (tid, t) <- Vector(targetTeamNum -> newTargetTeam, otherTeamNum -> newSourceTeam)
+            } yield tid -> t
+            s.copy(teams = s.teams ++ updatedTeams)
+        }
+        val withSwitchedNamesState = switchedNames.foldLeft(withSwitchedTeamsState) {
+          case (s, (cn, newName)) =>
+            val updatedTeams = for {(tid, t) <- s.teams; p <- t.players.get(cn)}
+              yield tid -> t.copy(players = t.players.updated(cn, p.copy(name = newName)))
+            s.copy(teams = s.teams ++ updatedTeams)
+        }
+        val withSpawnedPlayersState = spawnedPlayers.foldLeft(withSwitchedNamesState) {
+          case (s, cn) =>
+            val updatedTeams = for {(tid, t) <- s.teams; p <- t.players.get(cn)}
+              yield tid -> t.copy(players = t.players.updated(cn, p.copy(alive = true)))
+            s.copy(teams = s.teams ++ updatedTeams)
+        }
+        withSpawnedPlayersState.copy(millis = millis)
+    }
   }
-}
 
 }

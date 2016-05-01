@@ -24,7 +24,7 @@ case class PartialServerStateMachine(serverInfoReplyO: Option[ServerInfoReply] =
       case p: PlayerCns =>
         this.copy(playerCnsO = Option(p))
       case p: PlayerInfoReply if playerCnsO.toSeq.flatMap(_.cns).contains(p.clientNum) =>
-        if ( !playerInfoReplies.exists(_.clientNum == p.clientNum)) {
+        if (!playerInfoReplies.exists(_.clientNum == p.clientNum)) {
           this.copy(playerInfoReplies = playerInfoReplies :+ p)
         } else this
       case s: ServerInfoReply =>
@@ -47,14 +47,14 @@ case class PartialServerStateMachine(serverInfoReplyO: Option[ServerInfoReply] =
 
 case class CompletedServerStateMachine(serverInfoReply: ServerInfoReply, playerInfoReplies: List[PlayerInfoReply], teamInfos: Option[TeamInfos]) extends ServerStateMachine {
   override def next(input: ParsedResponse) = NothingServerStateMachine.next(input)
-  
+
   def spectators = {
-    val filteredPlayers = if(teamModes.contains(serverInfoReply.mode))
+    val filteredPlayers = if (teamModes.contains(serverInfoReply.mode))
       playerInfoReplies.filter(pi => Set("SPECTATOR", "SPEC").contains(pi.team))
-    else 
+    else
       playerInfoReplies.filter(pi => !activeTeams.contains(pi.team))
 
-      Option(filteredPlayers.map(_.name)).filter(_.nonEmpty)
+    Option(filteredPlayers.map(_.name)).filter(_.nonEmpty)
   }
 
   def toGameNow(ip: String, port: Int) =
@@ -73,7 +73,7 @@ case class CompletedServerStateMachine(serverInfoReply: ServerInfoReply, playerI
       map = Option(serverInfoReply.mapName).filter(_.nonEmpty),
       mode = modes.get(serverInfoReply.mode),
       minRemain = serverInfoReply.minRemain,
-      players = if ( teamInfos.nonEmpty ) None else Option(playerInfoReplies.filter(pi => activeTeams.contains(pi.team)).map(_.name)).filter(_.nonEmpty),
+      players = if (teamInfos.nonEmpty) None else Option(playerInfoReplies.filter(pi => activeTeams.contains(pi.team)).map(_.name)).filter(_.nonEmpty),
       spectators = spectators,
       teams = (for {
         TeamScore(name, frags, flags) <- teamInfos.toSeq.flatMap(_.teams)
@@ -85,12 +85,12 @@ case class CompletedServerStateMachine(serverInfoReply: ServerInfoReply, playerI
         players = for {
           p <- playerInfoReplies.sortBy(x => (x.flagScore, x.frags)).reverse
           if p.team == name
-        } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_>=0), frags = p.frags),
+        } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_ >= 0), frags = p.frags),
         spectators = Option(for {
           p <- playerInfoReplies.sortBy(x => (x.flagScore, x.frags)).reverse
           if p.team.contains(name)
           if !activeTeams.contains(p.team)
-        } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_>=0), frags = p.frags))
+        } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_ >= 0), frags = p.frags))
       )).toList
     )
 

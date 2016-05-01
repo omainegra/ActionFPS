@@ -9,8 +9,8 @@ import org.scalatest.{OptionValues, FunSuite, Matchers}
   */
 class ClansTest
   extends FunSuite
-  with Matchers
-  with OptionValues {
+    with Matchers
+    with OptionValues {
   test("It should work") {
     val recs = ClanRecord.parseRecords(getSample("clans.csv"))
     recs should have size 29

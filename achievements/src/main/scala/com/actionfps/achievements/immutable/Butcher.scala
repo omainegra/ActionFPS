@@ -7,14 +7,15 @@ import com.actionfps.gameparser.enrichers.{JsonGame, JsonGamePlayer}
   */
 sealed trait Butcher {
   def title = "Butcher"
+
   def description = "Make over 80 kills in a game"
 }
 
 object Butcher {
 
-  case class Achieved(frags: Int) extends Butcher  with CompletedAchievement
+  case class Achieved(frags: Int) extends Butcher with CompletedAchievement
 
-  case object NotAchieved extends Butcher  with AwaitingAchievement {
+  case object NotAchieved extends Butcher with AwaitingAchievement {
     def processGame(game: JsonGame,
                     player: JsonGamePlayer,
                     isRegisteredPlayer: JsonGamePlayer => Boolean): Option[Achieved] = {

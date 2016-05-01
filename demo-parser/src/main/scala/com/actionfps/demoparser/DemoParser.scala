@@ -3,6 +3,7 @@ package com.actionfps.demoparser
 import akka.util.ByteString
 
 import scala.util.control.NonFatal
+
 case class DemoPacket(millis: Int, chan: Int, data: ByteString)
 
 object DemoParser {
@@ -78,16 +79,16 @@ object DemoParser {
 
   object PositionResult {
     def parse(input: ByteString) =
-    try {
-      parsePosition(input)
-    } catch {
-      case NonFatal(e) => throw new RuntimeException(s"Failed to parse position due to: $e. Data: $input", e)
-    }
+      try {
+        parsePosition(input)
+      } catch {
+        case NonFatal(e) => throw new RuntimeException(s"Failed to parse position due to: $e. Data: $input", e)
+      }
   }
 
   def parsePosition(input: ByteString): Option[(PositionResult, ByteString)] = {
     if (input.size == 0) None
-    else if ( input(0) == SV_POSC ) {
+    else if (input(0) == SV_POSC) {
       val rest = input.drop(1)
       Option {
         val q = new BitQueue2(rest.toArray)
@@ -121,7 +122,7 @@ object DemoParser {
         // g appears to not be set
         (PositionResult(cn, f, o, vel, yaw, pitch, roll, scoping, compressed = true, shooting = shooting == 1), q.rest)
       }
-    } else if ( input(0) == SV_POS) {
+    } else if (input(0) == SV_POS) {
       val rest = input.drop(1)
       Option {
         val q = new CubeQueue(rest)
@@ -155,9 +156,9 @@ object DemoParser {
       }
     } else None
   }
-  
+
   var report: PositionResult => Unit = x => ()
-  
+
 
   case class PlayerEnt(lifesequence: Int, o: PositionVector, vel: PositionVector, eyeheight: Float, onfloor: Boolean, scoping: Boolean, yaw: Float, pitch: Float, move: Int, roll: Float, strafe: Float, onladder: Boolean, lastpos: Int)
 
@@ -236,8 +237,9 @@ object DemoParser {
     val SV_WELCOME = DemoParser.symbols.indexOf('SV_WELCOME)
     val SV_SERVERMODE = DemoParser.symbols.indexOf('SV_SERVERMODE)
     val SV_TEXT = DemoParser.symbols.indexOf('SV_TEXT)
+
     def parse(byteString: ByteString) = {
-      
+
       Option(byteString).collectFirst {
         case `SV_WELCOME` #:: numclients #:: rest =>
           val Some((mc, rest2)) = MapChange.parse(rest)
@@ -263,6 +265,7 @@ object DemoParser {
 
   object MapChange {
     val SV_MAPCHANGE = DemoParser.symbols.indexOf('SV_MAPCHANGE)
+
     def parse(byteString: ByteString) = {
       Option(byteString).collectFirst {
         case `SV_MAPCHANGE` #:: mapname ##:: mode #:: avl #:: rev #:: rest =>
@@ -272,17 +275,18 @@ object DemoParser {
   }
 
   /**
-   * but shots are sent via SV_SHOTFX
-if you want to make accuracy stats yes otherwise no.
-if you want to track players health you would need to handle SV_DAMAGE
-and SV_GIBDAMAGE
-   */
-  
-  
+    * but shots are sent via SV_SHOTFX
+    * if you want to make accuracy stats yes otherwise no.
+    * if you want to track players health you would need to handle SV_DAMAGE
+    * and SV_GIBDAMAGE
+    */
+
+
   case class HalfTime(isHalfTime: Boolean)
 
   object HalfTime {
     val SV_SETHALFTIME = DemoParser.symbols.indexOf('SV_SETHALFTIME)
+
     def parse(byteString: ByteString) = {
       Option(byteString).collectFirst {
         case `SV_SETHALFTIME` #:: v #:: rest =>
@@ -295,6 +299,7 @@ and SV_GIBDAMAGE
 
   object FlagCount {
     val SV_FLAGCNT = DemoParser.symbols.indexOf('SV_FLAGCNT)
+
     def parse(byteString: ByteString) = {
       Option(byteString).collectFirst {
         case `SV_FLAGCNT` #:: cn #:: flags #:: rest =>
@@ -302,43 +307,45 @@ and SV_GIBDAMAGE
       }
     }
   }
-//
-//  case class FlagAction(action: Int, flag: Int)
-//
-//  object FlagAction {
-//    def parse(byteString: ByteString) = {
-//      val SV_FLAGACTION= DemoParser.symbols.indexOf('SV_FLAGACTION)
-//      Option(byteString).collectFirst {
-//        case `SV_FLAGACTION` #:: action #:: flag #:: rest =>
-//          (FlagAction(action, flag), rest)
-//      }
-//    }
-//  }
-//
-//  case class FlagMsg(action: Int, flag: Int)
-//
-//  object FlagMsg {
-//    def parse(byteString: ByteString) = {
-//      val SV_FLAGMSG = DemoParser.symbols.indexOf('SV_FLAGMSG)
-//      Option(byteString).collectFirst {
-//        int flag = getint(p);FM_KTFSCORE
-//        int message = getint(p);
-//        int actor = getint(p);
-//        int flagtime = message == FM_KTFSCORE ? getint(p) : -1;
-//        flagmsg(flag, message, actor, flagtime);
-//        break;
-//        case `SV_FLAGMSG` #:: flat #:: message #:: actor #:: rest =>
-//          (FlagAction(action, flag), rest)
-//        case `SV_FLAGMSG` #:: flat #:: message #:: actor #:: rest =>
-//          (FlagAction(action, flag), rest)
-//      }
-//    }
-//  }
+
+  //
+  //  case class FlagAction(action: Int, flag: Int)
+  //
+  //  object FlagAction {
+  //    def parse(byteString: ByteString) = {
+  //      val SV_FLAGACTION= DemoParser.symbols.indexOf('SV_FLAGACTION)
+  //      Option(byteString).collectFirst {
+  //        case `SV_FLAGACTION` #:: action #:: flag #:: rest =>
+  //          (FlagAction(action, flag), rest)
+  //      }
+  //    }
+  //  }
+  //
+  //  case class FlagMsg(action: Int, flag: Int)
+  //
+  //  object FlagMsg {
+  //    def parse(byteString: ByteString) = {
+  //      val SV_FLAGMSG = DemoParser.symbols.indexOf('SV_FLAGMSG)
+  //      Option(byteString).collectFirst {
+  //        int flag = getint(p);FM_KTFSCORE
+  //        int message = getint(p);
+  //        int actor = getint(p);
+  //        int flagtime = message == FM_KTFSCORE ? getint(p) : -1;
+  //        flagmsg(flag, message, actor, flagtime);
+  //        break;
+  //        case `SV_FLAGMSG` #:: flat #:: message #:: actor #:: rest =>
+  //          (FlagAction(action, flag), rest)
+  //        case `SV_FLAGMSG` #:: flat #:: message #:: actor #:: rest =>
+  //          (FlagAction(action, flag), rest)
+  //      }
+  //    }
+  //  }
 
   case class TimeUp(millis: Int, limit: Int)
 
   object TimeUp {
     val SV_TIMEUP = DemoParser.symbols.indexOf('SV_TIMEUP)
+
     def parse(byteString: ByteString) = {
       Option(byteString).collectFirst {
         case `SV_TIMEUP` #:: millis #:: gamelimit #:: rest =>
@@ -352,6 +359,7 @@ and SV_GIBDAMAGE
 
   object ItemList {
     val SV_ITEMLIST = DemoParser.symbols.indexOf('SV_ITEMLIST)
+
     def parse(byteString: ByteString) = {
       Option(byteString).collectFirst {
         case `SV_ITEMLIST` #:: rest =>
@@ -379,8 +387,10 @@ and SV_GIBDAMAGE
   }
 
   case class FlagUpdates(items: Vector[FlagUpdate])
+
   object FlagUpdates {
     val SV_FLAGINFO = DemoParser.symbols.indexOf('SV_FLAGINFO)
+
     def parse(byteString: ByteString) = {
       Option(byteString).collectFirst {
         case `SV_FLAGINFO` #:: _ =>
@@ -391,7 +401,7 @@ and SV_GIBDAMAGE
             }
           }
           val (fis, rest) = go(byteString, Vector.empty)
-          if ( rest.nonEmpty) {
+          if (rest.nonEmpty) {
             println("After SV_FLAGINFO", rest)
           }
           (FlagUpdates(fis), rest)
@@ -401,17 +411,21 @@ and SV_GIBDAMAGE
 
   case class FlagUpdate(num: Int, newState: Int, carrying: Option[Int], dropped: Option[PositionVector]) {
     def inBase = newState == 0
+
     def stolen = newState == 1
+
     def wasDropped = newState == 2
+
     def idle = newState == 3
   }
 
   object FlagUpdate {
     val SV_FLAGINFO = DemoParser.symbols.indexOf('SV_FLAGINFO)
+
     def parse(byteString: ByteString) = {
       Option(byteString).collectFirst {
         case `SV_FLAGINFO` #:: flag #:: state #:: rest =>
-         if (state == 1) {
+          if (state == 1) {
             val Some((cn, rest2)) = Compressor.shiftInt(rest)
             (FlagUpdate(flag, state, Option(cn), None), rest2)
           } else if (state == 2) {
@@ -443,6 +457,7 @@ and SV_GIBDAMAGE
 
   object InitClient {
     val SV_INITCLIENT = DemoParser.symbols.indexOf('SV_INITCLIENT)
+
     def parse(byteString: ByteString) = {
       Option(byteString).collectFirst {
         case `SV_INITCLIENT` #:: cn #:: name ##:: claSkin #:: rvsfSkin #:: team #:: ip #:: rest =>
@@ -455,6 +470,7 @@ and SV_GIBDAMAGE
 
   object SvClient {
     val SV_CLIENT = DemoParser.symbols.indexOf('SV_CLIENT)
+
     def parse(byteString: ByteString): Option[(SvClient, ByteString)] = {
       Option(byteString).collectFirst {
         case `SV_CLIENT` #:: cn #:: len #:::: datums =>
@@ -470,11 +486,11 @@ and SV_GIBDAMAGE
           val (svClients, rest) = datums.splitAt(len)
           val (msgs, lefties) = go(svClients, Vector.empty)
 
-//          def warn(assertion: Boolean, message: => Any) {
-//          if (!assertion)
-//            println("assertion failed: "+ message)
-//        }
-//
+          //          def warn(assertion: Boolean, message: => Any) {
+          //          if (!assertion)
+          //            println("assertion failed: "+ message)
+          //        }
+          //
           assert(lefties.size == 0, {
             val starts = msgs.dropRight(lefties.size)
             s"Lefties should be all eliminated, found: ${lefties.size} (from ${datums.size} & specified size was $len), $lefties - started with $starts, ended up with $msgs - original input $byteString"
@@ -499,7 +515,7 @@ and SV_GIBDAMAGE
       Option(byteString).collectFirst {
         case `SV_CLIENT` #:: _ =>
           val (svClients, rest) = go(byteString, Vector.empty)
-//          assert(rest.isEmpty, "svClients should have been eliminated, but still have: " + rest)
+          //          assert(rest.isEmpty, "svClients should have been eliminated, but still have: " + rest)
           (SvClients(svClients), rest)
       }
     }
@@ -520,8 +536,11 @@ and SV_GIBDAMAGE
   case class SvSound(soundId: Int) extends SvClientSubMessage
 
   case class SvText(value: String, me: Boolean = false) extends SvClientSubMessage
+
   case class SvWelcome(welcome: Welcome) extends SvClientSubMessage
+
   case class SvSetteam(cn: Int, team: Int) extends SvClientSubMessage
+
   case class WeaponChange(weapon: Int) extends SvClientSubMessage
 
   object SvMessageSymbols {
@@ -549,10 +568,11 @@ and SV_GIBDAMAGE
     val SV_IPLIST = DemoParser.symbols.indexOf('SV_IPLIST)
     val SV_VOTERESULT = DemoParser.symbols.indexOf('SV_VOTERESULT)
     val SV_GAMEMODE = DemoParser.symbols.indexOf('SV_GAMEMODE)
-    
+
   }
+
   def svMessage(byteString: ByteString): Option[(SvClientSubMessage, ByteString)] = {
-//    val SV_WELCOME = DemoParser.symbols.indexOf('SV_WELCOME)
+    //    val SV_WELCOME = DemoParser.symbols.indexOf('SV_WELCOME)
     import SvMessageSymbols._
     Option(byteString).collectFirst {
       case `SV_SOUND` #:: _ #:: rest => (Ignore(SV_SOUND), rest)
@@ -560,7 +580,7 @@ and SV_GIBDAMAGE
         val Some((welcum, rest)) = Welcome.parse(byteString)
         (SvWelcome(welcum), rest)
       case `SV_VOICECOMTEAM` #:: _ #:: _ #:: rest => (Ignore(SV_VOICECOMTEAM), rest)
-      case `SV_VOICECOM` #:: _  #:: rest => (Ignore(SV_VOICECOM), rest)
+      case `SV_VOICECOM` #:: _ #:: rest => (Ignore(SV_VOICECOM), rest)
       case `SV_TEXTME` #:: txt ##:: rest => (SvText(txt, me = true), rest)
       case `SV_TEXT` #:: txt ##:: rest => (SvText(txt), rest)
       case `SV_FLAGMSG` #:: flag #:: 5 #:: actor #:: p #:: rest =>
@@ -675,6 +695,7 @@ and SV_GIBDAMAGE
 
   object Resume {
     val SV_RESUME = DemoParser.symbols.indexOf('SV_RESUME)
+
     def parse(byteString: ByteString, cln: Int) = {
       Option(byteString).collectFirst {
         case `SV_RESUME` #:: stuff =>

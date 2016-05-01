@@ -18,7 +18,7 @@ import scala.util.hashing.MurmurHash3
   */
 class FullFlowTest
   extends FunSuite
-  with Matchers {
+    with Matchers {
 
   lazy val clans = ClanRecord.parseRecords(com.actionfps.reference.getSample("clans.csv")).map(Clan.fromClanRecord)
   lazy val nicknames = NicknameRecord.parseRecords(com.actionfps.reference.getSample("nicknames.csv"))
@@ -67,15 +67,15 @@ class FullFlowTest
 
   }
 
-//  test("Games GeoIP works") {
-//    val prettyJson = Json.prettyPrint(Json.toJson(getSampleGames.head))
-//    val om = new ObjectMapper()
-//    val root = om.readTree(prettyJson)
-//    root.path("teams").get(0).path("players").get(0).asInstanceOf[ObjectNode].put("host", "92.222.171.133")
-//    val str = om.writeValueAsString(root)
-//    val theGame = JsonGame.fromJson(str)
-//    val res = theGame.withGeo(GeoIpLookup)
-//    println(res)
-//  }
+  //  test("Games GeoIP works") {
+  //    val prettyJson = Json.prettyPrint(Json.toJson(getSampleGames.head))
+  //    val om = new ObjectMapper()
+  //    val root = om.readTree(prettyJson)
+  //    root.path("teams").get(0).path("players").get(0).asInstanceOf[ObjectNode].put("host", "92.222.171.133")
+  //    val str = om.writeValueAsString(root)
+  //    val theGame = JsonGame.fromJson(str)
+  //    val res = theGame.withGeo(GeoIpLookup)
+  //    println(res)
+  //  }
 
 }

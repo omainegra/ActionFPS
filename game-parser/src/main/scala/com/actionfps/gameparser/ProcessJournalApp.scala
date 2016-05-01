@@ -30,7 +30,7 @@ object ProcessJournalApp extends App {
     source = new URL(name).openStream()
   }
 
-  if ( "gz".equals(System.getProperty("parser.input.format")) ) {
+  if ("gz".equals(System.getProperty("parser.input.format"))) {
     source = new GZIPInputStream(source)
   }
 

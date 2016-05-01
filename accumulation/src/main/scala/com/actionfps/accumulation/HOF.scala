@@ -19,6 +19,7 @@ case class HOF(achievements: List[HOF.AchievementRecord]) {
       achievements = nl
     )
   }
+
   def reversed = copy(achievements = achievements.map(ar => ar.reversed))
 }
 

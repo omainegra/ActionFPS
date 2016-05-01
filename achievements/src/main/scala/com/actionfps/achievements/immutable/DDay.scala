@@ -7,6 +7,7 @@ import com.actionfps.gameparser.enrichers.JsonGame
   */
 sealed trait DDay {
   def title = "D-Day"
+
   def description = "Play at least 12 games in one day"
 }
 
@@ -17,7 +18,9 @@ object DDay {
   private implicit class extractDay(jsonGame: JsonGame) {
     def day: String = jsonGame.id.substring(0, 10)
   }
+
   sealed trait NotAchieved extends PartialAchievement
+
   case object NotStarted extends DDay with NotAchieved {
     def includeGame(jsonGame: JsonGame) = Achieving(onDay = jsonGame.day, counter = 1)
 

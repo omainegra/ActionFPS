@@ -25,12 +25,14 @@ object ValidServers {
   }
 
   object Validator {
+
     implicit class validator(jsonGame: JsonGame)(implicit validServers: ValidServers) {
       def validateServer: Boolean = {
         val server = jsonGame.server
         validServers.items.exists(item => item._1 == server && item._2.isValid)
       }
     }
+
   }
 
 }
@@ -40,12 +42,15 @@ case class ValidServer(name: String, timezone: ZoneId, invalid: Option[Boolean],
 }
 
 case class ValidServers(items: Map[String, ValidServer]) {
+
   object FromLog {
     def unapply(string: String): Option[ValidServer] = items.get(string)
   }
+
   object AddressFromLog {
     def unapply(string: String): Option[String] = items.get(string).flatMap(_.address)
   }
+
 }
 
 

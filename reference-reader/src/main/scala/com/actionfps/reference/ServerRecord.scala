@@ -13,6 +13,7 @@ import scala.util.Try
 
 case class ServerRecord(region: String, hostname: String, port: Int, kind: String, password: Option[String]) {
   def address = s"""$hostname:$port"""
+
   def connectAddress = s"""assaultcube://$hostname:$port""" + (password.map(pw => s"/?password=$pw").getOrElse(""))
 }
 

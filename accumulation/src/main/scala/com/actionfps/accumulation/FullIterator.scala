@@ -108,7 +108,9 @@ case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Op
   def build = BuiltProfile(
     user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo
   )
-  def locationInfo: Option[LocationInfo] = if ( recentGames.isEmpty) None else {
+
+  def locationInfo: Option[LocationInfo] = if (recentGames.isEmpty) None
+  else {
     val myPlayers = recentGames
       .flatMap(_.teams)
       .flatMap(_.players)

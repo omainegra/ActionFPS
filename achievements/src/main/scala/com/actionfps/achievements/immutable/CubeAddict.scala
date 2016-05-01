@@ -27,10 +27,10 @@ object CubeAddict extends Incremental {
     200 -> "Wait, when did I start?"
   ).map { case (h, v) => (h * 60, v) }.getOrElse(level, s"Achieve ${level / 60} hours")
 
-  override def eventLevelTitle(level: Int): String = s"achieved Cube Addict level ${level/60}h"
+  override def eventLevelTitle(level: Int): String = s"achieved Cube Addict level ${level / 60}h"
 
   override def title: String = "Cube Addict"
 
-  override def levelTitle(level: Int): String = s"$title: ${level/60}h"
+  override def levelTitle(level: Int): String = s"$title: ${level / 60}h"
 }
 

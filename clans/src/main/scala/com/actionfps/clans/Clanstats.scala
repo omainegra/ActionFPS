@@ -13,6 +13,7 @@ object Clanstats {
       implicit val clanstatWrites = Json.writes[Clanstat]
       Writes[Clanstats](cs => Json.writes[Clanstats].writes(cs.named))
     }
+
     implicit def writeClanstat(implicit namer: Namer): Writes[Clanstat] = {
       Writes[Clanstat](cs => Json.writes[Clanstat].writes(cs.named))
     }
@@ -49,7 +50,7 @@ object Clanstats {
 case class Clanstats(clans: Map[String, Clanstat]) {
 
   def onlyRanked = copy(
-    clans = clans.filter{ case (_, clan) => clan.rank.nonEmpty }
+    clans = clans.filter { case (_, clan) => clan.rank.nonEmpty }
   )
 
   def named(implicit namer: Namer) = {
@@ -59,9 +60,9 @@ case class Clanstats(clans: Map[String, Clanstat]) {
   }
 
   def refreshedRanks = {
-    val updatedRanks = clans.collect{ case (clan, stat) if stat.wars >= 5 =>
+    val updatedRanks = clans.collect { case (clan, stat) if stat.wars >= 5 =>
       stat
-    }.toList.sortBy(_.elo).reverse.zipWithIndex.map{ case (stat, idx) =>
+    }.toList.sortBy(_.elo).reverse.zipWithIndex.map { case (stat, idx) =>
       val rank = idx + 1
       stat.id -> stat.copy(rank = Some(rank))
     }
@@ -129,6 +130,7 @@ case class Clanstat(id: String,
     frags = frags + other.frags,
     deaths = deaths + other.deaths
   )
+
   def named(implicit namer: Namer) =
     copy(name = namer.clan(id))
 }

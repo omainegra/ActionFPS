@@ -10,11 +10,11 @@ import play.api.libs.json.Json
   */
 class PlayersTest
   extends FunSuite
-  with Matchers {
+    with Matchers {
   test("It should work") {
     val jsn = Json.parse(getClass.getResourceAsStream("765308997.json"))
     val game = Json.fromJson[JsonGame](jsn).get
     PlayersStats.empty.countElo(game) shouldBe true
-    PlayersStats.empty.playerContributions(game)("sanzo") should be (0.40591513 +- 1e-5)
+    PlayersStats.empty.playerContributions(game)("sanzo") should be(0.40591513 +- 1e-5)
   }
 }

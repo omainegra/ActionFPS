@@ -5,6 +5,7 @@ package services
   */
 
 import java.io.File
+import java.time.ZonedDateTime
 import javax.inject._
 
 import akka.stream.scaladsl.Source
@@ -16,14 +17,14 @@ import com.actionfps.inter.{InterMessage, InterState}
 import lib.CallbackTailer
 import play.api.libs.json.Json
 import play.api.libs.streams.Streams
-import play.api.{Logger, Configuration}
+import play.api.{Configuration, Logger}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
 import providers.ReferenceProvider
 
 import scala.async.Async._
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 import concurrent.duration._
 import collection.JavaConverters._
 
@@ -40,7 +41,8 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
   val logger = Logger(getClass)
 
   val (intersEnum, intersChannel) = Concurrent.broadcast[Event]
-  val intersSource = Source.fromPublisher(Streams.enumeratorToPublisher(intersEnum))
+
+  def intersSource = Source.fromPublisher(Streams.enumeratorToPublisher(intersEnum))
 
   val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(intersChannel.push(Event("")))
   applicationLifecycle.addStopHook(() => Future(keepAlive.cancel()))
@@ -80,7 +82,8 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
           val allowed = {
             val userIsRegistered = await(referenceProvider.users).exists(_.nickname.nickname == interCall.nickname)
             val isNotExpired = interStateAgent.get().canAdd(interCall)
-            userIsRegistered && isNotExpired
+            val inLastFiveMinutes = zdt.isAfter(ZonedDateTime.now().minusMinutes(10))
+            userIsRegistered && isNotExpired && inLastFiveMinutes
           }
           interStateAgent.send { oldState =>
             logger.info(s"Received $interCall. Allowed? $allowed")

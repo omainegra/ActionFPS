@@ -13,21 +13,21 @@ import scala.util.Try
 //@RequiresPHP
 class IntegrationSpec
   extends PlaySpec
-  with OneServerPerSuite
-  with ScalaFutures
-  with IntegrationPatience
-  with OptionValues
-  with Results
-  with OneBrowserPerSuite
-  with HtmlUnitFactory
-  with Inspectors {
+    with OneServerPerSuite
+    with ScalaFutures
+    with IntegrationPatience
+    with OptionValues
+    with Results
+    with OneBrowserPerSuite
+    with HtmlUnitFactory
+    with Inspectors {
 
   import concurrent.duration._
 
   "Web" must {
     "Provide a master server" in {
       val result = await(WS.url(s"$root/retrieve.do?abc").get())(20.seconds)
-      result.body must include ("1337")
+      result.body must include("1337")
       result.status mustBe OK
       val result2 = await(WS.url(s"$root/ms/").get())
       result2.body mustEqual result.body
@@ -51,19 +51,19 @@ class IntegrationSpec
     "Navigate properly to an event" in {
       go to root
       click on cssSelector("#live-events a")
-      currentUrl must include ("/player/")
+      currentUrl must include("/player/")
       cssSelector("#profile").findAllElements mustNot be(empty)
     }
     "Navigate properly to a clan war" in {
       go to root
       click on cssSelector("#latest-clanwar a")
-      currentUrl must include ("/clanwar/")
+      currentUrl must include("/clanwar/")
       cssSelector(".team-header").findAllElements mustNot be(empty)
     }
     "Navigate properly to a game" in {
       go to root
       click on cssSelector("#existing-games a")
-      currentUrl must include ("/game/")
+      currentUrl must include("/game/")
       cssSelector(".GameCard").findAllElements must have size 1
     }
     "Navigate properly to a user" in {

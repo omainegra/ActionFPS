@@ -22,6 +22,7 @@ case class AchievementsIterator(map: Map[String, PlayerState], events: List[Map[
       newAch = state.achieved.toSet -- previous.map.get(user).map(_.achieved).getOrElse(Vector.empty).toSet
     } yield user -> newAch.toSet).toList
   }
+
   def includeGame(users: List[User])(jsonGame: JsonGame): AchievementsIterator = {
     val oEvents = scala.collection.mutable.Buffer.empty[Map[String, String]]
     var nComb = map

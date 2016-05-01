@@ -97,7 +97,10 @@ class ClansController @Inject()(common: Common,
           if (request.getQueryString("format").contains("json"))
             Ok(Json.toJson(clanwar))
           else
-            Ok(renderTemplate(None, supportsJson = false, None)(views.html.clanwar.clanwar(
+            Ok(renderTemplate(
+              title = None,
+              supportsJson = true,
+              login = None)(views.html.clanwar.clanwar(
               clanwarMeta = clanwar.meta.named,
               showPlayers = true,
               showGames = true

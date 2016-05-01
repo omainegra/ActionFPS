@@ -82,7 +82,7 @@ class Common @Inject()(configuration: Configuration
         .withQueryString(extraParams: _*))).body
       val parsedHtml = Jsoup.parse(rendered.cleanupPaths)
       val content = parsedHtml.select("#content")
-      if ( content.size() == 1 ) {
+      if (content.size() == 1) {
         val gotIt = renderTemplate(
           title = Option(parsedHtml.select("title")).map(_.text),
           supportsJson = false,

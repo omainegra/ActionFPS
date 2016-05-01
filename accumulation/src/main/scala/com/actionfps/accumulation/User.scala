@@ -3,6 +3,7 @@ package com.actionfps.accumulation
 /**
   * Created by William on 26/12/2015.
   */
+
 import java.time.{ZoneId, ZonedDateTime}
 
 import com.actionfps.gameparser.enrichers.ViewFields
@@ -11,8 +12,11 @@ import play.api.libs.json._
 
 sealed trait Nickname {
   def nickname: String
+
   def countryCode: Option[String]
+
   def from: ZonedDateTime
+
   def validAt(zonedDateTime: ZonedDateTime): Boolean = this match {
     case c: CurrentNickname => zonedDateTime.isAfter(from)
     case p: PreviousNickname => zonedDateTime.isAfter(from) && zonedDateTime.isBefore(p.to)
@@ -26,17 +30,22 @@ case class PreviousNickname(nickname: String, countryCode: Option[String], from:
 case class User(id: String, name: String, countryCode: Option[String], email: Option[String],
                 registrationDate: ZonedDateTime, nickname: CurrentNickname, previousNicknames: Option[List[PreviousNickname]]) {
   def nicknames: List[Nickname] = List(nickname) ++ previousNicknames.toList.flatten
+
   def validAt(nickname: String, zonedDateTime: ZonedDateTime) = nicknames.exists(n => n.nickname == nickname && n.validAt(zonedDateTime))
 }
+
 object User {
   implicit val vf = ViewFields.DefaultZonedDateTimeWrites
   implicit val pnFormat = Json.format[PreviousNickname]
   implicit val cnFormat = Json.format[CurrentNickname]
   implicit val userFormat = Json.format[User]
+
   object WithoutEmailFormat {
+
     import play.api.libs.json._
     import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
+
     implicit val noEmailUserWrite = Json.writes[User].transform((jv: JsObject) => jv.validate((__ \ 'email).json.prune).get)
   }
 
