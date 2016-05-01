@@ -6,7 +6,6 @@
 
 * Now open source.
 * https://actionfps.com/
-* Previously known as http://woop.ac/
 * Also see http://duel.gg/
 
 [![Throughput Graph](https://graphs.waffle.io/ScalaWilliam/actionfps/throughput.svg)](https://waffle.io/ScalaWilliam/actionfps/metrics) 
@@ -28,9 +27,11 @@ Install SBT: http://www.scala-sbt.org/download.html
 Install PHP7: https://bjornjohansen.no/upgrade-to-php7
 
 # Running frontend
-
 ```
-sbt web/run &
+sbt web/run
+```
+Separately:
+```
 cd web/dist/www && php -S 127.0.0.1:8888
 ```
 
