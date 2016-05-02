@@ -1,21 +1,36 @@
 package com.actionfps.ladder
 
-import java.time._
 import java.time.format.DateTimeFormatter
 
+import com.actionfps.ladder.parser.{LineParser, PlayerMessage}
 import org.scalatest.{Matchers, WordSpec}
 
 class LadderParserSpec extends WordSpec with Matchers {
   "it" must {
     "parse datetime" in {
-      val result = DateTimeFormatter.ofPattern("MMM dd HH:mm:ss").parse("Apr 27 12:12:36")
-      val wat = Year.of(2016).atMonthDay(MonthDay.from(result)).atTime(LocalTime.from(result).atOffset(ZoneOffset.of("+00:00"))).atZoneSameInstant(ZoneId.of("UTC"))
-      DateTimeFormatter.ISO_ZONED_DATE_TIME.format(wat) shouldBe "2016-04-27T12:12:36Z[UTC]"
+      val missingYearParser = MissingYearParser(2016)
+      val missingYearParser(date) = "Apr 27 12:12:36"
+
+      DateTimeFormatter.ISO_ZONED_DATE_TIME.format(date) shouldBe "2016-04-27T12:12:36Z[UTC]"
+    }
+    "parse user message" in {
+      val PlayerMessage(pm) = "[127.0.0.1] w00p|Drakas splattered cruising"
+      pm.name shouldBe "w00p|Drakas"
     }
     "work" in {
-      val f = "serverlog_20160427_12.12.36_local#28763.txt"
-//      scala.io.Source.fromFile(f).
+      val ln = "May 02 03:29:38 [127.0.0.1] w00p|Drakas splattered cruising"
+      val lp = LineParser(2016)
+      val lp(dt, msg) = ln
+      DateTimeFormatter.ISO_ZONED_DATE_TIME.format(dt) shouldBe "2016-05-02T03:29:38Z[UTC]"
+      msg shouldBe "[127.0.0.1] w00p|Drakas splattered cruising"
 
+      lp.unapply("May 02 03:29:38") shouldBe empty
+      lp.unapply("May 02 03:29:38 ").get._2 shouldBe ""
+
+    }
+    "fail for bad input" in {
+      val lp = LineParser(2016)
+      lp.unapply("ABCDEF          ") shouldBe empty
     }
   }
 

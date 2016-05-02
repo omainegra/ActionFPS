@@ -1,16 +1,38 @@
 package com.actionfps.ladder
 
-import java.io.{PipedInputStream, PipedOutputStream}
-import java.net.URL
-import java.util.logging.Level
+import java.io.FileReader
+import java.time.ZonedDateTime
+import java.util.TimerTask
 
-import com.jcabi.log.Logger
-import com.jcabi.ssh.{SSH, Shell}
+import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage, UserProvider}
+
+object MainSsh {
+
+}
+
 
 object ReaderApp extends App {
-  val rdr = new LadderSshReader(TailEnd)
-  scala.io.Source.fromInputStream(rdr.inputStream).getLines().map(x => s"=> ${x}").foreach(println)
-
+  val thingies = {
+    val s = scala.io.Source.fromFile("config/sources.tsv")
+    try s.getLines().map(_.split(":").toList).collect {
+      case host :: file :: Nil => host -> file
+    }.toList
+    finally s.close()
+  }
+  val (h, tf) = thingies.head
+  val pb = new ProcessBuilder("ssh", h, s"tail -n +0 -f '$tf'")
+  val ps = pb.start()
+  val res = scala.io.Source.fromInputStream(ps.getInputStream).getLines()
+  val prs = LineParser(atYear = 2016)
+  val up = UserProvider.direct
+  new java.util.Timer(true).schedule(new TimerTask {
+    override def run(): Unit = ps.destroy()
+  }, 5000)
+  res.collect {
+    case prs(_, PlayerMessage(pm)) =>
+      pm
+  }.scanLeft(Aggregate.empty)((agg, line) => agg.includeLine(line)(up)).toStream
+    .takeRight(1).foreach(println)
 }
 
 sealed trait ReadStrategy {
@@ -26,30 +48,3 @@ case object TailEnd extends ReadStrategy
 case object TailStart extends ReadStrategy
 
 case object Full extends ReadStrategy
-
-class LadderSshReader(readStrategy: ReadStrategy) {
-  val shell = new SSH(
-    "???", 22,
-    "???", new URL("???")
-  )
-
-  val inputStream = new PipedInputStream()
-  private val out = new PipedOutputStream(inputStream)
-  private val x = new Thread(new Runnable {
-    override def run(): Unit = {
-      new Shell.Safe(shell).exec(
-        s"${readStrategy.command} '???'",
-        null,
-        out,
-        //    Logger.stream(Level.INFO, this),
-        Logger.stream(Level.WARNING, this)
-      )
-    }
-  })
-  x.start()
-
-  def stop(): Unit = {
-    x.interrupt()
-  }
-
-}
