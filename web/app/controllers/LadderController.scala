@@ -10,7 +10,7 @@ import akka.agent.Agent
 import com.actionfps.ladder.SshTailer
 import com.actionfps.ladder.connecting.RemoteSshPath
 import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage, UserProvider}
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.inject.ApplicationLifecycle
 import play.api.mvc.{Action, Controller}
 import play.twirl.api.Html
@@ -22,9 +22,21 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 class LadderController @Inject
 ()(applicationLifecycle: ApplicationLifecycle,
    common: Common,
+   configuration: Configuration,
    referenceProvider: ReferenceProvider)
 (implicit executionContext: ExecutionContext) extends Controller {
-  val sshUrl = "ssh://assaultcube@woop.ac/home/assaultcube/ac2/assaultcube/serverlog_20160501_15.14.10_local%2328763.txt"
+
+  import collection.JavaConverters._
+
+  val tailers = configuration.getStringList("af.ladder.sources").get.asScala.map { sshUrl =>
+    Logger.info(s"Logging from ${sshUrl}")
+    val q = new SshTailer(
+      endOnly = false,
+      file = RemoteSshPath.unapply(sshUrl).get
+    )(includeLine)
+    q
+  }
+
   val prs = LineParser(atYear = 2016)
   val agg = Agent(Aggregate.empty)
 
@@ -44,12 +56,7 @@ class LadderController @Inject
     case _ =>
   }
 
-  val q = new SshTailer(
-    endOnly = false,
-    file = RemoteSshPath.unapply(sshUrl).get
-  )(includeLine)
-
-  applicationLifecycle.addStopHook(() => Future.successful(q.shutdown()))
+  applicationLifecycle.addStopHook(() => Future.successful(tailers.foreach(_.shutdown())))
 
   def ladder = Action { implicit req =>
     val hx =
