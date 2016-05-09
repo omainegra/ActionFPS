@@ -28,7 +28,7 @@ class Common @Inject()(configuration: Configuration
 
 
   def renderTemplate(title: Option[String], supportsJson: Boolean, login: Option[(String, String)])(html: Html)
-                    (implicit requestHeader: RequestHeader) = {
+                    (implicit requestHeader: RequestHeader): Html = {
     import org.jsoup.Jsoup
     var f = new File("web/dist/www/template.html")
     if (!f.exists()) {

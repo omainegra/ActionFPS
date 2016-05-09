@@ -20,6 +20,7 @@ lazy val root =
       demoParser,
       syslogAc,
       accumulation,
+      ladderParser,
       clans,
       players,
       stats
@@ -28,6 +29,7 @@ lazy val root =
     gameParser,
     web,
     referenceReader,
+    ladderParser,
     pingerClient,
     interParser,
     demoParser,
@@ -53,6 +55,7 @@ lazy val web = project
   .dependsOn(accumulation)
   .dependsOn(interParser)
   .dependsOn(stats)
+  .dependsOn(ladderParser)
   .enablePlugins(BuildInfoPlugin)
   .settings(dontDocument)
   .settings(
@@ -228,6 +231,15 @@ lazy val players = project
 
 lazy val startHazelcast = TaskKey[HazelcastInstance]("Start the web hazelcast instance")
 lazy val stopHazelcast = TaskKey[Unit]("Stop the web hazelcast instance")
+
+lazy val ladderParser =
+  Project(
+    id = "ladder-parser",
+    base = file("ladder-parser")
+  )
+    .settings(
+      git.useGitDescribe := true
+    )
 
 lazy val stats = project
   .dependsOn(accumulation)

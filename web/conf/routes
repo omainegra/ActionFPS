@@ -33,3 +33,4 @@ GET         /all/games.csv                  @controllers.GamesController.allCsv
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
 GET         /inters/                        @controllers.IntersController.inters
 GET         /stats/                         @controllers.StatsController.stats
+GET         /ladder/                        @controllers.LadderController.ladder
