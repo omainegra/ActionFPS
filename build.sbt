@@ -20,6 +20,7 @@ lazy val root =
       demoParser,
       syslogAc,
       accumulation,
+      ladderParser,
       clans,
       players,
       stats
@@ -28,6 +29,7 @@ lazy val root =
     gameParser,
     web,
     referenceReader,
+    ladderParser,
     pingerClient,
     interParser,
     demoParser,
