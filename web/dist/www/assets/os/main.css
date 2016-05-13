@@ -7,27 +7,31 @@ body {
   padding: 0;
   overflow-y: scroll;
 }
+html#wide div[role='main'] {
+  margin-left: 1em;
+  margin-right: 1em;
+  width:auto;
+}
 div[role='main'] {
-  width: 52em;
-  margin-left: auto;
-  margin-right: auto;
+  width:70em;
+
+  margin-left: 1em;
+  margin-right: 1em;
   background-image: url('https://cloud.githubusercontent.com/assets/2464813/12016400/3d163802-ad42-11e5-829b-57dc96397d02.png');
   padding-bottom: 2em;
   box-shadow: #f5f5f5 1px 1px 3px, #f5f5f5 -1px -1px 3px, #f5f5f5 1px -1px 2px, #f5f5f5 -1px 1px 3px;
+  display:flex;
 }
 
-#top {
+#menu {
   text-align: center;
   text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
   margin-top: -1em;
   padding-bottom: 1em;
+  background:linear-gradient(rgba(10,20,20,0.8),rgba(30,50,50,0.6));
+  max-width:14em;
 }
-#top {
-  display:flex;
-  /*background:rgba(10,20,20,0.6);*/
-  background:linear-gradient(rgba(10,20,20,0.8),rgba(30,50,50,0.6))
-}
-#top article {
+#menu {
   padding-top:3.8em;
   padding-left:1.6em;
   padding-right:2em;
@@ -41,18 +45,17 @@ div[role='main'] #top header {
   text-align: center;
   text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
 }
-#top header img {
-  max-width:300px;
+#menu header img {
+  max-width:100%;
 }
 .menu {
+
   list-style-type: none;
-  display:flex;
-  flex-flow:row wrap;
   margin:0;
+  margin-top:1.6em;
   padding:0;
   font-size:1.2em;
   text-align:left;
-  justify-content:space-between;
 }
 .menu li {
   margin:0;
