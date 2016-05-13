@@ -27,7 +27,7 @@ class Common @Inject()(configuration: Configuration
                         val messagesApi: MessagesApi, executionContext: ExecutionContext) extends I18nSupport {
 
 
-  def renderTemplate(title: Option[String], supportsJson: Boolean, login: Option[(String, String)])(html: Html)
+  def renderTemplate(title: Option[String], supportsJson: Boolean, login: Option[(String, String)], wide: Boolean = false)(html: Html)
                     (implicit requestHeader: RequestHeader): Html = {
     import org.jsoup.Jsoup
     var f = new File("web/dist/www/template.html")
@@ -41,6 +41,9 @@ class Common @Inject()(configuration: Configuration
     title.foreach(js.title)
     if (supportsJson) {
       js.select("#content").attr("data-has-json", "has-json")
+    }
+    if ( wide ) {
+      js.body.addClass("wide")
     }
 
     js.select(s"#reg-menu-reg-play").first().text(Messages("menu.register-play"))

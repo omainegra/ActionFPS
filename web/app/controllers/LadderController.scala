@@ -59,49 +59,10 @@ class LadderController @Inject
   applicationLifecycle.addStopHook(() => Future.successful(tailers.foreach(_.shutdown())))
 
   def ladder = Action { implicit req =>
-    val hx =
-      <article id="profile">
-        <div class="profile">
-          <h1>Ladder</h1>
-          <table>
-            <thead>
-              <tr>
-                <th>User</th> <th>Points</th> <th>Flags</th> <th>Frags</th> <th>Gibs</th>
-              </tr>
-            </thead>
-            <tbody>
-              {val sorted = agg.get().users.toList.sortBy(_._2.points).reverse
-            sorted.map {
-              case (id, us) =>
-                <tr>
-                  <th>
-                    <a href={s"/player/?id=$id"}>
-                      {id}
-                    </a>
-                  </th>
-                  <td>
-                    {us.points}
-                  </td>
-                  <td>
-                    {us.flags}
-                  </td>
-                  <td>
-                    {us.frags}
-                  </td>
-                  <td>
-                    {us.gibs}
-                  </td>
-                </tr>
-            }}
-            </tbody>
-          </table>
-        </div>
-      </article>
-
     Ok(common.renderTemplate(
       title = Some("Ladder"),
       supportsJson = false,
       login = None)
-    (Html(hx.toString())))
+    (views.html.ladder.content(agg.get())))
   }
 }

@@ -2,9 +2,17 @@
 @import lib.Clanner
 @import providers.ReferenceProvider
 @import java.time.format.DateTimeFormatter
-@(games: List[MixedGame], events: List[Map[String, String]], latestClanwar: Option[com.actionfps.clans.ClanwarMeta], bulletin: Option[providers.ReferenceProvider.Heading])(implicit clanner: Clanner)
+@(games: List[MixedGame], events: List[Map[String, String]],
+        latestClanwars: List[com.actionfps.clans.ClanwarMeta],
+        bulletin: Option[providers.ReferenceProvider.Heading],
+        ladder: com.actionfps.ladder.parser.Aggregate,
+    playersStats: com.actionfps.players.PlayersStats,
+    clanStats: com.actionfps.clans.Clanstats
+
+)(implicit clanner: Clanner)
+<div class="bordered" id="bulletins">
 @bulletin.map { h =>
-    <div id="bulletin">
+    <div class="bulletin">
         <div class="when">
             <time is="relative-time" datetime="@h.at.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)">@h.at.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)</time>
         </div>
@@ -13,7 +21,8 @@
         </div>
     </div>
 }
-<div id="live-events">
+</div>
+<div id="live-events" class="bordered">
     <ol class="LiveEvents live-events">
         @events.take(7).map { event =>
             <li><a href="/player/?id=@event("user")">@event("text")</a>
@@ -26,6 +35,15 @@
     </ol>
 </div>
 
+@views.html.ladder.content(ladder)
+@views.html.player_ranks(playersStats)
+@views.html.clan_rankings(clanStats)
+
+<div id="latest-clanwars">
+@latestClanwars.map { clanwar =>
+    @views.html.clanwar.render_clanwar(clanwar, false)
+}
+</div>
 <div id="games">
 
     <div id="dynamic-games">
@@ -33,9 +51,6 @@
     </div>
 
     <div id="new-games"></div>
-    @latestClanwar.map { clanwar =>
-        <div id="latest-clanwar">@views.html.clanwar.render_clanwar(clanwar, false)</div>
-    }
 
     <div id="existing-games">
     @games.map { game =>

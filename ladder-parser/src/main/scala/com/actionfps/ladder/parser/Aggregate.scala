@@ -22,6 +22,10 @@ case class Aggregate(users: Map[String, UserStatistics]) {
         else this
     }
   }
+
+  def top(num: Int): Aggregate = {
+    copy(users = users.toList.sortBy(_._2.points).takeRight(num).toMap)
+  }
 }
 
 object Aggregate {

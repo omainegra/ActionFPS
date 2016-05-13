@@ -79,6 +79,10 @@ case class PlayersStats(players: Map[String, PlayerStat]) {
     players = players.filter { case (k, v) => v.rank.isDefined }
   )
 
+  def top(n: Int) = copy(
+    players = players.toList.sortBy(_._2.rank).take(n).toMap
+  )
+
   def teamsElo(jsonGame: JsonGame): List[Double] = {
     jsonGame.teams.map { team =>
       team.players.map {

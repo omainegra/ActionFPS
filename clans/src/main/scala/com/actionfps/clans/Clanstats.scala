@@ -59,6 +59,10 @@ case class Clanstats(clans: Map[String, Clanstat]) {
     )
   }
 
+  def top(n: Int) = copy(
+    clans = clans.toList.sortBy(_._2.rank).take(n).toMap
+  )
+
   def refreshedRanks = {
     val updatedRanks = clans.collect { case (clan, stat) if stat.wars >= 5 =>
       stat

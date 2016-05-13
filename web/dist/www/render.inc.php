@@ -11,6 +11,17 @@ $domdoc = new DOMDocument();
 libxml_use_internal_errors(true);
 $domdoc->loadHTMLFile($main_template_path);
 libxml_use_internal_errors(false);
+function append_class(\DOMElement $element, $class) {
+    if ( !$element->hasAttribute('class') ) {
+        $new_value = $class;
+    } else {
+        $new_value = $element->getAttribute("class") . " ". $class;
+    }
+    $element->setAttribute("class", $new_value);
+}
+if ( isset($wide) && $wide ) {
+    append_class($domdoc->documentElement, "wide");
+}
 if (isset($title)) {
     $domdoc->getElementsByTagName("title")->item(0)->textContent = $title;
 }

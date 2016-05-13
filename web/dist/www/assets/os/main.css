@@ -7,7 +7,7 @@ body {
   padding: 0;
   overflow-y: scroll;
 }
-html#wide div[role='main'] {
+.wide div[role='main'] {
   margin-left: 1em;
   margin-right: 1em;
   width:auto;
@@ -29,7 +29,7 @@ div[role='main'] {
   margin-top: -1em;
   padding-bottom: 1em;
   background:linear-gradient(rgba(10,20,20,0.8),rgba(30,50,50,0.6));
-  max-width:14em;
+  max-width:10em;
 }
 #menu {
   padding-top:3.8em;
@@ -161,15 +161,14 @@ a:hover {
 #servers,
 #create-profile,
 #profile,
+.bordered,
 #players,
 #clans,
 #live-events,
 article#videos,
-#bulletin,
+#bulletins,
 #settings {
   margin: 2em;
-  margin-left: 4em;
-  margin-right: 4em;
   box-shadow: #000000 3px 3px 2px, #000000 -3px -3px 2px, #000000 3px -3px 2px, #000000 -3px 3px 2px;
   color: white;
   text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
@@ -687,11 +686,12 @@ input {
 #reg-form.signed-in #register-signedin {
   display:block;
 }
-#bulletin .when {
+#bulletins .when {
   min-width:6em;
   padding-right:1em;
 }
-#bulletin {display:flex;
+#bulletins .bulletin {display:flex;
+  margin-bottom:1em;
 }
 #reg-menu #log-in {
   display:inline-block;
@@ -703,4 +703,52 @@ input {
 }
 #stats a:hover circle {
   fill: orangered;
+}
+
+#ladder {
+  max-width: 24em;
+}
+#bulletins {
+  max-width:38em;
+}
+.wide #content {
+  display:flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+#games, #latest-clanwars {
+  margin:2em;
+}
+#bulletins {
+  flex: 1 0;
+}
+#bulletins { order:1 }
+#live-events { order:2 }
+#latest-clanwars {
+  order:4;
+}
+#games {
+  order:3;
+}
+#ladder {
+  order: 5;
+}
+#player-ranks {
+  order:6;
+}
+#clan-ranks {
+  order:7;
+}
+@media screen and (max-width: 1649px) {
+  #latest-clanwars {
+    order: 3;
+  }
+  #latest-clanwars .GameCard { display:none }
+  #latest-clanwars .GameCard:first-child { display:block }
+  #games {
+    order:4;
+  }
+  #ladder {
+    order:8;
+  }
 }
