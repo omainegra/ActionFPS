@@ -739,6 +739,26 @@ input {
 #clan-ranks {
   order:7;
 }
+@media screen and (min-height: 850px) and (min-width:1880px) {
+  #bulletins {
+    min-width:30em;
+  }
+  #ladder {
+    order:3
+  }
+  #player-ranks {
+    order:4;
+  }
+  #clan-ranks {
+    order:5;
+  }
+  #games {
+    order:6;
+  }
+  #latest-clanwars {
+    order:7
+  }
+}
 @media screen and (max-width: 1649px) {
   #latest-clanwars {
     order: 3;
