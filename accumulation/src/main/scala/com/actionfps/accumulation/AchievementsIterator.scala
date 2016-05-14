@@ -15,17 +15,23 @@ case class AchievementsIterator(map: Map[String, PlayerState], events: List[Map[
   /**
     * List of user --> Set[game --> achievement]
     */
-  def newAchievements(previous: AchievementsIterator): List[(String, scala.collection.immutable.Set[(String, com.actionfps.achievements.immutable.CompletedAchievement)])] = {
-    val updatedPlayers = (map.toSet -- previous.map.toSet).toMap
+  def newAchievements(updatedPlayers: Map[String, PlayerState], previous: AchievementsIterator): List[(String, List[(String, com.actionfps.achievements.immutable.CompletedAchievement)])] = {
     (for {
       (user, state) <- updatedPlayers
-      newAch = state.achieved.toSet -- previous.map.get(user).map(_.achieved).getOrElse(Vector.empty).toSet
-    } yield user -> newAch.toSet).toList
+      previousState <- previous.map.get(user)
+      newAch = state.achieved.drop(previousState.achieved.length)
+    } yield user -> newAch.toList).toList
   }
 
-  def includeGame(users: List[User])(jsonGame: JsonGame): AchievementsIterator = {
+  /**
+    * New state & also what's changed
+    * @param users
+    * @param jsonGame
+    * @return
+    */
+  def includeGame(users: List[User])(jsonGame: JsonGame): (AchievementsIterator, Map[String, PlayerState]) = {
     val oEvents = scala.collection.mutable.Buffer.empty[Map[String, String]]
-    var nComb = map
+    val updates = scala.collection.mutable.Map.empty[String, PlayerState]
     for {
       team <- jsonGame.teams
       player <- team.players
@@ -34,9 +40,10 @@ case class AchievementsIterator(map: Map[String, PlayerState], events: List[Map[
         users.exists(_.validAt(p.name, jsonGame.endTime)))
     } {
       oEvents ++= newEvents.map { case (date, text) => Map("user" -> user.id, "date" -> date, "text" -> s"${user.name} $text") }
-      nComb = nComb.updated(user.id, newPs)
+      updates += (user.id -> newPs)
     }
-    copy(map = nComb, events = oEvents.toList ++ events)
+
+    (copy(map = map ++ updates, events = oEvents.toList ++ events), updates.toMap)
   }
 }
 

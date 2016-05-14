@@ -40,13 +40,13 @@ case class FullIterator
     val enricher = EnrichGames(users.values.toList, clans.values.toList)
     import enricher.withUsersClass
     var richGame = jsonGame.withoutHosts.withUsers.withClans
-    val newAchievements = achievementsIterator.includeGame(fi.users.values.toList)(richGame)
+    val (newAchievements, whatsChanged) = achievementsIterator.includeGame(fi.users.values.toList)(richGame)
 
-    val nhof = newAchievements.newAchievements(achievementsIterator).foldLeft(hof) {
+    val nhof = newAchievements.newAchievements(whatsChanged, achievementsIterator).foldLeft(hof) {
       case (ahof, (user, items)) =>
         items.foldLeft(ahof) { case (xhof, (game, ach)) => xhof.includeAchievement(user, game, ach) }
     }
-    PartialFunction.condOpt(newAchievements.events.toSet -- achievementsIterator.events.toSet) {
+    PartialFunction.condOpt(newAchievements.events.drop(achievementsIterator.events.length)) {
       case set if set.nonEmpty =>
         richGame = richGame.copy(
           achievements = Option {
@@ -60,12 +60,17 @@ case class FullIterator
     }
     val ncw = clanwars.includeFlowing(richGame)
     var newClanwarCompleted: Option[CompleteClanwar] = None
-    val newClanstats = (ncw.complete -- clanwars.complete).headOption match {
-      case None =>
-        clanstats
-      case Some(completion) =>
-        newClanwarCompleted = Option(completion)
-        clanstats.include(completion)
+    val newClanstats = {
+      if (ncw.complete.size == clanwars.complete.size) clanstats
+      else {
+        (ncw.complete -- clanwars.complete).headOption match {
+          case None =>
+            clanstats
+          case Some(completion) =>
+            newClanwarCompleted = Option(completion)
+            clanstats.include(completion)
+        }
+      }
     }
     var newGames = {
       fi.games.updated(
