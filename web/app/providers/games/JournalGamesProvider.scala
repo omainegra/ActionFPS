@@ -5,7 +5,9 @@ package providers.games
   */
 
 import java.io.{File, FileInputStream}
+import java.util.concurrent.Executors
 import javax.inject._
+
 import com.actionfps.gameparser.ProcessJournalApp
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.gameparser.mserver.{ExtractMessage, MultipleServerParser, MultipleServerParserFoundGame}
@@ -20,6 +22,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, blocking}
 import ValidServers.Validator._
 import ValidServers.ImplicitValidServers._
+import org.apache.commons.io.input.Tailer
 
 object JournalGamesProvider {
 
@@ -71,26 +74,39 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
   val journalFiles = configuration.underlying.getStringList("af.journal.paths").asScala.map(new File(_))
 
   implicit private val geoIp = GeoIpLookup
-
+  val ex = Executors.newFixedThreadPool(journalFiles.size + 1)
+  applicationLifecycle.addStopHook(() => Future(ex.shutdown()))
   val gamesA = Future {
     blocking {
-      val initialGames = journalFiles
-        .par
-        .map(JournalGamesProvider.getFileGames)
-        .map(_.mapValues(_.withGeo).toMap)
-        .reduce(_ ++ _)
-      val gamesAgent = Agent(initialGames)
-      val lastGame = initialGames.toList.sortBy(_._1).lastOption.map(_._2)
-      val ngc = new NewGameCapture(
-        gameAlreadyExists = id => gamesAgent.get().contains(id),
-        afterGame = lastGame
-      )((ggame) => {
-        val game = ggame.withGeo
-        gamesAgent.send(_ + (game.id -> game))
-        hooks.get().foreach(f => f(game))
+      val (initialGames, tailIterator) = journalFiles.toList.sortBy(_.lastModified()).reverse match {
+        case recent :: rest =>
+          val adapter = new IteratorTailerListenerAdapter()
+          val tailer = new Tailer(recent, adapter, 2000)
+          val reader = GameScanner.tailReader(adapter)
+          ex.submit(tailer)
+          applicationLifecycle.addStopHook(() => Future(tailer.stop()))
+          val (initialRecentGames, tailIterator) = reader.collect(GameScanner.collect)
+          val otherGames = rest.par.map { file =>
+            val src = scala.io.Source.fromFile(file)
+            try src.getLines().scanLeft(GameScanner.zero)(GameScanner.scan).collect(GameScanner.collect).toList
+            finally src.close()
+          }.toList.flatten
+          (otherGames ++ initialRecentGames, tailIterator)
+        case Nil =>
+          (List.empty, Iterator.empty)
+      }
+      val gamesAgent = Agent(initialGames.filter(_.validate.isGood).map(g => g.id -> g.withGeo).toMap)
+      ex.submit(new Runnable {
+        override def run(): Unit = {
+          tailIterator.foreach { game =>
+            if (game.validate.isGood) {
+              val gg = game.withGeo
+              gamesAgent.send(_.updated(gg.id, gg))
+              hooks.get().foreach(h => h(gg))
+            }
+          }
+        }
       })
-      val tailer = new CallbackTailer(journalFiles.last, false)(ngc.processLine)
-      applicationLifecycle.addStopHook(() => Future.successful(tailer.shutdown()))
       gamesAgent
     }
   }

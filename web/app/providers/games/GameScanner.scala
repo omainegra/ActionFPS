@@ -21,4 +21,5 @@ object GameScanner extends Scanner[String, MultipleServerParser] {
     case MultipleServerParserFoundGame(fg, _) => fg
   }
 
+  def tailReader(adapter: IteratorTailerListenerAdapter) = new TailedScannerReader(adapter, this)
 }

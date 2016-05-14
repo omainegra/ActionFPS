@@ -12,6 +12,9 @@ object MultipleServerParser {
     serverStates = Map.empty,
     serverTimeCorrectors = Map.empty
   )
+  def collect: PartialFunction[MultipleServerParser, JsonGame] = {
+    case g: MultipleServerParserFoundGame => g.cg
+  }
 }
 
 sealed trait MultipleServerParser {
