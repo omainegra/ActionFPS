@@ -72,11 +72,25 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
   override def removeHook(f: (JsonGame) => Unit): Unit = hooks.send(_ - f)
 
   val journalFiles = configuration.underlying.getStringList("af.journal.paths").asScala.map(new File(_))
+  val gamesDatas = configuration.underlying.getStringList("af.ladder.games-data").asScala.map(new File(_))
 
   implicit private val geoIp = GeoIpLookup
   val ex = Executors.newFixedThreadPool(journalFiles.size + 1)
   applicationLifecycle.addStopHook(() => Future(ex.shutdown()))
-  val gamesA = Future {
+
+  val gamesDataF = Future {
+    blocking {
+      gamesDatas.par.flatMap { file =>
+        val src = scala.io.Source.fromFile(file)
+        try src.getLines().map(line => line.split("\t")(2)).map(JsonGame.fromJson).toList.filter(_.validate.isGood)
+        finally src.close
+      }.map(g => g.id -> g.withGeo).toList.toMap
+    }
+  }
+
+  val gamesA = for {d <- gamesDataF; d <- gamesI(d)} yield d
+
+  private def gamesI(input: Map[String, JsonGame]) = Future {
     blocking {
       val (initialGames, tailIterator) = journalFiles.toList.sortBy(_.lastModified()).reverse match {
         case recent :: rest =>

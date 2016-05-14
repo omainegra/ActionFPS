@@ -5,6 +5,8 @@ package com.actionfps.ladder.parser
   */
 case class Aggregate(users: Map[String, UserStatistics]) {
   def includeLine(playerMessage: PlayerMessage)(implicit userProvider: UserProvider): Aggregate = {
+    require(userProvider != null, "User provider cannot be null")
+    require(playerMessage.name != null, s"Player name cannot be numm, ${playerMessage}")
     userProvider.username(playerMessage.name) match {
       case None => this
       case Some(user) =>
