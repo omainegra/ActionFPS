@@ -90,7 +90,7 @@ case class FullIterator
     )
   }
 
-  def recentGames: List[JsonGame] = games.toList.sortBy(_._1).takeRight(50).reverse.map(_._2)
+  def recentGames(n: Int): List[JsonGame] = games.toList.sortBy(_._1).takeRight(n).reverse.map(_._2)
 
   def getProfileFor(id: String): Option[FullProfile] =
     users.get(id).map { user =>

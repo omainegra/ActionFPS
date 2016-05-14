@@ -15,8 +15,8 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext) {
 
   protected[providers] def fullStuff: Future[Agent[FullIterator]]
 
-  def getRecent =
-    fullStuff.map(_.get().recentGames)
+  def getRecent(n: Int) =
+    fullStuff.map(_.get().recentGames(n))
 
   def events: Future[List[Map[String, String]]] = {
     fullStuff.map(_.get().events)

@@ -40,6 +40,19 @@ class GamesController @Inject()(common: Common,
 
   import Clanwar.ImplicitFormats._
 
+  def recentGames = Action.async { implicit request =>
+    async {
+      implicit val namer = {
+        val clans = await(referenceProvider.clans)
+        Namer(id => clans.find(_.id == id).map(_.name))
+      }
+      val games = await(fullProvider.getRecent(100)).map(MixedGame.fromJsonGame)
+      Ok(renderTemplate(None, supportsJson = false, None, wide = false)(
+        views.html.recent_games(games)
+      ))
+    }
+  }
+
   def index = Action.async { implicit request =>
     async {
       implicit val namer = {
@@ -50,7 +63,7 @@ class GamesController @Inject()(common: Common,
         val clans = await(referenceProvider.clans)
         Clanner(id => clans.find(_.id == id))
       }
-      val games = await(fullProvider.getRecent).take(10).map(MixedGame.fromJsonGame)
+      val games = await(fullProvider.getRecent(10)).map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
       val latestClanwars = await(fullProvider.clanwars).complete.toList.sortBy(_.id).reverse.take(10).map(_.meta.named)
       val headingO = await(referenceProvider.bulletin)
