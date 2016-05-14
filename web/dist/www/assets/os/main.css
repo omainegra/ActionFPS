@@ -717,7 +717,8 @@ input {
   flex-wrap: wrap;
 }
 #games, #latest-clanwars {
-  margin:2em;
+  margin-left:auto;
+  margin-right:auto;
 }
 #bulletins {
   flex: 1 0;
