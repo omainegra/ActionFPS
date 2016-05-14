@@ -185,7 +185,7 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
 
       for {o <- outputs} info(s"Output item: $o")
 
-      inside(outputs(outputs.size - 2)) {
+      inside(outputs(outputs.size - 3)) {
         case FoundGame(header, Left(flagGame)) =>
           inside(header) {
             case GameFinishedHeader(mode, map, state) =>

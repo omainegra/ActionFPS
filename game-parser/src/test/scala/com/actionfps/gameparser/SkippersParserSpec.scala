@@ -12,6 +12,7 @@ class SkippersParserSpec
 
   "skippers" must {
     "Parse quitters at intermission" in {
+      info("This test fails and is enabled so that in future we recover scores from people who leave at intermission")
 
       val inputSequence = {
         val src = scala.io.Source.fromInputStream(getClass.getResourceAsStream("skippers.txt"))
@@ -22,7 +23,6 @@ class SkippersParserSpec
       }
 
       val outputs = inputSequence.scanLeft(NothingFound: ParserState)(_.next(_))
-      outputs.foreach(println)
 
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
 
