@@ -14,7 +14,7 @@ import com.actionfps.gameparser.mserver.{ExtractMessage, MultipleServerParser, M
 import akka.agent.Agent
 import com.actionfps.accumulation.{GeoIpLookup, ValidServers}
 import lib.CallbackTailer
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.inject.ApplicationLifecycle
 import providers.games.JournalGamesProvider.NewGameCapture
 
@@ -23,6 +23,8 @@ import scala.concurrent.{ExecutionContext, Future, blocking}
 import ValidServers.Validator._
 import ValidServers.ImplicitValidServers._
 import org.apache.commons.io.input.Tailer
+
+import scala.util.control.NonFatal
 
 object JournalGamesProvider {
 
@@ -65,6 +67,8 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
                                     (implicit executionContext: ExecutionContext)
   extends GamesProvider {
 
+  val logger = Logger(getClass)
+
   val hooks = Agent(Set.empty[JsonGame => Unit])
 
   override def addHook(f: (JsonGame) => Unit): Unit = hooks.send(_ + f)
@@ -82,7 +86,13 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
     blocking {
       gamesDatas.par.flatMap { file =>
         val src = scala.io.Source.fromFile(file)
-        try src.getLines().map(line => line.split("\t")(2)).map(JsonGame.fromJson).toList.filter(_.validate.isGood)
+        try src.getLines().filter(_.nonEmpty).map { line =>
+          try JsonGame.fromJson(line.split("\t")(2))
+          catch {
+            case NonFatal(e) => logger.error(s"Could not parse JSON line due to ${e}: $line", e)
+              throw e
+          }
+        }.toList.filter(_.validate.isGood)
         finally src.close
       }.map(g => g.id -> g.withGeo).toList.toMap
     }
