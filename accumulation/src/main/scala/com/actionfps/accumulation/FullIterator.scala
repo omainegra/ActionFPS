@@ -46,7 +46,7 @@ case class FullIterator
       case (ahof, (user, items)) =>
         items.foldLeft(ahof) { case (xhof, (game, ach)) => xhof.includeAchievement(user, game, ach) }
     }
-    PartialFunction.condOpt(newAchievements.events.drop(achievementsIterator.events.length)) {
+    PartialFunction.condOpt(newAchievements.events.dropRight(achievementsIterator.events.length)) {
       case set if set.nonEmpty =>
         richGame = richGame.copy(
           achievements = Option {
