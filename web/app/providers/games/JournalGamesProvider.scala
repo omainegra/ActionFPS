@@ -119,7 +119,8 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
         case Nil =>
           (List.empty, Iterator.empty)
       }
-      val gamesAgent = Agent(initialGames.filter(_.validate.isGood).map(g => g.id -> g.withGeo).toMap)
+      val jigm = initialGames.filter(_.validate.isGood).map(g => g.id -> g.withGeo).toMap
+      val gamesAgent = Agent(jigm ++ input)
       ex.submit(new Runnable {
         override def run(): Unit = {
           tailIterator.foreach { game =>
