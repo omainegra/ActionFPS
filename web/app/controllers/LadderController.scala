@@ -28,14 +28,6 @@ class LadderController @Inject
 
   import collection.JavaConverters._
 
-  val tailers = configuration.getStringList("af.ladder.sources").get.asScala.map { sshUrl =>
-    Logger.info(s"Logging from ${sshUrl}")
-    val q = new SshTailer(
-      endOnly = false,
-      file = RemoteSshPath.unapply(sshUrl).get
-    )(includeLine)
-    q
-  }
 
   val prs = LineParser(atYear = 2016)
   val agg = Agent(Aggregate.empty)
@@ -54,6 +46,15 @@ class LadderController @Inject
     case prs(_, PlayerMessage(pm)) =>
       agg.send(_.includeLine(pm)(up))
     case _ =>
+  }
+
+  val tailers = configuration.getStringList("af.ladder.sources").get.asScala.map { sshUrl =>
+    Logger.info(s"Logging from ${sshUrl}")
+    val q = new SshTailer(
+      endOnly = false,
+      file = RemoteSshPath.unapply(sshUrl).get
+    )(includeLine)
+    q
   }
 
   applicationLifecycle.addStopHook(() => Future.successful(tailers.foreach(_.shutdown())))
