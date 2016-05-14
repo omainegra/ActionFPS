@@ -2,7 +2,6 @@ package providers.games
 
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.google.inject.ImplementedBy
-import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
 
@@ -21,3 +20,11 @@ trait GamesProvider {
   def removeHook(hook: JsonGame => Unit): Unit = ()
 
 }
+
+
+
+
+
+
+
+
