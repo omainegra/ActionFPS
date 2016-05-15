@@ -94,7 +94,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
           }
         }.toList.filter(_.validate.isGood)
         finally src.close
-      }.map(g => g.id -> g.withGeo).toList.toMap
+      }.map(g => g.id -> g.withGeo.flattenPlayers).toList.toMap
     }
   }
 
@@ -125,7 +125,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
         override def run(): Unit = {
           tailIterator.foreach { game =>
             if (game.validate.isGood) {
-              val gg = game.withGeo
+              val gg = game.withGeo.flattenPlayers
               gamesAgent.send(_.updated(gg.id, gg))
               hooks.get().foreach(h => h(gg))
             }
