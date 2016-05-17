@@ -8,22 +8,18 @@ import java.io.{File, FileInputStream}
 import java.util.concurrent.Executors
 import javax.inject._
 
+import akka.agent.Agent
+import com.actionfps.accumulation.GeoIpLookup
+import com.actionfps.accumulation.ValidServers.ImplicitValidServers._
+import com.actionfps.accumulation.ValidServers.Validator._
 import com.actionfps.gameparser.ProcessJournalApp
 import com.actionfps.gameparser.enrichers.JsonGame
-import com.actionfps.gameparser.mserver.{ExtractMessage, MultipleServerParser, MultipleServerParserFoundGame}
-import akka.agent.Agent
-import com.actionfps.accumulation.{GeoIpLookup, ValidServers}
-import lib.CallbackTailer
-import play.api.{Configuration, Logger}
+import org.apache.commons.io.input.Tailer
 import play.api.inject.ApplicationLifecycle
-import providers.games.JournalGamesProvider.NewGameCapture
+import play.api.{Configuration, Logger}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, blocking}
-import ValidServers.Validator._
-import ValidServers.ImplicitValidServers._
-import org.apache.commons.io.input.Tailer
-
 import scala.util.control.NonFatal
 
 object JournalGamesProvider {
@@ -38,22 +34,6 @@ object JournalGamesProvider {
       .map(g => g.id -> g)
       .toMap
     finally fis.close()
-  }
-
-  class NewGameCapture(gameAlreadyExists: String => Boolean, afterGame: Option[JsonGame])(registerGame: JsonGame => Unit) {
-    var currentState = MultipleServerParser.empty
-
-    def processLine(line: String) = line match {
-      case line@ExtractMessage(date, _, _)
-        if afterGame.isEmpty || date.isAfter(afterGame.get.endTime.minusMinutes(20)) =>
-        currentState = currentState.process(line)
-        PartialFunction.condOpt(currentState) {
-          case MultipleServerParserFoundGame(fg, _)
-            if !gameAlreadyExists(fg.id) && fg.validate.isGood && fg.validateServer =>
-            registerGame(fg.flattenPlayers)
-        }
-      case _ =>
-    }
   }
 
 }
@@ -92,7 +72,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
             case NonFatal(e) => logger.error(s"Could not parse JSON line due to ${e}: $line", e)
               throw e
           }
-        }.toList.filter(_.validate.isGood)
+        }.toList.filter(_.validate.isGood).filter(_.validateServer)
         finally src.close
       }.map(g => g.id -> g.withGeo.flattenPlayers).toList.toMap
     }
@@ -124,7 +104,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
       ex.submit(new Runnable {
         override def run(): Unit = {
           tailIterator.foreach { game =>
-            if (game.validate.isGood) {
+            if (game.validate.isGood && game.validateServer) {
               val gg = game.withGeo.flattenPlayers
               gamesAgent.send(_.updated(gg.id, gg))
               hooks.get().foreach(h => h(gg))
