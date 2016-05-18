@@ -9,14 +9,13 @@ import javax.inject._
 import akka.agent.Agent
 import com.actionfps.ladder.SshTailer
 import com.actionfps.ladder.connecting.RemoteSshPath
-import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage, UserProvider}
-import play.api.{Configuration, Logger}
+import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage}
 import play.api.inject.ApplicationLifecycle
 import play.api.mvc.{Action, Controller}
-import play.twirl.api.Html
+import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class LadderController @Inject
@@ -28,19 +27,12 @@ class LadderController @Inject
 
   import collection.JavaConverters._
 
-
   val prs = LineParser(atYear = 2016)
   val agg = Agent(Aggregate.empty)
 
   import concurrent.duration._
 
-  val usrs = Await.result(referenceProvider.users, 10.seconds)
-  val nick2UserId = usrs.map { u => u.nickname.nickname -> u.id }.toMap
-  val up = new UserProvider {
-    override def username(nickname: String): Option[String] = {
-      nick2UserId.get(nickname)
-    }
-  }
+  val up = referenceProvider.syncUserProvider(10.seconds)
 
   def includeLine(input: String): Unit = input match {
     case prs(_, PlayerMessage(pm)) =>

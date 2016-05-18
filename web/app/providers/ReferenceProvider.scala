@@ -1,26 +1,27 @@
 package providers
 
-import java.io.{StringWriter, StringReader}
-import java.time.{ZoneId, ZonedDateTime, ZoneOffset}
-import javax.inject.Inject
-import com.actionfps.accumulation.{User, Clan}
+import java.io.{StringReader, StringWriter}
+import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
+import javax.inject.{Inject, Singleton}
+
+import com.actionfps.accumulation.{Clan, User}
+import com.actionfps.ladder.parser.UserProvider
 import com.actionfps.reference._
 import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import play.twirl.api.{HtmlFormat, Html}
+import play.twirl.api.{Html, HtmlFormat}
 import providers.ReferenceProvider.Heading
-
 
 import scala.async.Async._
 import scala.concurrent.duration.Duration
-
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
   * Created by William on 01/01/2016.
   */
+@Singleton
 class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheApi)
                                  (implicit wSClient: WSClient,
                                   executionContext: ExecutionContext) {
@@ -28,7 +29,7 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
   import controllers.cf
 
   def unCache(): Unit = {
-    List("clans", "servers", "registrations", "nicknames", "headings").foreach(cacheApi.remove)
+    List("clans", "servers", "registrations", "nicknames", "headings", "user-provider").foreach(cacheApi.remove)
   }
 
   private def fetch(key: String) = async {
@@ -39,6 +40,10 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
         cacheApi.set(key, value, Duration.apply("1h"))
         value
     }
+  }
+
+  def syncUserProvider(atMost: Duration): UserProvider = cacheApi.getOrElse[UserProvider]("user-provider") {
+    Await.result(Users(withEmails = false).provider, atMost)
   }
 
   object Clans {
@@ -111,6 +116,8 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
       val nicks = await(nicknames)
       regs.flatMap { reg => User.fromRegistration(reg, nicks) }
     }
+
+    def provider: Future[UserProvider] = users.map(l => new ReferenceProvider.ListUserProvider(l))
   }
 
   def clans: Future[List[Clan]] = Clans.clans
@@ -128,5 +135,14 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
 object ReferenceProvider {
 
   case class Heading(at: ZonedDateTime, html: Html)
+
+
+  class ListUserProvider(users: List[User]) extends UserProvider {
+    val nick2UserId = users.map { u => u.nickname.nickname -> u.id }.toMap
+
+    override def username(nickname: String): Option[String] = {
+      nick2UserId.get(nickname)
+    }
+  }
 
 }
