@@ -32,7 +32,7 @@ class LadderController @Inject
 
   import concurrent.duration._
 
-  val up = referenceProvider.syncUserProvider(10.seconds)
+  def up = referenceProvider.syncUserProvider(10.seconds)
 
   def includeLine(input: String): Unit = input match {
     case prs(_, PlayerMessage(pm)) =>
