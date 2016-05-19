@@ -22,7 +22,9 @@ div[role='main'] {
   box-shadow: #f5f5f5 1px 1px 3px, #f5f5f5 -1px -1px 3px, #f5f5f5 1px -1px 2px, #f5f5f5 -1px 1px 3px;
   display:flex;
 }
-
+.wide #ladder.bordered, .wide #player-ranks.bordered, .wide #clan-ranks.bordered {
+  padding:1.5em;
+}
 #menu {
   text-align: center;
   text-shadow: #333333 1px 1px 1px, #333333 -1px 1px 1px, #333333 1px -1px 1px, #333333 -1px -1px 1px;
