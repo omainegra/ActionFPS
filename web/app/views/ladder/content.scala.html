@@ -18,7 +18,7 @@
                         </th>
                             <td>@us.points</td>
                             <td>@us.flags</td> <td>@us.frags</td> <td>@us.gibs</td>
-                            <td><time is="relative-time" datetime="@us.lastSeen">@us.lastSeen</time></td>
+                            <td><time is="relative-time" datetime="@us.lastSeen.toString.take(20)">@us.lastSeen</time></td>
                         </tr>
                     }
                 }
