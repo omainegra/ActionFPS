@@ -54,8 +54,8 @@ object ReaderApp extends App {
     override def run(): Unit = ps.destroy()
   }, 5000)
   res.collect {
-    case prs(_, PlayerMessage(pm)) =>
-      pm
+    case prs(t, PlayerMessage(pm)) =>
+      pm.timed(t)
   }.scanLeft(Aggregate.empty)((agg, line) => agg.includeLine(line)(up)).toStream
     .takeRight(1).foreach(println)
 }

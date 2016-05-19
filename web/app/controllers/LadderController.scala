@@ -35,8 +35,8 @@ class LadderController @Inject
   def up = referenceProvider.syncUserProvider(10.seconds)
 
   def includeLine(input: String): Unit = input match {
-    case prs(_, PlayerMessage(pm)) =>
-      agg.send(_.includeLine(pm)(up))
+    case prs(time, PlayerMessage(pm)) =>
+      agg.send(_.includeLine(pm.timed(time))(up))
     case _ =>
   }
 

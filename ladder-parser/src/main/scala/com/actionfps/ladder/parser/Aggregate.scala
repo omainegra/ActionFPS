@@ -4,7 +4,8 @@ package com.actionfps.ladder.parser
   * Created by me on 02/05/2016.
   */
 case class Aggregate(users: Map[String, UserStatistics]) {
-  def includeLine(playerMessage: PlayerMessage)(implicit userProvider: UserProvider): Aggregate = {
+  def includeLine(timedPlayerMessage: TimedPlayerMessage)(implicit userProvider: UserProvider): Aggregate = {
+    import timedPlayerMessage.playerMessage
     require(userProvider != null, "User provider cannot be null")
     require(playerMessage.name != null, s"Player name cannot be numm, ${playerMessage}")
     userProvider.username(playerMessage.name) match {
@@ -14,7 +15,7 @@ case class Aggregate(users: Map[String, UserStatistics]) {
           copy(
             users = users.updated(
               key = user,
-              value = f(users.getOrElse(user, UserStatistics.empty))
+              value = f(users.getOrElse(user, UserStatistics.empty(time = timedPlayerMessage.time)).copy(lastSeen = timedPlayerMessage.time))
             )
           )
         }

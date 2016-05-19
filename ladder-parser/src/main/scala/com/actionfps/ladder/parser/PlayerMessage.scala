@@ -1,5 +1,7 @@
 package com.actionfps.ladder.parser
 
+import java.time.ZonedDateTime
+
 /**
   * Created by me on 02/05/2016.
   */
@@ -34,4 +36,8 @@ case class PlayerMessage(ip: String, name: String, message: String) {
 
   def scored: Boolean =
     words.headOption.contains("scored")
+
+  def timed(time: ZonedDateTime) = TimedPlayerMessage(time = time, playerMessage = this)
 }
+
+case class TimedPlayerMessage(time: ZonedDateTime, playerMessage: PlayerMessage)
