@@ -14,6 +14,7 @@ GET         /api/                           @controllers.MiscController.api
 GET         /client/                        @controllers.MiscController.client
 GET         /client/changes/                @controllers.MiscController.clientChanges
 GET         /questions/                     @controllers.MiscController.questions
+GET         /contact/                       @controllers.MiscController.contact
 GET         /servers/                       @controllers.MiscController.servers
 GET         /development/                   @controllers.MiscController.development
 GET         /login/                         @controllers.MiscController.login

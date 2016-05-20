@@ -33,6 +33,8 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
 
   def questions = forward("/questions/")
 
+  def contact = forward("/contact/")
+
   def development = forward("/development.php")
 
   def headings = Action.async { request =>
