@@ -707,7 +707,7 @@ input {
   fill: orangered;
 }
 
-#ladder {
+.wide #ladder {
   max-width: 24em;
 }
 #bulletins {

@@ -16,7 +16,7 @@ case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDate
 
   def see(atTime: ZonedDateTime) = copy(
     lastSeen = atTime,
-    timePlayed = timePlayed + (lastSeen.toEpochSecond - atTime.toEpochSecond)
+    timePlayed = timePlayed + (atTime.toEpochSecond - lastSeen.toEpochSecond)
   )
 
   def timePlayedText = {

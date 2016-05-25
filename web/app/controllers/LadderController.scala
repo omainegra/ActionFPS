@@ -9,8 +9,9 @@ import javax.inject._
 import akka.agent.Agent
 import com.actionfps.ladder.SshTailer
 import com.actionfps.ladder.connecting.RemoteSshPath
-import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage}
+import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage, UserStatistics}
 import play.api.inject.ApplicationLifecycle
+import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
@@ -52,10 +53,19 @@ class LadderController @Inject
   applicationLifecycle.addStopHook(() => Future.successful(tailers.foreach(_.shutdown())))
 
   def ladder = Action { implicit req =>
-    Ok(common.renderTemplate(
-      title = Some("Ladder"),
-      supportsJson = false,
-      login = None)
-    (views.html.ladder.ladder_table(agg.get())(showTime = true)))
+    req.getQueryString("format") match {
+      case Some("json") =>
+        implicit val aggWriter = {
+          implicit val usWriter = Json.writes[UserStatistics]
+          Json.writes[Aggregate]
+        }
+        Ok(Json.toJson(agg.get()))
+      case _ =>
+        Ok(common.renderTemplate(
+          title = Some("Ladder"),
+          supportsJson = true,
+          login = None)
+        (views.html.ladder.ladder_table(agg.get())(showTime = true)))
+    }
   }
 }
