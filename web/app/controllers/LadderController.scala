@@ -56,6 +56,6 @@ class LadderController @Inject
       title = Some("Ladder"),
       supportsJson = false,
       login = None)
-    (views.html.ladder.content(agg.get())))
+    (views.html.ladder.ladder_table(agg.get())(showTime = true)))
   }
 }

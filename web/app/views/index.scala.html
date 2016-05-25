@@ -34,13 +34,13 @@
     </ol>
 </div>
 
-@views.html.ladder.content(ladder)
+@views.html.ladder.ladder_table(ladder)(showTime = false)
 @views.html.player_ranks(playersStats)
 @views.html.clan_rankings(clanStats)
 
 <div id="latest-clanwars">
 @latestClanwars.map { clanwar =>
-    @views.html.clanwar.render_clanwar(clanwar, false)
+    @views.html.clanwar.render_clanwar(clanwar, showPlayers = false)
 }
 </div>
 <div id="games">

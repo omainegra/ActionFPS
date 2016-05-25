@@ -1,4 +1,4 @@
-@(aggregate: com.actionfps.ladder.parser.Aggregate)
+@(aggregate: com.actionfps.ladder.parser.Aggregate)(showTime: Boolean = false)
 
 <article id="ladder" class="bordered">
     <div class="profile">
@@ -6,7 +6,10 @@
         <table>
             <thead>
                 <tr>
-                    <th>User</th> <th>Points</th> <th>Flags</th> <th>Frags</th> <th>Gibs</th><th>Last seen</th>
+                    <th>User</th> <th>Points</th> <th>Flags</th> <th>Frags</th> <th>Gibs</th>
+                    <th>Time played</th>
+                    <th>Last seen</th>
+
                 </tr>
             </thead>
             <tbody>
@@ -18,6 +21,9 @@
                         </th>
                             <td>@us.points</td>
                             <td>@us.flags</td> <td>@us.frags</td> <td>@us.gibs</td>
+                            @if(showTime) {
+                                <td>@us.timePlayedText</td>
+                            }
                             <td><time is="relative-time" datetime="@us.lastSeen.toString.take(20)">@us.lastSeen</time></td>
                         </tr>
                     }

@@ -15,7 +15,8 @@ case class Aggregate(users: Map[String, UserStatistics]) {
           copy(
             users = users.updated(
               key = user,
-              value = f(users.getOrElse(user, UserStatistics.empty(time = timedPlayerMessage.time)).copy(lastSeen = timedPlayerMessage.time))
+              value = f(users.getOrElse(user, UserStatistics.empty(time = timedPlayerMessage.time))
+                .see(atTime = timedPlayerMessage.time))
             )
           )
         }
