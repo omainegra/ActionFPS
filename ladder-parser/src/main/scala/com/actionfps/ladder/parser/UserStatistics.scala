@@ -14,13 +14,16 @@ case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDate
 
   def points = (2 * frags) + (3 * gibs) + (15 * flags)
 
-  def see(atTime: ZonedDateTime) = copy(
-    lastSeen = atTime,
-    timePlayed = timePlayed + {
-      val d = (atTime.toEpochSecond - lastSeen.toEpochSecond)
-      if ( d < 120 ) d else 0
-    }
-  )
+  def see(atTime: ZonedDateTime) = {
+    if (atTime.isBefore(lastSeen)) this
+    else copy(
+      lastSeen = atTime,
+      timePlayed = timePlayed + {
+        val d = atTime.toEpochSecond - lastSeen.toEpochSecond
+        if (d < 120) d else 0
+      }
+    )
+  }
 
   def timePlayedText = {
     val duration = Duration.ofSeconds(timePlayed)
