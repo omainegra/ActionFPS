@@ -72,16 +72,17 @@ case class AchievementsRepresentation(completedAchievements: List[CompletedAchie
                                       partialAchievements: List[PartialAchievement],
                                       switchNotAchieveds: List[SwitchNotAchieved])
 
-case class CompletedAchievement(title: String, description: String, at: String, captureMaster: Option[CaptureMaster])
-
-case class PartialAchievement(title: String, description: String, percent: Int, captureMaster: Option[CaptureMaster])
-
-case class SwitchNotAchieved(title: String, description: String)
-
-object Jsons {
+object AchievementsRepresentation {
   implicit val captureMasterWriter = Writes[CaptureMaster](_.jsonTable)
   implicit val caFormats = Json.writes[CompletedAchievement]
   implicit val paFormats = Json.writes[PartialAchievement]
   implicit val saFormats = Json.writes[SwitchNotAchieved]
   implicit val arFormats = Json.writes[AchievementsRepresentation]
 }
+
+case class CompletedAchievement(title: String, description: String, at: String, captureMaster: Option[CaptureMaster])
+
+case class PartialAchievement(title: String, description: String, percent: Int, captureMaster: Option[CaptureMaster])
+
+case class SwitchNotAchieved(title: String, description: String)
+

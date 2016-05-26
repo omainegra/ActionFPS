@@ -44,10 +44,6 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
   def hof = Action.async { implicit request =>
     async {
       val h = await(fullProvider.hof)
-      implicit val hofarpW = Json.writes[HOF.AchievementRecordPlayer]
-      implicit val achW = Writes[Achievement](ach => Json.toJson(Map("title" -> ach.title, "description" -> ach.description)))
-      implicit val hofarW = Json.writes[HOF.AchievementRecord]
-      implicit val hofW = Json.writes[HOF]
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(h))
       else
@@ -57,7 +53,6 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
 
   def rankings = Action.async { implicit request =>
     async {
-      import PlayersStats.ImplicitWrites._
       val ranks = await(fullProvider.playerRanks).onlyRanked
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(ranks))
@@ -71,12 +66,6 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
       await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>
           if (request.getQueryString("format").contains("json")) {
-            implicit val fpw = {
-              import com.actionfps.achievements.Jsons._
-              implicit val spw = Json.writes[PlayerStat]
-              implicit val lif = Json.writes[LocationInfo]
-              Json.writes[BuiltProfile]
-            }
             Ok(Json.toJson(player.build))
           } else {
             Ok(renderTemplate(None, supportsJson = true, None)(views.html.player.player(player)))

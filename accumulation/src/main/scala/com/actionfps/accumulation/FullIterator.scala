@@ -3,7 +3,8 @@ package com.actionfps.accumulation
 import com.actionfps.achievements.{AchievementsRepresentation, PlayerState}
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.clans.{Clanstats, Clanwars, CompleteClanwar}
-import com.actionfps.players.{PlayerStat, PlayersStats}
+import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
+import play.api.libs.json.Json
 
 /**
   * Created by William on 01/01/2016.
@@ -91,7 +92,7 @@ case class FullIterator
       clanwars = ncw,
       hof = nhof,
       clanstats = newClanstats,
-      playersStats = playersStats.includeGame(richGame)
+      playersStats = playersStats.AtGame(richGame).includeGame
     )
   }
 
@@ -104,12 +105,19 @@ case class FullIterator
         .toList.sortBy(_.id).takeRight(7).reverse
       val achievements = achievementsIterator.map.get(id)
       val rank = playersStats.onlyRanked.players.get(id)
-      FullProfile(user = user, recentGames = recentGames, achievements = achievements, rank = rank)
+      FullProfile(
+        user = user,
+        recentGames = recentGames,
+        achievements = achievements,
+        rank = rank,
+        playerGameCounts = playersStats.gameCounts.get(id)
+      )
     }
 
 }
 
-case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState], rank: Option[PlayerStat]) {
+case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState],
+                       rank: Option[PlayerStat], playerGameCounts: Option[PlayerGameCounts]) {
   def build = BuiltProfile(
     user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo
   )
@@ -133,8 +141,16 @@ case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Op
 
 case class LocationInfo(timezone: Option[String], countryCode: Option[String], countryName: Option[String])
 
+object LocationInfo {
+  implicit val lif = Json.writes[LocationInfo]
+}
+
 case class BuiltProfile(user: User, recentGames: List[JsonGame],
                         achievements: Option[AchievementsRepresentation], rank: Option[PlayerStat],
                         location: Option[LocationInfo]) {
 
+}
+
+object BuiltProfile {
+  implicit val writes = Json.writes[BuiltProfile]
 }

@@ -1,4 +1,5 @@
 @import com.actionfps.accumulation.FullProfile
+@import play.api.libs.json.Json
 @(fullProfile: FullProfile)
 <article id="profile">
     <div class="profile">
@@ -38,6 +39,9 @@
                             }
                         }
                     </table>
+                    @fullProfile.playerGameCounts.map { gc =>
+                        <div class="heatmap" data-json="@Json.toJson(gc).toString"></div>
+                    }
                 </div>
                 <div class="achievements">
                     <h3>Achievements</h3>
