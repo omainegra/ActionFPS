@@ -7,27 +7,29 @@
             <thead>
                 <tr>
                     <th>User</th> <th>Points</th> <th>Flags</th> <th>Frags</th> <th>Gibs</th>
-                    <th>Time played</th>
+                    @if(showTime) {
+                        <th>Time played</th>
+                    }
                     <th>Last seen</th>
 
-                </tr>
+                    </tr>
             </thead>
             <tbody>
-                @aggregate.users.toList.sortBy(_._2.points).reverse.map {
-                    case (id, us) => {
-                        <tr><th><a href=@{
-                            s"/player/?id=$id"
-                        }>@id</a>
-                        </th>
-                            <td>@us.points</td>
-                            <td>@us.flags</td> <td>@us.frags</td> <td>@us.gibs</td>
-                            @if(showTime) {
-                                <td>@us.timePlayedText</td>
-                            }
-                            <td><time is="relative-time" datetime="@us.lastSeen.toString.take(20)">@us.lastSeen</time></td>
-                        </tr>
-                    }
+            @aggregate.users.toList.sortBy(_._2.points).reverse.map {
+                case (id, us) => {
+                    <tr><th><a href=@{
+                        s"/player/?id=$id"
+                    }>@id</a>
+                    </th>
+                        <td>@us.points</td>
+                        <td>@us.flags</td> <td>@us.frags</td> <td>@us.gibs</td>
+                        @if(showTime) {
+                            <td>@us.timePlayedText</td>
+                        }
+                        <td><time is="relative-time" datetime="@us.lastSeen.toString.take(20)">@us.lastSeen</time></td>
+                    </tr>
                 }
+            }
             </tbody>
         </table>
     </div>
