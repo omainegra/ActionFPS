@@ -1,7 +1,7 @@
 package providers.full
 
 import akka.agent.Agent
-import com.actionfps.accumulation.{HOF, FullIterator, FullProfile}
+import com.actionfps.accumulation.{FullIterator, FullProfile, HOF}
 import com.actionfps.clans.{Clanstats, Clanwars}
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats

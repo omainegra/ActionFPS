@@ -110,7 +110,6 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
       game.teams.forall(_.players.forall(_.score.isDefined)) && game.teams.map(_.players.size).toSet.size == 1
     }
 
-
     private def eloAdditions: Map[String, Double] = {
       val playersCount = game.teams.map(_.players.size).sum
       val elos: List[Double] = teamsElo

@@ -742,6 +742,10 @@ input {
 #clan-ranks {
   order:7;
 }
+.day-cell-tooltip {
+  margin-top:20em;
+  margin-left:10em;
+}
 @media screen and (min-height: 850px) and (min-width:1880px) {
   #bulletins {
     min-width:30em;

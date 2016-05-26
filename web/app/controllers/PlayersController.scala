@@ -8,7 +8,6 @@ import javax.inject._
 
 import com.actionfps.accumulation.{LocationInfo, HOF, BuiltProfile}
 import com.actionfps.achievements.immutable.Achievement
-import com.actionfps.players.{PlayerStat, PlayersStats}
 import play.api.Configuration
 import play.api.libs.json.{Writes, JsObject, Json}
 import play.api.libs.ws.WSClient

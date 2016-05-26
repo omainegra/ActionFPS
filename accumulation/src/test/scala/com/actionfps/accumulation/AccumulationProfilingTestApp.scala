@@ -48,10 +48,11 @@ object AccumulationProfilingTestApp extends App {
     playersStats = PlayersStats.empty
   )
   val result = games.foldLeft(fit)(_.includeGame(_))
-  result.events.map(_("text")).foreach(println)
+  result.events.map(_ ("text")).foreach(println)
   println("Done")
-//  println(result)
+  //  println(result)
 }
+
 // project accumulation
 // set cancelable in Global := true
 // set fork in test in run := true

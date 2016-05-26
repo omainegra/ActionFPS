@@ -110,7 +110,7 @@ case class FullIterator
         recentGames = recentGames,
         achievements = achievements,
         rank = rank,
-        playerGameCounts = playersStats.gameCounts.get(id)
+        playerGameCounts = playersStats.onlyRanked.gameCounts.get(id)
       )
     }
 
@@ -118,25 +118,27 @@ case class FullIterator
 
 case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState],
                        rank: Option[PlayerStat], playerGameCounts: Option[PlayerGameCounts]) {
+
   def build = BuiltProfile(
-    user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo
+    user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo, playerGameCounts
   )
 
-  def locationInfo: Option[LocationInfo] = if (recentGames.isEmpty) None
-  else {
-    val myPlayers = recentGames
-      .flatMap(_.teams)
-      .flatMap(_.players)
-      .filter(_.user.contains(user.id))
-    val recentTimezones = myPlayers.flatMap(_.timezone).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
-    val recentCountryCodes = myPlayers.flatMap(_.countryCode).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
-    val recentCountryNames = myPlayers.flatMap(_.countryName).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
-    Some(LocationInfo(
-      timezone = recentTimezones.lastOption.map(_._1),
-      countryCode = recentCountryCodes.lastOption.map(_._1),
-      countryName = recentCountryNames.lastOption.map(_._1)
-    ))
-  }
+  def locationInfo: Option[LocationInfo] =
+    if (recentGames.isEmpty) None
+    else {
+      val myPlayers = recentGames
+        .flatMap(_.teams)
+        .flatMap(_.players)
+        .filter(_.user.contains(user.id))
+      val recentTimezones = myPlayers.flatMap(_.timezone).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
+      val recentCountryCodes = myPlayers.flatMap(_.countryCode).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
+      val recentCountryNames = myPlayers.flatMap(_.countryName).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
+      Some(LocationInfo(
+        timezone = recentTimezones.lastOption.map(_._1),
+        countryCode = recentCountryCodes.lastOption.map(_._1),
+        countryName = recentCountryNames.lastOption.map(_._1)
+      ))
+    }
 }
 
 case class LocationInfo(timezone: Option[String], countryCode: Option[String], countryName: Option[String])
@@ -147,7 +149,7 @@ object LocationInfo {
 
 case class BuiltProfile(user: User, recentGames: List[JsonGame],
                         achievements: Option[AchievementsRepresentation], rank: Option[PlayerStat],
-                        location: Option[LocationInfo]) {
+                        location: Option[LocationInfo], gameCounts: Option[PlayerGameCounts]) {
 
 }
 
