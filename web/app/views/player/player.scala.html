@@ -4,7 +4,7 @@
 <article id="profile">
     <div class="profile">
         <h1>@fullProfile.user.nickname.nickname</h1>
-        
+
             <div class="main-info">
                 @fullProfile.achievements.map { achievements =>
                 <div class="basics">
@@ -41,6 +41,24 @@
                     </table>
                     @fullProfile.playerGameCounts.map { gc =>
                         <div class="heatmap" data-json="@Json.toJson(gc).toString"></div>
+                        <script type="text/javascript">
+                                (function(heatMapEl) {
+                                    var data = JSON.parse(heatMapEl.getAttribute("data-json"));
+                                    var chartData = data.map(function(item) {
+                                        return {
+                                            date: new Date(item.date),
+                                            count: item.count
+                                        }
+                                    });
+                                    var chart1 = calendarHeatmap()
+                                            .data(chartData)
+                                            .selector('.heatmap')
+                                            .colorRange(['#D8E6E7', '#218380'])
+                                            .tooltipUnit("game")
+                                            .tooltipEnabled(true);
+                                    chart1();  // render the chart
+                                })(document.querySelector(".heatmap"));
+                        </script>
                     }
                 </div>
                 <div class="achievements">
