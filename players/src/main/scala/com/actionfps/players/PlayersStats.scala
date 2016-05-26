@@ -68,10 +68,10 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
         players = players ++ ps.map { p =>
           p.user -> players.get(p.user).map(_ + p).getOrElse(p)
         },
-        gameCounts = gameCounts.updated(
-          key = game.id,
-          value = gameCounts.getOrElse(game.id, PlayerGameCounts.empty).include(ZonedDateTime.parse(game.id))
-        )
+        gameCounts = gameCounts ++
+          game.users.map { user =>
+            user -> gameCounts.getOrElse(user, PlayerGameCounts.empty).include(ZonedDateTime.parse(game.id))
+          }
       )
     }
 
