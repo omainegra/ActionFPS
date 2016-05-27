@@ -1,0 +1,59 @@
+{
+  "query": {
+    "filtered": {
+      "query": {
+        "query_string": {
+          "query": "*",
+          "analyze_wildcard": true
+        }
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "*"
+                }
+              }
+            },
+            {
+              "range": {
+                "date": {
+                  "gte": 1306456282041,
+                  "lte": 1464309082041,
+                  "format": "epoch_millis"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      }
+    }
+  },
+  "size": 0,
+  "aggs": {
+    "2": {
+      "terms": {
+        "field": "countryName",
+        "size": 25,
+        "order": {
+          "_count": "desc"
+        }
+      },
+      "aggs": {
+        "3": {
+          "terms": {
+            "field": "map",
+            "size": 1,
+            "order": {
+              "_count": "desc"
+            }
+          }
+        }
+      }
+    }
+  }
+}

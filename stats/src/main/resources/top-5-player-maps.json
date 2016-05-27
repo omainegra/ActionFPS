@@ -1,0 +1,72 @@
+{
+  "query": {
+    "filtered": {
+      "query": {
+        "query_string": {
+          "query": "*",
+          "analyze_wildcard": true
+        }
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "query": {
+                "match": {
+                  "user": {
+                    "query": "aarmaa",
+                    "type": "phrase"
+                  }
+                }
+              },
+              "$state": {
+                "store": "appState"
+              }
+            },
+            {
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "*"
+                }
+              }
+            },
+            {
+              "range": {
+                "date": {
+                  "gte": 1306456561417,
+                  "lte": 1464309361417,
+                  "format": "epoch_millis"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      }
+    }
+  },
+  "size": 0,
+  "aggs": {
+    "2": {
+      "terms": {
+        "field": "map",
+        "size": 5,
+        "order": {
+          "_count": "desc"
+        }
+      },
+      "aggs": {
+        "3": {
+          "terms": {
+            "field": "winner",
+            "size": 3,
+            "order": {
+              "_count": "desc"
+            }
+          }
+        }
+      }
+    }
+  }
+}

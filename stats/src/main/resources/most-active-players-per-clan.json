@@ -1,0 +1,86 @@
+{
+  "query": {
+    "filtered": {
+      "query": {
+        "query_string": {
+          "query": "*",
+          "analyze_wildcard": true
+        }
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "*"
+                }
+              }
+            },
+            {
+              "range": {
+                "date": {
+                  "gte": 1306456282041,
+                  "lte": 1464309082041,
+                  "format": "epoch_millis"
+                }
+              }
+            }
+          ],
+          "must_not": [
+            {
+              "query": {
+                "match": {
+                  "clan": {
+                    "query": "",
+                    "type": "phrase"
+                  }
+                }
+              },
+              "$state": {
+                "store": "appState"
+              }
+            },
+            {
+              "query": {
+                "match": {
+                  "user": {
+                    "query": "",
+                    "type": "phrase"
+                  }
+                }
+              },
+              "$state": {
+                "store": "appState"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "size": 0,
+  "aggs": {
+    "2": {
+      "terms": {
+        "field": "clan",
+        "size": 12,
+        "order": {
+          "_count": "desc"
+        }
+      },
+      "aggs": {
+        "3": {
+          "terms": {
+            "field": "user",
+            "size": 5,
+            "order": {
+              "_count": "desc"
+            }
+          }
+        }
+      }
+    }
+  }
+}
