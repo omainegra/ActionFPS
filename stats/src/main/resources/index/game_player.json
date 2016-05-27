@@ -1,0 +1,43 @@
+{
+  "game_player": {
+    "mappings": {
+      "game_player": {
+        "properties": {
+          "start_time": {
+            "type": "date"
+          },
+          "end_time": {
+            "type": "date"
+          },
+          "location": {
+            "type": "geo_point"
+          },
+          "score": {
+            "type": "integer"
+          },
+          "frags": {
+            "type": "integer"
+          },
+          "flags": {
+            "type": "integer"
+          },
+          "deaths": {
+            "type": "integer"
+          }
+        },
+        "dynamic_templates": [
+          {
+            "notanalyzed": {
+              "match": "*",
+              "match_mapping_type": "string",
+              "mapping": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

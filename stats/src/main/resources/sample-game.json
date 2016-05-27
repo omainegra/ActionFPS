@@ -1,0 +1,70 @@
+{
+  "id": "2016-05-27T09:51:28Z",
+  "endTime": "2016-05-27T11:42:47+02:00",
+  "map": "ac_sunset",
+  "mode": "ctf",
+  "state": "open",
+  "teams": [
+    {
+      "name": "CLA",
+      "flags": 7,
+      "frags": 89,
+      "players": [
+        {
+          "name": "Pi_md",
+          "score": 505,
+          "flags": 5,
+          "frags": 35,
+          "deaths": 51,
+          "clan": "pi",
+          "countryCode": "IN",
+          "countryName": "India",
+          "timezone": "Asia/Kolkata"
+        },
+        {
+          "name": "|DnC|anyone",
+          "score": 755,
+          "flags": 2,
+          "frags": 54,
+          "deaths": 45,
+          "user": "piotrekmpc",
+          "clan": "dnc",
+          "countryCode": "PL",
+          "countryName": "Poland",
+          "timezone": "Europe/Warsaw"
+        }
+      ]
+    },
+    {
+      "name": "RVSF",
+      "flags": 5,
+      "frags": 95,
+      "players": [
+        {
+          "name": "|KH|32",
+          "score": 455,
+          "flags": 3,
+          "frags": 33,
+          "deaths": 49,
+          "user": "thirtytwo",
+          "clan": "kh",
+          "countryCode": "US",
+          "countryName": "United States",
+          "timezone": "America/Chicago"
+        },
+        {
+          "name": "Godlike",
+          "score": 778,
+          "flags": 2,
+          "frags": 62,
+          "deaths": 41,
+          "countryCode": "US",
+          "countryName": "United States",
+          "timezone": "America/Chicago"
+        }
+      ]
+    }
+  ],
+  "server": "62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#1999]",
+  "duration": 15
+}
