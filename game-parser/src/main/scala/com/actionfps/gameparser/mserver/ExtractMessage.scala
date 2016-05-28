@@ -12,11 +12,6 @@ import scala.util.control.NonFatal
   * Created by William on 11/11/2015.
   */
 object ExtractMessage {
-  /**
-    * @return server identifier & message
-    */
-  val oldMatcher =
-    """Date: (.*), Server: (.*), Payload: (.*)""".r
 
   /**
     * Fast matcher. 90% faster than the above regex. One small change! :-O

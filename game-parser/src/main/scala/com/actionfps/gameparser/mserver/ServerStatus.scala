@@ -10,27 +10,29 @@ import scala.util.Try
   */
 object ServerStatus {
 
-  val regex = """Status at ([^ ]+ [^ ]+): (\d+) remote.*""".r
+  import fastparse.all._
 
-  object ExtractInt {
-    def unapply(input: String) = Try(input.toInt).toOption
+  val dig = CharIn('0' to '9')
+  val ddig = dig ~ dig
+  val ddddig = ddig ~ ddig
+  val date = ddig ~ "-" ~ ddig ~ "-" ~ ddddig
+  val time = ddig ~ ":" ~ ddig ~ ":" ~ ddig
+  val dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
+  val dtime = (date ~ " " ~ time).!.map { v =>
+    LocalDateTime.parse(v, dtf)
   }
 
-  object ExtractLDT {
-    val dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
+  val intM = CharIn('0' to '9').rep.!.map(_.toInt)
 
-    def unapply(input: String): Option[LocalDateTime] = {
-      Try(LocalDateTime.parse(input, dtf)).toOption
-    }
-  }
+  val mtch = "Status at " ~ dtime ~ ": " ~ intM ~ " remote" ~ AnyChar.rep
 
   /**
     * second parameter = # of clients
     */
   def unapply(input: String): Option[(LocalDateTime, Int)] = {
-    PartialFunction.condOpt(input) {
-      case regex(ExtractLDT(ldt), ExtractInt(num)) =>
-        (ldt, num)
+    val r = mtch.parse(input)
+    PartialFunction.condOpt(r) {
+      case Parsed.Success(rr, _) => rr
     }
   }
 

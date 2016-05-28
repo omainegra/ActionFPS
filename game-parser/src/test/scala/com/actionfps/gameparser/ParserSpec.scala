@@ -1,10 +1,46 @@
 package com.actionfps.gameparser
 
 import com.actionfps.gameparser.ingesters._
+import fastparse.all._
 import org.scalatest._
 
 class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with OptionValues {
+
   "Demo capture" must {
+
+    "parse demo written" in {
+      val input = """demo written to file "demos/20141214_1547_local_ac_aqueous_4min_TDM.dmo" (115739 bytes)"""
+      val DemoWritten(dw) = input
+      dw.filename shouldEqual "demos/20141214_1547_local_ac_aqueous_4min_TDM.dmo"
+      dw.size shouldEqual "115739 bytes"
+    }
+
+    "Parse date" in {
+      DemoRecorded.year.parse("2014").get
+      val input = "Thu Dec 18 19:24:56 2014"
+      DemoRecorded.timestampParse.parse(input).get
+      val Parsed.Success(res, _) = DemoRecorded.timestampParse.!.parse(input)
+      res shouldEqual input
+    }
+    "Parse map" in {
+      val input = "ac_mines"
+      val Parsed.Success(res, _) = DemoRecorded.mapName.!.parse(input)
+      res shouldEqual input
+    }
+    "Parse size" in {
+      val input = "610.60kB"
+      val Parsed.Success(res, _) = DemoRecorded.size.!.parse(input)
+      res shouldEqual input
+    }
+
+    "Parse a basic bit" in {
+      val input = "Thu Dec 18 19:24:56 2014: ctf, ac_gothic, 610.60kB"
+      val Parsed.Success(res, _) = DemoRecorded.quotedBit.parse(input)
+      res.dateTime shouldBe "Thu Dec 18 19:24:56 2014"
+      res.mode shouldBe "ctf"
+      res.map shouldBe "ac_gothic"
+      res.size shouldBe "610.60kB"
+    }
     "Not fail another demo" in {
       val inputSequence =
         """
@@ -50,7 +86,8 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
 
     }
   }
-  "Duration calculator" must {
+
+  "Duration calculator" ignore {
     "Report current game properly" in {
       val inputSequence =
         """
@@ -69,6 +106,58 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
       fifth shouldBe GameFinished(15)
     }
   }
+
+  "Game parse" must {
+    "Parse a finish line" in {
+      val input = "Game status: team deathmatch on ac_aqueous, game finished, open, 6 clients"
+      val GameFinishedHeader(h) = input
+      h.map shouldBe "ac_aqueous"
+      h.state shouldBe "open"
+    }
+    "Parse in progress" in {
+      val input = "Game status: hunt the flag on ac_depot, 14 minutes remaining, open, 4 clients"
+      val GameInProgressHeader(h) = input
+      h.map shouldBe "ac_depot"
+      h.remaining shouldBe 14
+    }
+    "Parse frag game score" in {
+      val line = " 0 Daimon           RVSF    -12    0     3  0   32 normal  2.12.186.32"
+      val line2 = " 1 ~FEL~.RayDen     RVSF     57    8     2  0  169 normal  186.83.65.12"
+      val TeamModes.FragStyle.IndividualScore(r) = line
+      val TeamModes.FragStyle.IndividualScore(r2) = line2
+    }
+    "Parse flag game score" in {
+      val line = "1 w00p|Lucas       RVSF    1    514   45    42  0  112 normal  138.231.142.200"
+      val TeamModes.FlagStyle.IndividualScore(r) = line
+    }
+    "Parse team flag score" in {
+      val line = "Team  CLA:  0 players,    0 frags,    0 flags"
+      val TeamModes.FlagStyle.TeamScore(t) = line
+    }
+    "Parse a disconnected TDM score" in {
+      val line = "   ~FEL~MR.JAM      RVSF    1    7       -    - disconnected"
+      val TeamModes.FragStyle.IndividualScoreDisconnected(t) = line
+    }
+
+    /** This was to test my fastparses **/
+    "Parse game statuses" ignore {
+      val statuses = scala.io.Source.fromFile("accumulation/sample.log")
+        .getLines
+        .filter(_.contains("minutes"))
+        .filter(_.contains("Game status"))
+        .map { l =>
+          val t = "ayload: "
+          l.substring(l.indexOf(t) + t.length)
+        }
+        .toList
+      val l = statuses.map(GameInProgressHeader.unapply)
+      //      val l2 = statuses.map(GameInProgressHeader.unapply2)
+      //      val notMatching = l.zip(l2).zip(statuses).filter{case ((a, b), c) => a != b}
+      //      notMatching.foreach(println)
+      //      notMatching shouldBe empty
+    }
+  }
+
   "Game capture" must {
     "Not fail for a TDM game" in {
       val inputSequence =
@@ -306,6 +395,5 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
     }
 
   }
-
 
 }
