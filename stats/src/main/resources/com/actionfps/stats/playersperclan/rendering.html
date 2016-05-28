@@ -1,0 +1,64 @@
+<!doctype html>
+<!--suppress JSUnfilteredForInLoop -->
+<html>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.css">
+
+<div id="chart" style="height: 200px;">
+    <svg></svg>
+</div>
+
+<script type="text/javascript">
+    var chart = nv.models.multiBarHorizontalChart().stacked(true).showControls(false).showYAxis(false);
+    var inputData = {
+        "clans": ["fd", "ir", "u", "dnc", "kh", "pi"],
+        "unregistered": [1, 0, 0, 0, 0, 1],
+        "totals": [2, 2, 2, 1, 1, 1],
+        "users": {
+            "rafael": {"ir": 1},
+            "piotrekmpc": {"dnc": 1},
+            "fury": {"ir": 1},
+            "catico": {"u": 2},
+            "gazda": {"fd": 1},
+            "thirtytwo": {"kh": 1}
+        }
+    };
+
+    function render_rows(data, unregistered) {
+        var haveDataClans = data.clans.filter(function (clan, idx) {
+            return data.unregistered[idx] != data.totals[idx]
+        });
+        if (unregistered) {
+            haveDataClans = data.clans;
+        }
+        var rows = [];
+        for (var user in data.users) {
+            if (data.users.hasOwnProperty(user)) {
+                var values = haveDataClans.map(function (clan) {
+                    return {x: clan, y: data.users[user][clan] || 0};
+                });
+                rows.push({key: user, values: values});
+            }
+        }
+        if (unregistered) {
+            rows.push({
+                key: 'Unregistered',
+                color: "grey",
+                values: haveDataClans.map(function (clan, idx) {
+                    return {x: clan, y: data.unregistered[idx]};
+                })
+            });
+        }
+        return rows;
+    }
+    d3.json('most-active-players-per-clan.result.json', function (data) {
+        var newData = render_rows(inputData);
+        d3.select('#chart svg').datum(newData)
+                .transition().duration(500).call(chart);
+    });
+</script>
+
+</body>
+</html>

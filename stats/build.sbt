@@ -4,3 +4,6 @@ libraryDependencies += json
 libraryDependencies += "com.propensive" %% "rapture-json" % "2.0.0-M5"
 libraryDependencies += "com.propensive" %% "rapture-json-circe" % "2.0.0-M5"
 
+run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in(Compile, run), runner in(Compile, run))
+
+runMain in Compile <<= Defaults.runMainTask(fullClasspath in Compile, runner in(Compile, run))

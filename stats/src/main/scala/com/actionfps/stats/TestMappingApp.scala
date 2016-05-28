@@ -46,8 +46,8 @@ object TestMappingApp extends App {
   }
 
   val m = new ObjectMapper()
-//    val rootNode = m.readTree(getClass.getResourceAsStream("/sample-game.json")).asInstanceOf[ObjectNode]
-//  val rootNode = m.readTree(new URL("https://actionfps.com/game/?id=2016-05-28T00:30:42Z&format=json").openStream()).asInstanceOf[ObjectNode]
+  //    val rootNode = m.readTree(getClass.getResourceAsStream("/sample-game.json")).asInstanceOf[ObjectNode]
+  //  val rootNode = m.readTree(new URL("https://actionfps.com/game/?id=2016-05-28T00:30:42Z&format=json").openStream()).asInstanceOf[ObjectNode]
   val rootNode = m.readTree(new URL("https://actionfps.com/game/?id=2016-05-27T22:21:22Z&format=json").openStream()).asInstanceOf[ObjectNode]
   enrichTimes(rootNode)
   val gms = flattenGamePlayers(rootNode).map(g => g -> m.writeValueAsString(g))
@@ -81,7 +81,7 @@ object TestMappingApp extends App {
     "dontanalyse" typed StringType index NotAnalyzed
   ) matching "*" matchMappingType "string"
 
-//  client.execute(delete index "games").await
+  //  client.execute(delete index "games").await
   Thread.sleep(500)
 
   val gpMap = mapping("game_player") fields (
@@ -92,7 +92,7 @@ object TestMappingApp extends App {
     ) dynamicTemplates defaultDynamic
 
   val gMap = mapping("game") fields standardMappings dynamicTemplates defaultDynamic
-//  client.execute(create index "games" mappings(gpMap, gMap)).await
+  //  client.execute(create index "games" mappings(gpMap, gMap)).await
   Thread.sleep(1000)
 
   gms.foreach { gm =>
