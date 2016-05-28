@@ -30,7 +30,7 @@ object DemoRecorded {
   val year = digit ~ digit ~ digit ~ digit
   val timestampParse = threeLetterUpper ~ " " ~ threeLetterUpper ~ " " ~ twoDigits ~ " " ~ time ~ " " ~ year
 
-  val mapName = (P("ac_") ~ (upperCase | lowerCase).rep(1)).!
+  val mapName = (P("ac_") ~ CharsWhile(c => c != ',' && c != ' ').rep(1)).!
 
   val size = digit.rep(min = 1) ~ ("." ~ digit.rep ~ (upperCase | lowerCase).rep)
   val mrBit = ", " ~ digit.rep ~ " mr"
@@ -39,9 +39,6 @@ object DemoRecorded {
     .map { case (ts, mode, map, s) => DemoRecorded(ts, mode, map, s) }
 
   val fullCap = "Demo \"" ~ quotedBit ~ "\" recorded."
-
-  val capture = """Demo "(.*):\s+(.*), ([^\s]+), (\d+[^\s]+), .*" recorded\.""".r
-  val capture2 = """Demo "(.*):\s+(.*), ([^\s]+), (\d+[^\s]+)" recorded\.""".r
 
   def unapply(input: String): Option[DemoRecorded] = {
     val res = fullCap.parse(input)
