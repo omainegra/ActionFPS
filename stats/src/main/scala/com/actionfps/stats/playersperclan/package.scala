@@ -26,7 +26,51 @@ package object playersperclan {
     jv.as[Json]
   }
 
-  case class PlayersPerClan(clans: List[String], unregistered: List[Int], totals: List[Int], users: Map[String, Map[String, Int]])
+  object PlayersPerClan {
+    def empty: PlayersPerClan = PlayersPerClan(clans = List.empty, unregistered = List.empty,
+      totals = List.empty, users = Map.empty)
+  }
+
+  case class PlayersPerClan(clans: List[String], unregistered: List[Int], totals: List[Int], users: Map[String, Map[String, Int]]) {
+
+    private def ensureClan(clan: String): PlayersPerClan = {
+      if (clans.contains(clan)) this
+      else copy(
+        clans = clans :+ clan,
+        totals = totals :+ 0,
+        unregistered = unregistered :+ 0
+      )
+    }
+
+    private def withPlayer(player: Player): PlayersPerClan = {
+      player.clan match {
+        case None => this
+        case Some(clan) =>
+          val withClan = ensureClan(clan)
+          val clanIndex = withClan.clans.indexOf(clan)
+          val withPartition = player.user match {
+            case Some(user) =>
+              withClan.copy(
+                users = {
+                  val userClanCounts = users.getOrElse(user, Map.empty)
+                  users.updated(user, userClanCounts.updated(clan, userClanCounts.getOrElse(clan, 0) + 1))
+                }
+              )
+            case None =>
+              withClan.copy(
+                unregistered = withClan.unregistered.updated(clanIndex, withClan.unregistered(clanIndex) + 1)
+              )
+          }
+          withPartition.copy(
+            totals = withPartition.totals.updated(clanIndex, withPartition.totals(clanIndex) + 1)
+          )
+      }
+    }
+
+    def include(game: Game): PlayersPerClan = {
+      game.teams.flatMap(_.players).foldLeft(this)(_.withPlayer(_))
+    }
+  }
 
   def transformResult(jsn: Json): PlayersPerClan = {
     val rslt = for {
@@ -53,5 +97,6 @@ package object playersperclan {
       users = players
     )
   }
+
 
 }

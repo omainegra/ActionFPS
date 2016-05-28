@@ -15,4 +15,8 @@ object SimplifyAggregationApp extends App {
   val q = transformResult(jsn)
   val out = Json.format(Json(q))
   println(out)
+  val gameNode = Json.parse(scala.io.Source.fromInputStream(getClass.getResourceAsStream("/sample-game.json")).mkString)
+  val res = PlayersPerClan.empty.include(GameReader(gameNode))
+  println(res)
+
 }
