@@ -128,6 +128,7 @@ lazy val gameParser =
     .settings(
       rpmVendor := "typesafe",
       libraryDependencies += json,
+      libraryDependencies += "com.lihaoyi" %% "fastparse" % "0.3.7",
       libraryDependencies += scalactic,
       rpmBrpJavaRepackJars := true,
       rpmLicense := Some("BSD"),
