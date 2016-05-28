@@ -10,6 +10,7 @@
       "filter": {
         "bool": {
           "must": [
+            {"exists": {"field": "player.clan"}},
             {
               "query": {
                 "query_string": {
@@ -20,39 +21,10 @@
             },
             {
               "range": {
-                "date": {
-                  "gte": 1306456282041,
-                  "lte": 1464309082041,
-                  "format": "epoch_millis"
+                "utcStartTime": {
+                  "gte": "2016-05-01T09:42:47Z",
+                  "lte": "2016-05-28T09:42:47Z"
                 }
-              }
-            }
-          ],
-          "must_not": [
-            {
-              "query": {
-                "match": {
-                  "clan": {
-                    "query": "",
-                    "type": "phrase"
-                  }
-                }
-              },
-              "$state": {
-                "store": "appState"
-              }
-            },
-            {
-              "query": {
-                "match": {
-                  "user": {
-                    "query": "",
-                    "type": "phrase"
-                  }
-                }
-              },
-              "$state": {
-                "store": "appState"
               }
             }
           ]
@@ -62,18 +34,21 @@
   },
   "size": 0,
   "aggs": {
-    "2": {
+    "clans": {
       "terms": {
-        "field": "clan",
+        "field": "player.clan",
         "size": 12,
         "order": {
           "_count": "desc"
         }
       },
       "aggs": {
-        "3": {
+        "unregistered": {
+          "missing": {"field": "player.user"}
+        },
+        "registered_players": {
           "terms": {
-            "field": "user",
+            "field": "player.user",
             "size": 5,
             "order": {
               "_count": "desc"
