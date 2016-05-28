@@ -1,7 +1,6 @@
 package com.actionfps.stats
 
-import algebra.Semigroup
-import com.actionfps.stats.cumulativeplayer.CumulativePlayer
+import com.actionfps.stats.cumulativeplayer.PlayerAccumulation
 
 /**
   * Created by me on 28/05/2016.
@@ -9,22 +8,16 @@ import com.actionfps.stats.cumulativeplayer.CumulativePlayer
 object AccumulateApp extends App {
 
   import rapture.json._
-  import rapture.json.jsonBackends.circe._
   import formatters.compact._
+  import rapture.json.jsonBackends.circe._
 
   val result = scala.io.Source.fromFile("games.txt").getLines().map(g =>
     GameReader(Json.parse(g)))
-    .take(1000)
-    .foldLeft(CumulativePlayer.empty)(_.includeGame(_))
+    .take(400)
+    .foldLeft(PlayerAccumulation.empty)(_.includeGame(_))
 
   println(result)
   println(Json.format(Json(result)))
-
-  import cats.derived._
-  import semigroup._
-  import legacy._
-  import cats.std.all._
-  println(Semigroup[CumulativePlayer].combine(CumulativePlayer.empty,CumulativePlayer.empty))
 
 
 }
