@@ -245,7 +245,8 @@ lazy val ladderParser =
 lazy val stats = project
   .dependsOn(accumulation)
   .settings(
-    libraryDependencies += xml
+    libraryDependencies += xml,
+    libraryDependencies += json
   )
 
 updateOptions in Global := (updateOptions in Global).value.withCachedResolution(true)

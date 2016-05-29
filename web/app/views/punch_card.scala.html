@@ -1,0 +1,20 @@
+@import com.actionfps.stats.Stats.PunchCard
+@import play.api.libs.json.Json
+@(punchCard: PunchCard)
+<div id="punchcard" data-punched="@Json.toJson(punchCard)"></div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.3.11/d3.min.js"></script>
+<script src="/assets/d3.punchcard.js"></script>
+
+<script type="text/javascript">
+        (function () {
+            var punchSelector = "#punchcard";
+            var docWidth = document.getElementById('punchcard').offsetWidth;
+            var jsonData = document.querySelector(punchSelector).getAttribute("data-punched");
+            console.log(jsonData);
+            var data = JSON.parse(jsonData).map(d3.entries);
+            new D3punchcard({
+                data: data,
+                element: punchSelector
+            }).draw({width: docWidth});
+        })();
+</script>
