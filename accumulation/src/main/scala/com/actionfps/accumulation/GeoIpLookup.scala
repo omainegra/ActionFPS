@@ -13,7 +13,7 @@ object GeoIpLookup extends IpLookup {
     val A = new File("resources/GeoLiteCityv6.dat")
     val B = new File("web/resources/GeoLiteCityv6.dat")
     val C = new File("../resources/GeoLiteCityv6.dat")
-    val D = new File("target/geoip-resources./GeoLiteCityv6.dat")
+    val D = new File("target/geoip-resources/GeoLiteCityv6.dat")
     List(A, B, C, D).filter(_.exists()).head
   }
 
