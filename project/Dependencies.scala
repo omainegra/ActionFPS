@@ -9,12 +9,12 @@ trait Dependencies {
   val async = "org.scala-lang.modules" %% "scala-async" % "0.9.5"
   val xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
   val commonsNet = "commons-net" % "commons-net" % "3.5"
-  val jodaTime = "joda-time" % "joda-time" % "2.9.3"
+  val jodaTime = "joda-time" % "joda-time" % "2.9.4"
   val jodaConvert = "org.joda" % "joda-convert" % "1.8.1"
-  val commonsCsv = "org.apache.commons" % "commons-csv" % "1.3"
-  val jsoup = "org.jsoup" % "jsoup" % "1.9.1"
+  val commonsCsv = "org.apache.commons" % "commons-csv" % "1.4"
+  val jsoup = "org.jsoup" % "jsoup" % "1.9.2"
   val groovy = "org.codehaus.groovy" % "groovy-all" % "2.4.6"
-  val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.2"
+  val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.3"
   val fluentHc = "org.apache.httpcomponents" % "fluent-hc" % "4.5.2"
   val commonsIo = "commons-io" % "commons-io" % "2.5"
   val scalatestPlus = "org.scalatestplus" %% "play" % "1.4.0" % "test"
@@ -32,6 +32,6 @@ trait Dependencies {
 
   val mockito = "org.mockito" % "mockito-all" % "1.10.19" % "test"
 
-  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.4"
+  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.6"
 
 }
