@@ -2,7 +2,7 @@ package providers.games
 
 import javax.inject.{Inject, Singleton}
 
-import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.enrichers.{JsonGame, xJsonGame}
 import akka.agent.Agent
 import controllers.Common
 import play.api.Configuration
@@ -29,7 +29,7 @@ class ApiAllGamesProvider @Inject()(configuration: Configuration)
     response.body.split("\n").toIterator.map { line =>
       line.split("\t").toList match {
         case List(id, json) =>
-          id -> JsonGame.fromJson(json).flattenPlayers
+          id -> xJsonGame.fromJson(json).flattenPlayers
       }
     }.toMap
   )

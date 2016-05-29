@@ -61,6 +61,7 @@ class ServerStatusParserTest
   }
 
   ignore("MSP against a local thing") {
+    import enrichers._
     scala.io.Source.fromFile("../j.log")
       .getLines()
       .scanLeft(MultipleServerParser.empty)(_.process(_))

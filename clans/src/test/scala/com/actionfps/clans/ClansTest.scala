@@ -2,7 +2,7 @@ package com.actionfps.clans
 
 import java.net.URL
 
-import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.enrichers._
 import org.scalatest.{Matchers, FunSuite}
 import play.api.libs.json.Json
 

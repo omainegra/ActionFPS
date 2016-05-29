@@ -4,7 +4,7 @@ import java.io.File
 import java.net.URL
 
 import com.actionfps.clans.{Clanstats, Clanwars}
-import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.enrichers._
 import com.actionfps.players.PlayersStats
 import com.actionfps.reference.{ClanRecord, NicknameRecord, Registration}
 import jdk.nashorn.api.scripting.URLReader
@@ -21,7 +21,7 @@ object AccumulationProfilingTestApp extends App {
       (gamesTxt #> gf).!
     }
     val file = scala.io.Source.fromFile(gf)
-    try file.getLines().map(JsonGame.fromJson).toList
+    try file.getLines().map(xJsonGame.fromJson).toList
     finally file.close()
   }
 

@@ -2,25 +2,17 @@ package com.actionfps.gameparser.enrichers
 
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.{Date}
+
+import com.actionfps.api.{Game, GamePlayer, GameTeam}
 import com.actionfps.gameparser.Maps
-import com.actionfps.gameparser.ingesters.{FlagGameBuilder, FoundGame, FragGameBuilder}
-import org.joda.time.{DateTimeZone, DateTime}
-import org.joda.time.format.ISODateTimeFormat
-import play.api.libs.json.{Writes, JsValue, Json, JsObject}
+import com.actionfps.gameparser.ingesters.FoundGame
+import play.api.libs.json.{JsObject, Json, Writes}
+
 import scala.util.hashing.MurmurHash3
 
 case class GameJsonFound(jsonGame: JsonGame)
 
-object JsonGame {
-
-  case class GameAchievement(user: String, text: String)
-
-  implicit val gaf = Json.format[GameAchievement]
-  implicit val vf = ViewFields.ZonedWrite
-  implicit val Af = Json.format[JsonGamePlayer]
-  implicit val Bf = Json.format[JsonGameTeam]
-  implicit val fmt = Json.format[JsonGame]
+object xJsonGame {
 
   def fromJson(string: String): JsonGame = {
     val g = Json.fromJson[JsonGame](Json.parse(string)).get
@@ -31,7 +23,7 @@ object JsonGame {
 
   def build(id: String, foundGame: FoundGame, endDate: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
 
-    JsonGame(
+    Game(
       clanwar = None,
       id = id,
       endTime = endDate,
@@ -47,15 +39,15 @@ object JsonGame {
         val tp = foundGame.game.fold(g => (g.scores ++ g.disconnectedScores).map(_.project),
           g => (g.scores ++ g.disconnectedScores).map(_.project))
 
-        for {team <- tt.sortBy(team => (team.flags, team.frags)).reverse.toList}
-          yield JsonGameTeam(
+        for {team <- tt.sortBy(team => (team.flags, team.frags)).reverse}
+          yield GameTeam(
             name = team.name,
             flags = team.flags,
             frags = team.frags,
             clan = None,
             players = {
               for {player <- tp.filter(_.team == team.name).sortBy(p => (p.flag, p.frag)).reverse}
-                yield JsonGamePlayer(
+                yield GamePlayer(
                   name = player.name,
                   host = player.host,
                   score = player.score,
@@ -94,11 +86,12 @@ trait IpLookup {
   def lookup(ip: String): IpLookup.IpLookupResult
 }
 
-case class JsonGamePlayer(name: String, host: Option[String], score: Option[Int],
-                          flags: Option[Int], frags: Int, deaths: Int, user: Option[String], clan: Option[String],
-                          countryCode: Option[String], countryName: Option[String], timezone: Option[String]) {
+class RichGamePlayer(gamePlayer: JsonGamePlayer) {
+
+  import gamePlayer._
+
   def addIpLookupResult(ipLookup: IpLookup.IpLookupResult): JsonGamePlayer = {
-    copy(
+    gamePlayer.copy(
       countryCode = ipLookup.countryCode orElse countryCode,
       countryName = ipLookup.countryName orElse countryName,
       timezone = ipLookup.timezone orElse timezone
@@ -106,43 +99,10 @@ case class JsonGamePlayer(name: String, host: Option[String], score: Option[Int]
   }
 
   def withCountry(implicit lookup: IpLookup): JsonGamePlayer = {
-    host.map(lookup.lookup).map(this.addIpLookupResult).getOrElse(this)
+    host.map(lookup.lookup).map(this.addIpLookupResult).getOrElse(gamePlayer)
   }
 }
 
-case class JsonGameTeam(name: String, flags: Option[Int], frags: Int, players: List[JsonGamePlayer], clan: Option[String]) {
-  def withGeo(implicit lookup: IpLookup): JsonGameTeam = {
-    copy(players = players.map(_.withCountry))
-  }
-
-  /**
-    * A player might disconnect mid-game, get a new IP. Goal here is to sum up their scores properly.
-    */
-  def flattenPlayers = {
-    var newPlayers = players
-    players.groupBy(_.name).collect {
-      case (playerName, them@first :: rest) if rest.nonEmpty =>
-        val newPlayer = JsonGamePlayer(
-          name = playerName,
-          host = first.host,
-          score = first.score.map(_ => them.flatMap(_.score).sum),
-          flags = first.flags.map(_ => them.flatMap(_.flags).sum),
-          frags = them.map(_.frags).sum,
-          deaths = them.map(_.frags).sum,
-          user = first.user,
-          clan = first.clan,
-          countryCode = None,
-          countryName = None,
-          timezone = None
-        )
-        (playerName, newPlayer)
-    }.foreach { case (playerName, newPlayer) =>
-      newPlayers = newPlayers.filterNot(_.name == playerName)
-      newPlayers = newPlayers :+ newPlayer
-    }
-    copy(players = newPlayers.sortBy(player => player.flags -> player.frags).reverse)
-  }
-}
 
 case class ViewFields(startTime: ZonedDateTime, winner: Option[String], winnerClan: Option[String]) {
   def toJson = Json.toJson(this)(ViewFields.jsonFormat)
@@ -154,58 +114,26 @@ object ViewFields {
   implicit val jsonFormat = Json.writes[ViewFields]
 }
 
-case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: String, state: String,
-                    teams: List[JsonGameTeam], server: String, duration: Int, clangame: Option[Set[String]],
-                    clanwar: Option[String], achievements: Option[List[JsonGame.GameAchievement]]) {
+class RichTeam(gameTeam: GameTeam) {
 
-  def users = teams.flatMap(_.players).flatMap(_.user)
+  import gameTeam._
+
+  def withGeo(implicit lookup: IpLookup): GameTeam = {
+    gameTeam.copy(players = players.map(_.withCountry))
+  }
+}
+
+class RichGame(game: Game) {
+
+  import game._
 
   def testHash = {
     Math.abs(MurmurHash3.stringHash(id)).toString
   }
 
-  def withGeo(implicit lookup: IpLookup): JsonGame = {
-    copy(teams = teams.map(_.withGeo))
+  def withGeo(implicit lookup: IpLookup): Game = {
+    game.copy(teams = teams.map(_.withGeo))
   }
-
-  def teamSize = teams.map(_.players.size).min
-
-  def hasUser(user: String) = teams.exists(_.players.exists(_.user.contains(user)))
-
-  def flattenPlayers = transformTeams(_.flattenPlayers)
-
-  def withoutHosts = transformPlayers((_, player) => player.copy(host = None))
-
-  def transformPlayers(f: (JsonGameTeam, JsonGamePlayer) => JsonGamePlayer) =
-    copy(teams = teams.map(team => team.copy(players = team.players.map(player => f(team, player)))))
-
-  def transformTeams(f: JsonGameTeam => JsonGameTeam) = copy(teams = teams.map(f))
-
-  def isTie = winner.isEmpty
-
-  def winner = {
-    for {
-      teamA <- teams
-      scoreA = teamA.flags.getOrElse(teamA.frags)
-      teamB <- teams
-      scoreB = teamB.flags.getOrElse(teamB.frags)
-      if scoreA != scoreB
-    } yield {
-      if (scoreA > scoreB) teamA.name
-      else teamB.name
-    }
-  }.headOption
-
-  def isClangame = clangame.exists(_.nonEmpty)
-
-  def winnerClan =
-    if (isClangame)
-      for {
-        winningTeamName <- winner
-        team <- teams.find(_.name == winningTeamName)
-        clan <- team.clan
-      } yield clan
-    else None
 
   def viewFields = ViewFields(
     startTime = endTime.minusMinutes(duration),
@@ -214,7 +142,7 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
   )
 
   def toJson: JsObject = {
-    Json.toJson(this)(JsonGame.fmt).asInstanceOf[JsObject] ++ viewFields.toJson.asInstanceOf[JsObject]
+    Json.toJson(game).asInstanceOf[JsObject] ++ viewFields.toJson.asInstanceOf[JsObject]
   }
 
   import org.scalactic._
@@ -228,7 +156,7 @@ case class JsonGame(id: String, endTime: ZonedDateTime, map: String, mode: Strin
     else if (minTeamPlayers < 2) Bad(s"One team has $minTeamPlayers players, expecting 2 or more.")
     else if (teams.size < 2) Bad(s"Expected team size >= 2, got ${teams.size}")
     else if (minTeamAverageFrags < 12) Bad(s"One team has average frags $minTeamAverageFrags, expected >= 12 ")
-    else Good(this)
+    else Good(game)
   }
 
 }

@@ -1,10 +1,12 @@
 package com.actionfps.accumulation
 
 import com.actionfps.achievements.{AchievementsRepresentation, PlayerState}
-import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.api.GameAchievement
+import com.actionfps.gameparser.enrichers._
 import com.actionfps.clans.{Clanstats, Clanwars, CompleteClanwar}
 import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
 import play.api.libs.json.Json
+
 
 /**
   * Created by William on 01/01/2016.
@@ -52,7 +54,7 @@ case class FullIterator
         richGame = richGame.copy(
           achievements = Option {
             richGame.achievements.toList.flatten ++ set.map(map =>
-              JsonGame.GameAchievement(
+              GameAchievement(
                 user = map("user"),
                 text = map("text")
               ))
@@ -154,5 +156,6 @@ case class BuiltProfile(user: User, recentGames: List[JsonGame],
 }
 
 object BuiltProfile {
+  import com.actionfps.gameparser.enrichers.xJsonGame._
   implicit val writes = Json.writes[BuiltProfile]
 }

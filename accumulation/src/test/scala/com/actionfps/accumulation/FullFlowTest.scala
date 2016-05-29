@@ -2,16 +2,13 @@ package com.actionfps.accumulation
 
 import java.io.{File, FileWriter}
 
-import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.enrichers._
 import com.actionfps.gameparser.mserver.{MultipleServerParser, MultipleServerParserFoundGame}
 import com.actionfps.reference.{ClanRecord, NicknameRecord, Registration}
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.Json
 
 import scala.io.{Codec, Source}
-import scala.util.hashing.MurmurHash3
 
 /**
   * Created by William on 26/12/2015.
@@ -25,8 +22,9 @@ class FullFlowTest
   lazy val users = Registration.parseRecords(com.actionfps.reference.getSample("registrations.csv")).flatMap(User.fromRegistration(_, nicknames))
   lazy val er = EnrichGames(users, clans)
 
+
   def getSampleGames = {
-    import er.withUsersClass
+    import er._
     val validServers = ValidServers.fromResource
     scala.io.Source.fromFile("accumulation/sample.log")(Codec.UTF8)
       .getLines()

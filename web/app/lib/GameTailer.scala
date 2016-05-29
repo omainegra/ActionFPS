@@ -2,14 +2,15 @@ package lib
 
 import java.io.File
 
-import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.enrichers.{JsonGame, xJsonGame}
 import com.actionfps.accumulation.ValidServers
+import com.actionfps.gameparser.enrichers.Implicits._
 
 class GameTailer(validServers: ValidServers, file: File, endOnly: Boolean)(callback: JsonGame => Unit)
   extends CallbackTailer(file, endOnly)(line =>
     line.split("\t").toList match {
       case List(id, _, _, json) =>
-        val game = JsonGame.fromJson(json)
+        val game = xJsonGame.fromJson(json)
         validServers.items.get(game.server).filter(_.isValid).foreach(vs =>
           game.validate.foreach { goodGame =>
             callback(goodGame.copy(

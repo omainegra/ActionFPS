@@ -13,7 +13,7 @@ import com.actionfps.accumulation.GeoIpLookup
 import com.actionfps.accumulation.ValidServers.ImplicitValidServers._
 import com.actionfps.accumulation.ValidServers.Validator._
 import com.actionfps.gameparser.ProcessJournalApp
-import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.enrichers._
 import org.apache.commons.io.input.Tailer
 import play.api.inject.ApplicationLifecycle
 import play.api.{Configuration, Logger}
@@ -67,7 +67,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
       gamesDatas.par.flatMap { file =>
         val src = scala.io.Source.fromFile(file)
         try src.getLines().filter(_.nonEmpty).map { line =>
-          try JsonGame.fromJson(line.split("\t")(3))
+          try xJsonGame.fromJson(line.split("\t")(3))
           catch {
             case NonFatal(e) => logger.error(s"Could not parse JSON line due to ${e}: $line", e)
               throw e

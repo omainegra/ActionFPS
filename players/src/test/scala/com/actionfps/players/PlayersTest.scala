@@ -2,7 +2,7 @@ package com.actionfps.players
 
 import java.time.ZonedDateTime
 
-import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.gameparser.enrichers._
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.Json
 

@@ -23,7 +23,8 @@ lazy val root =
       ladderParser,
       clans,
       players,
-      stats
+      stats,
+      objects
     ).dependsOn(
     achievements,
     gameParser,
@@ -37,7 +38,8 @@ lazy val root =
     accumulation,
     clans,
     players,
-    stats
+    stats,
+    objects
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -125,6 +127,7 @@ lazy val gameParser =
   )
     .enablePlugins(JavaAppPackaging)
     .enablePlugins(RpmPlugin)
+    .dependsOn(objects)
     .settings(
       rpmVendor := "typesafe",
       libraryDependencies += json,
@@ -250,3 +253,5 @@ lazy val stats = project
   )
 
 updateOptions in Global := (updateOptions in Global).value.withCachedResolution(true)
+
+lazy val objects = project

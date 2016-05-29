@@ -20,6 +20,7 @@ import providers._
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
+import com.actionfps.gameparser.enrichers.Implicits._
 
 /**
   * Created by William on 09/12/2015.

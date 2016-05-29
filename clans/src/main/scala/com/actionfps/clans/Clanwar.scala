@@ -3,7 +3,8 @@ package com.actionfps.clans
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.clans.Conclusion.Namer
 import play.api.libs.json.{JsObject, Writes, Format, Json}
-
+import com.actionfps.gameparser.enrichers._
+import com.actionfps.gameparser.enrichers.xJsonGame._
 /**
   * Created by William on 02/01/2016.
   */

@@ -10,6 +10,7 @@ import play.api.libs.json.Json
 
 import scala.concurrent.{Promise, Future, ExecutionContext}
 import scala.util.Success
+import com.actionfps.gameparser.enrichers.Implicits._
 
 object CachedJournalGamesProvider {
 
