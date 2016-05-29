@@ -5,14 +5,24 @@ import java.net.InetSocketAddress
 import akka.actor.{ActorLogging, Props, Terminated}
 import akka.io.{IO, Udp}
 import akka.util.ByteString
+import com.actionfps.pinger.Pinger.GotParsedResponse
+import com.actionfps.pinger.PongParser.ParsedResponse
 
 object Pinger {
-  def props = Props(new Pinger)
+  def props(implicit serverMappings: ServerMappings) = Props(new Pinger)
+
+  private[pinger] case class GotParsedResponse(from: (String, Int), stuff: ParsedResponse)
+
+  private[pinger] object GotParsedResponse {
+    def apply(inetSocketAddress: InetSocketAddress, stuff: ParsedResponse): GotParsedResponse = {
+      GotParsedResponse((inetSocketAddress.getAddress.getHostAddress, inetSocketAddress.getPort - 1), stuff)
+    }
+  }
 }
 
 import akka.actor.ActorDSL._
 
-class Pinger extends Act with ActorLogging {
+class Pinger(implicit serverMappings: ServerMappings) extends Act with ActorLogging {
 
   val serverStates = scala.collection.mutable.Map.empty[(String, Int), ServerStateMachine].withDefaultValue(NothingServerStateMachine)
 

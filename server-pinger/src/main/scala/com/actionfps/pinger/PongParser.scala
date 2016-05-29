@@ -2,7 +2,7 @@ package com.actionfps.pinger
 
 import akka.util.ByteString
 
-object PongParser {
+private[pinger] object PongParser {
 
   object GetUChar {
     def unapply(byte: Byte): Option[Int] =
