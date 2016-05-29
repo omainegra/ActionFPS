@@ -3,8 +3,9 @@ package com.actionfps.accumulation
 import com.actionfps.achievements.{AchievementsRepresentation, PlayerState}
 import com.actionfps.api.GameAchievement
 import com.actionfps.gameparser.enrichers._
-import com.actionfps.clans.{Clanstats, Clanwars, CompleteClanwar}
+import com.actionfps.clans.{Clanwars, CompleteClanwar}
 import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
+import com.actionfps.stats.Clanstats
 import play.api.libs.json.Json
 
 

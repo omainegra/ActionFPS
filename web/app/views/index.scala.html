@@ -1,12 +1,15 @@
 @import views.rendergame.MixedGame
 @import lib.Clanner
 @import java.time.format.DateTimeFormatter
+
+@import com.actionfps.players.PlayersStats
+@import com.actionfps.stats.Clanstats
 @(games: List[MixedGame], events: List[Map[String, String]],
         latestClanwars: List[com.actionfps.clans.ClanwarMeta],
         bulletin: Option[providers.ReferenceProvider.Heading],
         ladder: com.actionfps.ladder.parser.Aggregate,
-    playersStats: com.actionfps.players.PlayersStats,
-    clanStats: com.actionfps.clans.Clanstats
+    playersStats: PlayersStats,
+    clanStats: Clanstats
 
 )(implicit clanner: Clanner)
 <div class="bordered" id="bulletins">

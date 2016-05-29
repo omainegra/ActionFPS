@@ -4,9 +4,10 @@ import javax.inject.{Inject, Singleton}
 
 import com.actionfps.gameparser.enrichers.JsonGame
 import akka.agent.Agent
-import com.actionfps.clans.{Clanstats, Clanwars}
+import com.actionfps.clans.Clanwars
 import com.actionfps.accumulation.{AchievementsIterator, FullIterator, HOF}
 import com.actionfps.players.PlayersStats
+import com.actionfps.stats.Clanstats
 import play.api.inject.ApplicationLifecycle
 import providers.ReferenceProvider
 import providers.games.GamesProvider

@@ -12,34 +12,36 @@ lazy val root =
   )
     .aggregate(
       gameParser,
-      achievements,
+      pureAchievements,
       web,
       referenceReader,
-      pingerClient,
+      serverPinger,
       interParser,
       demoParser,
       syslogAc,
       accumulation,
       ladderParser,
-      clans,
-      players,
-      stats,
-      objects
+      pureClanwar,
+      pureStats,
+      pureGame,
+      pureClanwar,
+      testSuite
     ).dependsOn(
-    achievements,
+    pureAchievements,
     gameParser,
     web,
     referenceReader,
     ladderParser,
-    pingerClient,
+    serverPinger,
     interParser,
     demoParser,
     syslogAc,
     accumulation,
-    clans,
-    players,
-    stats,
-    objects
+    pureClanwar,
+    pureStats,
+    pureGame,
+    pureClanwar,
+    testSuite
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -53,10 +55,10 @@ lazy val root =
 
 lazy val web = project
   .enablePlugins(PlayScala)
-  .dependsOn(pingerClient)
+  .dependsOn(serverPinger)
   .dependsOn(accumulation)
   .dependsOn(interParser)
-  .dependsOn(stats)
+  .dependsOn(pureStats)
   .dependsOn(ladderParser)
   .enablePlugins(BuildInfoPlugin)
   .settings(dontDocument)
@@ -127,27 +129,33 @@ lazy val gameParser =
   )
     .enablePlugins(JavaAppPackaging)
     .enablePlugins(RpmPlugin)
-    .dependsOn(objects)
+    .dependsOn(pureGame)
     .settings(
       rpmVendor := "typesafe",
       libraryDependencies += json,
-      libraryDependencies += "com.lihaoyi" %% "fastparse" % "0.3.7",
+      libraryDependencies += fastParse,
       libraryDependencies += scalactic,
       rpmBrpJavaRepackJars := true,
       rpmLicense := Some("BSD"),
       git.useGitDescribe := true
     )
 
-lazy val achievements = project
-  .enablePlugins(GitVersioning)
-  .settings(
-    git.useGitDescribe := true
-  ).dependsOn(gameParser)
+lazy val pureAchievements =
+  Project(
+    id = "pure-achievements",
+    base = file("pure-achievements")
+  )
+    .enablePlugins(GitVersioning)
+    .settings(
+      git.useGitDescribe := true
+    ).dependsOn(gameParser)
 
 lazy val interParser =
   Project(
     id = "inter-parser",
     base = file("inter-parser")
+  ).settings(
+    libraryDependencies += fastParse
   )
 
 lazy val referenceReader =
@@ -159,10 +167,10 @@ lazy val referenceReader =
     git.useGitDescribe := true
   )
 
-lazy val pingerClient =
+lazy val serverPinger =
   Project(
-    id = "pinger-client",
-    base = file("pinger-client")
+    id = "server-pinger",
+    base = file("server-pinger")
   ).settings(
     libraryDependencies ++= Seq(
       akkaActor,
@@ -212,26 +220,23 @@ lazy val syslogAc =
     )
 
 lazy val accumulation = project
-  .dependsOn(achievements)
+  .dependsOn(pureAchievements)
   .dependsOn(referenceReader)
-  .dependsOn(clans)
-  .dependsOn(players)
+  .dependsOn(pureStats)
   .settings(
     git.useGitDescribe := true,
     libraryDependencies += geoipApi
   )
 
-lazy val clans = project
-  .dependsOn(gameParser)
-  .settings(
-    git.useGitDescribe := true
+lazy val pureClanwar =
+  Project(
+    id = "pure-clanwar",
+    base = file("pure-clanwar")
   )
-
-lazy val players = project
-  .dependsOn(gameParser)
-  .settings(
-    git.useGitDescribe := true
-  )
+    .dependsOn(pureGame)
+    .settings(
+      git.useGitDescribe := true
+    )
 
 lazy val startHazelcast = TaskKey[HazelcastInstance]("Start the web hazelcast instance")
 lazy val stopHazelcast = TaskKey[Unit]("Stop the web hazelcast instance")
@@ -245,13 +250,35 @@ lazy val ladderParser =
       git.useGitDescribe := true
     )
 
-lazy val stats = project
+lazy val pureStats =
+  Project(
+    id = "pure-stats",
+    base = file("pure-stats")
+  )
+    .dependsOn(pureClanwar)
+    .settings(
+      libraryDependencies += xml,
+      libraryDependencies += json
+    )
+
+lazy val pureGame = Project(
+  id = "pure-game",
+  base = file("pure-game")
+)
+
+lazy val testSuite = Project(
+  id = "test-suite",
+  base = file("test-suite")
+)
   .dependsOn(accumulation)
+  .dependsOn(ladderParser)
+  .dependsOn(pureStats)
+  .dependsOn(interParser)
   .settings(
-    libraryDependencies += xml,
     libraryDependencies += json
   )
 
-updateOptions in Global := (updateOptions in Global).value.withCachedResolution(true)
+// truly don't know if this works at all
+updateOptions := updateOptions.value.withCachedResolution(true)
 
-lazy val objects = project
+incOptions := incOptions.value.withNameHashing(true)

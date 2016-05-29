@@ -3,6 +3,7 @@ package com.actionfps
 import java.time.ZonedDateTime
 
 import scala.util.Try
+import fastparse.all._
 
 /**
   * Created by William on 09/12/2015.
@@ -31,12 +32,24 @@ package object inter {
     )
   }
 
-  object InterMessage {
-    val matcher = s"""\\[([^ ]+)\\] ([^ ]+) says: '(.*)'""".r
 
-    def unapply(input: String): Option[InterMessage] = PartialFunction.condOpt(input) {
-      case matcher(ip, nickname, "!inter") =>
-        InterMessage(ip, nickname)
+  object InterMessage {
+
+    val ip = {
+      val part = CharIn('1' to '9') ~ CharIn('0' to '9').rep
+      part ~ "." ~ part ~ "." ~ part ~ "." ~ part
+    }
+
+    val nickname = CharsWhile(_ != ' ')
+
+    val matcher = "[" ~ ip.! ~ "]" ~ " " ~ nickname.! ~ " says: '!inter'"
+    val mex = matcher.map(Function.tupled(InterMessage.apply))
+
+    def unapply(input: String): Option[InterMessage] = {
+      val m = mex.parse(input)
+      PartialFunction.condOpt(m) {
+        case Parsed.Success(r, _)=> r
+      }
     }
   }
 

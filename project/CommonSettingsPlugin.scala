@@ -17,7 +17,20 @@ object CommonSettingsPlugin extends AutoPlugin {
     resolvers += Resolver.mavenLocal,
     libraryDependencies += autoImport.scalatest,
     licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
-    publishMavenStyle := false
+    publishMavenStyle := false,
+    updateOptions := updateOptions.value.withCachedResolution(true),
+    incOptions := incOptions.value.withNameHashing(true)
+  )
+
+
+  override def buildSettings = Seq(
+    updateOptions := updateOptions.value.withCachedResolution(true),
+    incOptions := incOptions.value.withNameHashing(true)
+  )
+
+  override def globalSettings = Seq(
+    updateOptions := updateOptions.value.withCachedResolution(true),
+    incOptions := incOptions.value.withNameHashing(true)
   )
 
   object autoImport extends Dependencies {

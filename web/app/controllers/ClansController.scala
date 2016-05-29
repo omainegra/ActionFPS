@@ -6,17 +6,17 @@ package controllers
 
 import javax.inject._
 
-import com.actionfps.accumulation.Clan
-import com.actionfps.clans.Clanstats.ImplicitWrites._
-import com.actionfps.clans.{Clanstat, Clanwar}
-import com.actionfps.clans.Clanwar.ImplicitFormats._
+import com.actionfps.accumulation.{Clan, ClanwarJsonImplicits}
+import ClanwarJsonImplicits._
+import com.actionfps.clans.Clanwar
 import com.actionfps.clans.Conclusion.Namer
+import com.actionfps.stats.Clanstat
 import lib.Clanner
 import play.api.Configuration
-import play.api.libs.json.{Writes, Json}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import providers.full.FullProvider
 import providers.ReferenceProvider
+import providers.full.FullProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -120,7 +120,6 @@ class ClansController @Inject()(common: Common,
         val clans = await(referenceProvider.clans)
         Clanner(id => clans.find(_.id == id))
       }
-      import Clanwar.ImplicitFormats._
       val cws = await(fullProvider.clanwars).all.toList.sortBy(_.id).reverse.take(50)
       request.getQueryString("format") match {
         case Some("json") =>

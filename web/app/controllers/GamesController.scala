@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 
 import akka.stream.scaladsl.Source
+import com.actionfps.accumulation.ClanwarJsonImplicits
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.clans._
 import com.actionfps.clans.Conclusion.Namer
@@ -38,7 +39,7 @@ class GamesController @Inject()(common: Common,
 
   import common._
 
-  import Clanwar.ImplicitFormats._
+  import ClanwarJsonImplicits._
 
   def recentGames = Action.async { implicit request =>
     async {

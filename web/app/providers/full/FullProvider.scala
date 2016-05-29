@@ -2,9 +2,10 @@ package providers.full
 
 import akka.agent.Agent
 import com.actionfps.accumulation.{FullIterator, FullProfile, HOF}
-import com.actionfps.clans.{Clanstats, Clanwars}
+import com.actionfps.clans.Clanwars
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
+import com.actionfps.stats.Clanstats
 import com.google.inject.ImplementedBy
 
 import scala.concurrent.{ExecutionContext, Future}
