@@ -39,6 +39,7 @@ object CachedJournalGamesProvider {
 
 }
 
+import com.actionfps.formats.json.Formats._
 /**
   * Created by William on 2016-04-11.
   */

@@ -5,10 +5,7 @@ package com.actionfps.accumulation
   */
 
 import java.time.{ZoneId, ZonedDateTime}
-
-import com.actionfps.gameparser.enrichers.ViewFields
 import com.actionfps.reference.{NicknameRecord, Registration}
-import play.api.libs.json._
 
 sealed trait Nickname {
   def nickname: String
@@ -35,19 +32,6 @@ case class User(id: String, name: String, countryCode: Option[String], email: Op
 }
 
 object User {
-  implicit val vf = ViewFields.DefaultZonedDateTimeWrites
-  implicit val pnFormat = Json.format[PreviousNickname]
-  implicit val cnFormat = Json.format[CurrentNickname]
-  implicit val userFormat = Json.format[User]
-
-  object WithoutEmailFormat {
-
-    import play.api.libs.json._
-    import play.api.libs.json.Reads._
-    import play.api.libs.functional.syntax._
-
-    implicit val noEmailUserWrite = Json.writes[User].transform((jv: JsObject) => jv.validate((__ \ 'email).json.prune).get)
-  }
 
   def fromRegistration(registration: Registration, nicknames: List[NicknameRecord]): Option[User] = {
     val hisNicks = nicknames.filter(_.id == registration.id).sortBy(_.from.toString)

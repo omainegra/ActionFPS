@@ -4,16 +4,14 @@ import java.time.ZonedDateTime
 
 import com.actionfps.api.{Game, GamePlayer, GameTeam}
 import com.actionfps.gameparser.ingesters.FoundGame
-import play.api.libs.json.Json
 
 object JsonGame {
 
-  def fromJson(string: String): JsonGame = {
-    val g = Json.fromJson[JsonGame](Json.parse(string)).get
-
-    // some weird edge case from NYC/LA servers
-    if (g.duration == 60) g.copy(duration = 15) else g
-  }
+//  def fromJson(string: String): JsonGame = {
+//    val g = Json.fromJson[JsonGame](Json.parse(string)).get
+////     some weird edge case from NYC/LA servers
+//    if (g.duration == 60) g.copy(duration = 15) else g
+//  }
 
   def build(id: String, foundGame: FoundGame, endDate: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
 

@@ -1,7 +1,6 @@
 package com.actionfps.achievements.immutable
 
 import com.actionfps.gameparser.enrichers.{JsonGamePlayer, JsonGameTeam, JsonGame}
-import play.api.libs.json.{JsArray, JsObject}
 
 sealed trait CaptureMaster {
   def title = "Capture Master"
@@ -10,9 +9,6 @@ sealed trait CaptureMaster {
 
   def all: List[CaptureMapCompletion]
 
-  def jsonTable: JsObject = JsObject(Map(
-    "maps" -> JsArray(all.sortBy(_.map).map(_.asJson))
-  ))
 }
 
 object CaptureMaster {

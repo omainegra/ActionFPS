@@ -3,12 +3,14 @@ package com.actionfps.accumulation
 import java.io.File
 import java.net.URL
 
+import com.actionfps.api.Game
 import com.actionfps.clans.Clanwars
 import com.actionfps.gameparser.enrichers._
 import com.actionfps.players.PlayersStats
 import com.actionfps.reference.{ClanRecord, NicknameRecord, Registration}
 import com.actionfps.stats.Clanstats
 import jdk.nashorn.api.scripting.URLReader
+import play.api.libs.json.Json
 
 /**
   * Created by me on 14/05/2016.
@@ -22,7 +24,7 @@ object AccumulationProfilingTestApp extends App {
       (gamesTxt #> gf).!
     }
     val file = scala.io.Source.fromFile(gf)
-    try file.getLines().map(JsonGame.fromJson).toList
+    try file.getLines().map(str => Json.fromJson[Game](Json.parse(str)).get).toList
     finally file.close()
   }
 

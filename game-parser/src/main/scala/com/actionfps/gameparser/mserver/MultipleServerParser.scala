@@ -26,17 +26,6 @@ case class MultipleServerParserFoundGame(cg: JsonGame, next: MultipleServerParse
   def process(line: String): MultipleServerParser = {
     next.process(line)
   }
-
-  def goodString: Option[String] = {
-    cg.validate.toOption.map { game =>
-      s"${game.id}\t${game.toJson}"
-    }
-  }
-
-  def detailString: String = {
-    val info = cg.validate.fold(_ => "GOOD\t", b => s"BAD\t$b")
-    s"${cg.id}\t$info\t${cg.toJson}"
-  }
 }
 
 case class MultipleServerParserFailedLine(line: String, next: MultipleServerParserProcessing)

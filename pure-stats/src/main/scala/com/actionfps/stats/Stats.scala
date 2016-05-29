@@ -1,13 +1,8 @@
 package com.actionfps.stats
 
 import java.time.{DayOfWeek, ZonedDateTime}
-import java.time.format.{DateTimeFormatter, TextStyle}
-import java.util.Locale
-
-import play.api.libs.json._
 
 import scala.collection.immutable.ListMap
-import scala.xml.Elem
 
 /**
   * Created by me on 22/04/2016.
@@ -37,17 +32,6 @@ object Stats {
           dow -> emptyHours
         }: _*)
     )
-
-    implicit val writes = Writes[PunchCard] { pc =>
-      Json.toJson {
-        pc.dows.map { case (dow, vals) =>
-          val key = dow.getDisplayName(TextStyle.FULL_STANDALONE, Locale.ENGLISH)
-          val rest = vals.toList.map { case (k, v) => hours(k) -> JsString(v.toString) }
-          val combined = ("Type" -> JsString(key)) +: rest
-          ListMap[String, JsValue](combined: _*)
-        }
-      }
-    }
   }
 
   case class GameCounter(dates: ListMap[ZonedDateTime, Int], punchCard: PunchCard) {

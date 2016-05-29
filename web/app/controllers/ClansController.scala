@@ -6,8 +6,7 @@ package controllers
 
 import javax.inject._
 
-import com.actionfps.accumulation.{Clan, ClanwarJsonImplicits}
-import ClanwarJsonImplicits._
+import com.actionfps.accumulation.Clan
 import com.actionfps.clans.Clanwar
 import com.actionfps.clans.Conclusion.Namer
 import com.actionfps.stats.Clanstat

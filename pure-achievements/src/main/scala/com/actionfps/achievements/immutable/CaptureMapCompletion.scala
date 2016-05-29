@@ -1,7 +1,6 @@
 package com.actionfps.achievements.immutable
 
 import com.actionfps.gameparser.enrichers.{JsonGameTeam, JsonGamePlayer, JsonGame}
-import play.api.libs.json.{JsBoolean, JsString, JsNumber, JsObject}
 
 /**
   * Created by William on 12/11/2015.
@@ -14,13 +13,6 @@ sealed trait CaptureMapCompletion {
   def rvsf: Int
 
   def isCompleted: Boolean
-
-  def asJson: JsObject = JsObject(Map(
-    "map" -> JsString(map),
-    "completed" -> JsBoolean(isCompleted),
-    "cla" -> JsString(s"$cla/${CaptureMapCompletion.targetPerSide}"),
-    "rvsf" -> JsString(s"$rvsf/${CaptureMapCompletion.targetPerSide}")
-  ))
 
   val targetPerSide = CaptureMapCompletion.targetPerSide
 }

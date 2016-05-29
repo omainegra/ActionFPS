@@ -3,7 +3,6 @@ package com.actionfps.players
 import java.time.ZonedDateTime
 
 import com.actionfps.api.Game
-import play.api.libs.json.Json
 
 /**
   * Created by me on 26/05/2016.
@@ -146,7 +145,5 @@ object PlayersStats {
     players = Map.empty,
     gameCounts = Map.empty
   )
-
-  implicit val writeStats = Json.writes[PlayersStats]
 
 }

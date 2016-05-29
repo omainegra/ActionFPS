@@ -3,22 +3,19 @@ package controllers
 import javax.inject._
 
 import akka.stream.scaladsl.Source
-import com.actionfps.accumulation.ClanwarJsonImplicits
-import com.actionfps.gameparser.enrichers.JsonGame
-import com.actionfps.clans._
 import com.actionfps.clans.Conclusion.Namer
 import lib.Clanner
-import org.apache.commons.csv.{CSVFormat, CSVPrinter}
+import org.apache.commons.csv.CSVFormat
 import play.api.Configuration
 import play.api.libs.iteratee.Enumerator
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.Json
 import play.api.libs.streams.Streams
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-import play.filters.gzip.{Gzip, GzipFilter}
+import play.filters.gzip.GzipFilter
+import providers.ReferenceProvider
 import providers.full.FullProvider
 import providers.games.NewGamesProvider
-import providers.ReferenceProvider
 import services.PingerService
 import views.rendergame.MixedGame
 
@@ -38,8 +35,6 @@ class GamesController @Inject()(common: Common,
                                 wSClient: WSClient) extends Controller {
 
   import common._
-
-  import ClanwarJsonImplicits._
 
   def recentGames = Action.async { implicit request =>
     async {
@@ -116,7 +111,7 @@ class GamesController @Inject()(common: Common,
       val allGames = await(fullProvider.allGames)
       val enumerator = Enumerator
         .enumerate(allGames)
-        .map(game => s"${game.id}\t${game.toJson}\n")
+        .map(game => s"${game.id}\t${Json.toJson(game)}\n")
       Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)))
         .as("text/tab-separated-values")
         .withHeaders("Content-Disposition" -> "attachment; filename=games.tsv")
@@ -128,7 +123,7 @@ class GamesController @Inject()(common: Common,
       val allGames = await(fullProvider.allGames)
       val enumerator = Enumerator
         .enumerate(allGames)
-        .map(game => CSVFormat.DEFAULT.format(game.id, game.toJson) + "\n")
+        .map(game => CSVFormat.DEFAULT.format(game.id, Json.toJson(game)) + "\n")
       Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)))
         .as("text/csv")
     }
@@ -139,7 +134,7 @@ class GamesController @Inject()(common: Common,
       val allGames = await(fullProvider.allGames)
       val enumerator = Enumerator
         .enumerate(allGames)
-        .map(game => game.toJson.toString() + "\n")
+        .map(game => Json.toJson(game).toString() + "\n")
       Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)))
         .as("text/plain")
     }
@@ -151,8 +146,8 @@ class GamesController @Inject()(common: Common,
       val allGames = await(fullProvider.allGames)
       val enum = allGames match {
         case head :: rest =>
-          Enumerator(s"[\n  ${head.toJson}").andThen {
-            Enumerator.enumerate(rest).map(game => ",\n  " + game.toJson.toString())
+          Enumerator(s"[\n  ${Json.toJson(head)}").andThen {
+            Enumerator.enumerate(rest).map(game => ",\n  " + Json.toJson(game).toString())
           }.andThen(Enumerator("\n]"))
         case Nil => Enumerator("[]")
       }

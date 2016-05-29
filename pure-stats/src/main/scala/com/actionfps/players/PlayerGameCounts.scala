@@ -2,8 +2,6 @@ package com.actionfps.players
 
 import java.time.ZonedDateTime
 
-import play.api.libs.json._
-
 import scala.collection.immutable.ListMap
 
 /**
@@ -11,15 +9,6 @@ import scala.collection.immutable.ListMap
   */
 object PlayerGameCounts {
   def empty: PlayerGameCounts = PlayerGameCounts(games = List.empty, counts = ListMap.empty)
-
-  implicit val writes = Writes[PlayerGameCounts](pgc =>
-    JsArray(pgc.counts.map {
-      case (d, n) => JsObject(Map(
-        "date" -> JsString(d.toString.take(10)),
-        "count" -> JsNumber(n)
-      ))
-    }.toList)
-  )
 }
 
 case class PlayerGameCounts(games: List[ZonedDateTime], counts: ListMap[ZonedDateTime, Int]) {

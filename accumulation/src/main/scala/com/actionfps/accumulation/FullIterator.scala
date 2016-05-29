@@ -6,7 +6,6 @@ import com.actionfps.gameparser.enrichers._
 import com.actionfps.clans.{Clanwars, CompleteClanwar}
 import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
 import com.actionfps.stats.Clanstats
-import play.api.libs.json.Json
 
 
 /**
@@ -146,17 +145,6 @@ case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Op
 
 case class LocationInfo(timezone: Option[String], countryCode: Option[String], countryName: Option[String])
 
-object LocationInfo {
-  implicit val lif = Json.writes[LocationInfo]
-}
-
 case class BuiltProfile(user: User, recentGames: List[JsonGame],
                         achievements: Option[AchievementsRepresentation], rank: Option[PlayerStat],
-                        location: Option[LocationInfo], gameCounts: Option[PlayerGameCounts]) {
-
-}
-
-object BuiltProfile {
-  import com.actionfps.gameparser.enrichers.JsonGame._
-  implicit val writes = Json.writes[BuiltProfile]
-}
+                        location: Option[LocationInfo], gameCounts: Option[PlayerGameCounts])

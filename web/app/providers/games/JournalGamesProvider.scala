@@ -4,7 +4,7 @@ package providers.games
   * Created by William on 01/01/2016.
   */
 
-import java.io.{File, FileInputStream}
+import java.io.File
 import java.util.concurrent.Executors
 import javax.inject._
 
@@ -12,29 +12,33 @@ import akka.agent.Agent
 import com.actionfps.accumulation.GeoIpLookup
 import com.actionfps.accumulation.ValidServers.ImplicitValidServers._
 import com.actionfps.accumulation.ValidServers.Validator._
-import com.actionfps.gameparser.ProcessJournalApp
+import com.actionfps.api.Game
 import com.actionfps.gameparser.enrichers._
 import org.apache.commons.io.input.Tailer
 import play.api.inject.ApplicationLifecycle
+import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, blocking}
 import scala.util.control.NonFatal
+import com.actionfps.formats.json.Formats._
 
 object JournalGamesProvider {
 
-  def getFileGames(file: File) = {
-    val fis = new FileInputStream(file)
-    try ProcessJournalApp.parseSource(fis)
-      .map(_.cg)
-      .filter(_.validate.isGood)
-      .filter(_.validateServer)
-      .map(_.flattenPlayers)
-      .map(g => g.id -> g)
-      .toMap
-    finally fis.close()
-  }
+  def getFileGames(file: File): Map[String, Game] = ???
+
+  //    /= {
+  //    val fis = new FileInputStream(file)
+  //    try ProcessJournalApp.parseSource(fis)
+  //      .map(_.cg)
+  //      .filter(_.validate.isGood)
+  //      .filter(_.validateServer)
+  //      .map(_.flattenPlayers)
+  //      .map(g => g.id -> g)
+  //      .toMap
+  //    finally fis.close()
+  //  }
 
 }
 
@@ -67,7 +71,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
       gamesDatas.par.flatMap { file =>
         val src = scala.io.Source.fromFile(file)
         try src.getLines().filter(_.nonEmpty).map { line =>
-          try JsonGame.fromJson(line.split("\t")(3))
+          try Json.fromJson[Game](Json.parse(line.split("\t")(3))).get
           catch {
             case NonFatal(e) => logger.error(s"Could not parse JSON line due to ${e}: $line", e)
               throw e

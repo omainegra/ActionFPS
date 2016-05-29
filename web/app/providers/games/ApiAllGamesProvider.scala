@@ -3,11 +3,14 @@ package providers.games
 import javax.inject.{Inject, Singleton}
 
 import akka.agent.Agent
+import com.actionfps.api.Game
 import com.actionfps.gameparser.enrichers.JsonGame
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
+import com.actionfps.formats.json.Formats._
+import play.api.libs.json.Json
 
 /**
   * Created by William on 01/01/2016.
@@ -27,7 +30,7 @@ class ApiAllGamesProvider @Inject()(configuration: Configuration)
     response.body.split("\n").toIterator.map { line =>
       line.split("\t").toList match {
         case List(id, json) =>
-          id -> JsonGame.fromJson(json).flattenPlayers
+          id -> Json.fromJson[Game](Json.parse(json)).get.flattenPlayers
       }
     }.toMap
   )

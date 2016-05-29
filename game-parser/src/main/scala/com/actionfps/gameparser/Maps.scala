@@ -1,7 +1,5 @@
 package com.actionfps.gameparser
 
-import play.api.libs.json.Json
-
 /**
   * Created by me on 04/02/2016.
   */
@@ -11,11 +9,17 @@ case class Maps(maps: Map[String, AcMap])
 
 object Maps {
 
-  def fromMap(input: Map[String, String]): Maps = {
-    Maps(input.map { case (name, image) => name -> AcMap(name, image) })
+  val resource: Maps = {
+    val props = new java.util.Properties()
+    val is = getClass.getResourceAsStream("maps.properties")
+    try {
+      props.load(is)
+      import collection.JavaConverters._
+      Maps(maps = props.asScala.map { case (key, value) =>
+        key -> AcMap(name = key, image = value)
+      }.toMap)
+    }
+    finally is.close()
   }
-
-  val resource = Json.fromJson[Map[String, String]](Json.parse(getClass.getResourceAsStream("maps.json")))
-    .map(map => Maps.fromMap(map)).get
 
 }

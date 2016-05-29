@@ -21,6 +21,7 @@ import providers._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import com.actionfps.gameparser.enrichers.Implicits._
+import com.actionfps.formats.json.Formats._
 
 /**
   * Created by William on 09/12/2015.
@@ -48,7 +49,7 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
     //    val er = EnrichGames(recordsService.users, recordsService.com.actionfps.clans)
     //    import er.withUsersClass
     //    val b = game.withoutHosts.withUsers.flattenPlayers.withClans.toJson.+("isNew" -> JsBoolean(true))
-    val b = game.withoutHosts.toJson.+("isNew" -> JsBoolean(true))
+    val b = Json.toJson(game.withoutHosts).asInstanceOf[JsObject].+("isNew" -> JsBoolean(true))
 
     val jsonMap = Map("game" -> Seq(b.toString()), "maps" -> Seq(Json.toJson(Maps.resource.maps.mapValues(_.image)).toString()))
     common.renderRaw("/live/render-fragment.php")(_.post(jsonMap)).foreach(response =>

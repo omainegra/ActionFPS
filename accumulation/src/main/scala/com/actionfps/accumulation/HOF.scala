@@ -1,7 +1,6 @@
 package com.actionfps.accumulation
 
 import com.actionfps.achievements.immutable._
-import play.api.libs.json.{Json, Writes}
 
 /**
   * Created by me on 01/04/2016.
@@ -26,10 +25,6 @@ case class HOF(achievements: List[HOF.AchievementRecord]) {
 
 object HOF {
 
-  implicit val hofarpW = Json.writes[HOF.AchievementRecordPlayer]
-  implicit val achW = Writes[Achievement](ach => Json.toJson(Map("title" -> ach.title, "description" -> ach.description)))
-  implicit val hofarW = Json.writes[HOF.AchievementRecord]
-  implicit val hofW = Json.writes[HOF]
 
   def empty = HOF(
     achievements = achievements.map(achievement =>

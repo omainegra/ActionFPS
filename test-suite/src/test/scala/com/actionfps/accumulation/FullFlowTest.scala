@@ -46,7 +46,7 @@ class FullFlowTest
 
     games.size shouldBe 8
 
-    games.map { game => game.testHash -> game.toJson }.foreach {
+    games.map { game => game.testHash -> Json.toJson(game) }.foreach {
       case (hashedId, json) =>
         val path = s"test-suite/src/test/resources/com/actionfps/accumulation/samples/${hashedId}.json"
 

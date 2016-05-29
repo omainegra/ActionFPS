@@ -19,7 +19,9 @@ object CommonSettingsPlugin extends AutoPlugin {
     licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
     publishMavenStyle := false,
     updateOptions := updateOptions.value.withCachedResolution(true),
-    incOptions := incOptions.value.withNameHashing(true)
+    incOptions := incOptions.value.withNameHashing(true),
+    run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in(Compile, run), runner in(Compile, run)),
+    runMain in Compile <<= Defaults.runMainTask(fullClasspath in Compile, runner in(Compile, run))
   )
 
 

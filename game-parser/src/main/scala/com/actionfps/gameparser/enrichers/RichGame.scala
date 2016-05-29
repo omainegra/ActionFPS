@@ -2,7 +2,6 @@ package com.actionfps.gameparser.enrichers
 
 import com.actionfps.api.Game
 import com.actionfps.gameparser.Maps
-import play.api.libs.json.{JsObject, Json}
 
 import scala.util.hashing.MurmurHash3
 
@@ -10,6 +9,7 @@ import scala.util.hashing.MurmurHash3
   * Created by me on 29/05/2016.
   */
 class RichGame(game: JsonGame) {
+
   import game._
 
   def testHash = {
@@ -25,10 +25,6 @@ class RichGame(game: JsonGame) {
     winner = winner,
     winnerClan = winnerClan
   )
-
-  def toJson: JsObject = {
-    Json.toJson(game).asInstanceOf[JsObject] ++ viewFields.toJson.asInstanceOf[JsObject]
-  }
 
   import org.scalactic._
 

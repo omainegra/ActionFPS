@@ -4,8 +4,6 @@ import java.net.URL
 
 import com.actionfps.api.Game
 import org.scalatest.{FunSuite, Matchers}
-import com.actionfps.accumulation.ClanwarJsonImplicits._
-import com.actionfps.gameparser.enrichers.Implicits._
 import play.api.libs.json.Json
 
 /**

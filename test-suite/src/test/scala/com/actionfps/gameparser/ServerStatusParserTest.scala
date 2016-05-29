@@ -2,6 +2,7 @@ package com.actionfps.gameparser
 
 import com.actionfps.gameparser.mserver._
 import org.scalatest.{FunSuite, Matchers}
+import play.api.libs.json.Json
 
 /**
   * Created by William on 26/12/2015.
@@ -61,14 +62,13 @@ class ServerStatusParserTest
   }
 
   ignore("MSP against a local thing") {
-    import enrichers._
     scala.io.Source.fromFile("../j.log")
       .getLines()
       .scanLeft(MultipleServerParser.empty)(_.process(_))
       .collect {
         case MultipleServerParserFoundGame(cg, _) =>
           cg
-      }.take(2).map(_.toJson).foreach(println)
+      }.take(2).map(g => Json.toJson(g)).foreach(println)
   }
 
 }

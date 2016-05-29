@@ -2,7 +2,6 @@ package com.actionfps.achievements
 
 import com.actionfps.achievements.immutable.{CaptureMaster, NotAchievedAchievements, PlayerStatistics}
 import com.actionfps.gameparser.enrichers.{JsonGame, JsonGamePlayer, JsonGameTeam}
-import play.api.libs.json.{Json, Writes}
 
 case class PlayerState(combined: NotAchievedAchievements,
                        playerStatistics: PlayerStatistics, events: Vector[(String, String)], achieved: Vector[(String, immutable.CompletedAchievement)]) {
@@ -72,13 +71,6 @@ case class AchievementsRepresentation(completedAchievements: List[CompletedAchie
                                       partialAchievements: List[PartialAchievement],
                                       switchNotAchieveds: List[SwitchNotAchieved])
 
-object AchievementsRepresentation {
-  implicit val captureMasterWriter = Writes[CaptureMaster](_.jsonTable)
-  implicit val caFormats = Json.writes[CompletedAchievement]
-  implicit val paFormats = Json.writes[PartialAchievement]
-  implicit val saFormats = Json.writes[SwitchNotAchieved]
-  implicit val arFormats = Json.writes[AchievementsRepresentation]
-}
 
 case class CompletedAchievement(title: String, description: String, at: String, captureMaster: Option[CaptureMaster])
 

@@ -25,7 +25,8 @@ lazy val root =
       pureStats,
       pureGame,
       pureClanwar,
-      testSuite
+      testSuite,
+      jsonFormats
     ).dependsOn(
     pureAchievements,
     gameParser,
@@ -41,7 +42,8 @@ lazy val root =
     pureStats,
     pureGame,
     pureClanwar,
-    testSuite
+    testSuite,
+    jsonFormats
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -90,6 +92,7 @@ lazy val web = project
   .dependsOn(accumulation)
   .dependsOn(interParser)
   .dependsOn(pureStats)
+  .dependsOn(jsonFormats)
   .dependsOn(ladderParser)
   .enablePlugins(BuildInfoPlugin)
   .settings(dontDocument)
@@ -164,17 +167,12 @@ lazy val gameParser =
     id = "game-parser",
     base = file("game-parser")
   )
-    .enablePlugins(JavaAppPackaging)
-    .enablePlugins(RpmPlugin)
     .dependsOn(pureGame)
     .settings(
-      rpmVendor := "typesafe",
-      libraryDependencies += json,
+      git.useGitDescribe := true,
       libraryDependencies += fastParse,
       libraryDependencies += scalactic,
-      rpmBrpJavaRepackJars := true,
-      rpmLicense := Some("BSD"),
-      git.useGitDescribe := true
+      libraryDependencies += jodaTime
     )
 
 lazy val pureAchievements =
@@ -245,7 +243,6 @@ lazy val syslogAc =
       rpmBrpJavaRepackJars := true,
       rpmLicense := Some("BSD"),
       libraryDependencies ++= Seq(
-        json,
         syslog4j,
         logbackClassic,
         scalaLogging,
@@ -294,8 +291,7 @@ lazy val pureStats =
   )
     .dependsOn(pureClanwar)
     .settings(
-      libraryDependencies += xml,
-      libraryDependencies += json
+      libraryDependencies += xml
     )
 
 lazy val pureGame = Project(
@@ -311,8 +307,9 @@ lazy val testSuite = Project(
   .dependsOn(ladderParser)
   .dependsOn(pureStats)
   .dependsOn(interParser)
+  .dependsOn(syslogAc)
+  .dependsOn(jsonFormats)
   .settings(
-    libraryDependencies += json,
     (test in Test) <<= (test in Test) dependsOn(geoIpFiles in ThisBuild, sampleLog),
     run <<= (run in Runtime) dependsOn(geoIpFiles in ThisBuild, sampleLog in ThisBuild)
   )
@@ -332,6 +329,16 @@ sampleLog in ThisBuild := {
   }
   sampleLog
 }
+
+lazy val jsonFormats =
+  Project(
+    id = "json-formats",
+    base = file("json-formats")
+  )
+    .dependsOn(accumulation)
+    .settings(
+      libraryDependencies += json
+    )
 
 lazy val sampleLog = taskKey[File]("Sample Log")
 

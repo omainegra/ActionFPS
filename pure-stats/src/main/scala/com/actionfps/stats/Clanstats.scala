@@ -2,7 +2,6 @@ package com.actionfps.stats
 
 import com.actionfps.clans.Conclusion.Namer
 import com.actionfps.clans.{CompleteClanwar, Conclusion}
-import play.api.libs.json.{Json, Writes}
 
 /**
   * Created by William on 02/01/2016.

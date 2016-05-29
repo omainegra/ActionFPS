@@ -1,7 +1,5 @@
 package com.actionfps.players
 
-import play.api.libs.json.Json
-
 /**
   * Created by me on 26/05/2016.
   */
@@ -48,7 +46,5 @@ object PlayerStat {
     lastGame = lastGame,
     rank = None
   )
-
-  implicit val psw = Json.writes[PlayerStat]
 
 }
