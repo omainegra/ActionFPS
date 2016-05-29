@@ -26,7 +26,7 @@ class FullFlowTest
   def getSampleGames = {
     import er._
     val validServers = ValidServers.fromResource
-    scala.io.Source.fromFile("test-suite/sample.log")(Codec.UTF8)
+    scala.io.Source.fromFile("target/sample.log")(Codec.UTF8)
       .getLines()
       .scanLeft(MultipleServerParser.empty)(_.process(_))
       .collect { case m: MultipleServerParserFoundGame => m }

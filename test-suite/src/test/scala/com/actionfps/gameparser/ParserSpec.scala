@@ -141,7 +141,7 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
 
     /** This was to test my fastparses **/
     "Parse game statuses" ignore {
-      val statuses = scala.io.Source.fromFile("test-suite/sample.log")
+      val statuses = scala.io.Source.fromFile("target/sample.log")
         .getLines
         .filter(_.contains("minutes"))
         .filter(_.contains("Game status"))

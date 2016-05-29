@@ -85,7 +85,7 @@ class JournalNewGamesTest
     * Find two different games next to each other, extract their sets of lines.
     */
   def getGamesLines: (List[String], List[String], List[String]) = {
-    val fn = "../test-suite/sample.log"
+    val fn = "target/sample.log"
     // navigate to first bit
 
     val fileLines = {

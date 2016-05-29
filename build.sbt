@@ -53,6 +53,37 @@ lazy val root =
       }
     )
 
+lazy val geoIpFiles = taskKey[List[File]]("Files for GeoIp")
+lazy val downloadGeoIpFiles = taskKey[Unit]("Files for GeoIp")
+
+geoIpFiles in ThisBuild := {
+  import sbt._
+  import IO._
+  val resourcesDirectory = target.value / "geoip-resources"
+  if (!resourcesDirectory.exists()) {
+    createDirectory(resourcesDirectory)
+  }
+  val cityFileGz = resourcesDirectory / "GeoLiteCityv6.dat.gz"
+  val cityFile = resourcesDirectory / "GeoLiteCityv6.dat"
+  val ipFileGz = resourcesDirectory / "GeoIPASNumv6.dat.gz"
+  val ipFile = resourcesDirectory / "GeoIPASNumv6.dat"
+  if (!cityFile.exists()) {
+    val cityUrl = "http://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz"
+    streams.value.log.info(s"Downloading and decompressing ${cityUrl} to ${cityFile}...")
+    download(url(cityUrl), cityFileGz)
+    gunzip(cityFileGz, cityFile)
+    delete(cityFileGz)
+  }
+  if (!ipFile.exists()) {
+    val ipUrl = "http://geolite.maxmind.com/download/geoip/database/asnum/GeoIPASNumv6.dat.gz"
+    streams.value.log.info(s"Downloading and decompressing ${ipUrl} to ${ipFile}...")
+    download(url(ipUrl), ipFileGz)
+    gunzip(ipFileGz, ipFile)
+    delete(ipFileGz)
+  }
+  List(cityFile, ipFile)
+}
+
 lazy val web = project
   .enablePlugins(PlayScala)
   .dependsOn(serverPinger)
@@ -101,6 +132,12 @@ lazy val web = project
       git.gitHeadCommit,
       gitCommitDescription
     ),
+
+    mappings in Universal ++= {
+      (geoIpFiles in ThisBuild).value.map { f =>
+        f -> s"resources/${f.getName}"
+      }
+    },
     gitCommitDescription := {
       com.typesafe.sbt.SbtGit.GitKeys.gitReader.value.withGit { interface =>
         for {
@@ -275,8 +312,28 @@ lazy val testSuite = Project(
   .dependsOn(pureStats)
   .dependsOn(interParser)
   .settings(
-    libraryDependencies += json
+    libraryDependencies += json,
+    (test in Test) <<= (test in Test) dependsOn(geoIpFiles in ThisBuild, sampleLog),
+    run <<= (run in Runtime) dependsOn(geoIpFiles in ThisBuild, sampleLog in ThisBuild)
   )
+
+sampleLog in ThisBuild := {
+  import sbt._
+  import IO._
+  val sourceUrl = "https://gist.github.com/ScalaWilliam/ebff0a56f57a7966a829/raw/" +
+    "732629d6bfb01a39dffe57ad22a54b3bad334019/gistfile1.txt"
+  val sampleLog = target.value / "sample.log"
+  if (!sampleLog.exists()) {
+    streams.value.log.info(s"Downloading ${sourceUrl} to ${sampleLog}...")
+    download(
+      url = url(sourceUrl),
+      to = sampleLog
+    )
+  }
+  sampleLog
+}
+
+lazy val sampleLog = taskKey[File]("Sample Log")
 
 // truly don't know if this works at all
 updateOptions := updateOptions.value.withCachedResolution(true)
