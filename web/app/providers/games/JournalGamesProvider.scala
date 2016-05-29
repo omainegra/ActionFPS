@@ -67,7 +67,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
       gamesDatas.par.flatMap { file =>
         val src = scala.io.Source.fromFile(file)
         try src.getLines().filter(_.nonEmpty).map { line =>
-          try xJsonGame.fromJson(line.split("\t")(3))
+          try JsonGame.fromJson(line.split("\t")(3))
           catch {
             case NonFatal(e) => logger.error(s"Could not parse JSON line due to ${e}: $line", e)
               throw e

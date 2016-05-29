@@ -17,11 +17,11 @@ trait Implicits {
 
   implicit val fmt = {
     implicit val gaf = Json.format[GameAchievement]
-    implicit val vf = ViewFields.ZonedWrite
     implicit val Af = Json.format[JsonGamePlayer]
     implicit val Bf = Json.format[JsonGameTeam]
     Json.format[JsonGame]
   }
 
 }
+
 object Implicits extends Implicits

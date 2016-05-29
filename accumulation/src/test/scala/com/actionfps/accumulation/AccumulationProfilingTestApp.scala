@@ -21,7 +21,7 @@ object AccumulationProfilingTestApp extends App {
       (gamesTxt #> gf).!
     }
     val file = scala.io.Source.fromFile(gf)
-    try file.getLines().map(xJsonGame.fromJson).toList
+    try file.getLines().map(JsonGame.fromJson).toList
     finally file.close()
   }
 

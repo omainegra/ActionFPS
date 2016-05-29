@@ -156,6 +156,6 @@ case class BuiltProfile(user: User, recentGames: List[JsonGame],
 }
 
 object BuiltProfile {
-  import com.actionfps.gameparser.enrichers.xJsonGame._
+  import com.actionfps.gameparser.enrichers.JsonGame._
   implicit val writes = Json.writes[BuiltProfile]
 }

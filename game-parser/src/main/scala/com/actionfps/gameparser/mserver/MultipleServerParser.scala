@@ -60,7 +60,7 @@ case class MultipleServerParserProcessing(serverStates: Map[String, ServerState]
             serverStates.getOrElse(server, ServerState.empty).next(message) match {
               case sfg: ServerFoundGame =>
                 val duration = if (sfg.duration == 60) 15 else sfg.duration
-                val jg = xJsonGame.build(
+                val jg = JsonGame.build(
                   id = date.format(DateTimeFormatter.ISO_INSTANT),
                   foundGame = sfg.foundGame,
                   endDate = corrector.apply(date),
