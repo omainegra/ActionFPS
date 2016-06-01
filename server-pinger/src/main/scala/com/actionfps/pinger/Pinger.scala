@@ -1,6 +1,9 @@
 package com.actionfps.pinger
 
+import java.io.{FileOutputStream, ObjectOutputStream}
 import java.net.InetSocketAddress
+import java.time.{LocalDateTime, ZonedDateTime}
+import java.util.zip.GZIPOutputStream
 
 import akka.actor.{ActorLogging, Props, Terminated}
 import akka.io.{IO, Udp}
@@ -18,6 +21,7 @@ object Pinger {
       GotParsedResponse((inetSocketAddress.getAddress.getHostAddress, inetSocketAddress.getPort - 1), stuff)
     }
   }
+
 }
 
 import akka.actor.ActorDSL._
@@ -26,10 +30,20 @@ class Pinger(implicit serverMappings: ServerMappings) extends Act with ActorLogg
 
   val serverStates = scala.collection.mutable.Map.empty[(String, Int), ServerStateMachine].withDefaultValue(NothingServerStateMachine)
 
+  val fileOutputStream = new FileOutputStream("pinger-" + LocalDateTime.now() + ".log-bin.gz")
+  val gzippedOutputStream = new GZIPOutputStream(fileOutputStream)
+  val objectOutputStream = new ObjectOutputStream(gzippedOutputStream)
+
   whenStarting {
     log.info("Starting pinger actor")
     import context.system
     IO(Udp) ! Udp.Bind(self, new InetSocketAddress("0.0.0.0", 0))
+  }
+
+  whenStopping {
+    objectOutputStream.close()
+    gzippedOutputStream.close()
+    fileOutputStream.close()
   }
 
   becomeStacked {
@@ -38,14 +52,19 @@ class Pinger(implicit serverMappings: ServerMappings) extends Act with ActorLogg
       context.watch(udp)
       import PongParser.>>:
       becomeStacked {
-        case Udp.Received(PongParser.GetInt(1, PongParser.GetServerInfoReply(stuff)), from) =>
-          self ! GotParsedResponse(from, stuff)
-        case Udp.Received(0 >>: 1 >>: _ >>: PongParser.GetPlayerCns(stuff), from) =>
-          self ! GotParsedResponse(from, stuff)
-        case Udp.Received(0 >>: 1 >>: _ >>: PongParser.GetPlayerInfos(stuff), from) =>
-          self ! GotParsedResponse(from, stuff)
-        case Udp.Received(0 >>: 2 >>: _ >>: PongParser.GetTeamInfos(stuff), from) =>
-          self ! GotParsedResponse(from, stuff)
+        case o @ Udp.Received(message, from) =>
+          objectOutputStream.writeObject(o)
+          message match {
+            case PongParser.GetInt(1, PongParser.GetServerInfoReply(stuff)) =>
+              self ! GotParsedResponse(from, stuff)
+            case 0 >>: 1 >>: _ >>: PongParser.GetPlayerCns(stuff) =>
+              self ! GotParsedResponse(from, stuff)
+            case 0 >>: 1 >>: _ >>: PongParser.GetPlayerInfos(stuff) =>
+              self ! GotParsedResponse(from, stuff)
+            case 0 >>: 2 >>: _ >>: PongParser.GetTeamInfos(stuff) =>
+              self ! GotParsedResponse(from, stuff)
+            case _ =>
+          }
         case GotParsedResponse(from, stuff) =>
           val nextState = serverStates(from).next(stuff)
           serverStates += from -> nextState
