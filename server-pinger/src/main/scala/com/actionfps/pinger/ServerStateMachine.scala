@@ -10,6 +10,9 @@ import org.joda.time.format.ISODateTimeFormat
 private[pinger] sealed trait ServerStateMachine {
   def next(input: ParsedResponse): ServerStateMachine
 }
+object ServerStateMachine {
+  def empty: ServerStateMachine = NothingServerStateMachine
+}
 
 private[pinger] case object NothingServerStateMachine extends ServerStateMachine {
   override def next(input: ParsedResponse) = PartialServerStateMachine().next(input)
@@ -21,6 +24,8 @@ private[pinger] case class PartialServerStateMachine(serverInfoReplyO: Option[Se
                                                      teamInfosO: Option[TeamInfos] = None) extends ServerStateMachine {
   override def next(input: ParsedResponse) = {
     val nextResult = input match {
+      case p: PlayerCns if p.cns.isEmpty =>
+        this.copy(playerCnsO = None, playerInfoReplies = List.empty, teamInfosO = None)
       case p: PlayerCns =>
         this.copy(playerCnsO = Option(p))
       case p: PlayerInfoReply if playerCnsO.toSeq.flatMap(_.cns).contains(p.clientNum) =>
@@ -39,6 +44,8 @@ private[pinger] case class PartialServerStateMachine(serverInfoReplyO: Option[Se
         CompletedServerStateMachine(serverInfo, playerInfos, Option(teamInfos))
       case PartialServerStateMachine(Some(serverInfo), Some(PlayerCns(cns)), playerInfos, None) if cns.nonEmpty && playerInfos.size >= cns.size && !teamModes.contains(serverInfo.mode) =>
         CompletedServerStateMachine(serverInfo, playerInfos, None)
+      case PartialServerStateMachine(Some(serverInfo), None, Nil, None) =>
+        CompletedServerStateMachine(serverInfo, Nil, None)
       case other => other
     }
   }

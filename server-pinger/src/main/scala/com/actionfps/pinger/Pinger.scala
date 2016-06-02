@@ -50,35 +50,26 @@ class Pinger(implicit serverMappings: ServerMappings) extends Act with ActorLogg
     case Udp.Bound(boundTo) =>
       val udp = sender()
       context.watch(udp)
-      import PongParser.>>:
       becomeStacked {
-        case o @ Udp.Received(message, from) =>
+        case o@Udp.Received(message, f) =>
           objectOutputStream.writeObject(o)
-          message match {
-            case PongParser.GetInt(1, PongParser.GetServerInfoReply(stuff)) =>
-              self ! GotParsedResponse(from, stuff)
-            case 0 >>: 1 >>: _ >>: PongParser.GetPlayerCns(stuff) =>
-              self ! GotParsedResponse(from, stuff)
-            case 0 >>: 1 >>: _ >>: PongParser.GetPlayerInfos(stuff) =>
-              self ! GotParsedResponse(from, stuff)
-            case 0 >>: 2 >>: _ >>: PongParser.GetTeamInfos(stuff) =>
-              self ! GotParsedResponse(from, stuff)
-            case _ =>
-          }
-        case GotParsedResponse(from, stuff) =>
-          val nextState = serverStates(from).next(stuff)
-          serverStates += from -> nextState
-          log.debug(s"Received response: $from, $stuff")
-          nextState match {
-            case r: CompletedServerStateMachine =>
-              val newStatus = r.toStatus(from._1, from._2)
-              context.parent ! newStatus
-              val newStatus2 = r.toGameNow(from._1, from._2)
-              context.parent ! newStatus2
-              log.debug(s"Changed:  $r")
-            case o =>
-              log.debug(s"Unchanged: $o")
-            //                println("Not collected", from, o, stuff)
+          PartialFunction.condOpt(message) {
+            case ParsedResponse(resp) => GotParsedResponse(f, resp)
+          }.foreach { case GotParsedResponse(from, stuff) =>
+            val nextState = serverStates(from).next(stuff)
+            serverStates += from -> nextState
+            log.debug(s"Received response: $from, $stuff")
+            nextState match {
+              case r: CompletedServerStateMachine =>
+                val newStatus = r.toStatus(from._1, from._2)
+                context.parent ! newStatus
+                val newStatus2 = r.toGameNow(from._1, from._2)
+                context.parent ! newStatus2
+                log.debug(s"Changed:  $r")
+              case o =>
+                log.debug(s"Unchanged: $o")
+              //                println("Not collected", from, o, stuff)
+            }
           }
         case sp@SendPings(ip, port) =>
           log.debug(s"Sending pings: $sp")

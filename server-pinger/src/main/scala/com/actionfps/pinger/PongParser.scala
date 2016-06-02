@@ -109,6 +109,15 @@ private[pinger] object PongParser {
 
   sealed trait ParsedResponse
 
+  object ParsedResponse {
+    def unapply(message: ByteString) = PartialFunction.condOpt(message) {
+      case PongParser.GetInt(1, PongParser.GetServerInfoReply(stuff)) => stuff
+      case 0 >>: 1 >>: _ >>: PongParser.GetPlayerCns(stuff) => stuff
+      case 0 >>: 1 >>: _ >>: PongParser.GetPlayerInfos(stuff) => stuff
+      case 0 >>: 2 >>: _ >>: PongParser.GetTeamInfos(stuff) => stuff
+    }
+  }
+
   case class PlayerCns(cns: List[Int]) extends ParsedResponse
 
   object GetPlayerCns {
