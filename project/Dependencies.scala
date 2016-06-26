@@ -3,7 +3,7 @@ import sbt._
 trait Dependencies {
 
   val scalatest = "org.scalatest" %% "scalatest" % "2.2.6" % "test"
-  val json4s = "org.json4s" %% "json4s-jackson" % "3.3.0"
+  val json4s = "org.json4s" %% "json4s-jackson" % "3.4.0"
   val scalactic = "org.scalactic" %% "scalactic" % "2.2.6"
   val fastParse = "com.lihaoyi" %% "fastparse" % "0.3.7"
   val async = "org.scala-lang.modules" %% "scala-async" % "0.9.5"
@@ -13,7 +13,7 @@ trait Dependencies {
   val jodaConvert = "org.joda" % "joda-convert" % "1.8.1"
   val commonsCsv = "org.apache.commons" % "commons-csv" % "1.4"
   val jsoup = "org.jsoup" % "jsoup" % "1.9.2"
-  val groovy = "org.codehaus.groovy" % "groovy-all" % "2.4.6"
+  val groovy = "org.codehaus.groovy" % "groovy-all" % "2.4.7"
   val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.3"
   val fluentHc = "org.apache.httpcomponents" % "fluent-hc" % "4.5.2"
   val commonsIo = "commons-io" % "commons-io" % "2.5"
