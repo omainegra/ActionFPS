@@ -41,7 +41,7 @@ require("../render_game.inc.php");
     <p>Saves us time in development.</p>
     <h2 id="can-i-change-name"><a href="#can-i-change-name">Can I change the in-game name i picked while registering?</a></h2>
     <p>In the current state you are not able to change it. 
-        However if the name change is necessary (i.e joined or left a clan..) then you can make a post on the <a href="https://groups.google.com/forum/#!forum/actionfps" target="_blank">forum</a> and we will do it for you. </p>
+        However if the name change is necessary (i.e joined or left a clan..) then you can complete this <a href="https://docs.google.com/forms/d/10DqKjc8YxnpQ7llI2E2AT4ceYtypzZg0d5LD4lRTe0E/viewform" target="_blank">form</a> and we will do it for you. </p>
     <h2>Why are some games circled with blue on the frontpage?</h2>
     <p>This means that the games are happenning right now ! The real time game display allows you to see the score of a game in real time on your browser!</p>
     <h2 id="should-i-accept-notifications"><a href="#should-i-accept-notifications">Should I accept notifications?</a></h2>
