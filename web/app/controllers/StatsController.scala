@@ -39,7 +39,7 @@ class StatsController @Inject()(common: Common,
         supportsJson = false,
         login = None
       )(
-        html = Html(gcHtml.body)
+        html = views.html.stats.tableau.apply()
       ))
     }
   }
