@@ -49,20 +49,13 @@ package object flat {
     )
   }
 
-  val trioRender = new ShowLine[(Game, GameTeam, GamePlayer)] {
-    override def renders: List[(String, ((Game, GameTeam, GamePlayer)) => String)] = {
-      gameRender.renders.map { case (k, f) =>
-        s"game $k" ~> (t => f(t._1))
-      } ++
-        gameTeamRender.renders.map { case (k, f) =>
-          s"team $k" ~> (t => f(t._2))
-        } ++
-        gamePlayerRender.renders.map { case (k, f) =>
-          s"player $k" ~> (t => f(t._3))
-        }
-    }
-  }
+  type Trio = (Game, GameTeam, GamePlayer)
 
+  val trioRender = {
+    gameRender.prefix("game ").contraMap[Trio](_._1) &
+      gameTeamRender.prefix("team ").contraMap[Trio](_._2) &
+      gamePlayerRender.prefix("player ").contraMap[Trio](_._3)
+  }
 
   val playerStatRender = new ShowLine[PlayerStat] {
     override def renders: List[(String, (PlayerStat) => String)] = List(
