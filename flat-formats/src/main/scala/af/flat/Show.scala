@@ -8,9 +8,11 @@ case class Show[T](apply: T => String)
 object Show {
   implicit def strRender = Show[String](identity)
 
-  implicit def optStrRender = Show[Option[String]](_.getOrElse(""))
+  implicit def optRender[T](implicit o: Show[T]) = Show[Option[T]](_.map(o.apply).getOrElse(""))
 
   implicit def intRender = Show[Int](_.toString)
+
+  implicit def doubleRender = Show[Double](_.toString)
 
   implicit def booleanRender = Show[Boolean](_.toString)
 
