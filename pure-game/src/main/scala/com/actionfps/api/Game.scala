@@ -6,6 +6,8 @@ case class Game(id: String, endTime: ZonedDateTime, map: String, mode: String, s
                 teams: List[GameTeam], server: String, duration: Int, clangame: Option[Set[String]],
                 clanwar: Option[String], achievements: Option[List[GameAchievement]]) {
 
+  def startTime = endTime.minusMinutes(duration)
+
   def users = teams.flatMap(_.players).flatMap(_.user)
 
   def teamSize = teams.map(_.players.size).min

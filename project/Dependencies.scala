@@ -24,6 +24,7 @@ trait Dependencies {
   val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.1.7"
   val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0"
   val geoipApi = "com.maxmind.geoip" % "geoip-api" % "1.3.1"
+  val shapeless = "com.chuusai" %% "shapeless" % "2.3.1"
 
   val akkaActor = akka("actor")
   val akkaAgent = akka("agent")

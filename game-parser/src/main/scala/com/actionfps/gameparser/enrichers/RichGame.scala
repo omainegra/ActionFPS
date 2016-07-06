@@ -21,7 +21,7 @@ class RichGame(game: JsonGame) {
   }
 
   def viewFields = ViewFields(
-    startTime = endTime.minusMinutes(duration),
+    startTime = game.startTime,
     winner = winner,
     winnerClan = winnerClan
   )

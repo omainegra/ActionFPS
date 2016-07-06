@@ -26,6 +26,7 @@ lazy val root =
       pureGame,
       pureClanwar,
       testSuite,
+      flatFormats,
       jsonFormats
     ).dependsOn(
     pureAchievements,
@@ -43,6 +44,7 @@ lazy val root =
     pureGame,
     pureClanwar,
     testSuite,
+    flatFormats,
     jsonFormats
   )
     .settings(
@@ -93,6 +95,7 @@ lazy val web = project
   .dependsOn(interParser)
   .dependsOn(pureStats)
   .dependsOn(jsonFormats)
+  .dependsOn(flatFormats)
   .dependsOn(ladderParser)
   .enablePlugins(BuildInfoPlugin)
   .settings(dontDocument)
@@ -329,6 +332,16 @@ sampleLog in ThisBuild := {
   }
   sampleLog
 }
+
+lazy val flatFormats =
+  Project(
+    id = "flat-formats",
+    base = file("flat-formats")
+  )
+    .dependsOn(accumulation)
+    .settings(
+      libraryDependencies += shapeless
+    )
 
 lazy val jsonFormats =
   Project(
