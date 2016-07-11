@@ -61,6 +61,7 @@ package object flat {
 
   val playerStatRender = new ShowLine[PlayerStat] {
     override def renders: List[(String, (PlayerStat) => String)] = List(
+      "rank" ~> (_.rank),
       "user" ~> (_.user),
       "name" ~> (_.name),
       "elo" ~> (_.elo),
