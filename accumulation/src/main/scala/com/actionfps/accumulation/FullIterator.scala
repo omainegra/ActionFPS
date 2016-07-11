@@ -1,5 +1,7 @@
 package com.actionfps.accumulation
 
+import java.time.YearMonth
+
 import com.actionfps.achievements.{AchievementsRepresentation, PlayerState}
 import com.actionfps.api.GameAchievement
 import com.actionfps.gameparser.enrichers._
@@ -19,7 +21,8 @@ case class FullIterator
  clanstats: Clanstats,
  achievementsIterator: AchievementsIterator,
  hof: HOF,
- playersStats: PlayersStats) {
+ playersStats: PlayersStats,
+ playersStatsOverTime: Map[YearMonth, PlayersStats]) {
   fi =>
 
   def updateReference(newUsers: Map[String, User], newClans: Map[String, Clan]): FullIterator = {
@@ -32,7 +35,8 @@ case class FullIterator
       clanwars = Clanwars.empty,
       clanstats = Clanstats.empty,
       playersStats = PlayersStats.empty,
-      hof = HOF.empty
+      hof = HOF.empty,
+      playersStatsOverTime = Map.empty
     )
     games.valuesIterator.toList.sortBy(_.id).foldLeft(blank)(_.includeGame(_))
   }
@@ -88,13 +92,15 @@ case class FullIterator
         .map(g => g.id -> g)
         .toMap
     }
+    val newPs = playersStats.AtGame(richGame).includeGame
     copy(
       games = newGames,
       achievementsIterator = newAchievements,
       clanwars = ncw,
       hof = nhof,
       clanstats = newClanstats,
-      playersStats = playersStats.AtGame(richGame).includeGame
+      playersStats = newPs,
+      playersStatsOverTime = playersStatsOverTime.updated(YearMonth.from(richGame.startTime), newPs)
     )
   }
 

@@ -53,7 +53,8 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
       clanwars = Clanwars.empty,
       clanstats = Clanstats.empty,
       playersStats = PlayersStats.empty,
-      hof = HOF.empty
+      hof = HOF.empty,
+      playersStatsOverTime = Map.empty
     )
 
     val newIterator = allGames.valuesIterator.toList.sortBy(_.id).foldLeft(initial)(_.includeGame(_))

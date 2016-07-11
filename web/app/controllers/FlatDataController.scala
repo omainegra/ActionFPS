@@ -1,10 +1,11 @@
 package controllers
 
+import java.time.{YearMonth, ZoneId}
 import javax.inject.Inject
 
 import akka.stream.scaladsl.Source
 import com.actionfps.api.Game
-import com.actionfps.players.PlayerStat
+import com.actionfps.players.{PlayerStat, PlayersStats}
 import play.api.mvc.{Action, Controller}
 import providers.full.FullProvider
 
@@ -39,11 +40,24 @@ class FlatDataController @Inject()(fullProvider: FullProvider)
     af.flat.playerStatRender.renders.map(_._2.apply(g)).mkString(TAB)
   }
 
+  def ymPsToLines(ymps: (YearMonth, PlayersStats)): List[String] = {
+    ymps match {
+      case (ym, ps) =>
+        ps.players.values
+          .map(pss => af.flat.monthPsRender.renders.map(_._2.apply(ym, pss)).mkString(TAB))
+          .toList
+    }
+  }
+
   def playerStatTsv = Action.async {
-    val header = af.flat.playerStatRender.renders.map(_._1).mkString(TAB)
+    val header = af.flat.monthPsRender.renders.map(_._1).mkString(TAB)
     async {
-      val pst = await(fullProvider.playerRanks).players.values
-      val src = Source.single(header) ++ Source(pst.toList).map(statToList)
+      val pst = await(fullProvider.playerRanksOverTime)
+        .toList
+        .sortBy(_._1.toString)
+        .filterNot { case (ym, x) => ym == YearMonth.now(ZoneId.of("UTC")) }
+
+      val src = Source.single(header) ++ Source(pst).mapConcat(ymPsToLines)
       Ok.chunked(src.map(_ + NEW_LINE)).as(TSV_CONTENT_TYPE)
     }
   }

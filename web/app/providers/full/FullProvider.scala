@@ -1,5 +1,7 @@
 package providers.full
 
+import java.time.YearMonth
+
 import akka.agent.Agent
 import com.actionfps.accumulation.{FullIterator, FullProfile, HOF}
 import com.actionfps.clans.Clanwars
@@ -29,6 +31,10 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext) {
 
   def playerRanks: Future[PlayersStats] = {
     fullStuff.map(_.get().playersStats)
+  }
+
+  def playerRanksOverTime: Future[Map[YearMonth, PlayersStats]] = {
+    fullStuff.map(_.get().playersStatsOverTime)
   }
 
   def clanstats: Future[Clanstats] = {

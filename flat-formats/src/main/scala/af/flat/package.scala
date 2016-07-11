@@ -1,5 +1,7 @@
 package af
 
+import java.time.YearMonth
+
 import com.actionfps.api.{Game, GamePlayer, GameTeam}
 import com.actionfps.players.PlayerStat
 
@@ -74,5 +76,15 @@ package object flat {
     )
   }
 
+  type PlayerStatYM = (YearMonth, PlayerStat)
+
+  val yearMonthRender = new ShowLine[YearMonth] {
+    override def renders = List(
+      "yearMonth" ~> (_.toString)
+    )
+  }
+
+  val monthPsRender = yearMonthRender.contraMap[PlayerStatYM](_._1) &
+    playerStatRender.contraMap[PlayerStatYM](_._2)
 
 }
