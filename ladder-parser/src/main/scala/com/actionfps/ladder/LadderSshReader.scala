@@ -3,23 +3,7 @@ package com.actionfps.ladder
 import com.actionfps.ladder.parser.{LineParser, UserProvider}
 
 
-class ProcessTailer(command: List[String])(callback: String => Unit) {
-  val pb = new ProcessBuilder(command :_*)
-  val ps = pb.start()
-  val thread = new Thread(new Runnable {
-    override def run(): Unit = {
-      val ss = scala.io.Source.fromInputStream(ps.getInputStream)
-      try ss.getLines().foreach(callback)
-      finally ss.close()
-    }
-  })
-  thread.setDaemon(true)
-  thread.start()
 
-  def shutdown(): Unit = {
-    ps.destroy()
-  }
-}
 
 object ReaderApp extends App {
   val cmd = List("read-aura.sh")

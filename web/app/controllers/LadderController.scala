@@ -41,9 +41,10 @@ class LadderController @Inject
     case _ =>
   }
 
-  val tailers = configuration.getConfigSeq("af.ladder.sources").toSeq.flatten.map { source =>
-    val command = source.underlying.getStringList("command").asScala.toList
-    val year = source.underlying.getInt("year")
+  val tailers = LadderController
+    .getSourceCommands(configuration, "af.ladder.sources")
+    .toList
+    .flatten.map { case (command, year) =>
     val prs = LineParser(atYear = year)
     try {
       Logger.info(s"Starting process = ${command}")
@@ -54,7 +55,7 @@ class LadderController @Inject
         Logger.error(s"Failed to start: ${command}", e)
         throw e
     }
-  }.toList
+  }
 
   applicationLifecycle.addStopHook(() => Future.successful(tailers.foreach(_.shutdown())))
 
@@ -72,6 +73,18 @@ class LadderController @Inject
           supportsJson = true,
           login = None)
         (views.html.ladder.ladder_table(agg.get())(showTime = true)))
+    }
+  }
+}
+
+object LadderController {
+  def getSourceCommands(configuration: Configuration, path: String): Option[List[(List[String], Int)]] = {
+    import collection.JavaConverters._
+    configuration.getConfigList(path).map { items => items.asScala.map { source =>
+      val command = source.underlying.getStringList("command").asScala.toList
+      val year = source.underlying.getInt("year")
+      (command, year)
+    }.toList
     }
   }
 }
