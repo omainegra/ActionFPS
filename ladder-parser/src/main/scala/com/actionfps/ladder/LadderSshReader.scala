@@ -1,10 +1,8 @@
 package com.actionfps.ladder
 
-import java.io.FileReader
-import java.time.ZonedDateTime
 import java.util.TimerTask
 
-import com.actionfps.ladder.connecting.RemoteSshPath
+import com.actionfps.ladder.connecting.{RemoteSshAction, RemoteSshPath}
 import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage, UserProvider}
 
 object MainSsh {
@@ -15,11 +13,8 @@ object SmartReader extends App {
 
 }
 
-class SshTailer(file: RemoteSshPath, endOnly: Boolean)(callback: String => Unit) {
-  val pb = new ProcessBuilder("ssh", file.sshTarget,
-    if (endOnly) s"tail -f '${file.path}'"
-    else s"tail -n +0 -f '${file.path}'"
-  )
+class SshTailer(file: RemoteSshPath, remoteSshAction: RemoteSshAction)(callback: String => Unit) {
+  val pb = new ProcessBuilder("ssh", file.sshTarget, remoteSshAction.command)
   val ps = pb.start()
   val thread = new Thread(new Runnable {
     override def run(): Unit = {

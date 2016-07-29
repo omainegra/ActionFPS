@@ -8,7 +8,7 @@ import javax.inject._
 
 import akka.agent.Agent
 import com.actionfps.ladder.SshTailer
-import com.actionfps.ladder.connecting.RemoteSshPath
+import com.actionfps.ladder.connecting.{RemoteSshAction, RemoteSshPath}
 import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage, UserStatistics}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.Json
@@ -28,27 +28,27 @@ class LadderController @Inject
 
   import collection.JavaConverters._
 
-  val prs = LineParser(atYear = 2016)
+
   val agg = Agent(Aggregate.empty)
 
   import concurrent.duration._
 
   def up = referenceProvider.syncUserProvider(10.seconds)
 
-  def includeLine(input: String): Unit = input match {
+  def includeLine(prs: LineParser)(input: String): Unit = input match {
     case prs(time, PlayerMessage(pm)) =>
       agg.send(_.includeLine(pm.timed(time))(up))
     case _ =>
   }
 
-  val tailers = configuration.getStringList("af.ladder.sources").get.asScala.map { sshUrl =>
-    Logger.info(s"Logging from ${sshUrl}")
-    val q = new SshTailer(
-      endOnly = false,
-      file = RemoteSshPath.unapply(sshUrl).get
-    )(includeLine)
-    q
-  }
+  val tailers = configuration.getObjectList("af.ladder.sources").get.asScala.map { source =>
+    val url = source.toConfig.getString("url")
+    val command = source.toConfig.getString("execute")
+    val year = source.toConfig.getInt("year")
+    val prs = LineParser(atYear = year)
+    val t = new SshTailer(file = RemoteSshPath.unapply(url).get, remoteSshAction = RemoteSshAction.Execute(command))(includeLine(prs))
+    t
+  }.toList
 
   applicationLifecycle.addStopHook(() => Future.successful(tailers.foreach(_.shutdown())))
 
