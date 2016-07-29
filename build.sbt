@@ -359,3 +359,5 @@ lazy val sampleLog = taskKey[File]("Sample Log")
 updateOptions := updateOptions.value.withCachedResolution(true)
 
 incOptions := incOptions.value.withNameHashing(true)
+
+cancelable in Global := true
