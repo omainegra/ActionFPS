@@ -7,7 +7,7 @@ package controllers
 import javax.inject._
 
 import akka.agent.Agent
-import com.actionfps.ladder.SshTailer
+import com.actionfps.ladder.{ProcessTailer, SshTailer}
 import com.actionfps.ladder.connecting.{RemoteSshAction, RemoteSshPath}
 import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage, UserStatistics}
 import play.api.inject.ApplicationLifecycle
@@ -42,11 +42,10 @@ class LadderController @Inject
   }
 
   val tailers = configuration.getObjectList("af.ladder.sources").get.asScala.map { source =>
-    val url = source.toConfig.getString("url")
-    val command = source.toConfig.getString("execute")
+    val command = source.toConfig.getStringList("command").asScala.toList
     val year = source.toConfig.getInt("year")
     val prs = LineParser(atYear = year)
-    val t = new SshTailer(file = RemoteSshPath.unapply(url).get, remoteSshAction = RemoteSshAction.Execute(command))(includeLine(prs))
+    val t = new ProcessTailer(command)(includeLine(prs))
     t
   }.toList
 

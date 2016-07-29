@@ -13,8 +13,8 @@ object SmartReader extends App {
 
 }
 
-class SshTailer(file: RemoteSshPath, remoteSshAction: RemoteSshAction)(callback: String => Unit) {
-  val pb = new ProcessBuilder("ssh", file.sshTarget, remoteSshAction.command)
+class ProcessTailer(command: List[String])(callback: String => Unit) {
+  val pb = new ProcessBuilder(command :_*)
   val ps = pb.start()
   val thread = new Thread(new Runnable {
     override def run(): Unit = {
