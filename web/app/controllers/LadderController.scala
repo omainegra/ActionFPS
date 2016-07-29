@@ -7,13 +7,12 @@ package controllers
 import javax.inject._
 
 import akka.agent.Agent
-import com.actionfps.ladder.{ProcessTailer, SshTailer}
-import com.actionfps.ladder.connecting.{RemoteSshAction, RemoteSshPath}
+import com.actionfps.ladder.ProcessTailer
 import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage, UserStatistics}
+import play.api.Configuration
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
 
 import scala.concurrent.{ExecutionContext, Future}
