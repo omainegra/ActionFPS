@@ -27,7 +27,8 @@ lazy val root =
       pureClanwar,
       testSuite,
       flatFormats,
-      jsonFormats
+      jsonFormats,
+      liveListener
     ).dependsOn(
     pureAchievements,
     gameParser,
@@ -45,7 +46,8 @@ lazy val root =
     pureClanwar,
     testSuite,
     flatFormats,
-    jsonFormats
+    jsonFormats,
+    liveListener
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -354,6 +356,13 @@ lazy val jsonFormats =
       libraryDependencies += json
     )
 
+lazy val liveListener =
+  Project(
+    id = "live-listener",
+    base = file("live-listener")
+  )
+    .dependsOn(demoParser)
+
 lazy val sampleLog = taskKey[File]("Sample Log")
 
 // truly don't know if this works at all
@@ -362,3 +371,5 @@ updateOptions := updateOptions.value.withCachedResolution(true)
 incOptions := incOptions.value.withNameHashing(true)
 
 cancelable in Global := true
+
+fork in run in Global := true
