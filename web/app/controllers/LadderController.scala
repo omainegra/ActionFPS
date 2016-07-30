@@ -4,11 +4,13 @@ package controllers
   * Created by me on 09/05/2016.
   */
 
+import java.time.ZoneId
 import javax.inject._
 
 import akka.agent.Agent
 import com.actionfps.ladder.ProcessTailer
-import com.actionfps.ladder.parser.{Aggregate, LineParser, PlayerMessage, UserStatistics}
+import com.actionfps.ladder.parser.ScannedTiming.After
+import com.actionfps.ladder.parser._
 import play.api.{Configuration, Logger}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.Json
@@ -35,20 +37,23 @@ class LadderController @Inject
 
   def up = referenceProvider.syncUserProvider(10.seconds)
 
-  def includeLine(prs: LineParser)(input: String): Unit = input match {
-    case prs(time, PlayerMessage(pm)) =>
-      agg.send(_.includeLine(pm.timed(time))(up))
-    case _ =>
-  }
-
   val tailers = LadderController
     .getSourceCommands(configuration, "af.ladder.sources")
     .toList
-    .flatten.map { case (command, year) =>
-    val prs = LineParser(atYear = year)
+    .flatten.map { command =>
     try {
       Logger.info(s"Starting process = ${command}")
-      val t = new ProcessTailer(command)(line => includeLine(prs)(line))
+      var currentState = LineTimerScanner.empty
+      val t = new ProcessTailer(command)({
+        case DirectTimedLine(dtl) =>
+          currentState = currentState.include(dtl)
+          currentState.emitLine.foreach {
+            case ScanTimedLine(After(tm), PlayerMessage(m)) =>
+              agg.send(_.includeLine(m.timed(tm.atZone(ZoneId.of("UTC"))))(up))
+            case _ =>
+          }
+        case _ =>
+      })
       t
     } catch {
       case NonFatal(e) =>
@@ -78,12 +83,10 @@ class LadderController @Inject
 }
 
 object LadderController {
-  def getSourceCommands(configuration: Configuration, path: String): Option[List[(List[String], Int)]] = {
+  def getSourceCommands(configuration: Configuration, path: String): Option[List[List[String]]] = {
     import collection.JavaConverters._
     configuration.getConfigList(path).map { items => items.asScala.map { source =>
-      val command = source.underlying.getStringList("command").asScala.toList
-      val year = source.underlying.getInt("year")
-      (command, year)
+      source.underlying.getStringList("command").asScala.toList
     }.toList
     }
   }

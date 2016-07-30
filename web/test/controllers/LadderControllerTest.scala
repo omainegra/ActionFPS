@@ -15,7 +15,6 @@ class LadderControllerTest extends FunSuite {
     val config =
       """
         | items = [{
-        |year = 2016
         |command = ["/aff"]
         | }]
         |
@@ -25,8 +24,7 @@ class LadderControllerTest extends FunSuite {
 
     val l = LadderController.getSourceCommands(configuration, "items").value
     l should have size 1
-    l.head._2 shouldBe 2016
-    l.head._1.head shouldBe "/aff"
+    l.head.head shouldBe "/aff"
 
   }
 

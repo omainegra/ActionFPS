@@ -283,6 +283,7 @@ lazy val ladderParser =
     id = "ladder-parser",
     base = file("ladder-parser")
   )
+    .dependsOn(gameParser)
     .settings(
       git.useGitDescribe := true
     )

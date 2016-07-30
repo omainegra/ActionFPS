@@ -3,8 +3,6 @@ package com.actionfps.gameparser.mserver
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import scala.util.Try
-
 /**
   * Created by William on 26/12/2015.
   */
