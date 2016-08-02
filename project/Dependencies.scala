@@ -2,9 +2,10 @@ import sbt._
 
 trait Dependencies {
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+  val scalatest = "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+  val scalatestOld = "org.scalatest" %% "scalatest" % "2.2.6" % "test"
   val json4s = "org.json4s" %% "json4s-jackson" % "3.4.0"
-  val scalactic = "org.scalactic" %% "scalactic" % "2.2.6"
+  val scalactic = "org.scalactic" %% "scalactic" % "3.0.0"
   val fastParse = "com.lihaoyi" %% "fastparse" % "0.3.7"
   val async = "org.scala-lang.modules" %% "scala-async" % "0.9.5"
   val xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
@@ -14,11 +15,12 @@ trait Dependencies {
   val commonsCsv = "org.apache.commons" % "commons-csv" % "1.4"
   val jsoup = "org.jsoup" % "jsoup" % "1.9.2"
   val groovy = "org.codehaus.groovy" % "groovy-all" % "2.4.7"
-  val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.3"
+  val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.4"
   val fluentHc = "org.apache.httpcomponents" % "fluent-hc" % "4.5.2"
   val commonsIo = "commons-io" % "commons-io" % "2.5"
-  val scalatestPlus = "org.scalatestplus" %% "play" % "1.4.0" % "test"
-  val seleniumJava = "org.seleniumhq.selenium" % "selenium-java" % "2.53.0" % "test"
+  val scalatestPlus = "org.scalatestplus.play" % "scalatestplus-play_2.11" % "1.5.1"
+
+  val seleniumJava = "org.seleniumhq.selenium" % "selenium-java" % "2.53.1" % "test"
   val seleniumHtmlUnit = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0" % "test"
   val syslog4j = "org.syslog4j" % "syslog4j" % "0.9.30"
   val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.1.7"
@@ -33,6 +35,6 @@ trait Dependencies {
 
   val mockito = "org.mockito" % "mockito-all" % "1.10.19" % "test"
 
-  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.7"
+  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.8"
 
 }

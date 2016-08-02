@@ -15,7 +15,6 @@ object CommonSettingsPlugin extends AutoPlugin {
     javaOptions += "-Duser.timezone=UTC",
     javaOptions in run += "-Duser.timezone=UTC",
     resolvers += Resolver.mavenLocal,
-    libraryDependencies += autoImport.scalatest,
     licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
     publishMavenStyle := false,
     updateOptions := updateOptions.value.withCachedResolution(true),

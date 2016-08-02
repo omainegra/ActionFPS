@@ -115,6 +115,7 @@ lazy val web = project
       ws,
       async,
       scalatestPlus,
+      scalatestOld,
       seleniumHtmlUnit,
       seleniumJava,
       cache,
@@ -231,7 +232,8 @@ lazy val demoParser =
       libraryDependencies ++= Seq(
         commonsIo,
         json4s,
-        akkaActor
+        akkaActor,
+        scalatest
       ),
       git.useGitDescribe := true
     )
@@ -317,7 +319,8 @@ lazy val testSuite = Project(
   .dependsOn(jsonFormats)
   .settings(
     (test in Test) <<= (test in Test) dependsOn(geoIpFiles in ThisBuild, sampleLog),
-    run <<= (run in Runtime) dependsOn(geoIpFiles in ThisBuild, sampleLog in ThisBuild)
+    run <<= (run in Runtime) dependsOn(geoIpFiles in ThisBuild, sampleLog in ThisBuild),
+    libraryDependencies += scalatest
   )
 
 sampleLog in ThisBuild := {

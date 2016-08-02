@@ -1,4 +1,3 @@
-import akka.util.Timeout
 import org.openqa.selenium.WebDriver
 import org.scalatest.{Inspectors, OptionValues}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}

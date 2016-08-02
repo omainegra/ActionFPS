@@ -22,11 +22,23 @@ class FullFlowTest
   lazy val users = Registration.parseRecords(com.actionfps.reference.getSample("registrations.csv")).flatMap(User.fromRegistration(_, nicknames))
   lazy val er = EnrichGames(users, clans)
 
+  val sampleFile = {
+    val A = new File("target/sample.log")
+    val B = new File("../target/sample.log")
+    if ( A.exists() ) A else B
+  }
+
+  val testSuitePath = {
+    val A = new File("test-suite")
+    val B = new File("../test-suite")
+    if ( A.exists() ) A else B
+  }
+
 
   def getSampleGames = {
     import er._
     val validServers = ValidServers.fromResource
-    scala.io.Source.fromFile("target/sample.log")(Codec.UTF8)
+    scala.io.Source.fromFile(sampleFile)(Codec.UTF8)
       .getLines()
       .scanLeft(MultipleServerParser.empty)(_.process(_))
       .collect { case m: MultipleServerParserFoundGame => m }
@@ -48,7 +60,8 @@ class FullFlowTest
 
     games.map { game => game.testHash -> Json.toJson(game) }.foreach {
       case (hashedId, json) =>
-        val path = s"test-suite/src/test/resources/com/actionfps/accumulation/samples/${hashedId}.json"
+
+        val path = s"${testSuitePath.getCanonicalPath}/src/test/resources/com/actionfps/accumulation/samples/${hashedId}.json"
 
         if (new File(path).exists) {
           val haveJson = Json.parse(Source.fromFile(path).mkString)

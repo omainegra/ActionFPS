@@ -40,7 +40,8 @@
       "deaths" : 42,
       "user" : "quico",
       "countryCode" : "ES",
-      "countryName" : "Spain"
+      "countryName" : "Spain",
+      "timezone" : "Africa/Ceuta"
     } ]
   }, {
     "name" : "CLA",

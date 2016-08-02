@@ -25,6 +25,12 @@ class JournalNewGamesTest
 
   val tmpFileOlder = File.createTempFile("actionfps-journal-older", ".log")
   val tmpFile = File.createTempFile("actionfps-journal", ".log")
+  val sampleFile = {
+    val A = new File("target/sample.log")
+    val B = new File("../target/sample.log")
+    if ( A.exists() ) A else B
+  }
+
 
   override protected def afterAll(): Unit = {
     tmpFile.delete()
@@ -85,11 +91,10 @@ class JournalNewGamesTest
     * Find two different games next to each other, extract their sets of lines.
     */
   def getGamesLines: (List[String], List[String], List[String]) = {
-    val fn = "target/sample.log"
     // navigate to first bit
 
     val fileLines = {
-      val src = scala.io.Source.fromFile(fn)(Codec.UTF8)
+      val src = scala.io.Source.fromFile(sampleFile)(Codec.UTF8)
       try src.getLines().toList
       finally src.close()
     }

@@ -14,7 +14,8 @@ object GeoIpLookup extends IpLookup {
     val B = new File("web/resources/GeoLiteCityv6.dat")
     val C = new File("../resources/GeoLiteCityv6.dat")
     val D = new File("target/geoip-resources/GeoLiteCityv6.dat")
-    List(A, B, C, D).filter(_.exists()).head
+    val E = new File("../target/geoip-resources/GeoLiteCityv6.dat")
+    List(A, B, C, D, E).filter(_.exists()).head
   }
 
   lazy val ls = new LookupService(file, LookupService.GEOIP_MEMORY_CACHE)
