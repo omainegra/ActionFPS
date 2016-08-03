@@ -47,9 +47,6 @@ object DemoParser {
     'SV_CLIENT,
     'SV_EXTENSION,
     'SV_MAPIDENT, 'SV_HUDEXTRAS, 'SV_POINTS,
-    'SV_GAMEPAUSED, 'SV_GAMERESUMED, 'SV_GAMERESUMING,
-    'SV_TIMESYNC, 'SV_SETHALFTIME,
-    'SV_PLAYERID,
     'SV_NUM
   )
 
@@ -230,7 +227,7 @@ object DemoParser {
   }
 
 
-  case class Welcome(numClients: Int, mapChange: MapChange, haltTime: Option[HalfTime], timeUp: TimeUp, il: ItemList, resume: Resume, clientIdsO: Option[ClientIds],
+  case class Welcome(numClients: Int, mapChange: MapChange, timeUp: TimeUp, il: ItemList, resume: Resume,
                      serverMode: Int, motd: Option[String])
 
   object Welcome {
@@ -243,20 +240,16 @@ object DemoParser {
       Option(byteString).collectFirst {
         case `SV_WELCOME` #:: numclients #:: rest =>
           val Some((mc, rest2)) = MapChange.parse(rest)
-          val htO = HalfTime.parse(rest2)
-          val rest3 = htO.map(_._2).getOrElse(rest2)
-          val Some((tu, rest4)) = TimeUp.parse(rest3)
-          val Some((il, rest45)) = ItemList.parse(rest4)
-          val Some((re, rest5)) = Resume.parse(rest45, numclients)
-          val cidsOR = clientIds(rest5)
-          val rest6 = cidsOR.map(_._2).getOrElse(rest5)
-          val `SV_SERVERMODE` #:: smode #:: rest7 = rest6
-          val txtOR = Option(rest7).collectFirst {
+          val Some((tu, rest3)) = TimeUp.parse(rest2)
+          val Some((il, rest34)) = ItemList.parse(rest3)
+          val Some((re, rest4)) = Resume.parse(rest34, numclients)
+          val `SV_SERVERMODE` #:: smode #:: rest5 = rest4
+          val txtOR = Option(rest5).collectFirst {
             case `SV_TEXT` #:: txt ##:: moar =>
               (txt, moar)
           }
-          val finals = txtOR.map(_._2).getOrElse(rest7)
-          (Welcome(numclients, mc, htO.map(_._1), tu, il, re, cidsOR.map(_._1), smode, txtOR.map(_._1)), finals)
+          val finals = txtOR.map(_._2).getOrElse(rest5)
+          (Welcome(numclients, mc, tu, il, re, smode, txtOR.map(_._1)), finals)
       }
     }
   }
@@ -280,20 +273,6 @@ object DemoParser {
     * if you want to track players health you would need to handle SV_DAMAGE
     * and SV_GIBDAMAGE
     */
-
-
-  case class HalfTime(isHalfTime: Boolean)
-
-  object HalfTime {
-    val SV_SETHALFTIME = DemoParser.symbols.indexOf('SV_SETHALFTIME)
-
-    def parse(byteString: ByteString) = {
-      Option(byteString).collectFirst {
-        case `SV_SETHALFTIME` #:: v #:: rest =>
-          (HalfTime(v == 1), rest)
-      }
-    }
-  }
 
   case class FlagCount(cn: Int, flags: Int)
 
@@ -629,10 +608,6 @@ object DemoParser {
           case 'SA_STOPDEMO =>
           case 'SA_REMBANS =>
           case 'SA_SHUFFLETEAMS =>
-          case 'SA_SWITCHTEAMS =>
-          case 'SA_SORTTEAMS =>
-          case 'SA_PAUSEGAME =>
-          case 'SA_RESUMEGAME =>
           case 'SA_FORCETEAM => buf.getint; buf.getint
           case _ => buf.getint
         }
@@ -646,10 +621,6 @@ object DemoParser {
           case 'SA_STOPDEMO =>
           case 'SA_REMBANS =>
           case 'SA_SHUFFLETEAMS =>
-          case 'SA_SWITCHTEAMS =>
-          case 'SA_SORTTEAMS =>
-          case 'SA_PAUSEGAME =>
-          case 'SA_RESUMEGAME =>
           case 'SA_FORCETEAM => buf.getint; buf.getint
           case _ => buf.getint
         }
@@ -661,37 +632,6 @@ object DemoParser {
   case class SwitchTeam(newTeam: Int) extends SvClientSubMessage
 
   case class Resume(players: Vector[PlayerInfo], clients: Vector[InitClient])
-
-
-  case class ClientId(cn: Int, id: String, group: String, country: String)
-
-  def clientId(byteString: ByteString) = {
-    Option(byteString).collectFirst {
-      case cn #:: id ##:: group ##:: country ##:: rest =>
-        (ClientId(cn, id, group, country), rest)
-    }
-  }
-
-  case class ClientIds(clientIds: Vector[ClientId])
-
-  val SV_PLAYERID = DemoParser.symbols.indexOf('SV_PLAYERID)
-
-  def clientIds(byteString: ByteString) = {
-    Option(byteString).collectFirst {
-      case `SV_PLAYERID` #:: count #:: more =>
-        def go(input: ByteString, accum: Vector[ClientId]): (Vector[ClientId], ByteString) = {
-          if (accum.size == count) (accum, input)
-          else {
-            clientId(input) match {
-              case Some((cid, oth)) => go(oth, accum :+ cid)
-              case None => (accum, input)
-            }
-          }
-        }
-        val (clientIds, rest) = go(more, Vector.empty)
-        (ClientIds(clientIds), rest)
-    }
-  }
 
   object Resume {
     val SV_RESUME = DemoParser.symbols.indexOf('SV_RESUME)
