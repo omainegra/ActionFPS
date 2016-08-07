@@ -1,7 +1,8 @@
 package com.actionfps.demoparser
 
 import akka.util.ByteString
-import com.actionfps.demoparser.DemoParser._
+import com.actionfps.demoparser.objects._
+import com.actionfps.demoparser.objects.SvClientSubMessage.{SvSetteam, SvSpawn, SwitchName, SwitchTeam}
 import org.json4s.NoTypeHints
 
 import scala.annotation.tailrec
@@ -155,11 +156,16 @@ object DemoAnalysis {
   }
 
 
-  val go = DemoParser.demoPacketsStream _
+  val go = objects.demoPacketsStream _
 
   def goThroughPackets(input: ByteString) = {
     go(input).flatMap(bs => Welcome.parse(bs.data)).head
     go(input).flatMap(e => parsePacket(e.data).map(r => e.millis -> r))
+  }
+  def goThroughPackets2(input: ByteString) = {
+    val h = go(input).flatMap(bs => Welcome.parse(bs.data)).head
+    val r = go(input).flatMap(e => parsePacket(e.data).map(r => e.millis -> r))
+    (h, r)
   }
 
   def flowState(input: ByteString) = {

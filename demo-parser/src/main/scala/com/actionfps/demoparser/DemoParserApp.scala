@@ -12,7 +12,28 @@ import scala.util.Try
 /**
   * Created by William on 14/02/2015.
   */
+object DPB {
+
+  def parseFile(file: File) = {
+    val is = new GZIPInputStream(new FileInputStream(file))
+    try {
+      (1 to 428).foreach(_ => is.read())
+      val bs = org.apache.commons.io.IOUtils.toByteArray(is)
+      DemoAnalysis.goThroughPackets(ByteString(bs))
+    } finally is.close()
+  }
+  def parseFile2(file: File) = {
+    val is = new GZIPInputStream(new FileInputStream(file))
+    try {
+      (1 to 428).foreach(_ => is.read())
+      val bs = org.apache.commons.io.IOUtils.toByteArray(is)
+      DemoAnalysis.goThroughPackets2(ByteString(bs))
+    } finally is.close()
+  }
+
+}
 object DemoParserApp extends App {
+  import DPB._
   // 1358364864 just fails, why?
   //  Set(74).map(DemoParser.symbols).foreach(println)
   //    println(DemoParser.symbols(107))
@@ -29,13 +50,6 @@ object DemoParserApp extends App {
 
   import org.json4s.jackson.Serialization.write
 
-  def parseFile(file: File) = {
-    val is = new GZIPInputStream(new FileInputStream(file))
-    (1 to 428).foreach(_ => is.read())
-    val bs = org.apache.commons.io.IOUtils.toByteArray(is)
-    DemoAnalysis.goThroughPackets(ByteString(bs))
-  }
-
   val demosDir = new File("HOME\\Desktop\\Demos")
   //  val failedOnes = Vector(1003986242,1043319913,1274560658,1211763285,1697579163,1955177189,1983365056,
   //  1985324506,2066960023,916451708,1615509721,1336408268,1095211318,241713795)
@@ -44,7 +58,7 @@ object DemoParserApp extends App {
   //  val failedOnes = Vector(916451708,1615509721, 1274560658, 241713795)
   // fails: 1955177189
   var currentGame: String = ""
-  DemoParser.report = (f) => {
+  objects.report = (f) => {
     println("Game id", currentGame, "Zeroed Position result", f)
   }
   val filesz = demosDir.listFiles.toVector
