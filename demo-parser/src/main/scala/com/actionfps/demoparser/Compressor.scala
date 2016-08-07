@@ -3,6 +3,7 @@ package com.actionfps.demoparser
 import java.util
 
 import akka.util.ByteString
+import sw.Bytes
 
 import scala.annotation.tailrec
 
@@ -10,18 +11,26 @@ object Compressor {
 
   object ExtractString {
     def unapply(bs: ByteString) = shiftString(bs)
+
+    def unapply(bs: Bytes) = shiftString(bs.byteString.drop(bs.position)).map { case (i, r) => i -> Bytes(r, 0) }
   }
 
   object ExtractInt {
     def unapply(bs: ByteString) = shiftInt(bs)
+
+    def unapply(bs: Bytes) = shiftInt(bs.byteString.drop(bs.position)).map { case (i, r) => i -> Bytes(r, 0) }
   }
 
   object ExtractUInt {
     def unapply(bs: ByteString) = shiftUInt(bs)
+
+    def unapply(bs: Bytes) = shiftUInt(bs.byteString.drop(bs.position)).map { case (i, r) => i -> Bytes(r, 0) }
   }
 
   object ExtractLong {
     def unapply(bs: ByteString) = shiftLong(bs)
+
+    def unapply(bs: Bytes) = shiftLong(bs.byteString.drop(bs.position)).map { case (i, r) => i -> Bytes(r, 0) }
   }
 
   val #:: = ExtractInt

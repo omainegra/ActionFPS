@@ -271,12 +271,9 @@ package object objects {
   val #::: = ExtractLong
   val ##:: = ExtractString
 
+  val SV_TIMEUP = symbols.indexOf('SV_TIMEUP)
 
-
-
-
-
-
+  val SV_ITEMLIST = symbols.indexOf('SV_ITEMLIST)
 
   def svMessage(byteString: ByteString): Option[(SvClientSubMessage, ByteString)] = {
     import SvMessageSymbols._

@@ -1,5 +1,7 @@
 package com.actionfps.demoparser.objects
 
+import sw.ByteParser
+
 /**
   * Created by me on 06/08/2016.
   */
@@ -8,21 +10,24 @@ case class Welcome(numClients: Int, mapChange: MapChange, timeUp: TimeUp, il: It
 
 object Welcome {
 
-  def parse(byteString: ByteString) = {
-
-    Option(byteString).collectFirst {
-      case `SV_WELCOME` #:: numclients #:: rest =>
-        val Some((mc, rest2)) = MapChange.parse(rest)
-        val Some((tu, rest3)) = TimeUp.parse(rest2)
-        val Some((il, rest34)) = ItemList.parse(rest3)
-        val Some((re, rest4)) = Resume.parse(rest34, numclients)
-        val `SV_SERVERMODE` #:: smode #:: rest5 = rest4
-        val txtOR = Option(rest5).collectFirst {
-          case `SV_TEXT` #:: txt ##:: moar =>
-            (txt, moar)
-        }
-        val finals = txtOR.map(_._2).getOrElse(rest5)
-        (Welcome(numclients, mc, tu, il, re, smode, txtOR.map(_._1)), finals)
-    }
+  val byteParser = ByteParser[Welcome] {
+    case `SV_WELCOME` #::
+      numclients #::
+      MapChange.byteParser(mc,
+      TimeUp.byteParser(tu,
+      ItemList.byteParser(il, rest34))) =>
+      val resumer = Resume.byteParser(numclients)
+      rest34 match {
+        case resumer(re, `SV_SERVERMODE` #:: smode #:: rest5) =>
+          rest5 match {
+            case `SV_TEXT` #:: txt ##:: moar =>
+              (Welcome(numclients, mc, tu, il, re, smode, Some(txt)), moar)
+            case other =>
+              (Welcome(numclients, mc, tu, il, re, smode, None), other)
+          }
+      }
   }
+
+  val parse = byteParser.old _
+
 }
