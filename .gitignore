@@ -1,3 +1,6 @@
+*.dmo
+*.raw
+*.log-bin.gz
 *.log.gz
 acleague-1.0.*
 main.db

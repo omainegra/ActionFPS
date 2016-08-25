@@ -16,10 +16,10 @@ trait Dependencies {
   val kantanCsv = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.13"
   val jsoup = "org.jsoup" % "jsoup" % "1.9.2"
   val groovy = "org.codehaus.groovy" % "groovy-all" % "2.4.7"
-  val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.4"
+  val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.5"
   val fluentHc = "org.apache.httpcomponents" % "fluent-hc" % "4.5.2"
   val commonsIo = "commons-io" % "commons-io" % "2.5"
-  val scalatestPlus = "org.scalatestplus.play" % "scalatestplus-play_2.11" % "1.5.1"
+  val scalatestPlus = "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1"
 
   val seleniumJava = "org.seleniumhq.selenium" % "selenium-java" % "2.53.1" % "test"
   val seleniumHtmlUnit = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0" % "test"
@@ -27,7 +27,7 @@ trait Dependencies {
   val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.1.7"
   val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0"
   val geoipApi = "com.maxmind.geoip" % "geoip-api" % "1.3.1"
-  val shapeless = "com.chuusai" %% "shapeless" % "2.3.1"
+  val shapeless = "com.chuusai" %% "shapeless" % "2.3.2"
 
   val akkaActor = akka("actor")
   val akkaAgent = akka("agent")
@@ -36,6 +36,6 @@ trait Dependencies {
 
   val mockito = "org.mockito" % "mockito-all" % "1.10.19" % "test"
 
-  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.8"
+  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.9"
 
 }
