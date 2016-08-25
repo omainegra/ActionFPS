@@ -18,23 +18,16 @@ case class ServerRecord(region: String, hostname: String, port: Int, kind: Strin
 }
 
 object ServerRecord {
-  def parseRecords(input: Reader): List[ServerRecord] = {
-    import collection.JavaConverters._
-    CSVFormat.EXCEL.parse(input).asScala.flatMap { rec =>
-      for {
-        region <- Try(Option(rec.get(0))).toOption.flatten
-        hostname <- Try(Option(rec.get(1))).toOption.flatten.filter(_.nonEmpty)
-        port <- Try(rec.get(2).toInt).toOption
-        kind <- Try(Option(rec.get(3))).toOption.flatten.filter(_.nonEmpty)
-        password = Try(Option(rec.get(4))).toOption.flatten.filter(_.nonEmpty)
-      } yield ServerRecord(
-        region = region,
-        hostname = hostname,
-        port = port,
-        kind = kind,
-        password = password
-      )
-    }.toList
 
+  import kantan.csv.ops._
+  import kantan.csv.generic._
+
+  def parseRecords(input: Reader): List[ServerRecord] = {
+    input
+      .asCsvReader[ServerRecord](sep = ',', header = false)
+      .toList
+      .flatMap(_.toList)
+      .filter(_.hostname.nonEmpty)
+      .filter(_.kind.nonEmpty)
   }
 }

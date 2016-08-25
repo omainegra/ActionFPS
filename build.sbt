@@ -205,7 +205,8 @@ lazy val referenceReader =
     base = file("reference-reader")
   ).settings(
     libraryDependencies += commonsCsv,
-    git.useGitDescribe := true
+    git.useGitDescribe := true,
+    libraryDependencies += kantanCsv
   )
 
 lazy val serverPinger =

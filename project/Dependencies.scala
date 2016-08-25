@@ -13,6 +13,7 @@ trait Dependencies {
   val jodaTime = "joda-time" % "joda-time" % "2.9.4"
   val jodaConvert = "org.joda" % "joda-convert" % "1.8.1"
   val commonsCsv = "org.apache.commons" % "commons-csv" % "1.4"
+  val kantanCsv = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.13"
   val jsoup = "org.jsoup" % "jsoup" % "1.9.2"
   val groovy = "org.codehaus.groovy" % "groovy-all" % "2.4.7"
   val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.4"

@@ -4,12 +4,16 @@ import java.io.InputStreamReader
 import java.time.{LocalDate, LocalDateTime}
 import java.time.format.DateTimeFormatter
 
+import kantan.csv.{CellDecoder, DecodeResult}
+
 import scala.util.Try
 
 /**
   * Created by William on 05/12/2015.
   */
 package object reference {
+
+  implicit val ldtDecoder = CellDecoder(str => DecodeResult(parseLocalDateTime(str)))
 
   val dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
   val dtf2 = DateTimeFormatter.ofPattern("dd/MM/yyyy")
