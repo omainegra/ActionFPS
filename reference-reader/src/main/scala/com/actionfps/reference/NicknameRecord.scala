@@ -11,13 +11,18 @@ case class NicknameRecord(from: LocalDateTime, id: String, nickname: String)
 
 object NicknameRecord {
   def parseRecords(input: Reader): List[NicknameRecord] = {
-
-    import kantan.csv.ops._
-    import kantan.csv.generic._
-    input.asCsvReader[NicknameRecord](sep = ',', header = false)
-      .toList.flatMap(_.toList)
-      .filter(_.id.nonEmpty)
-      .filter(_.nickname.nonEmpty)
+    import collection.JavaConverters._
+    CSVFormat.EXCEL.parse(input).asScala.flatMap { rec =>
+      for {
+        from <- Try(parseLocalDateTime(rec.get(0))).toOption
+        id <- Option(rec.get(1)).filter(_.nonEmpty)
+        nickname <- Option(rec.get(2)).filter(_.nonEmpty)
+      } yield NicknameRecord(
+        from = from,
+        id = id,
+        nickname = nickname
+      )
+    }.toList
 
   }
 }
