@@ -44,5 +44,5 @@ Import the build.sbt file from Import Project from Existing Sources... menu
 * __PHP__ for the server-side frontend: speedy development for dynamic websites.
 
 ## DevOps
-Continuous Deployment: master --> GitHub webhook --> Python deployer. Simple monolithic deployment.
+Continuous Deployment: master --> <https://git.watch/> --> build & restart. Simple monolithic deployment.
 
