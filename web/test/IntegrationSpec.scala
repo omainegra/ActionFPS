@@ -1,38 +1,19 @@
 import org.openqa.selenium.WebDriver
-import org.scalatest.{Inspectors, OptionValues}
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.Inspectors._
 import org.scalatestplus.play.{HtmlUnitFactory, OneBrowserPerSuite, OneServerPerSuite, PlaySpec}
-import play.api.libs.ws.WS
-import play.api.mvc.Results
-import play.api.test.FakeApplication
-import play.api.test.Helpers._
 
-import scala.util.Try
 
 //@RequiresPHP
 class IntegrationSpec
   extends PlaySpec
     with OneServerPerSuite
-    with ScalaFutures
-    with IntegrationPatience
-    with OptionValues
-    with Results
     with OneBrowserPerSuite
     with HtmlUnitFactory
-    with Inspectors {
-
-  import concurrent.duration._
+{
 
   "Web" must {
-    "Provide a master server" in {
-      val result = await(WS.url(s"$root/retrieve.do?abc").get())(20.seconds)
-      result.body must include("1337")
-      result.status mustBe OK
-      val result2 = await(WS.url(s"$root/ms/").get())
-      result2.body mustEqual result.body
-    }
     "Load up" in {
-      info(s"${Try(go to root)}")
+      go to root
     }
     "Contain some games, events and a clanwar in the index page" in {
       go to root
@@ -41,7 +22,7 @@ class IntegrationSpec
         cssSelector("#live-events ol li").findAllElements mustNot be(empty)
       }
       withClue("Latest clanwar") {
-        cssSelector("#latest-clanwar .GameCard").findAllElements mustNot be(empty)
+        cssSelector("#latest-clanwars .GameCard").findAllElements mustNot be(empty)
       }
       withClue("Existing games") {
         cssSelector("#existing-games .GameCard").findAllElements mustNot be(empty)
@@ -55,7 +36,7 @@ class IntegrationSpec
     }
     "Navigate properly to a clan war" in {
       go to root
-      click on cssSelector("#latest-clanwar a")
+      click on cssSelector("#latest-clanwars a")
       currentUrl must include("/clanwar/")
       cssSelector(".team-header").findAllElements mustNot be(empty)
     }
@@ -75,12 +56,12 @@ class IntegrationSpec
     }
     "Navigate properly to a clan" in {
       go to root
-      click on cssSelector("#latest-clanwar .GameCard .team-header .clan a")
+      click on cssSelector("#latest-clanwars .GameCard .team-header .clan a")
       currentUrl must include("/clan/")
     }
     "Rankings to clans" in {
       go to s"$root/rankings/"
-      val firstClan = cssSelector("#rank a")
+      val firstClan = cssSelector("#rank th a")
       click on firstClan
       currentUrl must include("/clan/")
     }
@@ -88,25 +69,8 @@ class IntegrationSpec
       go to s"$root/clanwars/"
       cssSelector(".GameCard").findAllElements mustNot be(empty)
     }
-    "Clans index lists Woop" in {
-      go to s"$root/clans/"
-      forExactly(1, findAll(cssSelector("#clans a")).toList) { element =>
-        element.attribute("title").value mustEqual "Woop Clan"
-      }
-    }
-    "Aura 1337 is listed in Servers" in {
-      go to s"$root/servers/"
-      forExactly(1, findAll(cssSelector("#servers ul li a")).toList) { element =>
-        element.text mustEqual "aura.woop.ac 1337"
-      }
-    }
   }
 
-  implicit override lazy val app: FakeApplication =
-    FakeApplication(
-      additionalConfiguration = Map(
-      )
-    )
 
   implicit override lazy val webDriver: WebDriver = HtmlUnitFactory.createWebDriver(false)
 

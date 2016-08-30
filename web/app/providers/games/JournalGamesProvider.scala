@@ -28,18 +28,6 @@ object JournalGamesProvider {
 
   def getFileGames(file: File): Map[String, Game] = ???
 
-  //    /= {
-  //    val fis = new FileInputStream(file)
-  //    try ProcessJournalApp.parseSource(fis)
-  //      .map(_.cg)
-  //      .filter(_.validate.isGood)
-  //      .filter(_.validateServer)
-  //      .map(_.flattenPlayers)
-  //      .map(g => g.id -> g)
-  //      .toMap
-  //    finally fis.close()
-  //  }
-
 }
 
 /**
@@ -76,7 +64,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
             case NonFatal(e) => logger.error(s"Could not parse JSON line due to ${e}: $line", e)
               throw e
           }
-        }.toList.filter(_.validate.isGood).filter(_.validateServer)
+        }.toList.filter(_.validate.isRight).filter(_.validateServer)
         finally src.close
       }.map(g => g.id -> g.withGeo.flattenPlayers).toList.toMap
     }
@@ -103,12 +91,12 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
         case Nil =>
           (List.empty, Iterator.empty)
       }
-      val jigm = initialGames.filter(_.validate.isGood).filter(_.validateServer).map(g => g.id -> g.withGeo).toMap
+      val jigm = initialGames.filter(_.validate.isRight).filter(_.validateServer).map(g => g.id -> g.withGeo).toMap
       val gamesAgent = Agent(jigm ++ input)
       ex.submit(new Runnable {
         override def run(): Unit = {
           tailIterator.foreach { game =>
-            if (game.validate.isGood && game.validateServer) {
+            if (game.validate.isRight && game.validateServer) {
               val gg = game.withGeo.flattenPlayers
               gamesAgent.send(_.updated(gg.id, gg))
               hooks.get().foreach(h => h(gg))

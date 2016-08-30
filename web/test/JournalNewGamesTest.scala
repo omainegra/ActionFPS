@@ -3,8 +3,9 @@ import java.io._
 import com.actionfps.gameparser.enrichers._
 import com.actionfps.gameparser.mserver.{MultipleServerParser, MultipleServerParserFoundGame}
 import com.typesafe.config.ConfigFactory
-import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, OptionValues}
+import org.scalatest.mock.MockitoSugar._
+import org.scalatest.OptionValues._
+import org.scalatest.BeforeAndAfterAll
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
 import play.api.inject.ApplicationLifecycle
@@ -19,8 +20,6 @@ import scala.io.Codec
   */
 class JournalNewGamesTest
   extends PlaySpec
-    with MockitoSugar
-    with OptionValues
     with BeforeAndAfterAll {
 
   val tmpFileOlder = File.createTempFile("actionfps-journal-older", ".log")
@@ -105,7 +104,7 @@ class JournalNewGamesTest
         .map { line => lineNum = lineNum + 1; line }
         .scanLeft(MultipleServerParser.empty)(_.process(_))
         .collect {
-          case m: MultipleServerParserFoundGame if m.cg.validate.isGood =>
+          case m: MultipleServerParserFoundGame if m.cg.validate.isRight =>
             lineNum
         }.take(3).toList
     }
@@ -121,7 +120,7 @@ class JournalNewGamesTest
 
   def gamesFromLines(lines: List[String]) = {
     lines.scanLeft(MultipleServerParser.empty)(_.process(_))
-      .collect(MultipleServerParser.collect).filter(_.validate.isGood)
+      .collect(MultipleServerParser.collect).filter(_.validate.isRight)
   }
 
 }

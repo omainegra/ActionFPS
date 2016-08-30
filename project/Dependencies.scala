@@ -5,7 +5,6 @@ trait Dependencies {
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.0" % "test"
   val scalatestOld = "org.scalatest" %% "scalatest" % "2.2.6" % "test"
   val json4s = "org.json4s" %% "json4s-jackson" % "3.4.0"
-  val scalactic = "org.scalactic" %% "scalactic" % "3.0.0"
   val fastParse = "com.lihaoyi" %% "fastparse" % "0.3.7"
   val async = "org.scala-lang.modules" %% "scala-async" % "0.9.5"
   val xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.5"

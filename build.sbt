@@ -177,7 +177,6 @@ lazy val gameParser =
     .settings(
       git.useGitDescribe := true,
       libraryDependencies += fastParse,
-      libraryDependencies += scalactic,
       libraryDependencies += jodaTime
     )
 
@@ -377,3 +376,5 @@ incOptions := incOptions.value.withNameHashing(true)
 cancelable in Global := true
 
 fork in run in Global := true
+
+fork in Test in Global := true
