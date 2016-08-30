@@ -42,7 +42,7 @@ class FullFlowTest
       .getLines()
       .scanLeft(MultipleServerParser.empty)(_.process(_))
       .collect { case m: MultipleServerParserFoundGame => m }
-      .flatMap { m => m.cg.validate.toOption }
+      .flatMap { m => m.cg.validate.right.toOption }
       .map { m => m.withUsers.withClans.withGeo(GeoIpLookup) }
       .flatMap { g =>
         validServers.items.get(g.server).map { vs =>
