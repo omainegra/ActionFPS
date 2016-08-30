@@ -33,14 +33,13 @@
                     }
                     </div>
                     @game.players.filter(_.nonEmpty).map { players =>
-                        {<div class="dm-players">
+                        <div class="dm-players">
                             <ul>
                                 @players.map { player =>
                                     <li><span>@player</span></li>
                                 }
                             </ul>
                         </div>
-                        }
                     }
                     @game.spectators.filter(_.nonEmpty).map { spectators =>
                         <div class="spectators">

@@ -34,6 +34,12 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
   val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
   val liveGamesSource = Source.fromPublisher(Streams.enumeratorToPublisher(liveGamesEnum))
 
+  import concurrent.duration._
+
+  val keepAlive = actorSystem.scheduler.schedule(1.second, 5.seconds)(liveGamesChan.push(Event("")))
+
+  applicationLifecycle.addStopHook(() => Future.successful(keepAlive.cancel()))
+
   implicit val spw = Json.writes[ServerPlayer]
   implicit val stw = Json.writes[ServerTeam]
   implicit val cgw = Json.writes[CurrentGame]

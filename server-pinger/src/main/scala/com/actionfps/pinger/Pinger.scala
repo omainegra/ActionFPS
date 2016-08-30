@@ -30,20 +30,10 @@ class Pinger(implicit serverMappings: ServerMappings) extends Act with ActorLogg
 
   val serverStates = scala.collection.mutable.Map.empty[(String, Int), ServerStateMachine].withDefaultValue(NothingServerStateMachine)
 
-  val fileOutputStream = new FileOutputStream("pinger-" + LocalDateTime.now() + ".log-bin.gz")
-  val gzippedOutputStream = new GZIPOutputStream(fileOutputStream)
-  val objectOutputStream = new ObjectOutputStream(gzippedOutputStream)
-
   whenStarting {
     log.info("Starting pinger actor")
     import context.system
     IO(Udp) ! Udp.Bind(self, new InetSocketAddress("0.0.0.0", 0))
-  }
-
-  whenStopping {
-    objectOutputStream.close()
-    gzippedOutputStream.close()
-    fileOutputStream.close()
   }
 
   becomeStacked {
@@ -52,7 +42,6 @@ class Pinger(implicit serverMappings: ServerMappings) extends Act with ActorLogg
       context.watch(udp)
       becomeStacked {
         case o@Udp.Received(message, f) =>
-          objectOutputStream.writeObject(o)
           PartialFunction.condOpt(message) {
             case ParsedResponse(resp) => GotParsedResponse(f, resp)
           }.foreach { case GotParsedResponse(from, stuff) =>

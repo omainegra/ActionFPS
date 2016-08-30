@@ -99,6 +99,7 @@ lazy val web = project
   .dependsOn(jsonFormats)
   .dependsOn(flatFormats)
   .dependsOn(ladderParser)
+  .dependsOn(testSuite % "test->compile")
   .enablePlugins(BuildInfoPlugin)
   .settings(dontDocument)
   .settings(
@@ -317,6 +318,7 @@ lazy val testSuite = Project(
   .dependsOn(interParser)
   .dependsOn(syslogAc)
   .dependsOn(jsonFormats)
+  .dependsOn(serverPinger)
   .settings(
     (test in Test) <<= (test in Test) dependsOn(geoIpFiles in ThisBuild, sampleLog),
     run <<= (run in Runtime) dependsOn(geoIpFiles in ThisBuild, sampleLog in ThisBuild),
