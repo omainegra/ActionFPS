@@ -1,0 +1,59 @@
+@(game: com.actionfps.pinger.CurrentGameStatus, mapMapping: Map[String, String])
+@defining(
+    s"assaultcube://${game.now.server.server}"
+) { acLink =>
+    @game.map.map { map =>
+        @defining(s"background-image: url('${mapMapping.get(map).getOrElse("")}')") { style =>
+            <article class="GameCard game isLive" style="@style">
+                <div class="w">
+                    <header>
+                        <h2>
+                            <a>@{
+                                s"${game.mode.getOrElse("")} @ ${map}"
+                            }</a>
+
+                            <a class="server-link" href="@acLink">@game.now.server.shortName</a>
+
+                            <p class="time-remain">
+                            @game.minRemain match {
+                                case 1 => {1 minute remains}
+                                case 0 => {game finished}
+                                case m => {
+                                    @{
+                                        s"$m minutes remain"
+                                    }
+                                }
+                            }
+                            </p>
+                        </h2>
+                    </header>
+                    <div class="teams">
+                    @game.teams.filter(_.name != "spectator").map { team =>
+                        @live_render_team(game, team)
+                    }
+                    </div>
+                    @game.players.filter(_.nonEmpty).map { players =>
+                        {<div class="dm-players">
+                            <ul>
+                                @players.map { player =>
+                                    <li><span>@player</span></li>
+                                }
+                            </ul>
+                        </div>
+                        }
+                    }
+                    @game.spectators.filter(_.nonEmpty).map { spectators =>
+                        <div class="spectators">
+                            <h4>Spectators:</h4>
+                            <ul>
+                                @spectators.map { spectator =>
+                                    <li><span>@spectator</span></li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </article>
+        }
+    }
+}

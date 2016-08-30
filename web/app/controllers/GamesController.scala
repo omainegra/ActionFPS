@@ -25,7 +25,6 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class GamesController @Inject()(common: Common,
                                 newGamesProvider: NewGamesProvider,
-                                pingerService: PingerService,
                                 referenceProvider: ReferenceProvider,
                                 fullProvider: FullProvider,
                                 ladderController: LadderController,
@@ -91,14 +90,6 @@ class GamesController @Inject()(common: Common,
     }
   }
 
-  def serverUpdates = Action {
-    Ok.chunked(
-      content = {
-        Source(iterable = pingerService.status.get().valuesIterator.toList)
-          .concat(pingerService.liveGamesSource)
-      }
-    ).as("text/event-stream")
-  }
 
   def newGames = Action {
     Ok.chunked(

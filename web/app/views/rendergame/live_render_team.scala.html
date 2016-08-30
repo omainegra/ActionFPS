@@ -1,0 +1,28 @@
+@(game: com.actionfps.pinger.CurrentGameStatus, team: com.actionfps.pinger.CurrentGameTeam)
+@defining(
+    if(team.name.equalsIgnoreCase("CLA"))
+        "https://cloud.githubusercontent.com/assets/5359646/12695180/369c86da-c745-11e5-817f-46d8c4c42376.png"
+    else "https://cloud.githubusercontent.com/assets/5359646/12695181/369cda90-c745-11e5-96eb-3f3669f80aed.png"
+) { teamPng =>
+
+    <div class="@team.name team">
+        <div class="team-header">
+            <h3><img src="@teamPng"/></h3>
+
+            <div class="result">
+                @team.flags.map { flags => <span class="score">@flags</span> }
+                <span class="subscore">@team.frags</span>
+            </div>
+        </div>
+        <div class="players">
+            <ol>
+                @team.players.map { player =>
+                    @live_render_game_team_player(game, team, player, false)
+                }
+                @team.spectators.toList.flatten.map { spectator =>
+                    @live_render_game_team_player(game, team, spectator, true)
+                }
+            </ol>
+        </div>
+    </div>
+}

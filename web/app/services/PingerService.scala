@@ -25,8 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
-                              referenceProvider: ReferenceProvider,
-                              common: Common
+                              referenceProvider: ReferenceProvider
                              )(implicit actorSystem: ActorSystem,
                                executionContext: ExecutionContext) {
 
@@ -67,17 +66,14 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
     status.alter(m => m.updated(s"${cgse.id}${cgse.name}", cgse))
 
-    val jsonMap = Map("game" -> Seq(Json.toJson(b).toString()), "maps" -> Seq(Json.toJson(Maps.resource.maps.mapValues(_.image)).toString()))
-    common.renderRaw("/live/render-fragment.php")(_.post(jsonMap)).map(resp =>
-      Event(
-        id = Option(b.now.server.server),
-        name = Option("current-game-status-fragment"),
-        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(resp.body)).toString()
-      )
-    ).foreach { event =>
-      liveGamesChan.push(event)
-      status.alter(m => m.updated(s"${event.id}${event.name}", event))
-    }
+    val body = views.html.rendergame.live.apply(b, Maps.resource.maps.mapValues(_.image))
+    val event = Event(
+      id = Option(b.now.server.server),
+      name = Option("current-game-status-fragment"),
+      data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(body.toString())).toString()
+    )
+    liveGamesChan.push(event)
+    status.alter(m => m.updated(s"${event.id}${event.name}", event))
   }))
 
   import concurrent.duration._
