@@ -8,35 +8,34 @@
 * https://actionfps.com/
 * Also see http://duel.gg/
 
-# Prerequisites
+# Developing
+
+Use IntelliJ Community Edition: https://www.jetbrains.com/idea/download/
+
+Simply import the directory as an 'SBT' project
 
 Install SBT: http://www.scala-sbt.org/download.html
 
 Install PHP7: https://bjornjohansen.no/upgrade-to-php7
 
-# Running frontend
+In one console run:
+```
+sbt startPHP
+```
+
+In the other console run:
+
 ```
 sbt web/run
-```
-Separately:
-```
-cd web/dist/www && php -S 127.0.0.1:8888
 ```
 
 # Running tests
 
 ```
-sbt clean test dist
+sbt clean test
 ```
 
-# Coding it
-
-Use IntelliJ: https://www.jetbrains.com/idea/download/
-Import the build.sbt file from Import Project from Existing Sources... menu
-
-
-[![Throughput Graph](https://graphs.waffle.io/ScalaWilliam/actionfps/throughput.svg)](https://waffle.io/ScalaWilliam/actionfps/metrics) 
-
+[![Throughput Graph](https://graphs.waffle.io/ScalaWilliam/actionfps/throughput.svg)](https://waffle.io/ScalaWilliam/actionfps/metrics)
 
 # Technology Choices
 

@@ -129,6 +129,9 @@ lazy val web = project
       cfg.setInstanceName("web")
       Hazelcast.getOrCreateHazelcastInstance(cfg)
     },
+    startPHP := {
+      new java.lang.ProcessBuilder("php", "-S", "127.0.0.1:8888").directory(baseDirectory.value.getAbsoluteFile / "dist" / "www").!
+    },
     stopHazelcast := {
       startHazelcast.value.shutdown()
     },
@@ -280,8 +283,9 @@ lazy val pureClanwar =
       git.useGitDescribe := true
     )
 
-lazy val startHazelcast = TaskKey[HazelcastInstance]("Start the web hazelcast instance")
-lazy val stopHazelcast = TaskKey[Unit]("Stop the web hazelcast instance")
+lazy val startHazelcast = taskKey[HazelcastInstance]("Start the web hazelcast instance")
+lazy val startPHP = taskKey[Unit]("Start PHP")
+lazy val stopHazelcast = taskKey[Unit]("Stop the web hazelcast instance")
 
 lazy val ladderParser =
   Project(
