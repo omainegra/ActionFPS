@@ -35,6 +35,6 @@ trait Dependencies {
 
   val mockito = "org.mockito" % "mockito-all" % "1.10.19" % "test"
 
-  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.9"
+  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.10"
 
 }

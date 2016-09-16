@@ -26,7 +26,24 @@ import com.actionfps.formats.json.Formats._
 
 object JournalGamesProvider {
 
-  def getFileGames(file: File): Map[String, Game] = ???
+  def getJournalGames(logger: Logger, file: File): List[Game] = {
+    val src = scala.io.Source.fromFile(file)
+    try src.getLines().scanLeft(GameScanner.zero)(GameScanner.scan).collect(GameScanner.collect).toList
+    finally src.close()
+  }
+
+  def getGamesSnapshot(logger: Logger, file: File): List[Game] = {
+    val src = scala.io.Source.fromFile(file)
+    try src.getLines().filter(_.nonEmpty).map { line =>
+      println(line)
+      try Json.fromJson[Game](Json.parse(line.split("\t")(3))).get
+      catch {
+        case NonFatal(e) => logger.error(s"Could not parse JSON line due to ${e}: $line", e)
+          throw e
+      }
+    }.toList.filter(_.validate.isRight).filter(_.validateServer)
+    finally src.close
+  }
 
 }
 
@@ -57,15 +74,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
   val gamesDataF = Future {
     blocking {
       gamesDatas.par.flatMap { file =>
-        val src = scala.io.Source.fromFile(file)
-        try src.getLines().filter(_.nonEmpty).map { line =>
-          try Json.fromJson[Game](Json.parse(line.split("\t")(3))).get
-          catch {
-            case NonFatal(e) => logger.error(s"Could not parse JSON line due to ${e}: $line", e)
-              throw e
-          }
-        }.toList.filter(_.validate.isRight).filter(_.validateServer)
-        finally src.close
+        JournalGamesProvider.getGamesSnapshot(logger, file)
       }.map(g => g.id -> g.withGeo.flattenPlayers).toList.toMap
     }
   }
@@ -83,9 +92,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
           applicationLifecycle.addStopHook(() => Future(tailer.stop()))
           val (initialRecentGames, tailIterator) = reader.collect(GameScanner.collect)
           val otherGames = rest.par.map { file =>
-            val src = scala.io.Source.fromFile(file)
-            try src.getLines().scanLeft(GameScanner.zero)(GameScanner.scan).collect(GameScanner.collect).toList
-            finally src.close()
+            JournalGamesProvider.getJournalGames(logger, file)
           }.toList.flatten
           (otherGames ++ initialRecentGames, tailIterator)
         case Nil =>

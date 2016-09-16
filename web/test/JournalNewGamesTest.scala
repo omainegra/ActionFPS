@@ -56,7 +56,9 @@ class JournalNewGamesTest
       val sg = b.scanLeft(MultipleServerParser.empty)(_.process(_))
         .collectFirst { case m: MultipleServerParserFoundGame => m.cg }.value
       val cfg =
-        s"""af.journal.paths = ["${tmpFile.getAbsolutePath.replaceAllLiterally("\\", "/")}",
+        s"""
+            |af.ladder.games-data = []
+            |af.journal.paths = ["${tmpFile.getAbsolutePath.replaceAllLiterally("\\", "/")}",
             |"${tmpFileOlder.getAbsolutePath.replaceAllLiterally("\\", "/")}"]\n""".stripMargin
       val conf = Configuration(ConfigFactory.parseString(cfg))
       val al = mock[ApplicationLifecycle]
@@ -65,8 +67,8 @@ class JournalNewGamesTest
       fw.close()
       val js = new JournalGamesProvider(conf, al)
 
-      JournalGamesProvider.getFileGames(tmpFile) must have size 1
-      JournalGamesProvider.getFileGames(tmpFileOlder) must have size 1
+      JournalGamesProvider.getJournalGames(play.api.Logger(getClass), tmpFile) must have size 2
+      JournalGamesProvider.getJournalGames(play.api.Logger(getClass), tmpFileOlder) must have size 2
       import concurrent.duration._
       Await.result(js.games, 20.seconds) must have size 2
       var calls = 0
