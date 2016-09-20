@@ -6,6 +6,9 @@
         <table>
             <thead>
                 <tr>
+                    @if(showTime) {
+                        <th>Rank</th>
+                    }
                     <th>User</th> <th>Points</th> <th>Flags</th> <th>Frags</th> <th>Gibs</th>
                     @if(showTime) {
                         <th>Time played</th>
@@ -15,9 +18,12 @@
                     </tr>
             </thead>
             <tbody>
-            @aggregate.users.toList.sortBy(_._2.points).reverse.map {
-                case (id, us) => {
-                    <tr><th><a href=@{
+            @aggregate.users.toList.sortBy(_._2.points).reverse.zipWithIndex.map {
+                case ((id, us), rankM1) => {
+                    <tr>@if(showTime) {
+                        <td>@{rankM1 + 1}</td>
+                    }
+                        <th><a href=@{
                         s"/player/?id=$id"
                     }>@id</a>
                     </th>
