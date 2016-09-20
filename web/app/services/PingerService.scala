@@ -7,7 +7,8 @@ package services
 import javax.inject._
 
 import akka.actor.ActorDSL._
-import akka.actor.{ActorLogging, ActorSystem, Kill, Props}
+import akka.actor.SupervisorStrategy.Decider
+import akka.actor.{ActorKilledException, ActorLogging, ActorSystem, Kill, Props, SupervisorStrategy}
 import akka.agent.Agent
 import akka.stream.scaladsl.Source
 import com.actionfps.gameparser.Maps
@@ -108,6 +109,18 @@ object PingerService {
     log.info("Starting listener actor for pinger service...")
 
     val pingerActor = context.actorOf(name = "pinger", props = Pinger.props)
+
+    override final val supervisorStrategy: SupervisorStrategy = {
+      def defaultDecider: Decider = {
+        case _: ActorKilledException         ⇒ Restart
+        case _: Exception                    ⇒ Restart
+      }
+      OneForOneStrategy()(defaultDecider)
+    }
+
+    import concurrent.duration._
+    import context.dispatcher
+    context.system.scheduler.schedule(10.minutes, 10.minutes, pingerActor, Kill)
 
     become {
       case sp: SendPings =>
