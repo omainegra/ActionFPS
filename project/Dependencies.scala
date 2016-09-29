@@ -4,8 +4,8 @@ trait Dependencies {
 
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.0" % "test"
   val scalatestOld = "org.scalatest" %% "scalatest" % "2.2.6" % "test"
-  val json4s = "org.json4s" %% "json4s-jackson" % "3.4.0"
-  val fastParse = "com.lihaoyi" %% "fastparse" % "0.3.7"
+  val json4s = "org.json4s" %% "json4s-jackson" % "3.4.1"
+  val fastParse = "com.lihaoyi" %% "fastparse" % "0.4.1"
   val async = "org.scala-lang.modules" %% "scala-async" % "0.9.5"
   val xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
   val commonsNet = "commons-net" % "commons-net" % "3.5"
@@ -24,7 +24,7 @@ trait Dependencies {
   val seleniumHtmlUnit = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0" % "test"
   val syslog4j = "org.syslog4j" % "syslog4j" % "0.9.30"
   val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.1.7"
-  val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0"
+  val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"
   val geoipApi = "com.maxmind.geoip" % "geoip-api" % "1.3.1"
   val shapeless = "com.chuusai" %% "shapeless" % "2.3.2"
 
