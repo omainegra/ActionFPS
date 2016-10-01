@@ -20,7 +20,7 @@ class SampleTournamentTest extends FunSuite {
     result.isRight shouldBe true
   }
 
-  test("cannot initiate the same tournament twice") {
+  test("Cannot initiate the same tournament twice") {
     val t = TournImpl.empty
     val result = t.iterate(_.initiate("A", ZonedDateTime.now(), 3))
       .flatMap(_.iterate(_.initiate("A", ZonedDateTime.now().plusHours(2), 3)))
@@ -31,5 +31,33 @@ class SampleTournamentTest extends FunSuite {
     TournImpl.empty
       .iterate(_.initiate("A", ZonedDateTime.now().minusHours(2), 2))
       .isRight shouldBe false
+  }
+
+  test("Cannot cancel a non-existent tournament") {
+    TournImpl.empty.iterate(_.cancelTournament("abc")).isRight shouldBe false
+  }
+  test("Cancel a started tournament") {
+    TournImpl.empty.iterate(_.initiate("A", ZonedDateTime.now(), 3))
+      .flatMap(_.iterate(_.cancelTournament("A")))
+      .isRight shouldBe true
+  }
+  test("Cannot cancel a cancelled tournament") {
+    TournImpl.empty.iterate(_.initiate("A", ZonedDateTime.now(), 3))
+      .flatMap(_.iterate(_.cancelTournament("A")))
+      .flatMap(_.iterate(_.cancelTournament("A")))
+      .isRight shouldBe false
+  }
+
+  test("Cannot enter a non-existing tournament") {
+    TournImpl.empty.iterate(_.enterTournament("2", "3", "4")).isRight shouldBe false
+  }
+  test("Can enter a tournament") {
+    TournImpl.empty.iterate(_.initiate("A", ZonedDateTime.now(), 3))
+      .flatMap(_.iterate(_.enterTournament("A", "C", "B"))).isRight shouldBe true
+  }
+  test("Cannot enter a tournament twice") {
+    TournImpl.empty.iterate(_.initiate("A", ZonedDateTime.now(), 3))
+      .flatMap(_.iterate(_.enterTournament("A", "C", "B")))
+      .flatMap(_.iterate(_.enterTournament("A", "D", "B"))).isRight shouldBe false
   }
 }
