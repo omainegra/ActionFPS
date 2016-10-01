@@ -28,7 +28,8 @@ lazy val root =
       testSuite,
       flatFormats,
       jsonFormats,
-      liveListener
+      liveListener,
+      tournamentLeague
     ).dependsOn(
     pureAchievements,
     gameParser,
@@ -54,6 +55,13 @@ lazy val root =
         val extracted = Project.extract(state)
         val newSettings = extracted.structure.allProjectRefs map { proj =>
           testOptions in proj += sbt.Tests.Argument("-l", "af.RequiresPHP")
+        }
+        extracted.append(newSettings, state)
+      },
+      commands += Command.command("ignoreWIP", "ignore tests for WIP things", "") { state =>
+        val extracted = Project.extract(state)
+        val newSettings = extracted.structure.allProjectRefs map { proj =>
+          testOptions in proj += sbt.Tests.Argument("-l", "af.WIP")
         }
         extracted.append(newSettings, state)
       }
@@ -384,3 +392,11 @@ cancelable in Global := true
 fork in run in Global := true
 
 fork in Test in Global := true
+
+lazy val tournamentLeague = Project(
+  id = "tournament-league",
+  base = file("tournament-league")
+).settings(
+  scalaVersion := "2.12.0-RC1",
+  libraryDependencies += scalatest
+)

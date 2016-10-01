@@ -6,6 +6,6 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
 script:
-  - sbt ignorePHPTests test-suite/test
+  - sbt ignorePHPTests ignoreWIP test-suite/test
 jdk:
   - oraclejdk8
