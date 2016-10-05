@@ -46,9 +46,6 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
   logger.info("Starting new games provider")
 
   def processGame(game: JsonGame): Unit = {
-    //    val er = EnrichGames(recordsService.users, recordsService.com.actionfps.clans)
-    //    import er.withUsersClass
-    //    val b = game.withoutHosts.withUsers.flattenPlayers.withClans.toJson.+("isNew" -> JsBoolean(true))
     val b = Json.toJson(game.withoutHosts).asInstanceOf[JsObject].+("isNew" -> JsBoolean(true))
 
     val jsonMap = Map("game" -> Seq(b.toString()), "maps" -> Seq(Json.toJson(Maps.resource.maps.mapValues(_.image)).toString()))

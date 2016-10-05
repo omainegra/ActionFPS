@@ -1,13 +1,12 @@
-package providers.games
+package af.streamreaders
 
 import java.io.FileWriter
 import java.nio.file.Files
 import java.util.{Timer, TimerTask}
 
-import af.streamreaders.IteratorTailerListenerAdapter
-import org.apache.commons.io.input.Tailer
-import org.scalatest.{FunSuite, Matchers}
 import af.streamreaders.IteratorTailerListenerAdapter.{EndReached, GotLine, Stopped}
+import org.apache.commons.io.input.Tailer
+import org.scalatest._
 
 /**
   * Created by me on 14/05/2016.

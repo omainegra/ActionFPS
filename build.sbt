@@ -389,6 +389,7 @@ lazy val streamReaders =
     base = file("stream-readers")
   )
     .settings(libraryDependencies += commonsIo)
+    .settings(libraryDependencies += scalatest)
 
 lazy val sampleLog = taskKey[File]("Sample Log")
 
