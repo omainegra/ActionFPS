@@ -1,5 +1,6 @@
 package providers.games
 
+import af.streamreaders.{IteratorTailerListenerAdapter, Scanner, TailedScannerReader}
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.gameparser.mserver.{ExtractMessage, MultipleServerParser, MultipleServerParserFoundGame}
 

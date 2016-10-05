@@ -29,7 +29,8 @@ lazy val root =
       flatFormats,
       jsonFormats,
       liveListener,
-      tournamentLeague
+      tournamentLeague,
+      streamReaders
     ).dependsOn(
     pureAchievements,
     gameParser,
@@ -48,7 +49,8 @@ lazy val root =
     testSuite,
     flatFormats,
     jsonFormats,
-    liveListener
+    liveListener,
+    streamReaders
   )
     .settings(
       commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
@@ -104,6 +106,7 @@ lazy val web = project
   .dependsOn(accumulation)
   .dependsOn(interParser)
   .dependsOn(pureStats)
+  .dependsOn(streamReaders)
   .dependsOn(jsonFormats)
   .dependsOn(flatFormats)
   .dependsOn(ladderParser)
@@ -379,6 +382,13 @@ lazy val liveListener =
     base = file("live-listener")
   )
     .dependsOn(demoParser)
+
+lazy val streamReaders =
+  Project(
+    id = "stream-readers",
+    base = file("stream-readers")
+  )
+    .settings(libraryDependencies += commonsIo)
 
 lazy val sampleLog = taskKey[File]("Sample Log")
 

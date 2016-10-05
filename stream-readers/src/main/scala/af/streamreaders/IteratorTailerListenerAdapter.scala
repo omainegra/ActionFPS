@@ -1,4 +1,4 @@
-package providers.games
+package af.streamreaders
 
 import java.util.concurrent.{BlockingQueue, Executors, LinkedBlockingQueue, TimeUnit}
 

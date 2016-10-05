@@ -1,6 +1,6 @@
-package providers.games
+package af.streamreaders
 
-import providers.games.IteratorTailerListenerAdapter.GotLine
+import af.streamreaders.IteratorTailerListenerAdapter.GotLine
 
 /**
   * Essentially read a file in two halves: one for the data up to

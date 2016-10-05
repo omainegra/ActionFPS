@@ -1,4 +1,4 @@
-package providers.games
+package af.streamreaders
 
 /**
   * Created by me on 14/05/2016.

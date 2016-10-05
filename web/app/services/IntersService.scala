@@ -8,13 +8,13 @@ import java.io.File
 import java.time.ZonedDateTime
 import javax.inject._
 
+import af.streamreaders.CallbackTailer
 import akka.stream.scaladsl.Source
 import com.actionfps.gameparser.mserver.ExtractMessage
 import akka.actor.ActorSystem
 import akka.agent.Agent
 import com.actionfps.accumulation.ValidServers
 import com.actionfps.inter.{InterMessage, InterState}
-import lib.CallbackTailer
 import play.api.libs.json.Json
 import play.api.libs.streams.Streams
 import play.api.{Configuration, Logger}
@@ -27,6 +27,7 @@ import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
 import concurrent.duration._
 import collection.JavaConverters._
+import scala.util.{Failure, Success}
 
 /**
   * Created by William on 09/12/2015.
@@ -61,7 +62,10 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
   pickedFile match {
     case Some(file) =>
-      val tailer = new CallbackTailer(file, endOnly = true)(acceptLine)
+      val tailer = new CallbackTailer(file, endOnly = true)({
+        case Success(line) => acceptLine(line)
+        case Failure(reason) => logger.error("Failed to parse read a callback tailer line", reason)
+      })
       applicationLifecycle.addStopHook(() => Future(tailer.shutdown()))
       logger.info(s"Started tailing from ${file}")
     case None =>

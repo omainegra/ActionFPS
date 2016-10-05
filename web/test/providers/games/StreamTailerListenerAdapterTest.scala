@@ -4,9 +4,10 @@ import java.io.FileWriter
 import java.nio.file.Files
 import java.util.{Timer, TimerTask}
 
+import af.streamreaders.IteratorTailerListenerAdapter
 import org.apache.commons.io.input.Tailer
 import org.scalatest.{FunSuite, Matchers}
-import providers.games.IteratorTailerListenerAdapter.{EndReached, GotLine, Stopped}
+import af.streamreaders.IteratorTailerListenerAdapter.{EndReached, GotLine, Stopped}
 
 /**
   * Created by me on 14/05/2016.

@@ -8,6 +8,7 @@ import java.io.File
 import java.util.concurrent.Executors
 import javax.inject._
 
+import af.streamreaders.IteratorTailerListenerAdapter
 import akka.agent.Agent
 import com.actionfps.accumulation.GeoIpLookup
 import com.actionfps.accumulation.ValidServers.ImplicitValidServers._

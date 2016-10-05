@@ -5,6 +5,7 @@ import java.nio.file.Files
 import java.util.concurrent.Executors
 import java.util.{Timer, TimerTask}
 
+import af.streamreaders.{IteratorTailerListenerAdapter, Scanner, TailedScannerReader}
 import org.apache.commons.io.input.Tailer
 import org.scalatest.{FunSuite, Matchers}
 
