@@ -12,7 +12,7 @@ trait Dependencies {
   val jodaTime = "joda-time" % "joda-time" % "2.9.4"
   val jodaConvert = "org.joda" % "joda-convert" % "1.8.1"
   val commonsCsv = "org.apache.commons" % "commons-csv" % "1.4"
-  val kantanCsv = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.13"
+  val kantanCsv = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.15"
   val jsoup = "org.jsoup" % "jsoup" % "1.9.2"
   val groovy = "org.codehaus.groovy" % "groovy-all" % "2.4.7"
   val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.5"
@@ -35,6 +35,6 @@ trait Dependencies {
 
   val mockito = "org.mockito" % "mockito-all" % "1.10.19" % "test"
 
-  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.10"
+  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.11"
 
 }
