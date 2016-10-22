@@ -1,11 +1,14 @@
 package com.actionfps.ladder.parser
 
-import java.time.{Duration, ZonedDateTime}
+import java.time.{Duration, Instant, ZonedDateTime}
 
 /**
   * Created by me on 02/05/2016.
   */
 case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDateTime, timePlayed: Long) {
+
+  def lastSeenInstant: Instant = lastSeen.withNano(0).toInstant
+
   def kill = copy(frags = frags + 1)
 
   def gib = copy(gibs = gibs + 1)

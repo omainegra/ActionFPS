@@ -32,7 +32,7 @@
                         @if(showTime) {
                             <td>@us.timePlayedText</td>
                         }
-                        <td><time is="relative-time" datetime="@us.lastSeen.toString.take(20)">@us.lastSeen</time></td>
+                        <td><time is="relative-time" datetime="@us.lastSeenInstant">@us.lastSeenInstant</time></td>
                     </tr>
                 }
             }
