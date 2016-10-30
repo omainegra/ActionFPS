@@ -4,16 +4,16 @@ trait Dependencies {
 
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.0" % "test"
   val scalatestOld = "org.scalatest" %% "scalatest" % "2.2.6" % "test"
-  val json4s = "org.json4s" %% "json4s-jackson" % "3.4.1"
-  val fastParse = "com.lihaoyi" %% "fastparse" % "0.4.1"
+  val json4s = "org.json4s" %% "json4s-jackson" % "3.4.2"
+  val fastParse = "com.lihaoyi" %% "fastparse" % "0.4.2"
   val async = "org.scala-lang.modules" %% "scala-async" % "0.9.5"
-  val xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
+  val xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
   val commonsNet = "commons-net" % "commons-net" % "3.5"
   val jodaTime = "joda-time" % "joda-time" % "2.9.4"
   val jodaConvert = "org.joda" % "joda-convert" % "1.8.1"
   val commonsCsv = "org.apache.commons" % "commons-csv" % "1.4"
   val kantanCsv = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.15"
-  val jsoup = "org.jsoup" % "jsoup" % "1.9.2"
+  val jsoup = "org.jsoup" % "jsoup" % "1.10.1"
   val groovy = "org.codehaus.groovy" % "groovy-all" % "2.4.7"
   val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.5"
   val fluentHc = "org.apache.httpcomponents" % "fluent-hc" % "4.5.2"
@@ -35,6 +35,6 @@ trait Dependencies {
 
   val mockito = "org.mockito" % "mockito-all" % "1.10.19" % "test"
 
-  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.11"
+  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.12"
 
 }
