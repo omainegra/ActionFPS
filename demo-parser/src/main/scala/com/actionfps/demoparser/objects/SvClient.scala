@@ -27,7 +27,7 @@ object SvClient {
         //            println("assertion failed: "+ message)
         //        }
         //
-        assert(lefties.size == 0, {
+        assert(lefties.isEmpty, {
           val starts = msgs.dropRight(lefties.size)
           s"Lefties should be all eliminated, found: ${lefties.size} (from ${datums.size} & specified size was $len), $lefties - started with $starts, ended up with $msgs - original input $byteString"
         })

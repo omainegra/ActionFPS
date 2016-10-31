@@ -18,8 +18,4 @@ object SyslogServerEventIFScala {
     )
   }
 
-  implicit class toDateAddition(input: String) {
-    def toDate: Date = new Date(input)
-  }
-
 }

@@ -90,7 +90,7 @@ require("../render.inc.php");
                 $('#field-id').val(newId);
                 $('#field-username').val(newUsername);
                 $('#player-id-value').text(newId);
-            })
+            });
             $("#field-id").on("keyup", function (v) {
                 $('#player-id-value').text($(v.target).val());
             })

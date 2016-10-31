@@ -3,7 +3,7 @@
     s"assaultcube://${game.now.server.server}"
 ) { acLink =>
     @game.map.map { map =>
-        @defining(s"background-image: url('${mapMapping.get(map).getOrElse("")}')") { style =>
+        @defining(s"background-image: url('${mapMapping.getOrElse(map, "")}')") { style =>
             <article class="GameCard game isLive" style="@style">
                 <div class="w">
                     <header>

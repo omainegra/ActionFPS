@@ -14,7 +14,7 @@ object PositionResults {
           }
         }
         val (items, leftOver) = go(input, Vector.empty)
-        assert(leftOver.size == 0, s"Position parsing incomplete, have $leftOver from $input, with items $items")
+        assert(leftOver.isEmpty, s"Position parsing incomplete, have $leftOver from $input, with items $items")
         (PositionResults(items), ByteString.empty)
     }
   }

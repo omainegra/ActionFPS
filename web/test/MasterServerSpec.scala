@@ -1,7 +1,8 @@
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import play.api.libs.ws.{WS, WSClient}
+import play.api.libs.ws.WSClient
 import play.api.test.Helpers._
-import concurrent.duration._
+
+import scala.concurrent.duration._
 
 /**
   * Created by me on 30/08/2016.

@@ -38,7 +38,7 @@ object CaptureMaster {
 
     override def progress: Int = if (achieved.isEmpty) 0 else 100 * achieved.length / (achieved.length + achieving.length)
 
-    override def all: List[CaptureMapCompletion] = (achieving ++ achieved)
+    override def all: List[CaptureMapCompletion] = achieving ++ achieved
   }
 
   case class Achieved(achieved: List[CaptureMapCompletion.Achieved]) extends CaptureMaster with CompletedAchievement {

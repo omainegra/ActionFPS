@@ -48,7 +48,7 @@ package object objects {
 
 
   def parsePosition(input: ByteString): Option[(PositionResult, ByteString)] = {
-    if (input.size == 0) None
+    if (input.isEmpty) None
     else if (input(0) == SV_POSC) {
       val rest = input.drop(1)
       Option {

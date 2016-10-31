@@ -233,7 +233,7 @@ object Compressor {
 
     def rest = {
       val bs = new util.BitSet()
-      val skipBits = (8 - (tookbits % 8))
+      val skipBits = 8 - (tookbits % 8)
       //      if ( bits.take(skipBits + 8).forall(_ == false) ) {
       //        bits.drop(skipBits + 8).zipWithIndex.foreach { case (b, i) => bs.set(i, b)}
       //      } else {

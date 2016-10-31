@@ -274,7 +274,7 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
 
       for {o <- outputs} info(s"Output item: $o")
 
-      inside(outputs(outputs.size - 3)) {
+      inside(outputs(outputs.length - 3)) {
         case FoundGame(header, Left(flagGame)) =>
           inside(header) {
             case GameFinishedHeader(mode, map, state) =>
@@ -308,12 +308,12 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
 
               forExactly(1, scores) {
                 score => inside(score) {
-                  case TeamModes.FlagStyle.IndividualScore(cn, name, team, flag, score, frag, death, tk, ping, role, host) =>
+                  case TeamModes.FlagStyle.IndividualScore(cn, name, team, flag, ascore, frag, death, tk, ping, role, host) =>
                     cn shouldBe 0
                     name shouldBe "Drakas"
                     team shouldBe "RVSF"
                     flag shouldBe 0
-                    score shouldBe 9
+                    ascore shouldBe 9
                     frag shouldBe 0
                     death shouldBe 0
                     tk shouldBe 0
@@ -379,7 +379,7 @@ class ParserSpec extends WordSpec with Inside with Inspectors with Matchers with
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
 
 
-      inside(outputs(outputs.size - 2)) {
+      inside(outputs(outputs.length - 2)) {
         case FoundGame(header, Left(flagGame)) =>
           inside(flagGame) {
             case FlagGameBuilder(_, scores, disconnectedScores, teamScores) =>

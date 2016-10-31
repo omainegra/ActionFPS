@@ -25,9 +25,6 @@ case class AchievementsIterator(map: Map[String, PlayerState], events: List[Map[
 
   /**
     * New state & also what's changed
-    * @param users
-    * @param jsonGame
-    * @return
     */
   def includeGame(users: List[User])(jsonGame: JsonGame): (AchievementsIterator, Map[String, PlayerState]) = {
     val oEvents = scala.collection.mutable.Buffer.empty[Map[String, String]]
