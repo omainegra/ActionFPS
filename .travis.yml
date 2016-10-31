@@ -6,6 +6,6 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
 script:
-  - sbt ignorePHPTests ignoreWIP test-suite/test
+  - make travis
 jdk:
   - oraclejdk8

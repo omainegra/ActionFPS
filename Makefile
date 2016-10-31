@@ -18,6 +18,8 @@ watch:
 push-refs/heads/master:
 	git fetch
 	git pull
+	make deploy
+deploy:
 	sbt web/dist
 	cd /home/af/ && rm -fr /home/af/web-5.0/{conf,lib} && \
 		unzip -q -o /home/af/ActionFPS/web/target/universal/web-5.0.zip
