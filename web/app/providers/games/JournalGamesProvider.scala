@@ -36,11 +36,11 @@ object JournalGamesProvider {
   def getGamesSnapshot(logger: Logger, file: File): List[Game] = {
     val src = scala.io.Source.fromFile(file)
     try src.getLines().filter(_.nonEmpty).map { line =>
-      println(line)
       try Json.fromJson[Game](Json.parse(line.split("\t")(3))).get
       catch {
-        case NonFatal(e) => logger.error(s"Could not parse JSON line due to ${e}: $line", e)
-          throw e
+        case NonFatal(e) =>
+          logger.error(s"Could not parse JSON line due to ${e}: $line", e)
+          throw new RuntimeException(s"Failed to parse line in file ${file}: $line", e)
       }
     }.toList.filter(_.validate.isRight).filter(_.validateServer)
     finally src.close
