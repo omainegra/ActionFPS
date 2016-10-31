@@ -4,23 +4,19 @@ package controllers
   * Created by William on 01/01/2016.
   */
 
-import java.io.{StringWriter, File}
-import java.net.URL
+import java.io.File
 import javax.inject._
 
-import groovy.json.JsonSlurper
-import groovy.text.markup.{TemplateResolver, MarkupTemplateEngine, TemplateConfiguration}
 import org.jsoup.Jsoup
 import play.api.Configuration
-import play.api.i18n.{I18nSupport, MessagesApi, Messages}
-import play.api.libs.json.{Json, JsValue}
-import play.api.libs.ws.{WSResponse, WSRequest, WSClient}
-import play.api.mvc.{Result, RequestHeader, AnyContent, Action}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.mvc.Results._
+import play.api.mvc.{Action, AnyContent, RequestHeader, Result}
 import play.twirl.api.Html
 
 import scala.async.Async._
-import play.api.mvc.Results._
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 class Common @Inject()(configuration: Configuration
                       )(implicit wsClient: WSClient,

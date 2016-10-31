@@ -119,7 +119,6 @@ lazy val web = project
       akkaAgent,
       akkaslf,
       jsoup,
-      groovy,
       hazelcastClient,
       fluentHc,
       commonsIo,

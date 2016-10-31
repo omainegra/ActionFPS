@@ -14,7 +14,6 @@ trait Dependencies {
   val commonsCsv = "org.apache.commons" % "commons-csv" % "1.4"
   val kantanCsv = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.15"
   val jsoup = "org.jsoup" % "jsoup" % "1.10.1"
-  val groovy = "org.codehaus.groovy" % "groovy-all" % "2.4.7"
   val hazelcastClient = "com.hazelcast" % "hazelcast-client" % "3.6.5"
   val fluentHc = "org.apache.httpcomponents" % "fluent-hc" % "4.5.2"
   val commonsIo = "commons-io" % "commons-io" % "2.5"
