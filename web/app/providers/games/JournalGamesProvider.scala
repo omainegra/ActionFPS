@@ -17,12 +17,11 @@ import com.actionfps.api.Game
 import com.actionfps.gameparser.enrichers._
 import org.apache.commons.io.input.Tailer
 import play.api.inject.ApplicationLifecycle
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.{Configuration, Logger}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, blocking}
-import scala.util.control.NonFatal
 import com.actionfps.formats.json.Formats._
 
 object JournalGamesProvider {
@@ -36,11 +35,15 @@ object JournalGamesProvider {
   def getGamesSnapshot(logger: Logger, file: File): List[Game] = {
     val src = scala.io.Source.fromFile(file)
     try src.getLines().filter(_.nonEmpty).map { line =>
-      try Json.fromJson[Game](Json.parse(line.split("\t")(3))).get
-      catch {
-        case NonFatal(e) =>
-          logger.error(s"Could not parse JSON line due to ${e}: $line", e)
-          throw new RuntimeException(s"Failed to parse line in file ${file}: $line", e)
+      line.split("\t").toList match {
+        case id :: _ :: _ :: jsonText :: Nil =>
+          Json.fromJson[Game](Json.parse(jsonText)) match {
+            case JsSuccess(good, _) => good
+            case e: JsError =>
+              throw new RuntimeException(s"Failed to parse JSON in ${file}: $jsonText")
+          }
+        case _ =>
+          throw new RuntimeException(s"Failed to parse line in ${file}: $line")
       }
     }.toList.filter(_.validate.isRight).filter(_.validateServer)
     finally src.close
