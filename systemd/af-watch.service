@@ -1,0 +1,10 @@
+[Unit]
+Description=ActionFPS 5 Watcher
+[Service]
+User=af
+Type=simple
+WorkingDirectory=/home/af/ActionFPS
+ExecStart=/usr/bin/make watch
+Restart=on-abort
+[Install]
+WantedBy=default.target
