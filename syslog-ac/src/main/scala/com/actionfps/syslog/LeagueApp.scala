@@ -5,6 +5,9 @@ import java.net.URI
 import com.typesafe.scalalogging.StrictLogging
 import org.productivity.java.syslog4j.server.{SyslogServer, SyslogServerEventHandlerIF, SyslogServerEventIF, SyslogServerIF}
 
+import scala.annotation.tailrec
+import scala.util.control.NonFatal
+
 object LeagueApp extends App with StrictLogging {
 
   val bindUri = new URI(args(0))
@@ -28,5 +31,16 @@ object LeagueApp extends App with StrictLogging {
     }
   }
   syslogserver.getConfig.addEventHandler(handler)
-  syslogserver.run()
+
+  @tailrec
+  def run(): Unit = {
+    try syslogserver.run()
+    catch {
+      case NonFatal(e) =>
+        logger.error(s"Failed: ${e}", e)
+    }
+    run()
+  }
+
+  run()
 }
