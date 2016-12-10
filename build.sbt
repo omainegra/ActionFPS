@@ -407,6 +407,6 @@ lazy val tournamentLeague = Project(
   id = "tournament-league",
   base = file("tournament-league")
 ).settings(
-  scalaVersion := "2.12.0-RC1",
+  scalaVersion := "2.12.1",
   libraryDependencies += scalatest
 )
