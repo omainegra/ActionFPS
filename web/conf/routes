@@ -38,3 +38,4 @@ GET         /stats/                              @controllers.StatsController.st
 GET         /ladder/                             @controllers.LadderController.ladder
 GET         /data/games-teams-players.tsv        @controllers.FlatDataController.gamesPlayersTsv
 GET         /data/player-stat.tsv                @controllers.FlatDataController.playerStatTsv
+GET         /dev/live-template/                  @controllers.Dev.liveTemplate

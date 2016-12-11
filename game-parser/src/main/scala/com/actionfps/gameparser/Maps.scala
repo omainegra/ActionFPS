@@ -50,4 +50,6 @@ object Maps {
     }
   )
 
+  val mapToImage: Map[String, String] = Maps.resource.maps.mapValues(_.image)
+
 }
