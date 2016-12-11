@@ -73,7 +73,13 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
     status.alter(m => m.updated(s"${cgse.id}${cgse.name}", cgse))
 
-    val body = views.rendergame.Live.render(b, Maps.mapToImage)
+
+    val body =
+      try {
+        views.rendergame.Live.render(b, Maps.mapToImage)
+      } catch {
+        case e: Throwable => Logger.error(s"Failed to render game ${b}", e)
+      }
     val event = Event(
       id = Option(b.now.server.server),
       name = Option("current-game-status-fragment"),
@@ -112,14 +118,16 @@ object PingerService {
 
     override final val supervisorStrategy: SupervisorStrategy = {
       def defaultDecider: Decider = {
-        case _: ActorKilledException         ⇒ Restart
-        case _: Exception                    ⇒ Restart
+        case _: ActorKilledException ⇒ Restart
+        case _: Exception ⇒ Restart
       }
+
       OneForOneStrategy()(defaultDecider)
     }
 
     import concurrent.duration._
     import context.dispatcher
+
     context.system.scheduler.schedule(10.minutes, 10.minutes, pingerActor, Kill)
 
     become {
