@@ -68,10 +68,12 @@ object Live {
         }
 
     }
-    if (!"rvsf".equalsIgnoreCase(game.teams.maxBy(t => t.flags.getOrElse(t.frags)).name)) {
-      val cla = html.select(".team.cla").first()
-      html.select(".team.rvsf").first().before(cla.clone())
-      cla.remove()
+    if ( game.teams.nonEmpty ) {
+      if (!"rvsf".equalsIgnoreCase(game.teams.maxBy(t => t.flags.getOrElse(t.frags)).name)) {
+        val cla = html.select(".team.cla").first()
+        html.select(".team.rvsf").first().before(cla.clone())
+        cla.remove()
+      }
     }
     game.players match {
       case None => html.select(".dm-players").remove()

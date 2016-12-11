@@ -1,4 +1,5 @@
 import com.actionfps.gameparser.Maps
+import com.actionfps.pinger.CurrentGameStatus
 import controllers.Dev
 import org.jsoup.Jsoup
 import org.scalatest.{FunSuite, Matchers}
@@ -15,5 +16,14 @@ class LiveTemplateTranslateSpec extends FunSuite with Matchers {
     html shouldBe html2
     println(html)
     println(html2)
+  }
+  test("It doesn't fail for empty data") {
+    views.rendergame.Live.render(mapMapping = Maps.mapToImage, game =
+    CurrentGameStatus(
+      when = "", reasonablyActive = false, hasFlags = true, map = None, mode = None, minRemain = 123,
+      updatedTime = "", players = None, spectators = None, now = Dev.game.now,
+      teams = List.empty
+    )
+    )
   }
 }
