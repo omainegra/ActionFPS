@@ -26,6 +26,9 @@ object Live {
       case _ => html.select(".mode_map").first().remove()
     }
     List("rvsf", "cla").foreach { teamName =>
+      if ( !game.teams.exists(_.name.equalsIgnoreCase(teamName)) ) {
+        html.select(s".team.${teamName}").select(".players, .score, .subscore").remove()
+      }
       game.teams
         .find(_.name.equalsIgnoreCase(teamName))
         .map(team => team -> html.select(s".team.${team.name.toLowerCase}").first())
