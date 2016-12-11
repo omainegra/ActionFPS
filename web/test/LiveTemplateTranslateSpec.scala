@@ -18,12 +18,14 @@ class LiveTemplateTranslateSpec extends FunSuite with Matchers {
     println(html2)
   }
   test("It doesn't fail for empty data") {
-    views.rendergame.Live.render(mapMapping = Maps.mapToImage, game =
+    val result = views.rendergame.Live.render(mapMapping = Maps.mapToImage, game =
     CurrentGameStatus(
-      when = "", reasonablyActive = false, hasFlags = true, map = None, mode = None, minRemain = 123,
+      when = "", reasonablyActive = true, hasFlags = true, map = None, mode = None, minRemain = 123,
       updatedTime = "", players = None, spectators = None, now = Dev.game.now,
       teams = List.empty
     )
     )
+
+    result.body should not include "w00p"
   }
 }
