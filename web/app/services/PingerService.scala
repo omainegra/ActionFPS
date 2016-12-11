@@ -73,7 +73,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
     status.alter(m => m.updated(s"${cgse.id}${cgse.name}", cgse))
 
-    val body = views.html.rendergame.live.apply(b, Maps.resource.maps.mapValues(_.image))
+    val body = views.rendergame.Live.render(b, Maps.mapToImage)
     val event = Event(
       id = Option(b.now.server.server),
       name = Option("current-game-status-fragment"),
