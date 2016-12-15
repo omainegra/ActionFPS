@@ -15,8 +15,7 @@ class Dev @Inject()(common: Common) extends Controller {
   def liveTemplate = Action { implicit req =>
     val mapping = Maps.mapToImage
     val html = views.rendergame.Live.render(mapMapping = mapping, game = Dev.game)
-    val html2 = views.html.rendergame.live.render(mapMapping = mapping, game = Dev.game)
-    val fh = Html(html.body + "<hr/>" + html2.body)
+    val fh = Html(html.body + "<hr/>")
     Ok(common.renderTemplate(None, supportsJson = false, None)(fh))
   }
 }
