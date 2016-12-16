@@ -46,11 +46,46 @@ object Clanwar {
     def renderTeams(): Unit = {
       clanwar.conclusion.teams.flatMap(team => clanner.get(team.clan).map(c => team -> c))
         .foreach { case (team, clan) =>
-          val teamHtml = Jsoup.parse(views.html.clanwar.render_clanwar_team(team, clan, showPlayers).body)
-          teamHtml.select(".team-header a").attr("href", s"/clan/?id=${team.clan}")
-          teamHtml.select(".team-header h3 a img").attr("src", clan.logo)
-          teamHtml.select(".team-header .result .clan a").first().text(team.name.getOrElse(team.clan))
-          teamHtml.select(".team-header .result .score").first().text(s"${team.score}")
+          val teamHtml = Jsoup.parse(views.html.clanwar.render_clanwar_team().body)
+
+          def renderTeamHeader(): Unit = {
+            teamHtml.select(".team-header a").attr("href", s"/clan/?id=${team.clan}")
+            teamHtml.select(".team-header h3 a img").attr("src", clan.logo)
+            teamHtml.select(".team-header .result .clan a").first().text(team.name.getOrElse(team.clan))
+            teamHtml.select(".team-header .result .score").first().text(s"${team.score}")
+          }
+
+          def renderPlayers(): Unit = {
+            if (!showPlayers) teamHtml.select(".players").remove() else {
+              val linkedPlayer = teamHtml.select(".players li.player-linked").first()
+              val unlinkedPlayer = teamHtml.select(".players li.player-unlinked").first()
+              team.players.values.toList.sortBy(_.flags).reverse.map { player =>
+                val theLi = player.user match {
+                  case Some(user) =>
+                    val copied = linkedPlayer.clone()
+                    copied.select(".name a").first().text(player.name).attr("href", s"/player/?id=${user}")
+                    copied
+                  case _ =>
+                    val copied = unlinkedPlayer.clone()
+                    copied.select(".name span").first().text(player.name)
+                    copied
+                }
+                theLi.select(".flags").first().text(s"${player.flags}")
+                theLi.select(".frags").first().text(s"${player.frags}")
+
+                if (!player.awards.contains("mvp")) {
+                  theLi.select("img").remove()
+                }
+
+                theLi
+              }.foreach(linkedPlayer.parent().appendChild)
+              linkedPlayer.remove()
+              unlinkedPlayer.remove()
+            }
+          }
+
+          renderTeamHeader()
+          renderPlayers()
           htmlB.select(".teams").first().append(teamHtml.select("body").html())
         }
     }

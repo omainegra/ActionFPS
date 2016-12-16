@@ -1,4 +1,3 @@
-@(team: com.actionfps.clans.ClanwarTeam, clan: com.actionfps.accumulation.Clan, showPlayers: Boolean)
 <div class="team">
     <div class="team-header">
         <h3><a href="/clan/?id=bubu"><img src="https://cloud.githubusercontent.com/assets/16243477/12007811/08f26e38-ac16-11e5-8855-e23429e226d8.png" width="64" height="64" class="clan-logo"/></a></h3>
@@ -7,29 +6,22 @@
             <span class="score">1234</span>
         </div>
     </div>
-    @if(showPlayers) {
-        <div class="players">
-            <ol>
-            @team.players.values.toList.sortBy(_.flags).reverse.map { player =>
-                <li>
-                    <span class="score flags">@player.flags</span>
-                    <span class="subscore frags">@player.frags</span>
-                    <span class="name">
-                        @player.user match {
-                            case Some(user) => {
-                                <a href="/player/?id=@user">@player.name</a>
-                            }
-                            case None => {
-                                @player.name
-                            }
-                        }
-                        @if(player.awards.contains("mvp")) {
-                            <img src="https://cloud.githubusercontent.com/assets/2464813/12814236/6717aab2-cb35-11e5-822a-c9ad283b27df.png" title="MVP" />
-                        }
-                    </span>
-                </li>
-            }
-            </ol>
-        </div>
-    }
+    <div class="players">
+        <ol>
+            <li class="player-linked">
+                <span class="score flags">99</span>
+                <span class="subscore frags">99</span>
+                <span class="name"><a href="/player/?id=mama">Mama</a>
+                    <img src="https://cloud.githubusercontent.com/assets/2464813/12814236/6717aab2-cb35-11e5-822a-c9ad283b27df.png" title="MVP" />
+                </span>
+            </li>
+            <li class="player-unlinked">
+                <span class="score flags">99</span>
+                <span class="subscore frags">99</span>
+                <span class="name"><span>Mama</span>
+                    <img src="https://cloud.githubusercontent.com/assets/2464813/12814236/6717aab2-cb35-11e5-822a-c9ad283b27df.png" title="MVP" />
+                </span>
+            </li>
+        </ol>
+    </div>
 </div>
