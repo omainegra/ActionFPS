@@ -43,11 +43,25 @@ object Clanwar {
       }
     }
 
+    def renderTeams(): Unit = {
+      clanwar.conclusion.teams.flatMap(team => clanner.get(team.clan).map(c => team -> c))
+        .foreach { case (team, clan) =>
+          val teamHtml = Jsoup.parse(views.html.clanwar.render_clanwar_team(team, clan, showPlayers).body)
+          teamHtml.select(".team-header a").attr("href", s"/clan/?id=${team.clan}")
+          teamHtml.select(".team-header h3 a img").attr("src", clan.logo)
+          teamHtml.select(".team-header .result .clan a").first().text(team.name.getOrElse(team.clan))
+          teamHtml.select(".team-header .result .score").first().text(s"${team.score}")
+          htmlB.select(".teams").first().append(teamHtml.select("body").html())
+        }
+    }
+
     renderHeader()
     renderAchievements()
+    renderTeams()
 
     Html(htmlB.select("body").html())
 
     //    Html(html.select("body").html())
   }
+
 }
