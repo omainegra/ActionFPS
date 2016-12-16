@@ -13,20 +13,14 @@
         </header>
 
         <div class="teams">
-        @clanwar.conclusion.teams.flatMap(team => clanner.get(team.clan).map(c => team -> c)).map { case (team, clan) =>
-            @views.html.clanwar.render_clanwar_team(team, clan, showPlayers)
-        }
-        </div>
-        @if(!showPlayers) {
-            @clanwar.achievements.map { achievements =>
-                <div class="g-achievements">
-                    @achievements.map { achievement =>
-                        <a href="/player/?id=@achievement.user">@achievement.text</a>
-                        <br/>
-                    }
-                </div>
+            @clanwar.conclusion.teams.flatMap(team => clanner.get(team.clan).map(c => team -> c)).map { case (team, clan) =>
+                @views.html.clanwar.render_clanwar_team(team, clan, showPlayers)
             }
-        }
+        </div>
+        <div class="g-achievements">
+            <a href="/player/?id=pete">Pete won achievement X</a>
+            <br/>
+        </div>
     </div>
 
 </article>
