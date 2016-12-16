@@ -20,14 +20,5 @@ class TemplateSpec extends FunSuite with Matchers {
     result.body should not include "w00p"
   }
 
-  test("Clanwar template does not crash") {
-    implicit val namer = Dev.namer
-    implicit val clanner = Dev.clanner
-    val mapping = Maps.mapToImage
-    val html = views.clanwar.Clanwar.render(
-      clanwar = Dev.completeClanwar.meta.named,
-      showPlayers = true,
-      showGames = true
-    )
-  }
+
 }

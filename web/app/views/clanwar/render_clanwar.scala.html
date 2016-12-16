@@ -1,38 +1,33 @@
 @(clanwar: com.actionfps.clans.ClanwarMeta, showPlayers: Boolean)(implicit clanner: _root_.lib.Clanner)
-@defining(s"/clanwar/?id=${clanwar.id}") { url =>
+<article class="GameCard game clanwar" style="background-image: url('https://cloud.githubusercontent.com/assets/2464813/12814159/d5a55016-cb34-11e5-9eca-2321924b0b4a.png')">
+    <div class="w">
+        <header>
+            <h2>
+                <a href="#dud">
+                    <time is="local-time" datetime="2016-01-02T01:01:01Z" weekday="short" year="numeric" month="short" day="numeric">
+                        2016-01-02T01:01:01Z
+                    </time>
+                </a>
+                <a class="lcw" title="Incomplete clanwar" href="/questions/#completed-clanwar"><i class="fa fa-exclamation"></i></a>
+            </h2>
+        </header>
 
-    <article class="GameCard game clanwar" style="background-image: url('https://cloud.githubusercontent.com/assets/2464813/12814159/d5a55016-cb34-11e5-9eca-2321924b0b4a.png')">
-        <div class="w">
-            <header>
-                <h2>
-                    <a href="@url">
-                        <time is="local-time" datetime="@clanwar.id" weekday="short" year="numeric" month="short" day="numeric">
-                        @clanwar.id
-                        </time>
-                    </a>
-                    @if(!clanwar.completed) {
-                        <a class="lcw" title="Incomplete clanwar" href="/questions/#completed-clanwar"><i class="fa fa-exclamation"></i></a>
-                    }
-                </h2>
-            </header>
-
-            <div class="teams">
-            @clanwar.conclusion.teams.flatMap(team => clanner.get(team.clan).map(c => team -> c)).map { case (team, clan) =>
-                @views.html.clanwar.render_clanwar_team(team, clan, showPlayers)
-            }
-            </div>
-            @if(!showPlayers) {
-                @clanwar.achievements.map { achievements =>
-                    <div class="g-achievements">
-                        @achievements.map { achievement =>
-                            <a href="/player/?id=@achievement.user">@achievement.text</a>
-                            <br/>
-                        }
-                    </div>
-                }
-            }
+        <div class="teams">
+        @clanwar.conclusion.teams.flatMap(team => clanner.get(team.clan).map(c => team -> c)).map { case (team, clan) =>
+            @views.html.clanwar.render_clanwar_team(team, clan, showPlayers)
+        }
         </div>
+        @if(!showPlayers) {
+            @clanwar.achievements.map { achievements =>
+                <div class="g-achievements">
+                    @achievements.map { achievement =>
+                        <a href="/player/?id=@achievement.user">@achievement.text</a>
+                        <br/>
+                    }
+                </div>
+            }
+        }
+    </div>
 
-    </article>
-}
+</article>
 

@@ -43,7 +43,7 @@
 
 <div id="latest-clanwars">
 @latestClanwars.map { clanwar =>
-    @views.html.clanwar.render_clanwar(clanwar, showPlayers = false)
+    @views.clanwar.Clanwar.render(clanwar, showPlayers = false)
 }
 </div>
 <div id="games">

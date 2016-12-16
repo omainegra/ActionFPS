@@ -24,8 +24,7 @@ class Dev @Inject()(common: Common) extends Controller {
     val mapping = Maps.mapToImage
     val html = views.clanwar.Clanwar.render(
       clanwar = Dev.completeClanwar.meta.named,
-      showPlayers = true,
-      showGames = true
+      showPlayers = true
     )
     val fh = Html(html.body + "<hr/>")
     Ok(common.renderTemplate(None, supportsJson = false, None)(fh))
@@ -40,14 +39,21 @@ class Dev @Inject()(common: Common) extends Controller {
 }
 
 object Dev {
+  val gamePlayer = GamePlayer(name = "Newbie", host = None, score = None, flags = Some(2), frags = 54, deaths = 12,
+    user = Some("newbie"), clan = Some("woop"), countryCode = None, countryName = None, timezone = None)
   val gameTeam = GameTeam(name = "RVSF", flags = Some(3), frags = 99, clan = Some("woop"),
-    players = List(GamePlayer(name = "Newbie", host = None, score = None, flags = Some(2), frags = 54, deaths = 12,
-      user = Some("newbie"), clan = Some("woop"), countryCode = None, countryName = None, timezone = None)))
+    players = List(gamePlayer))
+  val otherTeam = gameTeam.copy(name = "CLA", clan = Some("bleh"), flags = Some(3),
+    players = List(
+      gamePlayer.copy(name = "Bewbie", user = Some("bewbie"), clan = Some("bleh")),
+      gamePlayer.copy(frags = 51, flags = Some(3), name = "Zewbie", user = Some("xewbie"), clan = Some("bleh"))
+
+    ))
   val completedGame = Game(
-    id = "abcd", endTime = ZonedDateTime.now(), map = "ac_depot", mode = "ctf", state = "WHAT",
+    id = "2015-01-01T03:04:05Z", endTime = ZonedDateTime.now(), map = "ac_depot", mode = "ctf", state = "WHAT",
     server = "aura.woop.ac:1999", duration = 15, clangame = Some(Set("woop", "bleh")), clanwar = Some("id"),
     achievements = Some(List(GameAchievement("newbie", "won it all"))),
-    teams = List(gameTeam, gameTeam.copy(clan = Some("bleh")))
+    teams = List(gameTeam, otherTeam)
   )
   val game = CurrentGameStatus(
     when = "now",
@@ -90,10 +96,10 @@ object Dev {
   implicit val namer = Namer(Map("newbie" -> "w00p|Newbie").get)
   val woopCln = Clan(id = "woop", name = "w00p", fullName = "Woop Clan",
     tag = None, tags = None, website = None, teamspeak = None,
-    logo = "WHUTUTUTU")
+    logo = "https://cloud.githubusercontent.com/assets/2464813/12814066/25c656a4-cb34-11e5-87a7-dbff30d759c6.png")
 
   implicit val clanner = Clanner(
     Map("woop" -> woopCln,
-      "bleh" -> woopCln.copy(id = "bleh", name = "BLEH")).get
+      "bleh" -> woopCln.copy(id = "bleh", name = "BLEH", logo = "https://cloud.githubusercontent.com/assets/5359646/12004841/d10c564a-ab7b-11e5-8d41-00e673cc0096.png")).get
   )
 }
