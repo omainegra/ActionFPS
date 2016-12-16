@@ -7,7 +7,7 @@ import org.scalatest.{FunSuite, Matchers}
 /**
   * Created by me on 11/12/2016.
   */
-class LiveTemplateTranslateSpec extends FunSuite with Matchers {
+class TemplateSpec extends FunSuite with Matchers {
   test("It doesn't fail for empty data") {
     val result = views.rendergame.Live.render(mapMapping = Maps.mapToImage, game =
     CurrentGameStatus(
@@ -18,5 +18,16 @@ class LiveTemplateTranslateSpec extends FunSuite with Matchers {
     )
 
     result.body should not include "w00p"
+  }
+
+  test("Clanwar template does not crash") {
+    implicit val namer = Dev.namer
+    implicit val clanner = Dev.clanner
+    val mapping = Maps.mapToImage
+    val html = views.clanwar.Clanwar.render(
+      clanwar = Dev.completeClanwar.meta.named,
+      showPlayers = true,
+      showGames = true
+    )
   }
 }

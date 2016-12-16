@@ -39,3 +39,4 @@ GET         /ladder/                             @controllers.LadderController.l
 GET         /data/games-teams-players.tsv        @controllers.FlatDataController.gamesPlayersTsv
 GET         /data/player-stat.tsv                @controllers.FlatDataController.playerStatTsv
 GET         /dev/live-template/                  @controllers.Dev.liveTemplate
+GET         /dev/clanwars/                       @controllers.Dev.clanwarTemplate

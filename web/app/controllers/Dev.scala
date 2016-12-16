@@ -1,9 +1,15 @@
 package controllers
 
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
+import com.actionfps.accumulation.Clan
+import com.actionfps.api.{Game, GameAchievement, GamePlayer, GameTeam}
+import com.actionfps.clans.CompleteClanwar
+import com.actionfps.clans.Conclusion.Namer
 import com.actionfps.gameparser.Maps
 import com.actionfps.pinger._
+import lib.Clanner
 import play.api.mvc.{Action, Controller}
 import play.twirl.api.Html
 
@@ -12,6 +18,19 @@ import play.twirl.api.Html
   */
 
 class Dev @Inject()(common: Common) extends Controller {
+  def clanwarTemplate = Action { implicit req =>
+    implicit val namer = Dev.namer
+    implicit val clanner = Dev.clanner
+    val mapping = Maps.mapToImage
+    val html = views.clanwar.Clanwar.render(
+      clanwar = Dev.completeClanwar.meta.named,
+      showPlayers = true,
+      showGames = true
+    )
+    val fh = Html(html.body + "<hr/>")
+    Ok(common.renderTemplate(None, supportsJson = false, None)(fh))
+  }
+
   def liveTemplate = Action { implicit req =>
     val mapping = Maps.mapToImage
     val html = views.rendergame.Live.render(mapMapping = mapping, game = Dev.game)
@@ -21,6 +40,15 @@ class Dev @Inject()(common: Common) extends Controller {
 }
 
 object Dev {
+  val gameTeam = GameTeam(name = "RVSF", flags = Some(3), frags = 99, clan = Some("woop"),
+    players = List(GamePlayer(name = "Newbie", host = None, score = None, flags = Some(2), frags = 54, deaths = 12,
+      user = Some("newbie"), clan = Some("woop"), countryCode = None, countryName = None, timezone = None)))
+  val completedGame = Game(
+    id = "abcd", endTime = ZonedDateTime.now(), map = "ac_depot", mode = "ctf", state = "WHAT",
+    server = "aura.woop.ac:1999", duration = 15, clangame = Some(Set("woop", "bleh")), clanwar = Some("id"),
+    achievements = Some(List(GameAchievement("newbie", "won it all"))),
+    teams = List(gameTeam, gameTeam.copy(clan = Some("bleh")))
+  )
   val game = CurrentGameStatus(
     when = "now",
     reasonablyActive = true,
@@ -51,5 +79,21 @@ object Dev {
         players = List(CurrentGamePlayer(name = "prepe", flags = None, frags = 29))
       )
     )
+  )
+
+  val completeClanwar = CompleteClanwar(
+    winner = Some("woop"),
+    clans = Set("woop", "bleh"),
+    scores = Map("woop" -> 2, "bleh" -> 1),
+    games = List(Dev.completedGame, Dev.completedGame)
+  )
+  implicit val namer = Namer(Map("newbie" -> "w00p|Newbie").get)
+  val woopCln = Clan(id = "woop", name = "w00p", fullName = "Woop Clan",
+    tag = None, tags = None, website = None, teamspeak = None,
+    logo = "WHUTUTUTU")
+
+  implicit val clanner = Clanner(
+    Map("woop" -> woopCln,
+      "bleh" -> woopCln.copy(id = "bleh", name = "BLEH")).get
   )
 }
