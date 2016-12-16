@@ -9,8 +9,8 @@ import play.twirl.api.Html
   */
 object Clanwar {
   def render(clanwar: com.actionfps.clans.ClanwarMeta, showPlayers: Boolean)(implicit clanner: Clanner): Html = {
-    val htmlA = views.html.clanwar.render_clanwar(clanwar, showPlayers)
-    val htmlB = Jsoup.parse(htmlA.body)
+
+    val htmlB = Jsoup.parse(lib.Soup.wwwLocation.resolve("clanwar.html").toFile, "UTF-8")
 
     def renderHeader(): Unit = {
       // Header
@@ -44,9 +44,12 @@ object Clanwar {
     }
 
     def renderTeams(): Unit = {
+      val teamsEl = htmlB.select(".teams .team")
+      val teamHtmlC = teamsEl.first().clone()
+
       clanwar.conclusion.teams.flatMap(team => clanner.get(team.clan).map(c => team -> c))
         .foreach { case (team, clan) =>
-          val teamHtml = Jsoup.parse(views.html.clanwar.render_clanwar_team().body)
+          val teamHtml = teamHtmlC.clone()
 
           def renderTeamHeader(): Unit = {
             teamHtml.select(".team-header a").attr("href", s"/clan/?id=${team.clan}")
@@ -86,8 +89,10 @@ object Clanwar {
 
           renderTeamHeader()
           renderPlayers()
-          htmlB.select(".teams").first().append(teamHtml.select("body").html())
+          htmlB.select(".teams").first().append(teamHtml.outerHtml())
         }
+
+      teamsEl.remove()
     }
 
     renderHeader()
@@ -95,8 +100,6 @@ object Clanwar {
     renderTeams()
 
     Html(htmlB.select("body").html())
-
-    //    Html(html.select("body").html())
   }
 
 }
