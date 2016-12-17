@@ -3,16 +3,14 @@ package views.rendergame
 import com.actionfps.api.GameTeam
 import com.actionfps.gameparser.enrichers.{JsonGamePlayer, JsonGameTeam}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import play.twirl.api.Html
 
 /**
   * Created by me on 17/12/2016.
   */
 object Render {
-  def renderSpectator(spectator: JsonGamePlayer): Html = {
-    val html = views.html.rendergame.render_game_team_player()
-    val js = org.jsoup.Jsoup.parse(html.body)
-    val target = js.select(".spectator")
+  def renderSpectator(target: Element, spectator: JsonGamePlayer): Unit = {
     spectator.flags match {
       case None => target.select(".flags").remove()
       case Some(flags) => target.select(".flags").first().text(s"$flags")
@@ -23,13 +21,9 @@ object Render {
       case Some(user) => target.select(".name a").attr("href", s"/player/?id=${user}").first().text(spectator.name)
       case None => target.select(".name").first().text(spectator.name)
     }
-    Html(target.outerHtml())
   }
 
-  def renderPlayer(player: JsonGamePlayer): Html = {
-    val html = views.html.rendergame.render_game_team_player()
-    val js = org.jsoup.Jsoup.parse(html.body)
-    val target = js.select(".player")
+  def renderPlayer(target: Element, player: JsonGamePlayer): Unit = {
     player.flags match {
       case None => target.select(".flags").remove()
       case Some(flags) => target.select(".flags").first().text(s"$flags")
@@ -39,7 +33,6 @@ object Render {
       case Some(user) => target.select(".name a").attr("href", s"/player/?id=${user}").first().text(player.name)
       case None => target.select(".name").first().text(player.name)
     }
-    Html(target.outerHtml())
   }
 
   def renderTeam(team: GameTeam, mixedGame: MixedGame): Html = {
@@ -58,10 +51,25 @@ object Render {
         doc.select(".team-header .subscore").remove()
     }
 
-    team.players.map(views.rendergame.Render.renderPlayer).map(_.body)
-      .foreach(doc.select(".players ol").first().append)
-    teamSpectators.toList.flatten.map(views.rendergame.Render.renderSpectator)
-      .map(_.body).foreach(doc.select(".players ol").first().append)
+    val playersOl = doc.select(".players ol").first()
+    val playersPlayers = playersOl.select(".player")
+    val playersSpectators = playersOl.select(".spectator")
+
+    team.players.map { player =>
+      val target = playersPlayers.first().clone()
+      views.rendergame.Render.renderPlayer(target, player)
+      target
+    }.foreach(playersOl.appendChild)
+
+    teamSpectators.toList.flatten.map { spectator =>
+      val target = playersSpectators.first().clone()
+      views.rendergame.Render.renderSpectator(target, spectator)
+      target
+    }.foreach(playersOl.appendChild)
+
+    playersPlayers.remove()
+    playersSpectators
+      .remove()
 
     doc.select("div.team").first().addClass(team.name.toLowerCase)
 
