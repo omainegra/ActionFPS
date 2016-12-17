@@ -25,17 +25,38 @@
         <ol>
             @team.players.map { player =>
                 @{
-                    val html = views.html.rendergame.render_game_team_player(player)
+                    val html = views.html.rendergame.render_game_team_player()
                     val js = org.jsoup.Jsoup.parse(html.body)
-                    Html(js.select(".player").outerHtml())
+                    val target = js.select(".player")
+                    player.flags match {
+                        case None => target.select(".flags").remove()
+                        case Some(flags) => target.select(".flags").first().text(s"$flags")
+                    }
+                    target.select(".frags").first().text(s"${player.frags}")
+                    player.user match {
+                        case Some(user) => target.select(".name a").attr("href", s"/player/?id=${user}").first().text(player.name)
+                        case None => target.select(".name").first().text(player.name)
+                    }
+                    Html(target.outerHtml())
                 }
             }
             @teamSpectators.map { spectators =>
                 @spectators.map { spectator =>
                     @{
-                        val html = views.html.rendergame.render_game_team_player(spectator)
+                        val html = views.html.rendergame.render_game_team_player()
                         val js = org.jsoup.Jsoup.parse(html.body)
-                        Html(js.select(".spectator").outerHtml())
+                        val target = js.select(".spectator")
+                        spectator.flags match {
+                            case None => target.select(".flags").remove()
+                            case Some(flags) => target.select(".flags").first().text(s"$flags")
+                        }
+                        target.select(".frags").first().text(s"${spectator.frags}")
+
+                        spectator.user match {
+                            case Some(user) => target.select(".name a").attr("href", s"/player/?id=${user}").first().text(spectator.name)
+                            case None => target.select(".name").first().text(spectator.name)
+                        }
+                        Html(target.outerHtml())
                     }
                 }
             }
