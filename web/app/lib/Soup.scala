@@ -6,7 +6,7 @@ import java.nio.file.{Files, Path, Paths}
 import com.actionfps.achievements.immutable.CaptureMaster
 import com.actionfps.achievements.immutable.CaptureMapCompletion.Achieving
 import com.actionfps.achievements.immutable.CaptureMapCompletion.Achieved
-import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import play.twirl.api.Html
 
 
@@ -28,33 +28,6 @@ object Soup {
   }
   if (!f.exists()) {
     f = new File("dist/www/template.html")
-  }
-
-  def captureMasterRender(captureMaster: CaptureMaster): Html = {
-    val doc = Jsoup.parse(wwwLocation.resolve("capture_master.html").toFile, "UTF-8")
-    val complete = doc.select("tr.complete").first()
-    val incomplete = doc.select("tr.incomplete").first()
-    captureMaster.all.map {
-      case a@Achieved(map) =>
-        val mapName = s"ctf @ ${map}"
-        val clone = complete.clone()
-        clone.select("th").first().text(mapName)
-        clone.select(".cla").first().text(s"${a.cla}/${a.cla}")
-        clone.select(".rvsf").first().text(s"${a.rvsf}/${a.rvsf}")
-        clone
-      case a@Achieving(map, cla, rvsf) =>
-        val clone = incomplete.clone()
-        val mapName = s"ctf @ ${map}"
-        clone.select("th").first().text(mapName)
-        clone.select(".cla").first().text(s"$cla/${a.targetPerSide}")
-        clone.select(".rvsf").first().text(s"$rvsf/${a.targetPerSide}")
-        clone
-    }.foreach { clone =>
-      incomplete.parents().first().appendChild(clone)
-    }
-    complete.remove()
-    incomplete.remove()
-    Html(doc.html())
   }
 
 }

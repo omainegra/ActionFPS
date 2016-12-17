@@ -37,6 +37,104 @@
                 <h3>Achievements</h3>
 
                 <div class="achievements">
+
+                    <!-- COMPLETED -->
+                    <div class="AchievementCard achievement achieved">
+                        <div class="cont">
+                            <div class="achievement-left">
+                                <div class="progress-radial progress-100">
+                                    <div class="overlay">✔</div>
+                                </div>
+                            </div>
+                            <div class="achievement-description">
+                                <header>
+                                    <h3>This one is complete</h3>
+
+                                    <p>With a game link to the side</p>
+                                </header>
+                                <p class="achieved-on">
+                                    <a href="/game/?id=@achievement.at"><time is="relative-time" datetime="2016-11-29T23:23:32Z">
+                                        2016-11-29T23:23:32Z
+                                    </time></a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- PARTIAL + CAPTURE MASTER -->
+
+
+                    <div class="AchievementCard achievement notAchieved partial">
+                        <div class="cont">
+                            <div class="achievement-left">
+                                <div class="progress-radial" style="
+                                background-image: linear-gradient(90deg, #2f3439 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(111deg, #ff6347 50%, #2f3439 50%, #2f3439);
+                                -left-background-image: linear-gradient(111deg, #ff6347 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), linear-gradient(270deg, #ff6347 50%, #2f3439 50%, #2f3439);
+"
+                                >
+                                    <div class="overlay">90%</div>
+                                </div>
+                            </div>
+                            <div class="achievement-description">
+                                <header>
+                                    <h3>Partial title</h3>
+
+                                    <p>This one is still ongoing</p>
+                                </header>
+
+                                <section class="content capture-master">
+                                    <div class="master">
+                                        <table class="map-master">
+                                            <thead>
+                                            <tr>
+                                                <th>Map</th>
+                                                <th>CLA</th>
+                                                <th>RVSF</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr class="complete">
+                                                <th class="map_mode">ctf @ ac_desert</th>
+                                                <td class="cla complete">3/3</td>
+                                                <td class="rvsf complete">3/3</td>
+                                            </tr>
+                                            <tr class="incomplete">
+                                                <th class="map_mode">ctf @ ac_desert</th>
+                                                <td class="cla partial">2/3</td>
+                                                <td class="rvsf partial">1/3</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </section>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NOT ACHIEVED -->
+
+                    <div class="AchievementCard achievement notAchieved notStarted">
+                        <div class="cont">
+                            <div class="achievement-left">
+                                <div class="progress-radial progress-0">
+                                    <div class="overlay"></div>
+                                </div>
+                            </div>
+                            <div class="achievement-description">
+                                <header>
+                                    <h3>Not achieved title</h3>
+                                    <p>This was not achieved at all</p>
+                                </header>
+                            </div>
+                        </div>
+                    </div>
+
+
+
                 </div>
             </div>
             <h2>Recent games</h2>
