@@ -1,9 +1,17 @@
-@import views.rendergame.MixedGame
-@(mixedGame: MixedGame, x: String)
-<article class="@mixedGame.className"
-style="@mixedGame.bgStyle">
+<article class="GameCard game">
     <div class="w">
-        @header(mixedGame, mixedGame.game)
+        <header>
+            <h2>
+                <a>
+                    <span class="heading">zzz</span>
+                    <time is="relative-time" datetime="2016-02-03">2016-02-03</time>
+                </a>
+                <a target="_blank" class="demo-link" href="abc">demo</a>
+                <a class="server-link"
+                href="assaultcube://test">on Aura 1991</a>
+                <p class="time-remain">x minutes</p>
+            </h2>
+        </header>
 
         <div class="teams">
 

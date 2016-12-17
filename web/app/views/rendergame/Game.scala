@@ -41,5 +41,5 @@ case class MixedGame(isNew: Boolean, game: JsonGame, now: Option[Now], players: 
 
   def bgStyle = bgImage.map(i => s"background-image: url('$i')").getOrElse("")
 
-  def className = s"GameCard game " + (if (now.isDefined) "isLive" else if (isNew) "isNew" else "")
+  def className = (if (now.isDefined) "isLive" else if (isNew) "isNew" else "")
 }

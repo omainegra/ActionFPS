@@ -1,7 +1,7 @@
 package views.rendergame
 
 import com.actionfps.api.GameTeam
-import com.actionfps.gameparser.enrichers.{JsonGamePlayer, JsonGameTeam}
+import com.actionfps.gameparser.enrichers.JsonGamePlayer
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import play.twirl.api.Html
@@ -11,9 +11,39 @@ import play.twirl.api.Html
   */
 object Render {
 
+  def fillHeader(target: Element, mixedGame: MixedGame): Unit = {
+    mixedGame.url.foreach(url => target.select("a").first().attr("href", url))
+    target.select(".heading").first().text(mixedGame.heading)
+    if (mixedGame.now.isEmpty) {
+      target.select("time").attr("datetime", mixedGame.game.endTime.toString).first().text(mixedGame.game.endTime.toString)
+    } else {
+      target.select("time").remove()
+    }
+    mixedGame.demoLink match {
+      case None => target.select(".demo-link").remove()
+      case Some(link) =>
+        target.select("a.demo-link").attr("href", link)
+    }
+    mixedGame.acLink match {
+      case None => target.select(".server-link").remove()
+      case Some(acLink) =>
+        target.select("a.server-link").attr("href", acLink).first().text(s"on ${mixedGame.now.get.server}")
+    }
+
+    mixedGame.now.flatMap(_.minRemain).map {
+      case 0 => "game finished"
+      case 1 => "1 minute remains"
+      case n => s"$n minutes remain"
+    } match {
+      case None => target.select(".time-remain").remove()
+      case Some(mins) => target.select(".time-remain").first().text(mins)
+    }
+  }
+
   def renderMixedGame(mixedGame: MixedGame): Html = {
-    val html = views.html.rendergame.render_game(mixedGame, "X")
-    val doc = Jsoup.parse(html.body)
+    val doc = Jsoup.parse(lib.Soup.wwwLocation.resolve("render_game.html").toFile, "UTF-8")
+    fillHeader(doc.select("header").first(), mixedGame)
+    doc.select("article").addClass(mixedGame.className).attr("style", mixedGame.bgStyle)
 
     mixedGame.players match {
       case None => doc.select(".dm-players").remove()
