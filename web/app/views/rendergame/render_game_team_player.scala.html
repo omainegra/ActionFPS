@@ -1,14 +1,26 @@
 @import com.actionfps.gameparser.enrichers.JsonGamePlayer
-@(player: JsonGamePlayer, spectator: Boolean = false)
-@defining(
-    if(spectator) "spectator" else "player"
-) { liClass =>
-    <li class=@liClass>
-        @player.flags.map { flags => <span class="score flags">@flags</span> }
-        <span class="subscore flags">@player.frags</span>
-        @player.user match {
-            case Some(user) => { <span class="name"><a href="/player/?id=@user">@player.name</a></span> }
-            case None => { <span class="name">@player.name</span>}
+@(player: JsonGamePlayer)
+<li class="spectator">
+    @player.flags.map { flags => <span class="score flags">@flags</span> }
+<span class="subscore flags">@player.frags</span>
+    @player.user match {
+        case Some(user) => {
+            <span class="name"><a href="/player/?id=@user">@player.name</a></span>
         }
-    </li>
-}
+        case None => {
+            <span class="name">@player.name</span>
+        }
+    }
+</li>
+<li class="player">
+    @player.flags.map { flags => <span class="score flags">@flags</span> }
+    <span class="subscore flags">@player.frags</span>
+    @player.user match {
+        case Some(user) => {
+            <span class="name"><a href="/player/?id=@user">@player.name</a></span>
+        }
+        case None => {
+            <span class="name">@player.name</span>
+        }
+    }
+</li>
