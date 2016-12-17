@@ -12,7 +12,7 @@ import controllers.Common
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
-import play.api.libs.json.{JsBoolean, JsString, JsObject, Json}
+import play.api.libs.json.{JsBoolean, JsObject, JsString, Json}
 import play.api.libs.streams.Streams
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
@@ -22,6 +22,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import com.actionfps.gameparser.enrichers.Implicits._
 import com.actionfps.formats.json.Formats._
+import views.rendergame.MixedGame
 
 /**
   * Created by William on 09/12/2015.
@@ -48,14 +49,12 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
   def processGame(game: JsonGame): Unit = {
     val b = Json.toJson(game.withoutHosts).asInstanceOf[JsObject].+("isNew" -> JsBoolean(true))
 
-    val jsonMap = Map("game" -> Seq(b.toString()), "maps" -> Seq(Json.toJson(Maps.resource.maps.mapValues(_.image)).toString()))
-    common.renderRaw("/live/render-fragment.php")(_.post(jsonMap)).foreach(response =>
-      thing.push(
-        Event(
-          id = Option(game.id),
-          name = Option("new-game"),
-          data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(response.body)).toString()
-        )
+    val gameHtml = views.rendergame.Render.renderMixedGame(MixedGame.fromJsonGame(game))
+    thing.push(
+      Event(
+        id = Option(game.id),
+        name = Option("new-game"),
+        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(gameHtml.body)).toString()
       )
     )
   }

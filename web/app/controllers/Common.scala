@@ -5,6 +5,7 @@ package controllers
   */
 
 import java.io.File
+import java.nio.file.Files
 import javax.inject._
 
 import org.jsoup.Jsoup
@@ -38,7 +39,7 @@ class Common @Inject()(configuration: Configuration
     if (supportsJson) {
       js.select("#content").attr("data-has-json", "has-json")
     }
-    if ( wide ) {
+    if (wide) {
       js.body.addClass("wide")
     }
 
@@ -67,11 +68,11 @@ class Common @Inject()(configuration: Configuration
     def cleanupPaths = html
   }
 
-  def renderRaw(path: String)(f: WSRequest => Future[WSResponse]): Future[WSResponse] = {
+  private def renderRaw(path: String)(f: WSRequest => Future[WSResponse]): Future[WSResponse] = {
     f(wsClient.url(s"$mainPath$path"))
   }
 
-  def renderPhp(path: String)(f: WSRequest => Future[WSResponse])
+  private def renderPhp(path: String)(f: WSRequest => Future[WSResponse])
                (implicit request: RequestHeader): Future[Result] = {
     async {
       val extraParams = List("af_id", "af_name").flatMap { key =>
@@ -99,10 +100,17 @@ class Common @Inject()(configuration: Configuration
 
   def forward(path: String, id: String): Action[AnyContent] = forward(path, Option(id))
 
-  def forward(path: String, id: Option[String] = None): Action[AnyContent] =
+  private def forward(path: String, id: Option[String] = None): Action[AnyContent] =
     Action.async { implicit request =>
       renderPhp(path)(_.withQueryString(id.map(i => "id" -> i).toList: _*).get())
     }
+
+  def renderStatic(path: String) = Action { implicit r =>
+    Ok(renderTemplate(title = None, supportsJson = false,
+      login = None, wide = false) {
+      Html(new String(Files.readAllBytes(lib.Soup.wwwLocation.resolve(path))))
+    })
+  }
 
 
 }

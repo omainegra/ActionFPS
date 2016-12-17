@@ -41,7 +41,6 @@ sbt clean test
 # Technology Choices
 
 * __Scala__ for data processing and Play framework: solid, stable toolkit for dealing with complex data.
-* __PHP__ for the server-side frontend: speedy development for dynamic websites.
 
 ## DevOps
 Continuous Deployment: master --> <https://git.watch/> --> build & restart. Simple monolithic deployment.

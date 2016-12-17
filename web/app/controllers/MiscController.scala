@@ -25,17 +25,15 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
 
   import common._
 
-  def api = forward("/api/")
+  def client = renderStatic("client.html")
 
-  def client = forward("/client/")
+  def clientChanges = renderStatic("client-changes.html")
 
-  def clientChanges = forward("/client/changes/")
+  def questions = renderStatic("questions.html")
 
-  def questions = forward("/questions/")
+  def contact = renderStatic("contact.html")
 
-  def contact = forward("/contact/")
-
-  def development = forward("/development.php")
+  def development = renderStatic("development.html")
 
   def headings = Action.async { request =>
     async {
@@ -68,11 +66,11 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
     }
   }
 
-  def login = forward("/login/")
+  def login = renderStatic("login.html")
 
-  def registerPlay = forward("/register-play/")
+  def registerPlay = renderStatic("register-play.html")
 
-  def play = forward("/play.php")
+  def play = renderStatic("play.html")
 
   def sync = Action.async(BodyParsers.parse.json) { request =>
     wSClient
