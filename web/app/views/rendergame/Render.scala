@@ -82,7 +82,7 @@ object Render {
       case None => doc.select(".of-clanwar").remove()
       case Some(clanwar) =>
         doc.select(".of-clanwar a").attr("href", s"/clanwar/?id=$clanwar")
-        doc.select(".of-clanwar time").attr("href", clanwar).first().text(clanwar)
+        doc.select(".of-clanwar time").attr("datetime", clanwar).first().text(clanwar)
     }
     import scala.collection.JavaConverters._
     mixedGame.game.achievements match {
