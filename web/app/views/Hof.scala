@@ -22,6 +22,7 @@ object Hof {
       players.map { case (user, time) =>
         val pt = rowTemplate.clone()
         pt.select("th a").attr("href", s"/player/?id=${user}").first().text(user)
+        pt.select("td a").attr("href", s"/game/?id=${time}")
         pt.select("time").attr("datetime", time).first().text(time)
         pt
       }.foreach(rowTemplate.parent().appendChild)
