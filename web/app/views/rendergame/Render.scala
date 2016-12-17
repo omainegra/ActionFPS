@@ -10,6 +10,10 @@ import play.twirl.api.Html
   * Created by me on 17/12/2016.
   */
 object Render {
+
+  def renderMixedGame(mixedGame: MixedGame): Html = {
+    views.html.rendergame.render_game(mixedGame, "X")
+  }
   def renderSpectator(target: Element, spectator: JsonGamePlayer): Unit = {
     spectator.flags match {
       case None => target.select(".flags").remove()

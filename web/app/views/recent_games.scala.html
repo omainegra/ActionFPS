@@ -11,7 +11,7 @@
 
     <div id="existing-games">
         @games.map { game =>
-            @views.html.rendergame.render_game(game)
+            @views.rendergame.Render.renderMixedGame(game)
         }
     </div>
 </div>

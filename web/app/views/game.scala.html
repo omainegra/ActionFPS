@@ -2,5 +2,5 @@
 @import views.rendergame.MixedGame
 @(jsonGame: JsonGame)
 <div id="game">
-@views.html.rendergame.render_game(MixedGame.fromJsonGame(jsonGame))
+@views.rendergame.Render.renderMixedGame(MixedGame.fromJsonGame(jsonGame))
 </div>

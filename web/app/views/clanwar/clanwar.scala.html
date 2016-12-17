@@ -6,7 +6,7 @@
     @Clanwar.render(clanwarMeta, showPlayers)
     @if(showGames) {
         @clanwarMeta.games.map { game =>
-            @views.html.rendergame.render_game(MixedGame.fromJsonGame(game))
+            @views.rendergame.Render.renderMixedGame(MixedGame.fromJsonGame(game))
         }
     }
 </div>
