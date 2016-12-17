@@ -39,9 +39,14 @@ object Render {
         lis.remove()
     }
 
+    val teams = doc.select(".teams > .team")
+
     mixedGame.game.teams.map { team =>
-      views.rendergame.Render.renderTeam(team, mixedGame)
-    }.map(_.body).foreach(doc.select(".teams").append)
+      val target = teams.first().clone()
+      views.rendergame.Render.renderTeam(target, team, mixedGame)
+      target
+    }.foreach(doc.select(".teams").first().appendChild)
+    teams.remove()
 
     mixedGame.game.clanwar match {
       case None => doc.select(".of-clanwar").remove()
@@ -54,7 +59,7 @@ object Render {
       case None => doc.select(".g-achievements").remove()
       case Some(achievements) =>
         val theChildren = doc.select(".g-achievements").first().children()
-        achievements.map{ ach =>
+        achievements.map { ach =>
           val cloned = theChildren.clone()
           cloned.select("a").attr("href", s"/player/?id=${ach.user}").first().text(ach.text)
           cloned
@@ -98,10 +103,8 @@ object Render {
     }
   }
 
-  def renderTeam(team: GameTeam, mixedGame: MixedGame): Html = {
+  def renderTeam(doc: Element, team: GameTeam, mixedGame: MixedGame): Unit = {
     val teamSpectators = mixedGame.teamSpectators.get(team.name)
-    val html = views.html.rendergame.render_team()
-    val doc = Jsoup.parse(html.body)
     if (team.name.equalsIgnoreCase("rvsf")) {
       doc.select(".team-header img").attr("src", doc.select(".team-header img").attr("data-rvsf-src"))
     }
@@ -141,7 +144,5 @@ object Render {
       .remove()
 
     doc.select("div.team").first().addClass(team.name.toLowerCase)
-
-    Html(doc.select("body").html())
   }
 }
