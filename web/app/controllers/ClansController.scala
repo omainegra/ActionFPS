@@ -16,6 +16,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import providers.ReferenceProvider
 import providers.full.FullProvider
+import views.ClanRankings
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -40,7 +41,7 @@ class ClansController @Inject()(common: Common,
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(stats))
       else
-        Ok(renderTemplate(None, supportsJson = true, None)(views.html.clan_rankings(stats)))
+        Ok(renderTemplate(None, supportsJson = true, None)(ClanRankings.render(stats)))
     }
   }
 
