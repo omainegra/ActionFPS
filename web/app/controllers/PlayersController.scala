@@ -56,7 +56,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(ranks))
       else
-        Ok(renderTemplate(None, supportsJson = true, None)(views.html.player_ranks(ranks)))
+        Ok(renderTemplate(None, supportsJson = true, None)(views.PlayerRanks.render(ranks)))
     }
   }
 
