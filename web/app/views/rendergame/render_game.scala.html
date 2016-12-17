@@ -1,12 +1,12 @@
 @import views.rendergame.MixedGame
 @(mixedGame: MixedGame)
 <article class="@mixedGame.className"
-    style="@mixedGame.bgStyle">
+style="@mixedGame.bgStyle">
     <div class="w">
         @header(mixedGame, mixedGame.game)
         <div class="teams">
         @mixedGame.game.teams.map { team =>
-            @render_team(team, mixedGame.teamSpectators.get(team.name))
+            @views.rendergame.Render.renderTeam(team, mixedGame)
         }
         </div>
 
