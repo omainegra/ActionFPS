@@ -67,7 +67,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
           if (request.getQueryString("format").contains("json")) {
             Ok(Json.toJson(player.build))
           } else {
-            Ok(renderTemplate(None, supportsJson = true, None)(views.html.player.player(player)))
+            Ok(renderTemplate(None, supportsJson = true, None)(views.player.Player.render(player)))
           }
         case None =>
           NotFound("Player could not be found")
