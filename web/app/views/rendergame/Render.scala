@@ -12,17 +12,72 @@ import play.twirl.api.Html
 object Render {
 
   def renderMixedGame(mixedGame: MixedGame): Html = {
-    views.html.rendergame.render_game(mixedGame, "X")
+    val html = views.html.rendergame.render_game(mixedGame, "X")
+    val doc = Jsoup.parse(html.body)
+
+    mixedGame.players match {
+      case None => doc.select(".dm-players").remove()
+      case Some(dms) =>
+        val lis = doc.select(".dm-players").select("li")
+        dms.map { dm =>
+          val tgt = lis.first().clone()
+          tgt.select("span").first().text(dm)
+          tgt
+        }.foreach(lis.first().parent().appendChild)
+        lis.remove()
+    }
+    mixedGame.spectators match {
+      case None =>
+        doc.select(".spectators").remove()
+      case Some(specs) =>
+        val lis = doc.select(".spectators li")
+        specs.map { spec =>
+          val tgt = lis.first().clone()
+          tgt.select("span").first().text(spec)
+          tgt
+        }.foreach(lis.first().parent().appendChild)
+        lis.remove()
+    }
+
+    mixedGame.game.teams.map { team =>
+      views.rendergame.Render.renderTeam(team, mixedGame)
+    }.map(_.body).foreach(doc.select(".teams").append)
+
+    mixedGame.game.clanwar match {
+      case None => doc.select(".of-clanwar").remove()
+      case Some(clanwar) =>
+        doc.select(".of-clanwar a").attr("href", s"/clanwar/?id=$clanwar")
+        doc.select(".of-clanwar time").attr("href", clanwar).first().text(clanwar)
+    }
+    import scala.collection.JavaConverters._
+    mixedGame.game.achievements match {
+      case None => doc.select(".g-achievements").remove()
+      case Some(achievements) =>
+        val theChildren = doc.select(".g-achievements").first().children()
+        achievements.map{ ach =>
+          val cloned = theChildren.clone()
+          cloned.select("a").attr("href", s"/player/?id=${ach.user}").first().text(ach.text)
+          cloned
+        }.flatMap(_.asScala.toList).foreach(doc.select(".g-achievements").first().appendChild)
+        theChildren.remove()
+    }
+
+    Html(doc.select("body").html())
   }
+
   def renderSpectator(target: Element, spectator: JsonGamePlayer): Unit = {
     spectator.flags match {
       case None => target.select(".flags").remove()
       case Some(flags) => target.select(".flags").first().text(s"$flags")
     }
-    target.select(".frags").first().text(s"${spectator.frags}")
+    target.select(".frags").first().text(s"${
+      spectator.frags
+    }")
 
     spectator.user match {
-      case Some(user) => target.select(".name a").attr("href", s"/player/?id=${user}").first().text(spectator.name)
+      case Some(user) => target.select(".name a").attr("href", s"/player/?id=${
+        user
+      }").first().text(spectator.name)
       case None => target.select(".name").first().text(spectator.name)
     }
   }
@@ -32,9 +87,13 @@ object Render {
       case None => target.select(".flags").remove()
       case Some(flags) => target.select(".flags").first().text(s"$flags")
     }
-    target.select(".frags").first().text(s"${player.frags}")
+    target.select(".frags").first().text(s"${
+      player.frags
+    }")
     player.user match {
-      case Some(user) => target.select(".name a").attr("href", s"/player/?id=${user}").first().text(player.name)
+      case Some(user) => target.select(".name a").attr("href", s"/player/?id=${
+        user
+      }").first().text(player.name)
       case None => target.select(".name").first().text(player.name)
     }
   }
@@ -49,9 +108,13 @@ object Render {
     team.flags match {
       case Some(flags) =>
         doc.select(".team-header .score").first().text(s"$flags")
-        doc.select(".team-header .subscore").first().text(s"${team.frags}")
+        doc.select(".team-header .subscore").first().text(s"${
+          team.frags
+        }")
       case None =>
-        doc.select(".team-header .score").first().text(s"${team.frags}")
+        doc.select(".team-header .score").first().text(s"${
+          team.frags
+        }")
         doc.select(".team-header .subscore").remove()
     }
 
@@ -59,16 +122,18 @@ object Render {
     val playersPlayers = playersOl.select(".player")
     val playersSpectators = playersOl.select(".spectator")
 
-    team.players.map { player =>
-      val target = playersPlayers.first().clone()
-      views.rendergame.Render.renderPlayer(target, player)
-      target
+    team.players.map {
+      player =>
+        val target = playersPlayers.first().clone()
+        views.rendergame.Render.renderPlayer(target, player)
+        target
     }.foreach(playersOl.appendChild)
 
-    teamSpectators.toList.flatten.map { spectator =>
-      val target = playersSpectators.first().clone()
-      views.rendergame.Render.renderSpectator(target, spectator)
-      target
+    teamSpectators.toList.flatten.map {
+      spectator =>
+        val target = playersSpectators.first().clone()
+        views.rendergame.Render.renderSpectator(target, spectator)
+        target
     }.foreach(playersOl.appendChild)
 
     playersPlayers.remove()

@@ -1,85 +1,36 @@
 @import views.rendergame.MixedGame
-@(mixedGame: MixedGame, x:String)
+@(mixedGame: MixedGame, x: String)
 <article class="@mixedGame.className"
 style="@mixedGame.bgStyle">
     <div class="w">
         @header(mixedGame, mixedGame.game)
+
         <div class="teams">
-        @mixedGame.game.teams.map { team =>
-            @views.rendergame.Render.renderTeam(team, mixedGame)
-        }
         </div>
 
-        @defining(
-                <div class="dm-players">
-                <ul>
+        <div class="dm-players">
+            <ul>
                 <li><span>freeman</span></li>
                 <li><span>banger</span></li>
-                </ul>
-                </div>
-        ) { template =>
-            @{
-                mixedGame.players.map { dms =>
-                    val js = org.jsoup.Jsoup.parse(template.toString)
-                    val lis = js.select("li")
-                    dms.map { dm =>
-                        val tgt = lis.first().clone()
-                        tgt.select("span").first().text(dm)
-                        tgt
-                    }.foreach(lis.first().parent().appendChild)
-                    lis.remove()
-                    Html(js.select("body").html())
-                }
-            }
-        }
+            </ul>
+        </div>
 
-        @mixedGame.players.map { players =>
-            <div class="dm-players">
-                <ul>
-                    @players.map { player =>
-                        <li><span>@player</span></li>
-                    }
-                </ul>
-            </div>
-        }
-
-        @defining(
-                <div class="spectators">
-                <h4>Spectators:</h4>
-                <ul>
+        <div class="spectators">
+            <h4>Spectators:</h4>
+            <ul>
                 <li><span>first|spec</span></li>
                 <li><span>seccy</span></li>
-                </ul>
-                </div>
-        ) { template =>
-            @{
-                mixedGame.spectators.map { specs =>
-                    val js = org.jsoup.Jsoup.parse(template.toString)
-                    val lis = js.select("li")
-                    specs.map { spec =>
-                        val tgt = lis.first().clone()
-                        tgt.select("span").first().text(spec)
-                        tgt
-                    }.foreach(lis.first().parent().appendChild)
-                    lis.remove()
-                    Html(js.select("body").html())
-                }
-            }
-        }
+            </ul>
+        </div>
 
-        @mixedGame.game.clanwar.map { clanwar =>
-            <div class="of-clanwar">
-                Part of <a href="/clanwar/?id=@clanwar">
-                the Clanwar <time is="relative-time" datetime="@clanwar">
-            @clanwar
-            </time></a></div>
-        }
-        @mixedGame.game.achievements.map { achievements =>
-            <div class="g-achievements">
-                @achievements.map { achievement =>
-                    <a href="/player/?id=@achievement.user">@achievement.text</a>
-                    <br/>
-                }
-        }
+        <div class="of-clanwar">
+            Part of <a href="/clanwar/?id=1234">
+            the Clanwar <time is="relative-time" datetime="1234">12345</time>
+        </a></div>
+
+        <div class="g-achievements">
+            <a href="/player/?id=drakas">Drakas won everything!</a>
+            <br/>
+        </div>
     </div>
 </article>
