@@ -1,8 +1,10 @@
 package controllers
 
-import play.api.libs.ws.WSClient
-import play.api.mvc.Action
-import play.api.mvc.Controller
+import java.nio.file.{Files, Path, Paths}
+import java.util.stream.Collectors
+
+import play.Environment
+import play.api.mvc.{Action, AnyContent, Controller}
 
 import scala.concurrent.ExecutionContext
 
@@ -12,13 +14,32 @@ import scala.concurrent.ExecutionContext
 
 import javax.inject._
 
-class Forwarder @Inject()(common: Common, wSClient: WSClient)(implicit executionContext: ExecutionContext)
+class Forwarder @Inject()(environment: Environment)(implicit executionContext: ExecutionContext)
   extends Controller {
 
-  def getAsset(file: String) = Action.async {
-    wSClient.url(s"${common.mainPath}/assets/$file")
-      .get().map { response =>
-      Ok(response.body).as(response.header("Content-Type").get)
+  require(!environment.isProd, s"Environment is ${environment}")
+
+  private val webDistWww = Paths.get("web/dist/www")
+
+  private val distWww = Paths.get("dist/www")
+
+  private def wwwPath = if (Files.exists(webDistWww)) webDistWww else distWww
+
+  private def assetsPath = wwwPath.resolve("assets")
+
+  private def resources = {
+    import scala.collection.JavaConverters._
+    Files.walk(assetsPath).collect(Collectors.toList[Path]).asScala.toList
+  }
+
+  def getAsset(path: String): Action[AnyContent] = {
+    resources.find(_.endsWith(path)) match {
+      case Some(v) => Action {
+        Ok.sendFile(v.toFile)
+      }
+      case None => Action {
+        NotFound("Not found")
+      }
     }
   }
 }
