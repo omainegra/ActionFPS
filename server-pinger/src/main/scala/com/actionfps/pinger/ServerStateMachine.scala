@@ -15,14 +15,14 @@ object ServerStateMachine {
 }
 
 private[pinger] case object NothingServerStateMachine extends ServerStateMachine {
-  override def next(input: ParsedResponse) = PartialServerStateMachine().next(input)
+  override def next(input: ParsedResponse): ServerStateMachine = PartialServerStateMachine().next(input)
 }
 
 private[pinger] case class PartialServerStateMachine(serverInfoReplyO: Option[ServerInfoReply] = None,
                                                      playerCnsO: Option[PlayerCns] = None,
                                                      playerInfoReplies: List[PlayerInfoReply] = List.empty,
                                                      teamInfosO: Option[TeamInfos] = None) extends ServerStateMachine {
-  override def next(input: ParsedResponse) = {
+  override def next(input: ParsedResponse): ServerStateMachine = {
     val nextResult = input match {
       case p: PlayerCns if p.cns.isEmpty =>
         this.copy(playerCnsO = None, playerInfoReplies = List.empty, teamInfosO = None)
@@ -56,7 +56,7 @@ private[pinger] case class CompletedServerStateMachine
 (serverInfoReply: ServerInfoReply,
  playerInfoReplies: List[PlayerInfoReply],
  teamInfos: Option[TeamInfos]) extends ServerStateMachine {
-  override def next(input: ParsedResponse) = NothingServerStateMachine.next(input)
+  override def next(input: ParsedResponse): ServerStateMachine = NothingServerStateMachine.next(input)
 
   private def spectators = {
     val filteredPlayers = if (teamModes.contains(serverInfoReply.mode))

@@ -6,7 +6,7 @@ import javax.inject.Inject
 import akka.stream.scaladsl.Source
 import com.actionfps.api.Game
 import com.actionfps.players.{PlayerStat, PlayersStats}
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 import providers.full.FullProvider
 
 import scala.concurrent.ExecutionContext
@@ -27,7 +27,7 @@ class FlatDataController @Inject()(fullProvider: FullProvider)
   def gameToPlayerLines(g: Game): List[String] =
     g.teams.flatMap(t => t.players.map(p => af.flat.trioRender.renders.map(_._2.apply(g, t, p)).mkString(TAB)))
 
-  def gamesPlayersTsv = Action.async {
+  def gamesPlayersTsv: Action[AnyContent] = Action.async {
     val header = af.flat.trioRender.renders.map(_._1).mkString(TAB)
     async {
       val games = await(fullProvider.allGames)
@@ -49,7 +49,7 @@ class FlatDataController @Inject()(fullProvider: FullProvider)
     }
   }
 
-  def playerStatTsv = Action.async {
+  def playerStatTsv: Action[AnyContent] = Action.async {
     val header = af.flat.monthPsRender.renders.map(_._1).mkString(TAB)
     async {
       val pst = await(fullProvider.playerRanksOverTime)

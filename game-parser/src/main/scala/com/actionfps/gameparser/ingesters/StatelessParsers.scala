@@ -8,10 +8,10 @@ object GameFinishedHeader {
 
   val acceptedMode = GameMode.gamemodes.map(gm => P(gm.name).map(_ => gm)).reduce(_ | _)
 
-  val cap = P("Game status: ") ~ acceptedMode ~ " on " ~ DemoRecorded.mapName.! ~
+  private val cap = P("Game status: ") ~ acceptedMode ~ " on " ~ DemoRecorded.mapName.! ~
     ", game finished, " ~ CharsWhile(_ != ',').! ~ ", " ~ DemoRecorded.digit.rep ~ " clients"
 
-  val capEx = cap.map(Function.tupled(GameFinishedHeader.apply))
+  private val capEx = cap.map(Function.tupled(GameFinishedHeader.apply))
 
   def unapply(input: String): Option[GameFinishedHeader] = {
     val res = capEx.parse(input)
@@ -25,16 +25,16 @@ case class GameInProgressHeader(mode: GameMode.GameMode, remaining: Int, map: St
 
 object GameInProgressHeader {
 
-  val timeRemaining = CharIn('0' to '9').rep(1).!.map(_.toInt) ~ " " ~ ("minutes" | "minute") ~ " remaining"
+  private val timeRemaining = CharIn('0' to '9').rep(1).!.map(_.toInt) ~ " " ~ ("minutes" | "minute") ~ " remaining"
 
-  val clients = CharIn('0' to '9').rep(1).!.map(_.toInt) ~ " clients"
+  private val clients = CharIn('0' to '9').rep(1).!.map(_.toInt) ~ " clients"
 
-  val spaces = " ".rep(1)
-  val input = "Game status: hunt the flag on ac_depot, 14 minutes remaining, open, 4 clients"
-  val cap = P("Game status:") ~ spaces ~ GameFinishedHeader.acceptedMode ~ " on " ~ DemoRecorded.mapName.! ~
+  private val spaces = " ".rep(1)
+  private val input = "Game status: hunt the flag on ac_depot, 14 minutes remaining, open, 4 clients"
+  private val cap = P("Game status:") ~ spaces ~ GameFinishedHeader.acceptedMode ~ " on " ~ DemoRecorded.mapName.! ~
     ", " ~ timeRemaining ~ "," ~ spaces ~ CharsWhile(_ != ',').rep(1).! ~ ", " ~ clients
 
-  val cap2 = cap.map { case (mode, map, remain, state, clientCount) => GameInProgressHeader(mode, remain, map, state) }
+  private val cap2 = cap.map { case (mode, map, remain, state, clientCount) => GameInProgressHeader(mode, remain, map, state) }
 
   def unapply(input: String): Option[GameInProgressHeader] = {
     val res = cap2.parse(input)
@@ -45,7 +45,7 @@ object GameInProgressHeader {
 }
 
 object VerifyTableHeader {
-  val parser = P("cn") ~ " ".rep ~ "name" ~ " ".rep ~ AnyChar.rep
+  private val parser = P("cn") ~ " ".rep ~ "name" ~ " ".rep ~ AnyChar.rep
 
   def unapply(input: String): Boolean = {
     parser.parse(input).isInstanceOf[Parsed.Success[Unit]]
@@ -54,12 +54,12 @@ object VerifyTableHeader {
 
 object TeamModes {
 
-  val dig = CharIn('0' to '9')
-  val usp = CharsWhile(_ != ' ').!
-  val sp = " ".rep(1)
-  val strSp = usp ~ " ".rep(1)
-  val dsp = ("-".? ~ dig.rep(1)).!.map(_.toInt)
-  val dSp = dsp ~ " ".rep(1)
+  private val dig = CharIn('0' to '9')
+  private val usp = CharsWhile(_ != ' ').!
+  private val sp = " ".rep(1)
+  private val strSp = usp ~ " ".rep(1)
+  private val dsp = ("-".? ~ dig.rep(1)).!.map(_.toInt)
+  private val dSp = dsp ~ " ".rep(1)
 
   object FragStyle {
 
@@ -70,8 +70,8 @@ object TeamModes {
 
     object IndividualScore {
 
-      val cap = " ".? ~ dSp ~ strSp ~ strSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ strSp ~ usp ~ " ".rep
-      val cpp = cap.map { case (a, b, c, d, e, f, g, h, i, j) => IndividualScore(a, b, c, d, e, f, g, h, i, j) }
+      private val cap = " ".? ~ dSp ~ strSp ~ strSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ strSp ~ usp ~ " ".rep
+      private val cpp = cap.map { case (a, b, c, d, e, f, g, h, i, j) => IndividualScore(a, b, c, d, e, f, g, h, i, j) }
 
       def unapply(input: String): Option[IndividualScore] = {
         val res = cpp.parse(input)
@@ -88,8 +88,8 @@ object TeamModes {
     }
 
     object IndividualScoreDisconnected {
-      val isdp = " ".rep ~ strSp ~ strSp ~ dSp ~ dSp ~ " ".rep ~ "-" ~ " ".rep ~ "-" ~ " ".rep ~ "disconnected"
-      val isd = isdp.map { case (a, b, c, d) => IndividualScoreDisconnected(a, b, c, d) }
+      private val isdp = " ".rep ~ strSp ~ strSp ~ dSp ~ dSp ~ " ".rep ~ "-" ~ " ".rep ~ "-" ~ " ".rep ~ "disconnected"
+      private val isd = isdp.map { case (a, b, c, d) => IndividualScoreDisconnected(a, b, c, d) }
 
       def unapply(input: String): Option[IndividualScoreDisconnected] = {
         val rs = isd.parse(input)
@@ -105,9 +105,9 @@ object TeamModes {
 
     object TeamScore {
 
-      val tpp = P("Team") ~ sp ~ CharsWhile(_ != ':').! ~ ":" ~ sp ~ dSp ~ "players," ~ sp ~ dSp ~ "frags"
+      private val tpp = P("Team") ~ sp ~ CharsWhile(_ != ':').! ~ ":" ~ sp ~ dSp ~ "players," ~ sp ~ dSp ~ "frags"
 
-      val trp = tpp.map { case (n, p, f) => TeamScore(n, p, f) }
+      private val trp = tpp.map { case (n, p, f) => TeamScore(n, p, f) }
 
       def unapply(input: String): Option[TeamScore] = {
         val r = trp.parse(input)
@@ -139,8 +139,8 @@ object TeamModes {
 
     object IndividualScore {
 
-      val cap = " ".? ~ dSp ~ strSp ~ strSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ strSp ~ usp ~ " ".rep
-      val cpp = cap.map { case (a, b, c, d, e, f, g, h, i, j, k) => IndividualScore(a, b, c, d, e, f, g, h, i, j, k) }
+      private val cap = " ".? ~ dSp ~ strSp ~ strSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ strSp ~ usp ~ " ".rep
+      private val cpp = cap.map { case (a, b, c, d, e, f, g, h, i, j, k) => IndividualScore(a, b, c, d, e, f, g, h, i, j, k) }
 
       def unapply(input: String): Option[IndividualScore] = {
         val q = cpp.parse(input)
@@ -156,8 +156,8 @@ object TeamModes {
     }
 
     object IndividualScoreDisconnected {
-      val cpp = " ".rep ~ strSp ~ strSp ~ dSp ~ dSp ~ dsp ~ " ".rep(1) ~ "-" ~ " ".rep(1) ~ "-" ~ " ".rep(1) ~ "disconnected"
-      val cmp = cpp.map { case (a, b, c, d, e) => IndividualScoreDisconnected(a, b, c, d, e) }
+      private val cpp = " ".rep ~ strSp ~ strSp ~ dSp ~ dSp ~ dsp ~ " ".rep(1) ~ "-" ~ " ".rep(1) ~ "-" ~ " ".rep(1) ~ "disconnected"
+      private val cmp = cpp.map { case (a, b, c, d, e) => IndividualScoreDisconnected(a, b, c, d, e) }
 
       def unapply(input: String): Option[IndividualScoreDisconnected] = {
         val r = cmp.parse(input)
@@ -173,10 +173,10 @@ object TeamModes {
 
     object TeamScore {
 
-      val tpp = P("Team") ~ sp ~ CharsWhile(_ != ':').! ~ ":" ~ sp ~ dSp ~
+      private val tpp = P("Team") ~ sp ~ CharsWhile(_ != ':').! ~ ":" ~ sp ~ dSp ~
         "players," ~ sp ~ dSp ~ "frags," ~ sp ~ dSp ~ "flags"
 
-      val trp = tpp.map { case (n, p, f, fl) => TeamScore(n, p, f, fl) }
+      private val trp = tpp.map { case (n, p, f, fl) => TeamScore(n, p, f, fl) }
 
       def unapply(input: String): Option[TeamScore] = {
         val r = trp.parse(input)

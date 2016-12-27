@@ -25,7 +25,7 @@ object PlayerMessage {
 
 case class PlayerMessage(ip: String, name: String, message: String) {
 
-  def words = message.split(" ").toList
+  def words: List[String] = message.split(" ").toList
 
   def killed: Option[String] =
     PartialFunction.condOpt(words) {

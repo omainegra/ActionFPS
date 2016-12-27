@@ -8,7 +8,7 @@ import com.actionfps.stats.Stats
 import play.api.Configuration
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 import play.twirl.api.Html
 import providers.ReferenceProvider
 import providers.full.FullProvider
@@ -26,7 +26,7 @@ class StatsController @Inject()(common: Common,
                                 executionContext: ExecutionContext,
                                 wSClient: WSClient) extends Controller {
 
-  def stats = Action.async { implicit request =>
+  def stats: Action[AnyContent] = Action.async { implicit request =>
     import scala.async.Async._
 
     async {
@@ -48,7 +48,7 @@ class StatsController @Inject()(common: Common,
 
 object StatsController {
   val fmt = DateTimeFormatter.ISO_DATE
-  implicit val lmWriter = Writes[ListMap[ZonedDateTime, Int]](pgc =>
+  implicit val lmWriter: Writes[ListMap[ZonedDateTime, Int]] = Writes[ListMap[ZonedDateTime, Int]](pgc =>
     JsArray(pgc.map {
       case (d, n) => JsObject(Map(
         "date" -> JsString(fmt.format(d)),

@@ -53,7 +53,7 @@ package object flat {
 
   type Trio = (Game, GameTeam, GamePlayer)
 
-  val trioRender = {
+  val trioRender: ShowLine[(Game, GameTeam, GamePlayer)] = {
     gameRender.prefix("game ").contraMap[Trio](_._1) &
       gameTeamRender.prefix("team ").contraMap[Trio](_._2) &
       gamePlayerRender.prefix("player ").contraMap[Trio](_._3)
@@ -85,7 +85,7 @@ package object flat {
     )
   }
 
-  val monthPsRender = yearMonthRender.contraMap[PlayerStatYM](_._1) &
+  val monthPsRender: ShowLine[(YearMonth, PlayerStat)] = yearMonthRender.contraMap[PlayerStatYM](_._1) &
     playerStatRender.contraMap[PlayerStatYM](_._2)
 
 }

@@ -47,7 +47,7 @@ case class NotAchievedAchievements
     )
   }
 
-  def include(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer)(isRegisteredPlayer: JsonGamePlayer => Boolean) = {
+  def include(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer)(isRegisteredPlayer: JsonGamePlayer => Boolean): Option[(NotAchievedAchievements, List[String], List[CompletedAchievement])] = {
     var me = this
     val newEvents = scala.collection.mutable.ListBuffer.empty[String]
     val achievedAchievements = scala.collection.mutable.ListBuffer.empty[CompletedAchievement]

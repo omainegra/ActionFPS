@@ -16,7 +16,7 @@ case class PlayerStat(user: String,
                       deaths: Int,
                       lastGame: String,
                       rank: Option[Int]) {
-  def +(other: PlayerStat) = copy(
+  def +(other: PlayerStat): PlayerStat = copy(
     name = other.name,
     wins = wins + other.wins,
     losses = losses + other.losses,

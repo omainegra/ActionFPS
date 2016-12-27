@@ -18,11 +18,11 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
     )
   }
 
-  def onlyRanked = copy(
+  def onlyRanked: PlayersStats = copy(
     players = players.filter { case (k, v) => v.rank.isDefined }
   )
 
-  def top(n: Int) = copy(
+  def top(n: Int): PlayersStats = copy(
     players = players.toList.sortBy(_._2.rank).take(n).toMap
   )
 

@@ -8,7 +8,7 @@ import com.actionfps.ladder.MissingYearParser
   * Created by me on 02/05/2016.
   */
 case class LineParser(atYear: Int) {
-  val myp = MissingYearParser(atYear)
+  private val myp = MissingYearParser(atYear)
 
   def unapply(line: String): Option[(ZonedDateTime, String)] = {
     if (line.length > 15 && line.substring(15, 16) == " ") {

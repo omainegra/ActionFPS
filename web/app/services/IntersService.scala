@@ -9,6 +9,7 @@ import java.time.ZonedDateTime
 import javax.inject._
 
 import af.streamreaders.CallbackTailer
+import akka.NotUsed
 import akka.stream.scaladsl.Source
 import com.actionfps.gameparser.mserver.ExtractMessage
 import akka.actor.ActorSystem
@@ -39,16 +40,16 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
                                                             actorSystem: ActorSystem,
                                                             executionContext: ExecutionContext) {
 
-  val logger = Logger(getClass)
+  private val logger = Logger(getClass)
 
-  val (intersEnum, intersChannel) = Concurrent.broadcast[Event]
+  private val (intersEnum, intersChannel) = Concurrent.broadcast[Event]
 
-  def intersSource = Source.fromPublisher(Streams.enumeratorToPublisher(intersEnum))
+  def intersSource: Source[Event, NotUsed] = Source.fromPublisher(Streams.enumeratorToPublisher(intersEnum))
 
-  val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(intersChannel.push(Event("")))
+  private val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(intersChannel.push(Event("")))
   applicationLifecycle.addStopHook(() => Future(keepAlive.cancel()))
 
-  val pickedFile = {
+  private val pickedFile = {
     configuration
       .underlying
       .getStringList("af.journal.paths")
@@ -72,7 +73,7 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
       logger.error(s"Could not find a file for tailing. Not starting Inters service!")
   }
 
-  val interStateAgent = Agent(InterState.empty)
+  private val interStateAgent = Agent(InterState.empty)
 
   def acceptLine(line: String): Unit = {
     val validServers = ValidServers.fromResource

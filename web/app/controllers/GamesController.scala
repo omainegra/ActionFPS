@@ -11,7 +11,7 @@ import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.Json
 import play.api.libs.streams.Streams
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 import play.filters.gzip.GzipFilter
 import providers.ReferenceProvider
 import providers.full.FullProvider
@@ -35,7 +35,7 @@ class GamesController @Inject()(common: Common,
 
   import common._
 
-  def recentGames = Action.async { implicit request =>
+  def recentGames: Action[AnyContent] = Action.async { implicit request =>
     async {
       implicit val namer = {
         val clans = await(referenceProvider.clans)
@@ -48,7 +48,7 @@ class GamesController @Inject()(common: Common,
     }
   }
 
-  def index = Action.async { implicit request =>
+  def index: Action[AnyContent] = Action.async { implicit request =>
     async {
       implicit val namer = {
         val clans = await(referenceProvider.clans)
@@ -77,7 +77,7 @@ class GamesController @Inject()(common: Common,
     }
   }
 
-  def game(id: String) = Action.async { implicit request =>
+  def game(id: String): Action[AnyContent] = Action.async { implicit request =>
     async {
       await(fullProvider.game(id)) match {
         case Some(game) =>
@@ -97,7 +97,7 @@ class GamesController @Inject()(common: Common,
     ).as("text/event-stream")
   }
 
-  def allTsv = Action.async {
+  def allTsv: Action[AnyContent] = Action.async {
     async {
       val allGames = await(fullProvider.allGames)
       val enumerator = Enumerator
@@ -109,7 +109,7 @@ class GamesController @Inject()(common: Common,
     }
   }
 
-  def allCsv = Action.async {
+  def allCsv: Action[AnyContent] = Action.async {
     async {
       val allGames = await(fullProvider.allGames)
       val enumerator = Enumerator
@@ -120,7 +120,7 @@ class GamesController @Inject()(common: Common,
     }
   }
 
-  def allTxt = Action.async {
+  def allTxt: Action[AnyContent] = Action.async {
     async {
       val allGames = await(fullProvider.allGames)
       val enumerator = Enumerator
@@ -132,7 +132,7 @@ class GamesController @Inject()(common: Common,
   }
 
 
-  def allJson = Action.async {
+  def allJson: Action[AnyContent] = Action.async {
     async {
       val allGames = await(fullProvider.allGames)
       val enum = allGames match {

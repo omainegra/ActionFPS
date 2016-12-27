@@ -2,7 +2,7 @@ package com.actionfps.clans
 
 import java.time.ZonedDateTime
 
-import com.actionfps.api.Game
+import com.actionfps.api.{Game, GameAchievement}
 
 case class ClanwarPlayer(flags: Int, frags: Int, score: Int, name: String, user: Option[String],
                          awards: Set[String]) {
@@ -108,11 +108,11 @@ case class ClanwarMeta(id: String,
                        completed: Boolean,
                        teamSize: Int,
                        games: List[Game]) {
-  def named(implicit namer: Conclusion.Namer) = copy(
+  def named(implicit namer: Conclusion.Namer): ClanwarMeta = copy(
     conclusion = conclusion.named
   )
 
-  def achievements = {
+  def achievements: Option[List[GameAchievement]] = {
     Option(games.sortBy(_.id).reverse.flatMap(_.achievements).flatten).filter(_.nonEmpty)
   }
 }

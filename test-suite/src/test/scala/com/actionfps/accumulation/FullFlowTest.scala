@@ -17,25 +17,25 @@ class FullFlowTest
   extends FunSuite
     with Matchers {
 
-  lazy val clans = ClanRecord.parseRecords(com.actionfps.reference.getSample("clans.csv")).map(Clan.fromClanRecord)
-  lazy val nicknames = NicknameRecord.parseRecords(com.actionfps.reference.getSample("nicknames.csv"))
-  lazy val users = Registration.parseRecords(com.actionfps.reference.getSample("registrations.csv")).flatMap(User.fromRegistration(_, nicknames))
+  lazy val clans: List[Clan] = ClanRecord.parseRecords(com.actionfps.reference.getSample("clans.csv")).map(Clan.fromClanRecord)
+  lazy val nicknames: List[NicknameRecord] = NicknameRecord.parseRecords(com.actionfps.reference.getSample("nicknames.csv"))
+  lazy val users: List[User] = Registration.parseRecords(com.actionfps.reference.getSample("registrations.csv")).flatMap(User.fromRegistration(_, nicknames))
   lazy val er = EnrichGames(users, clans)
 
-  val sampleFile = {
+  val sampleFile: File = {
     val A = new File("target/sample.log")
     val B = new File("../target/sample.log")
     if ( A.exists() ) A else B
   }
 
-  val testSuitePath = {
+  val testSuitePath: File = {
     val A = new File("test-suite")
     val B = new File("../test-suite")
     if ( A.exists() ) A else B
   }
 
 
-  def getSampleGames = {
+  def getSampleGames: List[JsonGame] = {
     import er._
     val validServers = ValidServers.fromResource
     scala.io.Source.fromFile(sampleFile)(Codec.UTF8)

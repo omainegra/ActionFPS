@@ -1,6 +1,6 @@
 package af.streamreaders
 
-import java.util.concurrent.{BlockingQueue, Executors, LinkedBlockingQueue, TimeUnit}
+import java.util.concurrent._
 
 import org.apache.commons.io.input.{Tailer, TailerListenerAdapter}
 
@@ -10,7 +10,7 @@ import org.apache.commons.io.input.{Tailer, TailerListenerAdapter}
 object IteratorTailerListenerAdapter {
 
   sealed trait IteratorStage {
-    def surfaceFailure = this match {
+    def surfaceFailure: IteratorStage = this match {
       case Failed(ex) => throw ex
       case other => other
     }
@@ -42,9 +42,9 @@ class IteratorTailerListenerAdapter extends TailerListenerAdapter {
 
   override def init(tailer: Tailer): Unit = this._tailer = tailer
 
-  def tailer = _tailer
+  def tailer: Tailer = _tailer
 
-  val simpleExecutor = Executors.newScheduledThreadPool(1)
+  val simpleExecutor: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
 
   override def handle(line: String): Unit = queue.put(GotLine(line))
 
@@ -81,11 +81,11 @@ class IteratorTailerListenerAdapter extends TailerListenerAdapter {
     override def next(): IteratorStage = queue.take()
   }
 
-  val iterator = readingEverythingIterator.takeWhile(_ != Stopped).++(Iterator(Stopped))
+  val iterator: Iterator[IteratorStage] = readingEverythingIterator.takeWhile(_ != Stopped).++(Iterator(Stopped))
 
-  val toEndIterator = iterator.takeWhile { i => i != EndReached && i != Stopped }.map(_.surfaceFailure)
+  val toEndIterator: Iterator[IteratorStage] = iterator.takeWhile { i => i != EndReached && i != Stopped }.map(_.surfaceFailure)
 
-  val toStopIterator = iterator.takeWhile { i => i != Stopped }.map(_.surfaceFailure)
+  val toStopIterator: Iterator[IteratorStage] = iterator.takeWhile { i => i != Stopped }.map(_.surfaceFailure)
 
 
 }

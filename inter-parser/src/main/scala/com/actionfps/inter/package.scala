@@ -35,15 +35,15 @@ package object inter {
 
   object InterMessage {
 
-    val ip = {
+    private val ip = {
       val part = CharIn('1' to '9') ~ CharIn('0' to '9').rep
       part ~ "." ~ part ~ "." ~ part ~ "." ~ part
     }
 
-    val nickname = CharsWhile(_ != ' ')
+    private val nickname = CharsWhile(_ != ' ')
 
-    val matcher = "[" ~ ip.! ~ "]" ~ " " ~ nickname.! ~ " says: '!inter'"
-    val mex = matcher.map(Function.tupled(InterMessage.apply))
+    private val matcher = "[" ~ ip.! ~ "]" ~ " " ~ nickname.! ~ " says: '!inter'"
+    private val mex = matcher.map(Function.tupled(InterMessage.apply))
 
     def unapply(input: String): Option[InterMessage] = {
       val m = mex.parse(input)

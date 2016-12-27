@@ -37,13 +37,13 @@ sealed trait Clanwar {
     }
   )
 
-  def allGames = this match {
+  def allGames: List[Game] = this match {
     case nc: NewClanwar => List(nc.firstGame)
     case tw: TwoGamesNoWinnerClanwar => List(tw.firstGame, tw.secondGame)
     case cc: CompleteClanwar => cc.games
   }
 
-  def conclusion = {
+  def conclusion: Conclusion = {
     val conc = Conclusion.conclude(allGames)
     this match {
       case cc: CompleteClanwar => conc.awardMvps

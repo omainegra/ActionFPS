@@ -12,7 +12,7 @@ class RichGame(game: JsonGame) {
 
   import game._
 
-  def testHash = {
+  def testHash: String = {
     Math.abs(MurmurHash3.stringHash(id)).toString
   }
 

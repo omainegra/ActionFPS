@@ -6,12 +6,12 @@ package controllers
 
 import javax.inject._
 
-import com.actionfps.accumulation.{LocationInfo, HOF, BuiltProfile}
+import com.actionfps.accumulation.{BuiltProfile, HOF, LocationInfo}
 import com.actionfps.achievements.immutable.Achievement
 import play.api.Configuration
-import play.api.libs.json.{Writes, JsObject, Json}
+import play.api.libs.json.{JsObject, Json, Writes}
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 import providers.full.FullProvider
 import providers.ReferenceProvider
 
@@ -24,7 +24,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
 
   import common._
 
-  def players = Action.async { implicit request =>
+  def players: Action[AnyContent] = Action.async { implicit request =>
     async {
       request.getQueryString("format") match {
         case Some("registrations-csv") =>
@@ -40,7 +40,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     }
   }
 
-  def hof = Action.async { implicit request =>
+  def hof: Action[AnyContent] = Action.async { implicit request =>
     async {
       val h = await(fullProvider.hof)
       if (request.getQueryString("format").contains("json"))
@@ -50,7 +50,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     }
   }
 
-  def rankings = Action.async { implicit request =>
+  def rankings: Action[AnyContent] = Action.async { implicit request =>
     async {
       val ranks = await(fullProvider.playerRanks).onlyRanked
       if (request.getQueryString("format").contains("json"))
@@ -60,7 +60,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     }
   }
 
-  def player(id: String) = Action.async { implicit request =>
+  def player(id: String): Action[AnyContent] = Action.async { implicit request =>
     async {
       await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>

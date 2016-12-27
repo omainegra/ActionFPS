@@ -43,7 +43,7 @@ object Dev {
     user = Some("newbie"), clan = Some("woop"), countryCode = None, countryName = None, timezone = None)
   val gameTeam = GameTeam(name = "RVSF", flags = Some(3), frags = 99, clan = Some("woop"),
     players = List(gamePlayer))
-  val otherTeam = gameTeam.copy(name = "CLA", clan = Some("bleh"), flags = Some(3),
+  val otherTeam: GameTeam = gameTeam.copy(name = "CLA", clan = Some("bleh"), flags = Some(3),
     players = List(
       gamePlayer.copy(name = "Bewbie", user = Some("bewbie"), clan = Some("bleh")),
       gamePlayer.copy(frags = 51, flags = Some(3), name = "Zewbie", user = Some("xewbie"), clan = Some("bleh"))

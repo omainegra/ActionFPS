@@ -30,29 +30,29 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
                              )(implicit actorSystem: ActorSystem,
                                executionContext: ExecutionContext) {
 
-  val logger = Logger(getClass)
+  private val logger = Logger(getClass)
 
-  val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
+  private val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
   val liveGamesSource = Source.fromPublisher(Streams.enumeratorToPublisher(liveGamesEnum))
 
   import concurrent.duration._
 
-  val keepAlive = actorSystem.scheduler.schedule(1.second, 5.seconds)(liveGamesChan.push(Event("")))
+  private val keepAlive = actorSystem.scheduler.schedule(1.second, 5.seconds)(liveGamesChan.push(Event("")))
 
   applicationLifecycle.addStopHook(() => Future.successful(keepAlive.cancel()))
 
-  implicit val spw = Json.writes[ServerPlayer]
-  implicit val stw = Json.writes[ServerTeam]
-  implicit val cgw = Json.writes[CurrentGame]
-  implicit val ssw = Json.writes[ServerStatus]
-  implicit val cgpw = Json.writes[CurrentGamePlayer]
-  implicit val cgtw = Json.writes[CurrentGameTeam]
-  implicit val cgnsw = Json.writes[CurrentGameNowServer]
-  implicit val cgnw = Json.writes[CurrentGameNow]
-  implicit val cgsw = Json.writes[CurrentGameStatus]
+  implicit private val spw = Json.writes[ServerPlayer]
+  implicit private val stw = Json.writes[ServerTeam]
+  implicit private val cgw = Json.writes[CurrentGame]
+  implicit private val ssw = Json.writes[ServerStatus]
+  implicit private val cgpw = Json.writes[CurrentGamePlayer]
+  implicit private val cgtw = Json.writes[CurrentGameTeam]
+  implicit private val cgnsw = Json.writes[CurrentGameNowServer]
+  implicit private val cgnw = Json.writes[CurrentGameNow]
+  implicit private val cgsw = Json.writes[CurrentGameStatus]
 
   val status = Agent(Map.empty[String, Event])
-  val listenerActor = actor(factory = actorSystem, name = "pinger")(new PingerService.ListenerActor({
+  private val listenerActor = actor(factory = actorSystem, name = "pinger")(new PingerService.ListenerActor({
     a =>
       liveGamesChan.push(
         Event(
@@ -91,7 +91,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
   import concurrent.duration._
 
-  val schedule = actorSystem.scheduler.schedule(0.seconds, 5.seconds) {
+  private val schedule = actorSystem.scheduler.schedule(0.seconds, 5.seconds) {
     referenceProvider.servers.foreach(_.foreach { server =>
       listenerActor ! SendPings(server.hostname, server.port)
     })
@@ -114,7 +114,7 @@ object PingerService {
 
     log.info("Starting listener actor for pinger service...")
 
-    val pingerActor = context.actorOf(name = "pinger", props = Pinger.props)
+    private val pingerActor = context.actorOf(name = "pinger", props = Pinger.props)
 
     override final val supervisorStrategy: SupervisorStrategy = {
       def defaultDecider: Decider = {

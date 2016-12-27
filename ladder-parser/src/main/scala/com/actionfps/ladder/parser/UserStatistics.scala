@@ -9,15 +9,15 @@ case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDate
 
   def lastSeenInstant: Instant = lastSeen.withNano(0).toInstant
 
-  def kill = copy(frags = frags + 1)
+  def kill: UserStatistics = copy(frags = frags + 1)
 
-  def gib = copy(gibs = gibs + 1)
+  def gib: UserStatistics = copy(gibs = gibs + 1)
 
-  def flag = copy(flags = flags + 1)
+  def flag: UserStatistics = copy(flags = flags + 1)
 
-  def points = (2 * frags) + (3 * gibs) + (15 * flags)
+  def points: Int = (2 * frags) + (3 * gibs) + (15 * flags)
 
-  def see(atTime: ZonedDateTime) = {
+  def see(atTime: ZonedDateTime): UserStatistics = {
     if (atTime.isBefore(lastSeen)) this
     else copy(
       lastSeen = atTime,
@@ -28,7 +28,7 @@ case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDate
     )
   }
 
-  def timePlayedText = {
+  def timePlayedText: String = {
     val duration = Duration.ofSeconds(timePlayed)
     val parts = scala.collection.mutable.ArrayBuffer.empty[String]
     val days = duration.toDays

@@ -1,6 +1,6 @@
 package com.actionfps.accumulation
 
-import com.actionfps.achievements.{CompletedAchievement, PlayerState}
+import com.actionfps.achievements.PlayerState
 import com.actionfps.gameparser.enrichers.JsonGame
 
 /**

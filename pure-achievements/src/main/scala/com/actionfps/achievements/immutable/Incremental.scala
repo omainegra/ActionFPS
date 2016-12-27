@@ -24,15 +24,15 @@ trait Incremental extends Serializable {
   sealed trait Achieved extends CoreType with CompletedAchievement
 
   case object Completed extends Achieved {
-    def title = inc.title
+    def title: String = inc.title
 
-    def description = inc.levelDescription(levels.last)
+    def description: String = inc.levelDescription(levels.last)
   }
 
   case class AchievedLevel(level: Int) extends Achieved {
-    override def title = inc.levelTitle(level)
+    override def title: String = inc.levelTitle(level)
 
-    override def description = inc.levelDescription(level)
+    override def description: String = inc.levelDescription(level)
   }
 
   def filter(inputType: InputType): Option[Int]
@@ -40,9 +40,9 @@ trait Incremental extends Serializable {
   def begin = Achieving(counter = 0, level = levels.head)
 
   case class Achieving(counter: Int, level: Int) extends CoreType with PartialAchievement {
-    def title = inc.levelTitle(level)
+    def title: String = inc.levelTitle(level)
 
-    override def description = inc.levelDescription(level)
+    override def description: String = inc.levelDescription(level)
 
     def include(inputType: InputType): Option[Either[(Achieving, Option[AchievedLevel]), Completed.type]] = {
       for {

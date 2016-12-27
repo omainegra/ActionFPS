@@ -13,7 +13,7 @@ import com.actionfps.stats.Clanstat
 import lib.Clanner
 import play.api.Configuration
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 import providers.ReferenceProvider
 import providers.full.FullProvider
 import views.ClanRankings
@@ -30,7 +30,7 @@ class ClansController @Inject()(common: Common,
 
   import common._
 
-  def rankings = Action.async { implicit request =>
+  def rankings: Action[AnyContent] = Action.async { implicit request =>
     async {
       implicit val namer = {
         val clans = await(referenceProvider.clans)
@@ -47,7 +47,7 @@ class ClansController @Inject()(common: Common,
 
   case class ClanView(clan: Clan, recentClanwars: List[Clanwar], stats: Option[Clanstat])
 
-  def clan(id: String) = Action.async { implicit request =>
+  def clan(id: String): Action[AnyContent] = Action.async { implicit request =>
     async {
       implicit val namer = {
         val clans = await(referenceProvider.clans)
@@ -82,7 +82,7 @@ class ClansController @Inject()(common: Common,
     }
   }
 
-  def clanwar(id: String) = Action.async { implicit request =>
+  def clanwar(id: String): Action[AnyContent] = Action.async { implicit request =>
     async {
       implicit val namer = {
         val clans = await(referenceProvider.clans)
@@ -110,7 +110,7 @@ class ClansController @Inject()(common: Common,
     }
   }
 
-  def clanwars = Action.async { implicit request =>
+  def clanwars: Action[AnyContent] = Action.async { implicit request =>
     async {
       implicit val namer = {
         val clans = await(referenceProvider.clans)
@@ -129,7 +129,7 @@ class ClansController @Inject()(common: Common,
     }
   }
 
-  def clans = Action.async { implicit request =>
+  def clans: Action[AnyContent] = Action.async { implicit request =>
     async {
       request.getQueryString("format") match {
         case Some("csv") =>

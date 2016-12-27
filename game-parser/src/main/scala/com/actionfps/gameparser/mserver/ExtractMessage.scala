@@ -50,7 +50,7 @@ object ExtractMessage {
     ISODateTimeFormat.dateTimeNoMillis().getParser,
     ISODateTimeFormat.dateTime().getParser
   )
-  val dateFmt = new DateTimeFormatterBuilder().append(null, parsers).toFormatter
+  private val dateFmt = new DateTimeFormatterBuilder().append(null, parsers).toFormatter
 
   def unapply(line: String): Option[(ZonedDateTime, String, String)] = {
     PartialFunction.condOpt(line) {

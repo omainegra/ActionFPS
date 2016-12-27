@@ -28,7 +28,7 @@ case class User(id: String, name: String, countryCode: Option[String], email: Op
                 registrationDate: ZonedDateTime, nickname: CurrentNickname, previousNicknames: Option[List[PreviousNickname]]) {
   def nicknames: List[Nickname] = List(nickname) ++ previousNicknames.toList.flatten
 
-  def validAt(nickname: String, zonedDateTime: ZonedDateTime) = nicknames.exists(n => n.nickname == nickname && n.validAt(zonedDateTime))
+  def validAt(nickname: String, zonedDateTime: ZonedDateTime): Boolean = nicknames.exists(n => n.nickname == nickname && n.validAt(zonedDateTime))
 }
 
 object User {

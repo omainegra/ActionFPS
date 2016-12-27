@@ -14,7 +14,7 @@ sealed trait CaptureMapCompletion {
 
   def isCompleted: Boolean
 
-  val targetPerSide = CaptureMapCompletion.targetPerSide
+  val targetPerSide: Int = CaptureMapCompletion.targetPerSide
 }
 
 object CaptureMapCompletion {

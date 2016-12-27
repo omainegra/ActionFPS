@@ -65,7 +65,7 @@ class Common @Inject()(configuration: Configuration
   }
 
   private implicit class cleanHtml(html: String) {
-    def cleanupPaths = html
+    def cleanupPaths: String = html
   }
 
   private def renderRaw(path: String)(f: WSRequest => Future[WSResponse]): Future[WSResponse] = {
@@ -94,9 +94,9 @@ class Common @Inject()(configuration: Configuration
     }
   }
 
-  def mainPath = configuration.underlying.getString("af.render.mainPath")
+  def mainPath: String = configuration.underlying.getString("af.render.mainPath")
 
-  def apiPath = configuration.underlying.getString("af.apiPath")
+  def apiPath: String = configuration.underlying.getString("af.apiPath")
 
   def forward(path: String, id: String): Action[AnyContent] = forward(path, Option(id))
 

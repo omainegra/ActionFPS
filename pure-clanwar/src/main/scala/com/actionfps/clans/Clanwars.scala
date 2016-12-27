@@ -22,7 +22,7 @@ case class Clanwars(incomplete: Set[IncompleteClanwar], complete: Set[CompleteCl
     } orElse Clanwar.begin(jsonGame).map(cw => copy(incomplete = incomplete + cw))
   }
 
-  def includeFlowing(jsonGame: Game) = includeGame(jsonGame).getOrElse(this)
+  def includeFlowing(jsonGame: Game): Clanwars = includeGame(jsonGame).getOrElse(this)
 
-  def all = incomplete ++ complete
+  def all: Set[Clanwar] = incomplete ++ complete
 }

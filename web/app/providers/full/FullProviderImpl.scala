@@ -40,7 +40,7 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
     await(await(fullStuff).alter(_.updateReference(users, clans)))
   }
 
-  override protected[providers] val fullStuff = async {
+  override protected[providers] val fullStuff: Future[Agent[FullIterator]] = async {
     val users = await(referenceProvider.users)
     val clans = await(referenceProvider.clans)
     val allGames = await(gamesProvider.games)

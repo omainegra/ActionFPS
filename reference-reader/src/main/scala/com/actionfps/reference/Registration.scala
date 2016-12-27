@@ -11,10 +11,10 @@ import scala.util.Try
 case class Registration(id: String, name: String, email: Option[String], registrationDate: LocalDateTime)
 
 object Registration {
-  val dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
-  val dtf2 = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+  val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
+  val dtf2: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
-  def filterRegistrationsEmail(sr: Reader) = {
+  def filterRegistrationsEmail(sr: Reader): String = {
     val parser = new CSVParser(sr, CSVFormat.EXCEL.withHeader())
     val sw = new StringWriter()
 

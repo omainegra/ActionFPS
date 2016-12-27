@@ -35,9 +35,9 @@ class LadderController @Inject
 
   import concurrent.duration._
 
-  def up = referenceProvider.syncUserProvider(10.seconds)
+  private def up = referenceProvider.syncUserProvider(10.seconds)
 
-  val tailers = LadderController
+  private val tailers = LadderController
     .getSourceCommands(configuration, "af.ladder.sources")
     .toList
     .flatten.map { command =>

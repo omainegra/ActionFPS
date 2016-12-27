@@ -21,10 +21,10 @@ import scala.util.{Success, Failure, Try}
 class CachedProvider @Inject()(fullProviderR: FullProviderImpl, applicationLifecycle: ApplicationLifecycle,
                                gamesProvider: GamesProvider)
                               (implicit executionContext: ExecutionContext) extends FullProvider() {
-  val hz = HazelcastClient.newHazelcastClient()
-  val theMap = hz.getMap[String, FullIterator]("stuff")
+  private val hz = HazelcastClient.newHazelcastClient()
+  private val theMap = hz.getMap[String, FullIterator]("stuff")
   private val keyName: String = "fullIterator"
-  val logger = Logger(getClass)
+  private val logger = Logger(getClass)
 
   addHook()
 
