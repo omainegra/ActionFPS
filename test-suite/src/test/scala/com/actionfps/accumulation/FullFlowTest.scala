@@ -65,7 +65,9 @@ class FullFlowTest
 
         if (new File(path).exists) {
           val haveJson = Json.parse(Source.fromFile(path).mkString)
-          json shouldBe haveJson
+          withClue(s"Path = ${path}:") {
+            json shouldBe haveJson
+          }
         } else {
           info(s"Writing them, they don't seem to exist! ${path}")
           val fw = new FileWriter(path, false)

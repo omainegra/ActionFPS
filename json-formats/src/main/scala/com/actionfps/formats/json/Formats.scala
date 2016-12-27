@@ -4,7 +4,6 @@ import java.time.ZonedDateTime
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.util.Locale
 
-import com.actionfps.accumulation.HOF.{AchievementRecord, AchievementRecordPlayer}
 import com.actionfps.accumulation.{CurrentNickname, User, _}
 import com.actionfps.achievements.{AchievementsRepresentation, CompletedAchievement, PartialAchievement, SwitchNotAchieved}
 import com.actionfps.achievements.immutable.{Achievement, CaptureMapCompletion, CaptureMaster, PlayerStatistics}
@@ -23,26 +22,30 @@ import scala.collection.immutable.ListMap
 object Formats extends Formats
 
 trait Formats {
-  val DefaultZonedDateTimeWrites = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_INSTANT)
-  implicit val jsonFormat = {
+  private val DefaultZonedDateTimeWrites = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_INSTANT)
+  private implicit val jsonFormat = {
 
     implicit val ZonedWrite = Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](DateTimeFormatter.ISO_ZONED_DATE_TIME)
     Json.writes[ViewFields]
   }
 
-  implicit val gaf: OFormat[GameAchievement] = Json.format[GameAchievement]
-  implicit val Af: OFormat[JsonGamePlayer] = Json.format[JsonGamePlayer]
-  implicit val Bf: OFormat[JsonGameTeam] = Json.format[JsonGameTeam]
+  private implicit val gaf: OFormat[GameAchievement] = Json.format[GameAchievement]
+  private implicit val Af: OFormat[JsonGamePlayer] = Json.format[JsonGamePlayer]
+  private implicit val Bf: OFormat[JsonGameTeam] = Json.format[JsonGameTeam]
   implicit val reads: Reads[JsonGame] = Json.reads[JsonGame]
-  implicit val writesG: Writes[JsonGame] = {
+
+  //noinspection TypeAnnotation
+  // ADDING a type annotation causes FullFlowTest to fail!
+//  implicit val writesG: Writes[JsonGame] = {
+  implicit val writesG = {
     Writes[JsonGame](jg =>
       Json.writes[JsonGame].writes(jg) ++ Json.toJson(jg.viewFields).asInstanceOf[JsObject]
     )
   }
 
-    implicit val vf = DefaultZonedDateTimeWrites
-  implicit val pnFormat: OFormat[PreviousNickname] = Json.format[PreviousNickname]
-  implicit val cnFormat: OFormat[CurrentNickname] = Json.format[CurrentNickname]
+  private implicit val vf = DefaultZonedDateTimeWrites
+  private implicit val pnFormat = Json.format[PreviousNickname]
+  private implicit val cnFormat = Json.format[CurrentNickname]
   implicit val userFormat: OFormat[User] = Json.format[User]
 
   object WithoutEmailFormat {
@@ -82,7 +85,7 @@ trait Formats {
   }
 
 
-  implicit val cmc: Writes[CaptureMapCompletion] = Writes[CaptureMapCompletion] { cmc =>
+  private implicit val cmc = Writes[CaptureMapCompletion] { cmc =>
     import cmc._
     JsObject(Map(
       "map" -> JsString(map),
@@ -91,24 +94,24 @@ trait Formats {
       "rvsf" -> JsString(s"$rvsf/${CaptureMapCompletion.targetPerSide}")
     ))
   }
-  implicit val captureMasterWriter: Writes[CaptureMaster] = Writes[CaptureMaster] { cm =>
+  private implicit val captureMasterWriter = Writes[CaptureMaster] { cm =>
     JsObject(Map(
       "maps" -> JsArray(cm.all.sortBy(_.map).map(x => Json.toJson(x)))
     ))
   }
-  implicit val caFormats: OWrites[CompletedAchievement] = Json.writes[CompletedAchievement]
-  implicit val paFormats: OWrites[PartialAchievement] = Json.writes[PartialAchievement]
-  implicit val saFormats: OWrites[SwitchNotAchieved] = Json.writes[SwitchNotAchieved]
-  implicit val arFormats: OWrites[AchievementsRepresentation] = Json.writes[AchievementsRepresentation]
-  implicit val lif: OWrites[LocationInfo] = Json.writes[LocationInfo]
-  implicit val hofarpW: OWrites[AchievementRecordPlayer] = Json.writes[HOF.AchievementRecordPlayer]
-  implicit val achW: Writes[Achievement] = Writes[Achievement](ach => Json.toJson(Map("title" -> ach.title, "description" -> ach.description)))
-  implicit val hofarW: OWrites[AchievementRecord] = Json.writes[HOF.AchievementRecord]
+  private implicit val caFormats = Json.writes[CompletedAchievement]
+  private implicit val paFormats = Json.writes[PartialAchievement]
+  private implicit val saFormats = Json.writes[SwitchNotAchieved]
+  private implicit val arFormats = Json.writes[AchievementsRepresentation]
+  private implicit val lif = Json.writes[LocationInfo]
+  private implicit val hofarpW = Json.writes[HOF.AchievementRecordPlayer]
+  private implicit val achW = Writes[Achievement](ach => Json.toJson(Map("title" -> ach.title, "description" -> ach.description)))
+  private implicit val hofarW = Json.writes[HOF.AchievementRecord]
   implicit val hofW: OWrites[HOF] = Json.writes[HOF]
 
-  implicit val psw: OWrites[PlayerStat] = Json.writes[PlayerStat]
+  private implicit val psw = Json.writes[PlayerStat]
 
-  implicit val writes: Writes[PlayerGameCounts] = Writes[PlayerGameCounts](pgc =>
+  private implicit val writes = Writes[PlayerGameCounts](pgc =>
     JsArray(pgc.counts.map {
       case (d, n) => JsObject(Map(
         "date" -> JsString(d.toString.take(10)),
@@ -118,7 +121,7 @@ trait Formats {
   )
 
   implicit val writeStats: OWrites[PlayersStats] = Json.writes[PlayersStats]
-  implicit val fmts: OFormat[PlayerStatistics] = Json.format[PlayerStatistics]
+  private implicit val fmts = Json.format[PlayerStatistics]
 
   implicit val bpwrites: OWrites[BuiltProfile] = Json.writes[BuiltProfile]
 
