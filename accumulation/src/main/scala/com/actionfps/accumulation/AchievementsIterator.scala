@@ -12,6 +12,8 @@ object AchievementsIterator {
 }
 
 case class AchievementsIterator(map: Map[String, PlayerState], events: List[Map[String, String]]) {
+  def isEmpty: Boolean = map.isEmpty && events.isEmpty
+
   /**
     * List of user --> Set[game --> achievement]
     */

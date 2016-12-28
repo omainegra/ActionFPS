@@ -6,6 +6,8 @@ import com.actionfps.achievements.immutable._
   * Created by me on 01/04/2016.
   */
 case class HOF(achievements: List[HOF.AchievementRecord]) {
+  def isEmpty: Boolean = achievements.isEmpty || achievements.forall(_.players.isEmpty)
+
   def includeAchievement(user: String, game: String, achievement: CompletedAchievement): HOF = {
     val nl = achievements.map {
       case ar if ar.achievement.title == achievement.title =>

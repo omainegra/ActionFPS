@@ -38,6 +38,8 @@ object Clanstats {
 }
 
 case class Clanstats(clans: Map[String, Clanstat]) {
+  def isEmpty: Boolean = clans.isEmpty
+
 
   def onlyRanked: Clanstats = copy(
     clans = clans.filter { case (_, clan) => clan.rank.nonEmpty }

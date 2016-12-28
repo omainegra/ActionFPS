@@ -13,6 +13,10 @@ import com.actionfps.stats.Clanstats
 /**
   * Created by William on 01/01/2016.
   */
+object FullIterator {
+  def empty: FullIterator = new FullIterator()
+}
+
 case class FullIterator
 (users: Map[String, User],
  games: Map[String, JsonGame],
@@ -24,6 +28,19 @@ case class FullIterator
  playersStats: PlayersStats,
  playersStatsOverTime: Map[YearMonth, PlayersStats]) {
   fi =>
+
+  def this() = this(users = Map.empty,
+    games = Map.empty,
+    clans = Map.empty,
+    clanwars = Clanwars.empty,
+    clanstats = Clanstats.empty,
+    achievementsIterator = AchievementsIterator.empty,
+    hof = HOF.empty,
+    playersStats = PlayersStats.empty,
+    playersStatsOverTime = Map.empty)
+
+  def isEmpty: Boolean = users.isEmpty && games.isEmpty && clans.isEmpty && clanwars.isEmpty && clanstats.isEmpty &&
+    achievementsIterator.isEmpty && hof.isEmpty && playersStats.isEmpty && playersStatsOverTime.isEmpty
 
   def updateReference(newUsers: Map[String, User], newClans: Map[String, Clan]): FullIterator = {
     val blank = FullIterator(
