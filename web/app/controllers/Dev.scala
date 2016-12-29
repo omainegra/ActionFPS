@@ -50,7 +50,7 @@ class Dev @Inject()(common: Common) extends SimpleRouter {
         Dev.fullProfile,
         Some(Dev.rankedStat)
       )
-        .transform(_.replaceAllLiterally("/player/signature.svg", "/dev/sig.svg"))
+        .transform(_.replaceAllLiterally("/player/signature.svg?id=boo", "/dev/sig.svg?map=ac_depot"))
       ))
     }
   }

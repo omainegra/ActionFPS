@@ -140,12 +140,26 @@ case class FullIterator
 
 }
 
+
+object CommonUtil {
+  //noinspection ScalaUnusedSymbol
+  def mostCommon[T](from: List[T]): Option[T] = {
+    from
+      .groupBy(identity)
+      .mapValues(_.size)
+      .toList
+      .sortBy { case (item, count) => count }
+      .lastOption
+      .map { case (item, count) => item }
+  }
+}
+
 case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState],
                        rank: Option[PlayerStat], playerGameCounts: Option[PlayerGameCounts]) {
 
   def build = BuiltProfile(
     user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo, playerGameCounts,
-    favouriteMap = None
+    favouriteMap = CommonUtil.mostCommon(recentGames.map(_.map))
   )
 
   def locationInfo: Option[LocationInfo] =
@@ -155,13 +169,10 @@ case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Op
         .flatMap(_.teams)
         .flatMap(_.players)
         .filter(_.user.contains(user.id))
-      val recentTimezones = myPlayers.flatMap(_.timezone).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
-      val recentCountryCodes = myPlayers.flatMap(_.countryCode).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
-      val recentCountryNames = myPlayers.flatMap(_.countryName).groupBy(identity).mapValues(_.size).toList.sortBy(_._2)
       Some(LocationInfo(
-        timezone = recentTimezones.lastOption.map(_._1),
-        countryCode = recentCountryCodes.lastOption.map(_._1),
-        countryName = recentCountryNames.lastOption.map(_._1)
+        timezone = CommonUtil.mostCommon(myPlayers.flatMap(_.timezone)),
+        countryCode = CommonUtil.mostCommon(myPlayers.flatMap(_.countryCode)),
+        countryName = CommonUtil.mostCommon(myPlayers.flatMap(_.countryName))
       ))
     }
 }

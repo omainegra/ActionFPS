@@ -84,7 +84,7 @@ object Player {
     val doc = htmlB
     doc.select("h1").first().text(player.user.nickname.nickname)
     val signatureHref = s"/player/signature.svg?id=${player.user.id}"
-    doc.select("#player-signature").attr("href", signatureHref).select("img").attr("src", signatureHref)
+    doc.select("#player-signature").attr("href", signatureHref).select("object").attr("data", signatureHref)
 
     val fullProfile = player
     fullProfile.achievements match {
@@ -99,6 +99,12 @@ object Player {
           case None => doc.select(".country").remove()
           case Some(countryName) =>
             doc.select(".country td").first().text(countryName)
+            val built = fullProfile.build
+            built.favouriteMap match {
+              case Some(map) => doc.select(".favourite_map").first().text(map)
+              case None => doc.select(".favourite_map").first().previousSibling().remove()
+                doc.select(".favourite_map").first().remove()
+            }
         }
         doc.select(".time-played").first().text(achievements.playerStatistics.timePlayedStr)
         doc.select(".flags").first().text(achievements.playerStatistics.flags.toString)

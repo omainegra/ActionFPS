@@ -239,7 +239,7 @@ a.demo-link {
 #player-signature {
   float: right;
 }
-#player-signature img {
+#player-signature object {
   max-width:6em;
 }
 .basic-counts th, .ladder-counts th {
