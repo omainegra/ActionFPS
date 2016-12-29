@@ -80,9 +80,11 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     async {
       await(fullProvider.getPlayerProfileFor(id)) match {
         case Some(player) =>
+          val build = player.build
           views.player.Signature(interrank =
-            player.rank.flatMap(_.rank),
-            playername = player.user.nickname.nickname,
+            build.rank.flatMap(_.rank),
+            map = build.favouriteMap,
+            playername = build.user.nickname.nickname,
             ladderrank = ladderController.agg.get().ranked.find(_.user == id).map(_.rank),
             gamecount = player.achievements.map(_.playerStatistics.gamesPlayed)
           ).result

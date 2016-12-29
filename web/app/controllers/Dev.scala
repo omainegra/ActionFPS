@@ -34,11 +34,13 @@ class Dev @Inject()(common: Common) extends SimpleRouter {
   override def routes: Routes = {
     case GET(p"/live-template/") => liveTemplate
     case GET(p"/clanwars/") => clanwarTemplate
-    case GET(p"/sig.svg") => Action {
+    case GET(p"/sig.svg") => Action { request =>
       views.player.Signature(interrank = Some(1),
         playername = "w00p|Drakas",
         ladderrank = Some(2),
-        gamecount = Some(4)).result
+        gamecount = Some(4),
+        map = request.getQueryString("map")
+      ).result
     }
     case GET(p"/sig/") => Action {
       Ok(Html("""<img src="../sig.svg">"""))

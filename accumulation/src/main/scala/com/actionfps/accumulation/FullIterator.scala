@@ -144,7 +144,8 @@ case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Op
                        rank: Option[PlayerStat], playerGameCounts: Option[PlayerGameCounts]) {
 
   def build = BuiltProfile(
-    user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo, playerGameCounts
+    user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo, playerGameCounts,
+    favouriteMap = None
   )
 
   def locationInfo: Option[LocationInfo] =
@@ -169,4 +170,4 @@ case class LocationInfo(timezone: Option[String], countryCode: Option[String], c
 
 case class BuiltProfile(user: User, recentGames: List[JsonGame],
                         achievements: Option[AchievementsRepresentation], rank: Option[PlayerStat],
-                        location: Option[LocationInfo], gameCounts: Option[PlayerGameCounts])
+                        location: Option[LocationInfo], gameCounts: Option[PlayerGameCounts], favouriteMap: Option[String])
