@@ -3,11 +3,13 @@ package controllers
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
-import com.actionfps.accumulation.Clan
+import com.actionfps.accumulation.{Clan, CurrentNickname, FullProfile, User}
 import com.actionfps.api.{Game, GameAchievement, GamePlayer, GameTeam}
 import com.actionfps.clans.CompleteClanwar
 import com.actionfps.clans.Conclusion.Namer
 import com.actionfps.gameparser.Maps
+import com.actionfps.ladder.parser.Aggregate.RankedStat
+import com.actionfps.ladder.parser.UserStatistics
 import com.actionfps.pinger._
 import lib.Clanner
 import play.api.mvc.Action
@@ -23,6 +25,12 @@ import play.twirl.api.Html
 
 class Dev @Inject()(common: Common) extends SimpleRouter {
 
+  private implicit class RichHtml(html: Html) {
+    def transform(f: String => String): Html = {
+      Html(f(html.body))
+    }
+  }
+
   override def routes: Routes = {
     case GET(p"/live-template/") => liveTemplate
     case GET(p"/clanwars/") => clanwarTemplate
@@ -34,6 +42,14 @@ class Dev @Inject()(common: Common) extends SimpleRouter {
     }
     case GET(p"/sig/") => Action {
       Ok(Html("""<img src="../sig.svg">"""))
+    }
+    case GET(p"/player/") => Action { implicit req =>
+      Ok(common.renderTemplate(None, supportsJson = true, None)(views.player.Player.render(
+        Dev.fullProfile,
+        Some(Dev.rankedStat)
+      )
+        .transform(_.replaceAllLiterally("/player/signature.svg", "/dev/sig.svg"))
+      ))
     }
   }
 
@@ -58,6 +74,26 @@ class Dev @Inject()(common: Common) extends SimpleRouter {
 }
 
 object Dev {
+  val rankedStat = RankedStat(user = "w00p|User", rank = 23,
+    userStatistics = UserStatistics(frags = 12, gibs = 13, flags = 14,
+      lastSeen = ZonedDateTime.now(), timePlayed = 123L))
+
+  val fullProfile = FullProfile(
+    recentGames = Nil,
+    achievements = None,
+    rank = None,
+    playerGameCounts = None,
+    user = User(
+      id = "boo",
+      name = "Boo",
+      countryCode = None,
+      email = None,
+      previousNicknames = None,
+      registrationDate = ZonedDateTime.now().minusDays(5),
+      nickname = CurrentNickname(nickname = "w00p|Boo", countryCode = None, from = ZonedDateTime.now().minusDays(2))
+    )
+  )
+
   val gamePlayer = GamePlayer(name = "Newbie", host = None, score = None, flags = Some(2), frags = 54, deaths = 12,
     user = Some("newbie"), clan = Some("woop"), countryCode = None, countryName = None, timezone = None)
   val gameTeam = GameTeam(name = "RVSF", flags = Some(3), frags = 99, clan = Some("woop"),

@@ -83,6 +83,9 @@ object Player {
     val htmlB = Jsoup.parse(lib.Soup.wwwLocation.resolve("player.html").toFile, "UTF-8")
     val doc = htmlB
     doc.select("h1").first().text(player.user.nickname.nickname)
+    val signatureHref = s"/player/signature.svg?id=${player.user.id}"
+    doc.select("#player-signature").attr("href", signatureHref).select("img").attr("href", signatureHref)
+
     val fullProfile = player
     fullProfile.achievements match {
       case None =>

@@ -34,6 +34,9 @@ So you can edit templates without having to have the true data.
 * https://actionfps.com/dev/clanwars/
 * https://actionfps.com/dev/sig.svg
 * https://actionfps.com/dev/sig/
+* https://actionfps.com/dev/player/
+
+# Issue history
 
 [![Throughput Graph](https://graphs.waffle.io/ScalaWilliam/actionfps/throughput.svg)](https://waffle.io/ScalaWilliam/actionfps/metrics)
 

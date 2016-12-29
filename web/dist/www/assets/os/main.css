@@ -236,6 +236,12 @@ a.demo-link {
 .ladder-counts {
   width: 26em;
 }
+#player-signature {
+  float: right;
+}
+#player-signature img {
+  max-width:6em;
+}
 .basic-counts th, .ladder-counts th {
   text-align: left;
 }
