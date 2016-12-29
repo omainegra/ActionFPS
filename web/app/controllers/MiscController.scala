@@ -25,16 +25,6 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
 
   import common._
 
-  def client: Action[AnyContent] = renderStatic("client.html")
-
-  def clientChanges: Action[AnyContent] = renderStatic("client-changes.html")
-
-  def questions: Action[AnyContent] = renderStatic("questions.html")
-
-  def contact: Action[AnyContent] = renderStatic("contact.html")
-
-  def development: Action[AnyContent] = renderStatic("development.html")
-
   def headings: Action[AnyContent] = Action.async { request =>
     async {
       request.getQueryString("format") match {
@@ -65,12 +55,6 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
       }
     }
   }
-
-  def login: Action[AnyContent] = renderStatic("login.html")
-
-  def registerPlay: Action[AnyContent] = renderStatic("register-play.html")
-
-  def play: Action[AnyContent] = renderStatic("play.html")
 
   def sync: Action[JsValue] = Action.async(BodyParsers.parse.json) { request =>
     wSClient

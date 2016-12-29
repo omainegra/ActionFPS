@@ -5,7 +5,7 @@ package controllers
   */
 
 import java.io.File
-import java.nio.file.Files
+import java.nio.file.{Files, Path}
 import javax.inject._
 
 import org.jsoup.Jsoup
@@ -73,7 +73,7 @@ class Common @Inject()(configuration: Configuration
   }
 
   private def renderPhp(path: String)(f: WSRequest => Future[WSResponse])
-               (implicit request: RequestHeader): Future[Result] = {
+                       (implicit request: RequestHeader): Future[Result] = {
     async {
       val extraParams = List("af_id", "af_name").flatMap { key =>
         request.cookies.get(key).map(cookie => key -> cookie.value)
@@ -105,12 +105,11 @@ class Common @Inject()(configuration: Configuration
       renderPhp(path)(_.withQueryString(id.map(i => "id" -> i).toList: _*).get())
     }
 
-  def renderStatic(path: String) = Action { implicit r =>
+  def renderStatic(path: Path) = Action { implicit r =>
     Ok(renderTemplate(title = None, supportsJson = false,
       login = None, wide = false) {
       Html(new String(Files.readAllBytes(lib.Soup.wwwLocation.resolve(path))))
     })
   }
-
 
 }
