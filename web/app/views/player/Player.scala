@@ -84,7 +84,7 @@ object Player {
     val doc = htmlB
     doc.select("h1").first().text(player.user.nickname.nickname)
     val signatureHref = s"/player/signature.svg?id=${player.user.id}"
-    doc.select("#player-signature").attr("href", signatureHref).select("img").attr("href", signatureHref)
+    doc.select("#player-signature").attr("href", signatureHref).select("img").attr("src", signatureHref)
 
     val fullProfile = player
     fullProfile.achievements match {
