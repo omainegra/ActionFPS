@@ -1,28 +1,29 @@
-->          /                                    controllers.StaticPageRouter
-->          /dev/                                controllers.Dev
-->          /all/                                controllers.AllGames
-GET         /assets/*file                        @controllers.Forwarder.getAsset(file: String)
+->          /                               controllers.StaticPageRouter
+->          /dev/                           controllers.Dev
+->          /all/                           controllers.AllGames
+GET         /assets/*file                   @controllers.Forwarder.getAsset(file: String)
 
-GET         /                                    @controllers.GamesController.index
-GET         /game/                               @controllers.GamesController.game(id: String)
-GET         /clans/                              @controllers.ClansController.clans
-GET         /rankings/                           @controllers.ClansController.rankings
-GET         /clan/                               @controllers.ClansController.clan(id: String)
-GET         /clanwar/                            @controllers.ClansController.clanwar(id: String)
-GET         /clanwars/                           @controllers.ClansController.clanwars
-GET         /players/                            @controllers.PlayersController.players
-GET         /player/                             @controllers.PlayersController.player(id: String)
-GET         /playerranks/                        @controllers.PlayersController.rankings
-GET         /hof/                                @controllers.PlayersController.hof
-GET         /servers/                            @controllers.MiscController.servers
-GET         /headings/                           @controllers.MiscController.headings
-GET         /ms/                                 @controllers.Masterserver.ms
-GET         /retrieve.do                         @controllers.Masterserver.ms
-GET         /server-updates/                     @controllers.LiveGamesController.serverUpdates
-GET         /recent-games/                       @controllers.GamesController.recentGames
-GET         /new-games/                          @controllers.GamesController.newGames
-POST        /admin/reload-reference/             @controllers.Admin.reloadReference()
-GET         /inters/                             @controllers.IntersController.inters
-GET         /ladder/                             @controllers.LadderController.ladder
+GET         /                               @controllers.GamesController.index
+GET         /game/                          @controllers.GamesController.game(id: String)
+GET         /clans/                         @controllers.ClansController.clans
+GET         /rankings/                      @controllers.ClansController.rankings
+GET         /clan/                          @controllers.ClansController.clan(id: String)
+GET         /clanwar/                       @controllers.ClansController.clanwar(id: String)
+GET         /clanwars/                      @controllers.ClansController.clanwars
+GET         /players/                       @controllers.PlayersController.players
+GET         /player/                        @controllers.PlayersController.player(id: String)
+GET         /player/signature.svg           @controllers.PlayersController.playerSig(id: String)
+GET         /playerranks/                   @controllers.PlayersController.rankings
+GET         /hof/                           @controllers.PlayersController.hof
+GET         /servers/                       @controllers.MiscController.servers
+GET         /headings/                      @controllers.MiscController.headings
+GET         /ms/                            @controllers.Masterserver.ms
+GET         /retrieve.do                    @controllers.Masterserver.ms
+GET         /server-updates/                @controllers.LiveGamesController.serverUpdates
+GET         /recent-games/                  @controllers.GamesController.recentGames
+GET         /new-games/                     @controllers.GamesController.newGames
+POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
+GET         /inters/                        @controllers.IntersController.inters
+GET         /ladder/                        @controllers.LadderController.ladder
 
-GET         /version/                            @controllers.MiscController.version
+GET         /version/                       @controllers.MiscController.version

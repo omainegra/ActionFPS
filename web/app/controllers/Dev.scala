@@ -11,17 +11,32 @@ import com.actionfps.gameparser.Maps
 import com.actionfps.pinger._
 import lib.Clanner
 import play.api.mvc.Action
+import play.api.mvc.Results._
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import play.api.routing.sird._
 import play.twirl.api.Html
-import play.api.mvc.Results._
 
 /**
   * Created by me on 11/12/2016.
   */
 
 class Dev @Inject()(common: Common) extends SimpleRouter {
+
+  override def routes: Routes = {
+    case GET(p"/live-template/") => liveTemplate
+    case GET(p"/clanwars/") => clanwarTemplate
+    case GET(p"/sig.svg") => Action {
+      views.player.Signature(interrank = Some(1),
+        playername = "w00p|Drakas",
+        ladderrank = Some(2),
+        gamecount = Some(4)).result
+    }
+    case GET(p"/sig/") => Action {
+      Ok(Html("""<img src="../sig.svg">"""))
+    }
+  }
+
   private def clanwarTemplate = Action { implicit req =>
     implicit val namer = Dev.namer
     implicit val clanner = Dev.clanner
@@ -39,11 +54,6 @@ class Dev @Inject()(common: Common) extends SimpleRouter {
     val html = views.rendergame.Live.render(mapMapping = mapping, game = Dev.game)
     val fh = Html(html.body + "<hr/>")
     Ok(common.renderTemplate(None, supportsJson = false, None)(fh))
-  }
-
-  override def routes: Routes = {
-    case GET(p"/live-template/") => liveTemplate
-    case GET(p"/clanwars/") => clanwarTemplate
   }
 }
 
