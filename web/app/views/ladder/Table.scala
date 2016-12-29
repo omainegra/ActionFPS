@@ -15,7 +15,7 @@ object Table {
     val tr = doc.select("tbody > tr")
     aggregate.ranked.map { case Aggregate.RankedStat(id, rankM1, us) =>
       val target = tr.first().clone()
-      target.select(".rank").first().text(s"${rankM1 + 1}")
+      target.select(".rank").first().text(s"${rankM1}")
       target.select(".user a").attr("href", s"/player/?id=$id").first().text(id)
       target.select(".points").first().text(s"${us.points}")
       target.select(".flags").first().text(s"${us.flags}")
