@@ -26,7 +26,6 @@ lazy val root =
       pureGame,
       pureClanwar,
       testSuite,
-      flatFormats,
       jsonFormats,
       liveListener,
       tournamentLeague,
@@ -47,7 +46,6 @@ lazy val root =
     pureGame,
     pureClanwar,
     testSuite,
-    flatFormats,
     jsonFormats,
     liveListener,
     streamReaders
@@ -101,7 +99,6 @@ lazy val web = project
   .dependsOn(pureStats)
   .dependsOn(streamReaders)
   .dependsOn(jsonFormats)
-  .dependsOn(flatFormats)
   .dependsOn(ladderParser)
   .enablePlugins(BuildInfoPlugin)
   .settings(dontDocument)
@@ -346,16 +343,6 @@ sampleLog in ThisBuild := {
   }
   sampleLog
 }
-
-lazy val flatFormats =
-  Project(
-    id = "flat-formats",
-    base = file("flat-formats")
-  )
-    .dependsOn(accumulation)
-    .settings(
-      libraryDependencies += shapeless
-    )
 
 lazy val jsonFormats =
   Project(

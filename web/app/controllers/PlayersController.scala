@@ -6,14 +6,12 @@ package controllers
 
 import javax.inject._
 
-import com.actionfps.accumulation.{BuiltProfile, HOF, LocationInfo}
-import com.actionfps.achievements.immutable.Achievement
 import play.api.Configuration
-import play.api.libs.json.{JsObject, Json, Writes}
+import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, AnyContent, Controller}
-import providers.full.FullProvider
 import providers.ReferenceProvider
+import providers.full.FullProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext

@@ -28,9 +28,6 @@ class LadderController @Inject
    referenceProvider: ReferenceProvider)
 (implicit executionContext: ExecutionContext) extends Controller {
 
-  import collection.JavaConverters._
-
-
   val agg = Agent(Aggregate.empty)
 
   import concurrent.duration._
