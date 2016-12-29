@@ -233,7 +233,10 @@ a.demo-link {
 .basic-counts {
   width: 26em;
 }
-.basic-counts th {
+.ladder-counts {
+  width: 26em;
+}
+.basic-counts th, .ladder-counts th {
   text-align: left;
 }
 ol.recent-games {

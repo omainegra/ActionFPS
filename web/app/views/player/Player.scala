@@ -6,6 +6,7 @@ import com.actionfps.accumulation.FullProfile
 import com.actionfps.achievements.AchievementsRepresentation
 import com.actionfps.achievements.immutable.CaptureMapCompletion.{Achieved, Achieving}
 import com.actionfps.achievements.immutable.CaptureMaster
+import com.actionfps.ladder.parser.Aggregate.RankedStat
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import play.twirl.api.Html
@@ -78,7 +79,7 @@ object Player {
     notStarted.remove()
   }
 
-  def render(player: FullProfile): Html = {
+  def render(player: FullProfile, rankedStat: Option[RankedStat]): Html = {
     val htmlB = Jsoup.parse(lib.Soup.wwwLocation.resolve("player.html").toFile, "UTF-8")
     val doc = htmlB
     doc.select("h1").first().text(player.user.nickname.nickname)
@@ -100,6 +101,8 @@ object Player {
         doc.select(".flags").first().text(achievements.playerStatistics.flags.toString)
         doc.select(".games-played").first().text(achievements.playerStatistics.gamesPlayed.toString)
         doc.select(".frags").first().text(achievements.playerStatistics.frags.toString)
+
+
         fullProfile.rank match {
           case None =>
             doc.select(".rank").remove()
@@ -113,6 +116,19 @@ object Player {
         fullProfile.playerGameCounts.map { gc =>
           views.html.game_counts(gc.counts)
         }.map(_.body).foreach(doc.select(".basics").first().append)
+
+        rankedStat match {
+          case None => doc.select(".ladder").remove()
+          case Some(rs) =>
+
+            doc.select(".ladder-rank").first().text(rs.rank.toString)
+            doc.select(".ladder-points").first().text(rs.userStatistics.points.toString)
+            doc.select(".ladder-time-played").first().text(rs.userStatistics.timePlayedText)
+
+            doc.select(".ladder-flags").first().text(rs.userStatistics.flags.toString)
+            doc.select(".ladder-frags").first().text(rs.userStatistics.frags.toString)
+            doc.select(".ladder-gibs").first().text(rs.userStatistics.gibs.toString)
+        }
     }
 
     val rgili = doc.select(".recent-games li")

@@ -1,5 +1,7 @@
 package com.actionfps.ladder.parser
 
+import com.actionfps.ladder.parser.Aggregate.RankedStat
+
 /**
   * Created by me on 02/05/2016.
   */
@@ -20,6 +22,7 @@ case class Aggregate(users: Map[String, UserStatistics]) {
             )
           )
         }
+
         if (playerMessage.killed.isDefined) addStat(_.kill)
         else if (playerMessage.gibbed.isDefined) addStat(_.gib)
         else if (playerMessage.scored) addStat(_.flag)
@@ -30,8 +33,15 @@ case class Aggregate(users: Map[String, UserStatistics]) {
   def top(num: Int): Aggregate = {
     copy(users = users.toList.sortBy(_._2.points).takeRight(num).toMap)
   }
+
+  def ranked: List[Aggregate.RankedStat] = {
+    users.toList.sortBy(_._2.points).reverse.zipWithIndex.map { case ((id, s), r) => RankedStat(id, r, s) }
+  }
 }
 
 object Aggregate {
+
+  case class RankedStat(user: String, rank: Int, userStatistics: UserStatistics)
+
   def empty = Aggregate(users = Map.empty)
 }

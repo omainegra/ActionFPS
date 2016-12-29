@@ -1,5 +1,6 @@
 package com.actionfps.ladder.parser
 
+import java.time.format.DateTimeFormatter
 import java.time.{Duration, Instant, ZonedDateTime}
 
 /**
@@ -8,6 +9,10 @@ import java.time.{Duration, Instant, ZonedDateTime}
 case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDateTime, timePlayed: Long) {
 
   def lastSeenInstant: Instant = lastSeen.withNano(0).toInstant
+
+  def lastSeenText: String = {
+    DateTimeFormatter.ISO_INSTANT.format(lastSeen)
+  }
 
   def kill: UserStatistics = copy(frags = frags + 1)
 

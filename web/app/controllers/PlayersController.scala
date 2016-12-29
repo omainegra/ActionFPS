@@ -18,6 +18,7 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class PlayersController @Inject()(common: Common, referenceProvider: ReferenceProvider,
+                                  ladderController: LadderController,
                                   fullProvider: FullProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
   import common._
@@ -65,7 +66,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
           if (request.getQueryString("format").contains("json")) {
             Ok(Json.toJson(player.build))
           } else {
-            Ok(renderTemplate(None, supportsJson = true, None)(views.player.Player.render(player)))
+            Ok(renderTemplate(None, supportsJson = true, None)(views.player.Player.render(player, ladderController.agg.get().ranked.find(_.user == id))))
           }
         case None =>
           NotFound("Player could not be found")
