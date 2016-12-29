@@ -1,8 +1,11 @@
 ->          /                                    controllers.StaticPageRouter
+->          /dev/                                controllers.Dev
+->          /all/                                controllers.AllGames
+GET         /assets/*file                        @controllers.Forwarder.getAsset(file: String)
+
 GET         /                                    @controllers.GamesController.index
 GET         /game/                               @controllers.GamesController.game(id: String)
 GET         /clans/                              @controllers.ClansController.clans
-GET         /assets/*file                        @controllers.Forwarder.getAsset(file: String)
 GET         /rankings/                           @controllers.ClansController.rankings
 GET         /clan/                               @controllers.ClansController.clan(id: String)
 GET         /clanwar/                            @controllers.ClansController.clanwar(id: String)
@@ -19,16 +22,9 @@ GET         /version/                            @controllers.MiscController.ver
 GET         /server-updates/                     @controllers.LiveGamesController.serverUpdates
 GET         /recent-games/                       @controllers.GamesController.recentGames
 GET         /new-games/                          @controllers.GamesController.newGames
-GET         /all/                                @controllers.GamesController.allTsv
-GET         /all/games.txt                       @controllers.GamesController.allTxt
-GET         /all/games.json                      @controllers.GamesController.allJson
-GET         /all/games.tsv                       @controllers.GamesController.allTsv
-GET         /all/games.csv                       @controllers.GamesController.allCsv
 POST        /admin/reload-reference/             @controllers.Admin.reloadReference()
 GET         /inters/                             @controllers.IntersController.inters
 GET         /stats/                              @controllers.StatsController.stats
 GET         /ladder/                             @controllers.LadderController.ladder
 GET         /data/games-teams-players.tsv        @controllers.FlatDataController.gamesPlayersTsv
 GET         /data/player-stat.tsv                @controllers.FlatDataController.playerStatTsv
-GET         /dev/live-template/                  @controllers.Dev.liveTemplate
-GET         /dev/clanwars/                       @controllers.Dev.clanwarTemplate

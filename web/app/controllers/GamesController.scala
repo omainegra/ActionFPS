@@ -2,21 +2,13 @@ package controllers
 
 import javax.inject._
 
-import akka.stream.scaladsl.Source
 import com.actionfps.clans.Conclusion.Namer
 import lib.Clanner
-import org.apache.commons.csv.CSVFormat
-import play.api.Configuration
-import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.Json
-import play.api.libs.streams.Streams
-import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, AnyContent, Controller}
-import play.filters.gzip.GzipFilter
 import providers.ReferenceProvider
 import providers.full.FullProvider
 import providers.games.NewGamesProvider
-import services.PingerService
 import views.rendergame.MixedGame
 
 import scala.async.Async._
@@ -27,11 +19,8 @@ class GamesController @Inject()(common: Common,
                                 newGamesProvider: NewGamesProvider,
                                 referenceProvider: ReferenceProvider,
                                 fullProvider: FullProvider,
-                                ladderController: LadderController,
-                                gzipFilter: GzipFilter)
-                               (implicit configuration: Configuration,
-                                executionContext: ExecutionContext,
-                                wSClient: WSClient) extends Controller {
+                                ladderController: LadderController)
+                               (implicit executionContext: ExecutionContext) extends Controller {
 
   import common._
 
@@ -90,61 +79,10 @@ class GamesController @Inject()(common: Common,
     }
   }
 
-
   def newGames = Action {
     Ok.chunked(
       content = newGamesProvider.newGamesSource
     ).as("text/event-stream")
-  }
-
-  def allTsv: Action[AnyContent] = Action.async {
-    async {
-      val allGames = await(fullProvider.allGames)
-      val enumerator = Enumerator
-        .enumerate(allGames)
-        .map(game => s"${game.id}\t${Json.toJson(game)}\n")
-      Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)))
-        .as("text/tab-separated-values")
-        .withHeaders("Content-Disposition" -> "attachment; filename=games.tsv")
-    }
-  }
-
-  def allCsv: Action[AnyContent] = Action.async {
-    async {
-      val allGames = await(fullProvider.allGames)
-      val enumerator = Enumerator
-        .enumerate(allGames)
-        .map(game => CSVFormat.DEFAULT.format(game.id, Json.toJson(game)) + "\n")
-      Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)))
-        .as("text/csv")
-    }
-  }
-
-  def allTxt: Action[AnyContent] = Action.async {
-    async {
-      val allGames = await(fullProvider.allGames)
-      val enumerator = Enumerator
-        .enumerate(allGames)
-        .map(game => Json.toJson(game).toString() + "\n")
-      Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)))
-        .as("text/plain")
-    }
-  }
-
-
-  def allJson: Action[AnyContent] = Action.async {
-    async {
-      val allGames = await(fullProvider.allGames)
-      val enum = allGames match {
-        case head :: rest =>
-          Enumerator(s"[\n  ${Json.toJson(head)}").andThen {
-            Enumerator.enumerate(rest).map(game => ",\n  " + Json.toJson(game).toString())
-          }.andThen(Enumerator("\n]"))
-        case Nil => Enumerator("[]")
-      }
-      Ok.chunked(Source.fromPublisher(Streams.enumeratorToPublisher(enum)))
-        .as("application/json")
-    }
   }
 
 }
