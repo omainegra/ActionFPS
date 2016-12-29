@@ -17,7 +17,7 @@ case class InterState(lastCalls: List[InterCall]) {
     }
   }
 
-  def +(interCall: InterCall) = copy(lastCalls = (lastCalls :+ interCall).takeRight(20))
+  def +(interCall: InterCall): InterState = copy(lastCalls = (lastCalls :+ interCall).takeRight(20))
 
 }
 

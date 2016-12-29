@@ -4,9 +4,9 @@ import javax.inject._
 
 import com.actionfps.reference.HeadingsRecord
 import play.api.Configuration
-import play.api.libs.json.{JsObject, JsString, Json}
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, BodyParsers, Controller}
+import play.api.mvc.{Action, AnyContent, BodyParsers, Controller}
 import play.twirl.api.Html
 import providers.ReferenceProvider
 
@@ -25,17 +25,7 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
 
   import common._
 
-  def client = renderStatic("client.html")
-
-  def clientChanges = renderStatic("client-changes.html")
-
-  def questions = renderStatic("questions.html")
-
-  def contact = renderStatic("contact.html")
-
-  def development = renderStatic("development.html")
-
-  def headings = Action.async { request =>
+  def headings: Action[AnyContent] = Action.async { request =>
     async {
       request.getQueryString("format") match {
         case Some("csv") =>
@@ -52,7 +42,7 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
     }
   }
 
-  def servers = Action.async { implicit request =>
+  def servers: Action[AnyContent] = Action.async { implicit request =>
     async {
       request.getQueryString("format") match {
         case Some("csv") =>
@@ -66,13 +56,7 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
     }
   }
 
-  def login = renderStatic("login.html")
-
-  def registerPlay = renderStatic("register-play.html")
-
-  def play = renderStatic("play.html")
-
-  def sync = Action.async(BodyParsers.parse.json) { request =>
+  def sync: Action[JsValue] = Action.async(BodyParsers.parse.json) { request =>
     wSClient
       .url(s"$mainPath/sync/")
       .post(request.body)

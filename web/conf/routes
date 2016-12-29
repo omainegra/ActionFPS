@@ -1,7 +1,11 @@
+->          /                                    controllers.StaticPageRouter
+->          /dev/                                controllers.Dev
+->          /all/                                controllers.AllGames
+GET         /assets/*file                        @controllers.Forwarder.getAsset(file: String)
+
 GET         /                                    @controllers.GamesController.index
 GET         /game/                               @controllers.GamesController.game(id: String)
 GET         /clans/                              @controllers.ClansController.clans
-GET         /assets/*file                        @controllers.Forwarder.getAsset(file: String)
 GET         /rankings/                           @controllers.ClansController.rankings
 GET         /clan/                               @controllers.ClansController.clan(id: String)
 GET         /clanwar/                            @controllers.ClansController.clanwar(id: String)
@@ -10,32 +14,15 @@ GET         /players/                            @controllers.PlayersController.
 GET         /player/                             @controllers.PlayersController.player(id: String)
 GET         /playerranks/                        @controllers.PlayersController.rankings
 GET         /hof/                                @controllers.PlayersController.hof
-GET         /client/                             @controllers.MiscController.client
-GET         /client/changes/                     @controllers.MiscController.clientChanges
-GET         /questions/                          @controllers.MiscController.questions
-GET         /contact/                            @controllers.MiscController.contact
 GET         /servers/                            @controllers.MiscController.servers
-GET         /development/                        @controllers.MiscController.development
-GET         /login/                              @controllers.MiscController.login
-GET         /register-play/                      @controllers.MiscController.registerPlay
-GET         /play/                               @controllers.MiscController.play
 GET         /headings/                           @controllers.MiscController.headings
 GET         /ms/                                 @controllers.Masterserver.ms
 GET         /retrieve.do                         @controllers.Masterserver.ms
-GET         /version/                            @controllers.MiscController.version
 GET         /server-updates/                     @controllers.LiveGamesController.serverUpdates
 GET         /recent-games/                       @controllers.GamesController.recentGames
 GET         /new-games/                          @controllers.GamesController.newGames
-GET         /all/                                @controllers.GamesController.allTsv
-GET         /all/games.txt                       @controllers.GamesController.allTxt
-GET         /all/games.json                      @controllers.GamesController.allJson
-GET         /all/games.tsv                       @controllers.GamesController.allTsv
-GET         /all/games.csv                       @controllers.GamesController.allCsv
 POST        /admin/reload-reference/             @controllers.Admin.reloadReference()
 GET         /inters/                             @controllers.IntersController.inters
-GET         /stats/                              @controllers.StatsController.stats
 GET         /ladder/                             @controllers.LadderController.ladder
-GET         /data/games-teams-players.tsv        @controllers.FlatDataController.gamesPlayersTsv
-GET         /data/player-stat.tsv                @controllers.FlatDataController.playerStatTsv
-GET         /dev/live-template/                  @controllers.Dev.liveTemplate
-GET         /dev/clanwars/                       @controllers.Dev.clanwarTemplate
+
+GET         /version/                            @controllers.MiscController.version

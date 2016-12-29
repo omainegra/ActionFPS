@@ -6,26 +6,26 @@ case class Game(id: String, endTime: ZonedDateTime, map: String, mode: String, s
                 teams: List[GameTeam], server: String, duration: Int, clangame: Option[Set[String]],
                 clanwar: Option[String], achievements: Option[List[GameAchievement]]) {
 
-  def startTime = endTime.minusMinutes(duration)
+  def startTime: ZonedDateTime = endTime.minusMinutes(duration)
 
-  def users = teams.flatMap(_.players).flatMap(_.user)
+  def users: List[String] = teams.flatMap(_.players).flatMap(_.user)
 
-  def teamSize = teams.map(_.players.size).min
+  def teamSize: Int = teams.map(_.players.size).min
 
-  def hasUser(user: String) = teams.exists(_.players.exists(_.user.contains(user)))
+  def hasUser(user: String): Boolean = teams.exists(_.players.exists(_.user.contains(user)))
 
-  def flattenPlayers = transformTeams(_.flattenPlayers)
+  def flattenPlayers: Game = transformTeams(_.flattenPlayers)
 
-  def withoutHosts = transformPlayers((_, player) => player.copy(host = None))
+  def withoutHosts: Game = transformPlayers((_, player) => player.copy(host = None))
 
-  def transformPlayers(f: (GameTeam, GamePlayer) => GamePlayer) =
+  def transformPlayers(f: (GameTeam, GamePlayer) => GamePlayer): Game =
     copy(teams = teams.map(team => team.copy(players = team.players.map(player => f(team, player)))))
 
-  def transformTeams(f: GameTeam => GameTeam) = copy(teams = teams.map(f))
+  def transformTeams(f: GameTeam => GameTeam): Game = copy(teams = teams.map(f))
 
-  def isTie = winner.isEmpty
+  def isTie: Boolean = winner.isEmpty
 
-  def winner = {
+  def winner: Option[String] = {
     for {
       teamA <- teams
       scoreA = teamA.flags.getOrElse(teamA.frags)
@@ -38,9 +38,9 @@ case class Game(id: String, endTime: ZonedDateTime, map: String, mode: String, s
     }
   }.headOption
 
-  def isClangame = clangame.exists(_.nonEmpty)
+  def isClangame: Boolean = clangame.exists(_.nonEmpty)
 
-  def winnerClan =
+  def winnerClan: Option[String] =
     if (isClangame)
       for {
         winningTeamName <- winner

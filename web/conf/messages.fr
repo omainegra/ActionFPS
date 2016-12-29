@@ -1,9 +1,0 @@
-menu.official-clans=Clans officiels
-menu.player-ranks=Rang individuel
-menu.clan-ranks=Rang par équipe
-menu.clan-wars=Matches par équipes
-menu.hall-of-fame=Trophées
-menu.servers=Serveurs
-menu.login=Se connecter
-menu.play=Jouer!
-menu.register-play=M'inscrire et Jouer!

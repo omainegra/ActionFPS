@@ -10,19 +10,19 @@ object ServerStatus {
 
   import fastparse.all._
 
-  val dig = CharIn('0' to '9')
-  val ddig = dig ~ dig
-  val ddddig = ddig ~ ddig
-  val date = ddig ~ "-" ~ ddig ~ "-" ~ ddddig
-  val time = ddig ~ ":" ~ ddig ~ ":" ~ ddig
-  val dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
-  val dtime = (date ~ " " ~ time).!.map { v =>
+  private val dig = CharIn('0' to '9')
+  private val ddig = dig ~ dig
+  private val ddddig = ddig ~ ddig
+  private val date = ddig ~ "-" ~ ddig ~ "-" ~ ddddig
+  private val time = ddig ~ ":" ~ ddig ~ ":" ~ ddig
+  private val dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
+  private val dtime = (date ~ " " ~ time).!.map { v =>
     LocalDateTime.parse(v, dtf)
   }
 
-  val intM = CharIn('0' to '9').rep.!.map(_.toInt)
+  private val intM = CharIn('0' to '9').rep.!.map(_.toInt)
 
-  val mtch = "Status at " ~ dtime ~ ": " ~ intM ~ " remote" ~ AnyChar.rep
+  private val mtch = "Status at " ~ dtime ~ ": " ~ intM ~ " remote" ~ AnyChar.rep
 
   /**
     * second parameter = # of clients

@@ -28,16 +28,13 @@ class LadderController @Inject
    referenceProvider: ReferenceProvider)
 (implicit executionContext: ExecutionContext) extends Controller {
 
-  import collection.JavaConverters._
-
-
   val agg = Agent(Aggregate.empty)
 
   import concurrent.duration._
 
-  def up = referenceProvider.syncUserProvider(10.seconds)
+  private def up = referenceProvider.syncUserProvider(10.seconds)
 
-  val tailers = LadderController
+  private val tailers = LadderController
     .getSourceCommands(configuration, "af.ladder.sources")
     .toList
     .flatten.map { command =>

@@ -38,22 +38,24 @@ object Clanstats {
 }
 
 case class Clanstats(clans: Map[String, Clanstat]) {
+  def isEmpty: Boolean = clans.isEmpty
 
-  def onlyRanked = copy(
+
+  def onlyRanked: Clanstats = copy(
     clans = clans.filter { case (_, clan) => clan.rank.nonEmpty }
   )
 
-  def named(implicit namer: Namer) = {
+  def named(implicit namer: Namer): Clanstats = {
     copy(
       clans = clans.mapValues(_.named)
     )
   }
 
-  def top(n: Int) = copy(
+  def top(n: Int): Clanstats = copy(
     clans = clans.toList.sortBy(_._2.rank).take(n).toMap
   )
 
-  def refreshedRanks = {
+  def refreshedRanks: Clanstats = {
     val updatedRanks = clans.collect { case (clan, stat) if stat.wars >= 5 =>
       stat
     }.toList.sortBy(_.elo).reverse.zipWithIndex.map { case (stat, idx) =>
@@ -112,7 +114,7 @@ case class Clanstat(id: String,
                     frags: Int,
                     deaths: Int,
                     rank: Option[Int] = None) {
-  def +(other: Clanstat) = copy(
+  def +(other: Clanstat): Clanstat = copy(
     wins = wins + other.wins,
     losses = losses + other.losses,
     ties = ties + other.ties,
@@ -125,7 +127,7 @@ case class Clanstat(id: String,
     deaths = deaths + other.deaths
   )
 
-  def named(implicit namer: Namer) =
+  def named(implicit namer: Namer): Clanstat =
     copy(name = namer.clan(id))
 }
 

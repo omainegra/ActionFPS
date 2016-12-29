@@ -28,7 +28,7 @@ import akka.actor.ActorDSL._
 
 class Pinger(implicit serverMappings: ServerMappings) extends Act with ActorLogging {
 
-  val serverStates = scala.collection.mutable.Map.empty[(String, Int), ServerStateMachine].withDefaultValue(NothingServerStateMachine)
+  private val serverStates = scala.collection.mutable.Map.empty[(String, Int), ServerStateMachine].withDefaultValue(NothingServerStateMachine)
 
   whenStarting {
     log.info("Starting pinger actor")

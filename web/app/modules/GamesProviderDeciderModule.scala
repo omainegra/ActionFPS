@@ -14,7 +14,7 @@ class GamesProviderDeciderModule extends Module {
 
   val logger = Logger(getClass)
 
-  override def bindings(environment: Environment, configuration: Configuration) = {
+  override def bindings(environment: Environment, configuration: Configuration): List[Binding[_ >: FullProvider with GamesProvider <: Object]] = {
     val a =
       if (configuration.getString("af.games.source").contains("cached-journal")) {
         List(bind[GamesProvider].to[CachedJournalGamesProvider])

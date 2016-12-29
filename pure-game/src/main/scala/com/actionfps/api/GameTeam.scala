@@ -7,7 +7,7 @@ case class GameTeam(name: String, flags: Option[Int], frags: Int, players: List[
   /**
     * A player might disconnect mid-game, get a new IP. Goal here is to sum up their scores properly.
     */
-  def flattenPlayers = {
+  def flattenPlayers: GameTeam = {
     var newPlayers = players
     players.groupBy(_.name).collect {
       case (playerName, them@first :: rest) if rest.nonEmpty =>

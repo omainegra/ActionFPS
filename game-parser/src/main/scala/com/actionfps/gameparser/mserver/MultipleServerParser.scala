@@ -3,7 +3,7 @@ package com.actionfps.gameparser.mserver
 import java.time.format.DateTimeFormatter
 
 import com.actionfps.gameparser.enrichers.JsonGame
-import com.actionfps.gameparser.enrichers._
+
 /**
   * Created by William on 11/11/2015.
   */

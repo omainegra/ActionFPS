@@ -5,7 +5,7 @@ package com.actionfps.ladder
   */
 class ProcessTailer(command: List[String])(callback: String => Unit) {
   val pb = new ProcessBuilder(command :_*)
-  val ps = pb.start()
+  val ps: Process = pb.start()
   val thread = new Thread(new Runnable {
     override def run(): Unit = {
       val ss = scala.io.Source.fromInputStream(ps.getInputStream)

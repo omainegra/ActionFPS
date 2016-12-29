@@ -1,6 +1,7 @@
 package com.actionfps.gameparser.ingesters
 
 import fastparse.all._
+import fastparse.core.Parser
 
 /**
   * Created by me on 29/05/2016.
@@ -18,27 +19,27 @@ object DemoRecorded {
     "bot team survivor", "bot team one shot, one kill"
   )
 
-  val modeMatch = modes.map(m => P(m)).reduce(_ | _)
+  private val modeMatch = modes.map(m => P(m)).reduce(_ | _)
 
   val digit = CharIn('0' to '9')
-  val upperCase = CharIn('A' to 'Z')
-  val lowerCase = CharIn('a' to 'z')
-  val threeLetterUpper = upperCase ~ lowerCase ~ lowerCase
-  val twoDigits = digit ~ digit
+  private val upperCase = CharIn('A' to 'Z')
+  private val lowerCase = CharIn('a' to 'z')
+  private val threeLetterUpper = upperCase ~ lowerCase ~ lowerCase
+  private val twoDigits = digit ~ digit
 
-  val time = twoDigits ~ ":" ~ twoDigits ~ ":" ~ twoDigits
-  val year = digit ~ digit ~ digit ~ digit
-  val timestampParse = threeLetterUpper ~ " " ~ threeLetterUpper ~ " " ~ twoDigits ~ " " ~ time ~ " " ~ year
+  private val time = twoDigits ~ ":" ~ twoDigits ~ ":" ~ twoDigits
+  val year: Parser[Unit, Char, String] = digit ~ digit ~ digit ~ digit
+  val timestampParse: Parser[Unit, Char, String] = threeLetterUpper ~ " " ~ threeLetterUpper ~ " " ~ twoDigits ~ " " ~ time ~ " " ~ year
 
-  val mapName = (P("ac_") ~ CharsWhile(c => c != ',' && c != ' ').rep(1)).!
+  val mapName: Parser[String, Char, String] = (P("ac_") ~ CharsWhile(c => c != ',' && c != ' ').rep(1)).!
 
-  val size = digit.rep(min = 1) ~ ("." ~ digit.rep ~ (upperCase | lowerCase).rep)
-  val mrBit = ", " ~ digit.rep ~ " mr"
+  val size: Parser[Unit, Char, String] = digit.rep(min = 1) ~ ("." ~ digit.rep ~ (upperCase | lowerCase).rep)
+  private val mrBit = ", " ~ digit.rep ~ " mr"
 
-  val quotedBit = (timestampParse.! ~ ": " ~ modeMatch.! ~ ", " ~ mapName.! ~ ", " ~ size.! ~ mrBit.?)
+  val quotedBit: Parser[DemoRecorded, Char, String] = (timestampParse.! ~ ": " ~ modeMatch.! ~ ", " ~ mapName.! ~ ", " ~ size.! ~ mrBit.?)
     .map { case (ts, mode, map, s) => DemoRecorded(ts, mode, map, s) }
 
-  val fullCap = "Demo \"" ~ quotedBit ~ "\" recorded."
+  private val fullCap = "Demo \"" ~ quotedBit ~ "\" recorded."
 
   def unapply(input: String): Option[DemoRecorded] = {
     val res = fullCap.parse(input)

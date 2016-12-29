@@ -10,15 +10,19 @@ import com.actionfps.clans.Conclusion.Namer
 import com.actionfps.gameparser.Maps
 import com.actionfps.pinger._
 import lib.Clanner
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.Action
+import play.api.routing.Router.Routes
+import play.api.routing.SimpleRouter
+import play.api.routing.sird._
 import play.twirl.api.Html
+import play.api.mvc.Results._
 
 /**
   * Created by me on 11/12/2016.
   */
 
-class Dev @Inject()(common: Common) extends Controller {
-  def clanwarTemplate = Action { implicit req =>
+class Dev @Inject()(common: Common) extends SimpleRouter {
+  private def clanwarTemplate = Action { implicit req =>
     implicit val namer = Dev.namer
     implicit val clanner = Dev.clanner
     val mapping = Maps.mapToImage
@@ -30,11 +34,16 @@ class Dev @Inject()(common: Common) extends Controller {
     Ok(common.renderTemplate(None, supportsJson = false, None)(fh))
   }
 
-  def liveTemplate = Action { implicit req =>
+  private def liveTemplate = Action { implicit req =>
     val mapping = Maps.mapToImage
     val html = views.rendergame.Live.render(mapMapping = mapping, game = Dev.game)
     val fh = Html(html.body + "<hr/>")
     Ok(common.renderTemplate(None, supportsJson = false, None)(fh))
+  }
+
+  override def routes: Routes = {
+    case GET(p"/live-template/") => liveTemplate
+    case GET(p"/clanwars/") => clanwarTemplate
   }
 }
 
@@ -43,7 +52,7 @@ object Dev {
     user = Some("newbie"), clan = Some("woop"), countryCode = None, countryName = None, timezone = None)
   val gameTeam = GameTeam(name = "RVSF", flags = Some(3), frags = 99, clan = Some("woop"),
     players = List(gamePlayer))
-  val otherTeam = gameTeam.copy(name = "CLA", clan = Some("bleh"), flags = Some(3),
+  val otherTeam: GameTeam = gameTeam.copy(name = "CLA", clan = Some("bleh"), flags = Some(3),
     players = List(
       gamePlayer.copy(name = "Bewbie", user = Some("bewbie"), clan = Some("bleh")),
       gamePlayer.copy(frags = 51, flags = Some(3), name = "Zewbie", user = Some("xewbie"), clan = Some("bleh"))

@@ -77,15 +77,15 @@ case object NothingFound extends ParserState {
 }
 
 case object NotEnoughPlayersFailure extends ParserState {
-  def next(input: String) = NothingFound.next(input)
+  def next(input: String): ParserState = NothingFound.next(input)
 }
 
 case object NotEnoughTeamsFailure extends ParserState {
-  def next(input: String) = NothingFound.next(input)
+  def next(input: String): ParserState = NothingFound.next(input)
 }
 
 case class UnexpectedInput(line: String) extends ParserState {
-  def next(input: String) = NothingFound.next(input)
+  def next(input: String): ParserState = NothingFound.next(input)
 }
 
 case class FragGameBuilder(header: GameFinishedHeader, scores: List[TeamModes.FragStyle.IndividualScore], disconnectedScores: List[TeamModes.FragStyle.IndividualScoreDisconnected], teamScores: List[TeamModes.FragStyle.TeamScore])

@@ -163,7 +163,7 @@ object ValidServers {
   val fromResource = ValidServers(validServers.map(v => v.logId -> v).toMap)
 
   object ImplicitValidServers {
-    implicit val fromResourceVS = fromResource
+    implicit val fromResourceVS: ValidServers = fromResource
   }
 
   object Validator {
@@ -180,7 +180,7 @@ object ValidServers {
 }
 
 case class ValidServer(logId: String, name: String, timezone: ZoneId, address: Option[String] = None, invalid: Option[Boolean] = None) {
-  def isValid = !invalid.contains(true)
+  def isValid: Boolean = !invalid.contains(true)
 }
 
 case class ValidServers(items: Map[String, ValidServer]) {

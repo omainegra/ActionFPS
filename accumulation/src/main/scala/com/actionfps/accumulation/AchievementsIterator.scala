@@ -1,6 +1,6 @@
 package com.actionfps.accumulation
 
-import com.actionfps.achievements.{CompletedAchievement, PlayerState}
+import com.actionfps.achievements.PlayerState
 import com.actionfps.gameparser.enrichers.JsonGame
 
 /**
@@ -12,6 +12,8 @@ object AchievementsIterator {
 }
 
 case class AchievementsIterator(map: Map[String, PlayerState], events: List[Map[String, String]]) {
+  def isEmpty: Boolean = map.isEmpty && events.isEmpty
+
   /**
     * List of user --> Set[game --> achievement]
     */

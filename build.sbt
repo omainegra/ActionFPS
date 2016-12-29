@@ -26,7 +26,6 @@ lazy val root =
       pureGame,
       pureClanwar,
       testSuite,
-      flatFormats,
       jsonFormats,
       liveListener,
       tournamentLeague,
@@ -47,19 +46,11 @@ lazy val root =
     pureGame,
     pureClanwar,
     testSuite,
-    flatFormats,
     jsonFormats,
     liveListener,
     streamReaders
   )
     .settings(
-      commands += Command.command("ignorePHPTests", "ignore tests that depend on PHP instrumentation", "") { state =>
-        val extracted = Project.extract(state)
-        val newSettings = extracted.structure.allProjectRefs map { proj =>
-          testOptions in proj += sbt.Tests.Argument("-l", "af.RequiresPHP")
-        }
-        extracted.append(newSettings, state)
-      },
       commands += Command.command("ignoreWIP", "ignore tests for WIP things", "") { state =>
         val extracted = Project.extract(state)
         val newSettings = extracted.structure.allProjectRefs map { proj =>
@@ -108,13 +99,15 @@ lazy val web = project
   .dependsOn(pureStats)
   .dependsOn(streamReaders)
   .dependsOn(jsonFormats)
-  .dependsOn(flatFormats)
   .dependsOn(ladderParser)
-  .dependsOn(testSuite % "test->compile")
   .enablePlugins(BuildInfoPlugin)
   .settings(dontDocument)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings: _*)
+  .dependsOn(testSuite % "test->compile;it->compile")
   .settings(
-    libraryDependencies ++= Seq(
+      scalaSource in IntegrationTest := baseDirectory.value / "it",
+      libraryDependencies ++= Seq(
       akkaActor,
       akkaAgent,
       akkaslf,
@@ -125,12 +118,12 @@ lazy val web = project
       filters,
       ws,
       async,
-      scalatestPlus,
-      scalatestOld,
-      seleniumHtmlUnit,
-      seleniumJava,
+      scalatestPlus % "it,test",
+      scalatestIt,
+      seleniumHtmlUnit % "it",
+      seleniumJava % "it",
       cache,
-      mockito
+      mockito % "it,test"
     ),
     (run in Compile) <<= (run in Compile).dependsOn(startHazelcast),
     startHazelcast := {
@@ -350,16 +343,6 @@ sampleLog in ThisBuild := {
   }
   sampleLog
 }
-
-lazy val flatFormats =
-  Project(
-    id = "flat-formats",
-    base = file("flat-formats")
-  )
-    .dependsOn(accumulation)
-    .settings(
-      libraryDependencies += shapeless
-    )
 
 lazy val jsonFormats =
   Project(

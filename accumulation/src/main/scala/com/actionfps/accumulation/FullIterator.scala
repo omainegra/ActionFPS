@@ -13,6 +13,10 @@ import com.actionfps.stats.Clanstats
 /**
   * Created by William on 01/01/2016.
   */
+object FullIterator {
+  def empty: FullIterator = new FullIterator()
+}
+
 case class FullIterator
 (users: Map[String, User],
  games: Map[String, JsonGame],
@@ -25,8 +29,20 @@ case class FullIterator
  playersStatsOverTime: Map[YearMonth, PlayersStats]) {
   fi =>
 
+  def this() = this(users = Map.empty,
+    games = Map.empty,
+    clans = Map.empty,
+    clanwars = Clanwars.empty,
+    clanstats = Clanstats.empty,
+    achievementsIterator = AchievementsIterator.empty,
+    hof = HOF.empty,
+    playersStats = PlayersStats.empty,
+    playersStatsOverTime = Map.empty)
+
+  def isEmpty: Boolean = users.isEmpty && games.isEmpty && clans.isEmpty && clanwars.isEmpty && clanstats.isEmpty &&
+    achievementsIterator.isEmpty && hof.isEmpty && playersStats.isEmpty && playersStatsOverTime.isEmpty
+
   def updateReference(newUsers: Map[String, User], newClans: Map[String, Clan]): FullIterator = {
-    val enricher = EnrichGames(newUsers.values.toList, newClans.values.toList)
     val blank = FullIterator(
       users = newUsers,
       clans = newClans,
@@ -41,9 +57,9 @@ case class FullIterator
     games.valuesIterator.toList.sortBy(_.id).foldLeft(blank)(_.includeGame(_))
   }
 
-  def events = achievementsIterator.events.take(10)
+  def events: List[Map[String, String]] = achievementsIterator.events.take(10)
 
-  def includeGame(jsonGame: JsonGame) = {
+  def includeGame(jsonGame: JsonGame): FullIterator = {
     val enricher = EnrichGames(users.values.toList, clans.values.toList)
     import enricher.withUsersClass
     var richGame = jsonGame.withoutHosts.withUsers.withClans

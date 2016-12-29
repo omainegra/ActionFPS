@@ -22,7 +22,7 @@ object Stats {
   }
 
   object PunchCard {
-    val hours = List("12a") ++ (1 to 11).map(_ + "a") ++ List("12p") ++ (1 to 11).map(_ + "p")
+    val hours: List[String] = List("12a") ++ (1 to 11).map(_ + "a") ++ List("12p") ++ (1 to 11).map(_ + "p")
 
     private def emptyHours = (0 to 23).map(n => n -> 0).toMap
 

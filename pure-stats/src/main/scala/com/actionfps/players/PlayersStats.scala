@@ -9,6 +9,8 @@ import com.actionfps.api.Game
   */
 case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String, PlayerGameCounts]) {
   pss =>
+  def isEmpty: Boolean = players.isEmpty && gameCounts.isEmpty
+
   private def updatedRanks = {
     val ur = players.values.toList.sortBy(_.elo).reverse.filter(_.games >= Players.MIN_GAMES_RANK).zipWithIndex.collect {
       case (stat, int) => stat.user -> stat.copy(rank = Option(int + 1))
@@ -18,11 +20,11 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
     )
   }
 
-  def onlyRanked = copy(
+  def onlyRanked: PlayersStats = copy(
     players = players.filter { case (k, v) => v.rank.isDefined }
   )
 
-  def top(n: Int) = copy(
+  def top(n: Int): PlayersStats = copy(
     players = players.toList.sortBy(_._2.rank).take(n).toMap
   )
 

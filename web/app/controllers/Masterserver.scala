@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import play.api.Configuration
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 import providers.ReferenceProvider
 
 import scala.async.Async._
@@ -18,7 +18,7 @@ class Masterserver @Inject()(configuration: Configuration,
                             (implicit executionContext: ExecutionContext)
   extends Controller {
 
-  def ms = Action.async {
+  def ms: Action[AnyContent] = Action.async {
     async {
       Ok {
         await(referenceProvider.servers).map(serverRecord =>

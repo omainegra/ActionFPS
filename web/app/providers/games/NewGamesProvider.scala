@@ -35,15 +35,15 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
                                 (implicit actorSystem: ActorSystem,
                                  executionContext: ExecutionContext) {
 
-  val processFn: JsonGame => Unit = processGame
+  private val processFn: JsonGame => Unit = processGame
   gamesProvider.addHook(processFn)
   applicationLifecycle.addStopHook(() => Future(gamesProvider.removeHook(processFn)))
 
-  val (newGamesEnum, thing) = Concurrent.broadcast[Event]
+  private val (newGamesEnum, thing) = Concurrent.broadcast[Event]
   val newGamesSource = Source.fromPublisher(Streams.enumeratorToPublisher(newGamesEnum))
-  val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(thing.push(Event("")))
+  private val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(thing.push(Event("")))
 
-  val logger = Logger(getClass)
+  private val logger = Logger(getClass)
   logger.info("Starting new games provider")
 
   def processGame(game: JsonGame): Unit = {

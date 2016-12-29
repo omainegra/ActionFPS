@@ -6,7 +6,7 @@ import com.actionfps.gameparser.enrichers.{JsonGame, JsonGamePlayer}
   * Created by William on 11/11/2015.
   */
 case class PlayerStatistics(playedGames: List[String], flags: Int, frags: Int, timePlayed: Int, gamesPlayed: Int) {
-  def timePlayedStr = {
+  def timePlayedStr: String = {
     timePlayed / 60 match {
       case 0 => "not enough"
       case tp =>

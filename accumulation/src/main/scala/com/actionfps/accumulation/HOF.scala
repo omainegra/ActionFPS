@@ -6,6 +6,8 @@ import com.actionfps.achievements.immutable._
   * Created by me on 01/04/2016.
   */
 case class HOF(achievements: List[HOF.AchievementRecord]) {
+  def isEmpty: Boolean = achievements.isEmpty || achievements.forall(_.players.isEmpty)
+
   def includeAchievement(user: String, game: String, achievement: CompletedAchievement): HOF = {
     val nl = achievements.map {
       case ar if ar.achievement.title == achievement.title =>
@@ -20,7 +22,7 @@ case class HOF(achievements: List[HOF.AchievementRecord]) {
     )
   }
 
-  def reversed = copy(achievements = achievements.map(ar => ar.reversed))
+  def reversed: HOF = copy(achievements = achievements.map(ar => ar.reversed))
 }
 
 object HOF {
@@ -48,7 +50,7 @@ object HOF {
   )
 
   case class AchievementRecord(achievement: Achievement, players: List[AchievementRecordPlayer]) {
-    def reversed = copy(players = players.reverse)
+    def reversed: AchievementRecord = copy(players = players.reverse)
   }
 
   case class AchievementRecordPlayer(user: String, atGame: String)

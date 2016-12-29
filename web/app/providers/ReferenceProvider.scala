@@ -124,7 +124,7 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
 
   def users: Future[List[User]] = Users(withEmails = false).users
 
-  implicit val serverRecordRead = Json.reads[ServerRecord]
+  private implicit val serverRecordRead = Json.reads[ServerRecord]
 
   def servers: Future[List[ServerRecord]] = Servers.servers
 
@@ -138,7 +138,7 @@ object ReferenceProvider {
 
 
   class ListUserProvider(users: List[User]) extends UserProvider {
-    val nick2UserId = users.map { u => u.nickname.nickname -> u.id }.toMap
+    private val nick2UserId = users.map { u => u.nickname.nickname -> u.id }.toMap
 
     override def username(nickname: String): Option[String] = {
       nick2UserId.get(nickname)

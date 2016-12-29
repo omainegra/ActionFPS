@@ -24,9 +24,9 @@ class ApiAllGamesProvider @Inject()(configuration: Configuration)
                                    (implicit executionContext: ExecutionContext,
                                     wSClient: WSClient) extends GamesProvider {
 
-  def allPath = configuration.underlying.getString("af.reference.games")
+  private def allPath = configuration.underlying.getString("af.reference.games")
 
-  def fetchAllGames = wSClient.url(allPath).get().map(response =>
+  private def fetchAllGames = wSClient.url(allPath).get().map(response =>
     response.body.split("\n").toIterator.map { line =>
       line.split("\t").toList match {
         case List(id, json) =>
@@ -35,7 +35,7 @@ class ApiAllGamesProvider @Inject()(configuration: Configuration)
     }.toMap
   )
 
-  val allGamesFA = fetchAllGames.map(m => Agent(m))
+  private val allGamesFA = fetchAllGames.map(m => Agent(m))
 
   override def games: Future[Map[String, JsonGame]] = allGamesFA.map(_.get())
 }

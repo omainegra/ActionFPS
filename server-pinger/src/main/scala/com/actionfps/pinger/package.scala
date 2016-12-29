@@ -5,7 +5,7 @@ package com.actionfps
   */
 package object pinger {
 
-  val modes = List(
+  val modes: Map[Int, String] = List(
     "team deathmatch", "coopedit", "deathmatch", "survivor",
     "team survivor", "ctf", "pistol frenzy", "bot team deathmatch", "bot deathmatch", "last swiss standing",
     "one shot, one kill", "team one shot, one kill", "bot one shot, one kill", "hunt the flag", "team keep the flag",
@@ -22,8 +22,8 @@ package object pinger {
 
   case class SendPings(ip: String, port: Int)
 
-  val playerStates = List("alive", "dead", "spawning", "lagged", "editing", "spectate").zipWithIndex.map(_.swap).toMap
-  val guns = List("knife", "pistol", "carbine", "shotgun", "subgun", "sniper", "assault", "cpistol", "grenade", "pistol").zipWithIndex.map(_.swap).toMap
+  val playerStates: Map[Int, String] = List("alive", "dead", "spawning", "lagged", "editing", "spectate").zipWithIndex.map(_.swap).toMap
+  val guns: Map[Int, String] = List("knife", "pistol", "carbine", "shotgun", "subgun", "sniper", "assault", "cpistol", "grenade", "pistol").zipWithIndex.map(_.swap).toMap
 
 
 }

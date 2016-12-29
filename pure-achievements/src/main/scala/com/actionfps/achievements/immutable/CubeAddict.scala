@@ -10,7 +10,7 @@ object CubeAddict extends Incremental {
 
   def hourLevels = List(5, 10, 20, 50, 100, 200)
 
-  override def levels = hourLevels.map(_ * 60)
+  override def levels: List[Int] = hourLevels.map(_ * 60)
 
   override type InputType = JsonGame
 

@@ -9,7 +9,7 @@ import com.actionfps.gameparser.mserver.{ExtractMessage, MultipleServerParser, M
   */
 object GameScanner extends Scanner[String, MultipleServerParser] {
 
-  def zero = MultipleServerParser.empty
+  def zero: MultipleServerParser = MultipleServerParser.empty
 
   def scan(state: MultipleServerParser, line: String): MultipleServerParser = {
     line match {

@@ -2,7 +2,7 @@ import sbt._
 import sbt.Keys._
 
 object CommonSettingsPlugin extends AutoPlugin {
-  override def trigger = allRequirements
+  override def trigger: PluginTrigger = allRequirements
 
   override def projectSettings = Seq(
     scalaVersion := "2.11.8",

@@ -15,10 +15,10 @@ package object reference {
 
   implicit val ldtDecoder = CellDecoder(str => DecodeResult(parseLocalDateTime(str)))
 
-  val dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
-  val dtf2 = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+  val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
+  val dtf2: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-  def parseLocalDateTime(s: String) =
+  def parseLocalDateTime(s: String): LocalDateTime =
     Try(LocalDateTime.parse(s, dtf)).
       orElse(Try(LocalDate.parse(s, dtf2).atStartOfDay())).
       orElse(Try(LocalDate.parse(s).atStartOfDay())).get

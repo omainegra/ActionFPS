@@ -1,6 +1,6 @@
 .PHONY: syslog check-syslog-version clean
 travis:
-	sbt ignorePHPTests ignoreWIP test-suite/test
+	sbt ignoreWIP test-suite/test
 default:
 	sbt web/dist
 clean:

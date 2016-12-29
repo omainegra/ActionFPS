@@ -28,7 +28,7 @@ object DDay {
   }
 
   case class Achieving(onDay: String, counter: Int) extends DDay with NotAchieved {
-    def includeGame(jsonGame: JsonGame) = {
+    def includeGame(jsonGame: JsonGame): Either[Achieving, Achieved.type] = {
       val day = jsonGame.day
       if (day == onDay) {
         if (counter + 1 == target) Right(Achieved)
