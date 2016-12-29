@@ -35,7 +35,7 @@ case class Aggregate(users: Map[String, UserStatistics]) {
   }
 
   def ranked: List[Aggregate.RankedStat] = {
-    users.toList.sortBy(_._2.points).reverse.zipWithIndex.map { case ((id, s), r) => RankedStat(id, r, s) }
+    users.toList.sortBy(_._2.points).reverse.zipWithIndex.map { case ((id, s), r) => RankedStat(id, r + 1, s) }
   }
 }
 
