@@ -16,7 +16,6 @@ fork in run in Global := true
 fork in Test in Global := true
 
 
-
 import java.util.Base64
 import Dependencies._
 import com.hazelcast.core.{HazelcastInstance, Hazelcast}

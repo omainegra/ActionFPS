@@ -7,6 +7,14 @@ import tl.TournamentEvent._
   */
 sealed trait Tournament {
   def load(tournamentEvent: TournamentEvent): Tournament
+
+  def initiate(slots: Int): Option[List[TournamentEvent]] = None
+
+  def win(clanId: String): Option[List[TournamentEvent]] = None
+
+  def start(): Option[List[TournamentEvent]] = None
+
+  def registerClan(clanId: String): Option[List[TournamentEvent]] = None
 }
 
 object Tournament {
@@ -17,16 +25,16 @@ object Tournament {
       case _ => this
     }
 
-    def initiate(slots: Int): TournamentEvent = TournamentLaunched(slots)
+    override def initiate(slots: Int): Option[List[TournamentEvent]] = Some(List(TournamentLaunched(slots)))
   }
 
   case class WaitingToStart(slots: Int, filled: List[String]) extends Tournament {
 
-    def start(): Option[List[TournamentEvent]] = {
+    override def start(): Option[List[TournamentEvent]] = {
       if (filled.size > 1) Some(List(TournamentStarted(filled))) else None
     }
 
-    def registerClan(clanId: String): Option[List[TournamentEvent]] = {
+    override def registerClan(clanId: String): Option[List[TournamentEvent]] = {
       if (filled.contains(clanId)) None
       else if (filled.size + 1 == slots) Some(List(ClanRegistered(clanId), TournamentReady))
       else Some(List(ClanRegistered(clanId)))
@@ -35,10 +43,7 @@ object Tournament {
     override def load(tournamentEvent: TournamentEvent): Tournament = tournamentEvent match {
       case ClanRegistered(clanId) => copy(filled = filled :+ clanId)
       case TournamentStarted(clans) => ActiveTournament(clans)
-      case TournamentReady => this
-      case ClanWon(_, _) => this
-      case TournamentLaunched(_) => this
-      case TournamentWon(_) => this
+      case _ => this
     }
 
   }
@@ -48,12 +53,13 @@ object Tournament {
   }
 
   case class ActiveTournament() extends Tournament {
-    def win(clanId: String): Option[List[TournamentEvent]] = {
+    override def win(clanId: String): Option[List[TournamentEvent]] = {
       None
     }
 
     override def load(tournamentEvent: TournamentEvent): Tournament = tournamentEvent match {
       case ClanWon(_, _) => this
+      case TournamentWon(_) => Inactive
       case _ => this
     }
   }
