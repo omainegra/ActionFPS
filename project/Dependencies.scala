@@ -1,6 +1,6 @@
 import sbt._
 
-trait Dependencies {
+object Dependencies {
 
   val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.0" % "test"
   val scalatestOld: ModuleID = "org.scalatest" %% "scalatest" % "2.2.6" % "test"

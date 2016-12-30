@@ -5,8 +5,6 @@ object CommonSettingsPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = allRequirements
 
   override def projectSettings = Seq(
-    scalaVersion := "2.11.8",
-    organization := "com.actionfps",
     scalacOptions := Seq(
       "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
       "-language:existentials", "-language:implicitConversions",
@@ -17,24 +15,11 @@ object CommonSettingsPlugin extends AutoPlugin {
     resolvers += Resolver.mavenLocal,
     licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
     publishMavenStyle := false,
-    updateOptions := updateOptions.value.withCachedResolution(true),
-    incOptions := incOptions.value.withNameHashing(true),
     run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in(Compile, run), runner in(Compile, run)),
     runMain in Compile <<= Defaults.runMainTask(fullClasspath in Compile, runner in(Compile, run))
   )
 
-
-  override def buildSettings = Seq(
-    updateOptions := updateOptions.value.withCachedResolution(true),
-    incOptions := incOptions.value.withNameHashing(true)
-  )
-
-  override def globalSettings = Seq(
-    updateOptions := updateOptions.value.withCachedResolution(true),
-    incOptions := incOptions.value.withNameHashing(true)
-  )
-
-  object autoImport extends Dependencies {
+  object autoImport {
 
     val dontDocument = Seq(
       publishArtifact in(Compile, packageDoc) := false,

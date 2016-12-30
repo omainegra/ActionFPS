@@ -1,9 +1,26 @@
-import java.util.Base64
-
-import com.hazelcast.core.{HazelcastInstance, Hazelcast}
-import org.eclipse.jgit.revwalk.RevWalk
 
 name := "actionfps"
+
+scalaVersion in ThisBuild := "2.11.8"
+
+organization in ThisBuild := "com.actionfps"
+
+updateOptions in ThisBuild := (updateOptions in ThisBuild).value.withCachedResolution(true)
+
+incOptions in ThisBuild := (incOptions in ThisBuild).value.withNameHashing(true)
+
+cancelable in Global := true
+
+fork in run in Global := true
+
+fork in Test in Global := true
+
+
+
+import java.util.Base64
+import Dependencies._
+import com.hazelcast.core.{HazelcastInstance, Hazelcast}
+import org.eclipse.jgit.revwalk.RevWalk
 
 lazy val root =
   Project(
@@ -106,8 +123,8 @@ lazy val web = project
   .settings(Defaults.itSettings: _*)
   .dependsOn(testSuite % "test->compile;it->compile")
   .settings(
-      scalaSource in IntegrationTest := baseDirectory.value / "it",
-      libraryDependencies ++= Seq(
+    scalaSource in IntegrationTest := baseDirectory.value / "it",
+    libraryDependencies ++= Seq(
       akkaActor,
       akkaAgent,
       akkaslf,
@@ -371,21 +388,15 @@ lazy val streamReaders =
 
 lazy val sampleLog = taskKey[File]("Sample Log")
 
-// truly don't know if this works at all
-updateOptions := updateOptions.value.withCachedResolution(true)
-
-incOptions := incOptions.value.withNameHashing(true)
-
-cancelable in Global := true
-
-fork in run in Global := true
-
-fork in Test in Global := true
-
 lazy val tournamentLeague = Project(
   id = "tournament-league",
   base = file("tournament-league")
 ).settings(
-  scalaVersion := "2.12.1",
   libraryDependencies += scalatest
+)
+
+def dontDocument = Seq(
+  publishArtifact in(Compile, packageDoc) := false,
+  publishArtifact in packageDoc := false,
+  sources in(Compile, doc) := Seq.empty
 )
