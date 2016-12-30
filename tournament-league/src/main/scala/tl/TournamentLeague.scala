@@ -46,3 +46,4 @@ object LeagueEvent {
 
 sealed trait TournamentEvent
 
+// todo simplify it all. Actually, we only 1 tournament at any point in time! :-O
