@@ -1,49 +1,42 @@
 package tl
 
-import java.time.Instant
-
-import tl.LeagueEvent.{InitTournamentEvent, LeagueTournamentEvent}
+import tl.TournamentEvent.{ClanRegistered, TournamentReady}
 
 sealed trait Tournament {
   def load(tournamentEvent: TournamentEvent): Tournament
 }
 
 object Tournament {
-  def initial(slots: Int, latestStart: Instant): Tournament = ???
-}
 
-case class TournamentState(tournaments: Map[String, Tournament]) {
-  me =>
+  case object Inactive extends Tournament {
+    override def load(tournamentEvent: TournamentEvent): Tournament = this
+  }
 
-  case class AtTournament(tournamentId: String) {
-    def initiate(slots: Int, latestStart: Instant): Option[InitTournamentEvent] = {
-      if (tournaments.contains(tournamentId)) None
-      else Some(InitTournamentEvent(slots, latestStart))
+  case class WaitingToStart(slots: Int, filled: List[String]) extends Tournament {
+    def registerClan(clanId: String): Option[List[TournamentEvent]] = {
+      if ( filled.contains(clanId) ) None
+      else if ( filled.size + 1 == slots ) Some(List(ClanRegistered(clanId), TournamentReady))
+      else Some(List(ClanRegistered(clanId)))
     }
 
-    def accept(leagueEvent: LeagueEvent): TournamentState = {
-      (leagueEvent, tournaments.get(tournamentId)) match {
-        case (LeagueTournamentEvent(tournamentEvent), Some(tournament)) =>
-          me.copy(tournaments = tournaments.updated(tournamentId, tournament.load(tournamentEvent)))
-        case (InitTournamentEvent(slots, latestStart), None) =>
-          me.copy(tournaments = tournaments.updated(tournamentId, Tournament.initial(slots, latestStart)))
-        case _ => me
-      }
+    override def load(tournamentEvent: TournamentEvent): Tournament = tournamentEvent match {
+      case ClanRegistered(clanId) => copy(filled = filled :+ clanId)
+      case _ => this
     }
   }
 
-}
 
-sealed trait LeagueEvent
-
-object LeagueEvent {
-
-  case class InitTournamentEvent(slots: Int, latestStart: Instant) extends LeagueEvent
-
-  case class LeagueTournamentEvent(tournamentEvent: TournamentEvent) extends LeagueEvent
-
+  def initial: Tournament = Inactive
 }
 
 sealed trait TournamentEvent
 
-// todo simplify it all. Actually, we only 1 tournament at any point in time! :-O
+object TournamentEvent {
+
+  case class ClanRegistered(clanId: String) extends TournamentEvent
+
+  case object TournamentStarted extends TournamentEvent
+
+  case object TournamentReady extends TournamentEvent
+
+}
