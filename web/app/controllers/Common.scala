@@ -3,6 +3,7 @@ package controllers
 /**
   * Created by William on 01/01/2016.
   */
+
 import java.io.File
 import java.nio.file.{Files, Path}
 import javax.inject._
@@ -65,9 +66,9 @@ class Common @Inject()(configuration: Configuration
 
   def apiPath: String = configuration.underlying.getString("af.apiPath")
 
-  def renderStatic(path: Path) = Action { implicit r =>
-    Ok(renderTemplate(title = None, supportsJson = false,
-      login = None, wide = false) {
+  def renderStatic(path: Path, wide: Boolean = false) = Action { implicit r =>
+    Ok(renderTemplate(title = None, supportsJson = false, wide = wide,
+      login = None) {
       Html(new String(Files.readAllBytes(lib.Soup.wwwLocation.resolve(path))))
     })
   }

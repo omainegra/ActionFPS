@@ -1,20 +1,27 @@
 <link rel="canonical" href="/tournaments/">
-<article id="questions">
+<article id="questions" class="html-wide">
 
     <h2>Tournaments</h2>
-    <style>
-        .alert {
-            padding: 0.2em;
-            border-bottom: 2px solid #f44336;
-            color: white;
-        }
-    </style>
-    <p class="alert">This is a <strong>*test*</strong> of <a href="https://challonge.com/af_test_tournament">Challonge</a> integration.
-        Play <strong>ANY</strong> <u>clan</u> game, let's see if it
-        works.</p>
-    <p class="alert">Feedback &amp; questions &#8658; <a href="https://discord.gg/YB35KE3">ActionFPS Discord
+    <p>This is a <strong>*test*</strong> of <a
+            href="https://challonge.com/af_test_tournament">Challonge</a> integration.</p>
+    <p>Feedback &amp; questions &#8658; <a href="https://discord.gg/YB35KE3">ActionFPS Discord
         Channel</a>.</p>
+    <h3>How to play</h3>
+    <p>Do a Clan-Match game.</p>
+
+    <p>If it works We shall expand it to clanwars once this is verified to be working for normal games.</p>
+
     <iframe src="https://challonge.com/af_test_tournament/module" width="100%" height="500" frameborder="0"
             scrolling="auto" allowtransparency="true"></iframe>
 
+    <h3>How it works (pseudo-code)</h3>
+    <pre>if game.winner and game.loser is not None:
+    for every tournament in challonge.open_tournaments:
+        for every match in the tournament.remaining_matches:
+            if game.winner and game.loser in match.players:
+                match.update(
+                    winner = game.winner,
+                    loser = game.loser,
+                    score = "1-0"
+                )</pre>
 </article>
