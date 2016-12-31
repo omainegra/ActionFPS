@@ -121,23 +121,23 @@ object Player {
             doc.select(".elo-points").first().text(Math.round(rank.elo).toString)
         }
 
-
         fullProfile.playerGameCounts.map { gc =>
           views.html.game_counts(gc.counts)
         }.map(_.body).foreach(doc.select(".basics").first().append)
 
-        rankedStat match {
-          case None => doc.select(".ladder").remove()
-          case Some(rs) =>
+    }
 
-            doc.select(".ladder-rank").first().text(rs.rank.toString)
-            doc.select(".ladder-points").first().text(rs.userStatistics.points.toString)
-            doc.select(".ladder-time-played").first().text(rs.userStatistics.timePlayedText)
+    rankedStat match {
+      case None => doc.select(".ladder").remove()
+      case Some(rs) =>
 
-            doc.select(".ladder-flags").first().text(rs.userStatistics.flags.toString)
-            doc.select(".ladder-frags").first().text(rs.userStatistics.frags.toString)
-            doc.select(".ladder-gibs").first().text(rs.userStatistics.gibs.toString)
-        }
+        doc.select(".ladder-rank").first().text(rs.rank.toString)
+        doc.select(".ladder-points").first().text(rs.userStatistics.points.toString)
+        doc.select(".ladder-time-played").first().text(rs.userStatistics.timePlayedText)
+
+        doc.select(".ladder-flags").first().text(rs.userStatistics.flags.toString)
+        doc.select(".ladder-frags").first().text(rs.userStatistics.frags.toString)
+        doc.select(".ladder-gibs").first().text(rs.userStatistics.gibs.toString)
     }
 
     val rgili = doc.select(".recent-games li")
