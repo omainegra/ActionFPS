@@ -49,7 +49,7 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
       playersStatsOverTime = Map.empty
     )
 
-    val newIterator = allGames.valuesIterator.toList.sortBy(_.id).foldLeft(initial)(_.includeGame(_))
+    val newIterator = initial.includeGames(allGames.valuesIterator.toList.sortBy(_.id))
 
     Agent(newIterator)
   }
@@ -57,7 +57,7 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
   gamesProvider.addAutoRemoveHook(applicationLifecycle) { game =>
     fullStuff.foreach { originalIteratorAgent =>
       val originalIterator = originalIteratorAgent.get()
-      originalIteratorAgent.alter(_.includeGame(game)).foreach { newIterator =>
+      originalIteratorAgent.alter(_.includeGames(List(game))).foreach { newIterator =>
         val fid = FullIteratorDetector(originalIterator, newIterator)
         fid.detectGame.map(NewGameDetected).foreach(actorSystem.eventStream.publish)
         fid.detectClanwar.map(NewClanwarCompleted).foreach(actorSystem.eventStream.publish)

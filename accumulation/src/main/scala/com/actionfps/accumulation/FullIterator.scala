@@ -54,12 +54,16 @@ case class FullIterator
       hof = HOF.empty,
       playersStatsOverTime = Map.empty
     )
-    games.valuesIterator.toList.sortBy(_.id).foldLeft(blank)(_.includeGame(_))
+    blank.includeGames(games.valuesIterator.toList.sortBy(_.id))
   }
 
   def events: List[Map[String, String]] = achievementsIterator.events.take(10)
 
-  def includeGame(jsonGame: JsonGame): FullIterator = {
+  def includeGames(list: List[JsonGame]): FullIterator = {
+    list.foldLeft(this)(_.includeGame(_))
+  }
+
+  private def includeGame(jsonGame: JsonGame): FullIterator = {
     val enricher = EnrichGames(users.values.toList, clans.values.toList)
     import enricher.withUsersClass
     var richGame = jsonGame.withoutHosts.withUsers.withClans

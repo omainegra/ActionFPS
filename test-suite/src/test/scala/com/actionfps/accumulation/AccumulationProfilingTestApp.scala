@@ -51,7 +51,7 @@ object AccumulationProfilingTestApp extends App {
     playersStats = PlayersStats.empty,
     playersStatsOverTime = Map.empty
   )
-  val result = games.foldLeft(fit)(_.includeGame(_))
+  val result = fit.includeGames(games)
   result.events.map(_ ("text")).foreach(println)
   println("Done")
   //  println(result)

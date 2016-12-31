@@ -45,7 +45,7 @@ class CachedProvider @Inject()(fullProviderR: FullProviderImpl, applicationLifec
   }
 
   gamesProvider.addAutoRemoveHook(applicationLifecycle) { game =>
-    fullStuff.map(_.alter(_.includeGame(game)).foreach(fi => theMap.put(keyName, fi)))
+    fullStuff.map(_.alter(_.includeGames(List(game))).foreach(fi => theMap.put(keyName, fi)))
   }
 
   applicationLifecycle.addStopHook(() => Future.successful(hz.shutdown()))
