@@ -516,7 +516,7 @@ code {
   text-align: right;
 }
 .LiveEvents.live-events li a {
-  width: 32em;
+  width: 27em;
   display: inline-block;
   color: wheat;
   text-decoration: none;
@@ -701,7 +701,7 @@ input {
   min-width:6em;
   padding-right:1em;
 }
-#bulletins .bulletin {display:flex;
+#bulletins .bulletin {
   margin-bottom:1em;
 }
 #reg-menu #log-in {
@@ -720,7 +720,7 @@ input {
   max-width: 24em;
 }
 #bulletins {
-  max-width:38em;
+  max-width:48em;
 }
 .wide #content {
   display:flex;
