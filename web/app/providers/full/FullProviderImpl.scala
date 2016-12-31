@@ -24,15 +24,9 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
                                  applicationLifecycle: ApplicationLifecycle)
                                 (implicit executionContext: ExecutionContext) extends FullProvider() {
 
-  def addHook(): Unit = {
-    val hook: JsonGame => Unit = (game) => {
-      fullStuff.map(_.send(_.includeGame(game)))
-    }
-    gamesProvider.addHook(hook)
-    applicationLifecycle.addStopHook(() => Future.successful(gamesProvider.removeHook(hook)))
+  gamesProvider.addAutoRemoveHook(applicationLifecycle) { game =>
+    fullStuff.map(_.send(_.includeGame(game)))
   }
-
-  addHook()
 
   override def reloadReference(): Future[FullIterator] = async {
     val users = await(referenceProvider.users).map(u => u.id -> u).toMap

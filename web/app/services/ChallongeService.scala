@@ -5,6 +5,8 @@ import javax.inject.{Inject, Singleton}
 import akka.agent.Agent
 import play.api.Configuration
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
+import play.api.inject.ApplicationLifecycle
+import providers.games.GamesProvider
 import tl.{ForChallongeApi, OpenMatchPlayers}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,7 +16,8 @@ import scala.util.control.NonFatal
   * Created by me on 31/12/2016.
   */
 @Singleton
-class ChallongeService @Inject()(wSClient: WSClient, configuration: Configuration)(implicit executionContext: ExecutionContext) {
+class ChallongeService @Inject()(wSClient: WSClient, configuration: Configuration, gamesProvider: GamesProvider,
+                                 applicationLifecycle: ApplicationLifecycle)(implicit executionContext: ExecutionContext) {
 
   private val activeTournaments = Agent(Set.empty[String])
 
@@ -65,7 +68,12 @@ class ChallongeService @Inject()(wSClient: WSClient, configuration: Configuratio
 
   private val firstFetch = fetchTournaments()
 
-  // todo trigger/automatically update tournaments
+  gamesProvider.addAutoRemoveHook(applicationLifecycle) { jsonGame =>
+    for {
+      winnerClan <- jsonGame.winnerClan.toList
+      loserClan <- jsonGame.clangame.flatMap(_.find(_ != winnerClan))
+    } receiveClanwar(winnerClanId = winnerClan, loserClanId = loserClan)
+  }
 
 }
 

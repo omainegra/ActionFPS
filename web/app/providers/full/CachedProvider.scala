@@ -26,8 +26,6 @@ class CachedProvider @Inject()(fullProviderR: FullProviderImpl, applicationLifec
   private val keyName: String = "fullIterator"
   private val logger = Logger(getClass)
 
-  addHook()
-
   override protected[providers] val fullStuff: Future[Agent[FullIterator]] = async {
     if (theMap.containsKey(keyName)) {
       /** In case class has changed **/
@@ -46,12 +44,8 @@ class CachedProvider @Inject()(fullProviderR: FullProviderImpl, applicationLifec
     }
   }
 
-  def addHook(): Unit = {
-    val hook: JsonGame => Unit = (game) => {
-      fullStuff.map(_.alter(_.includeGame(game)).foreach(fi => theMap.put(keyName, fi)))
-    }
-    gamesProvider.addHook(hook)
-    applicationLifecycle.addStopHook(() => Future.successful(gamesProvider.removeHook(hook)))
+  gamesProvider.addAutoRemoveHook(applicationLifecycle) { game =>
+    fullStuff.map(_.alter(_.includeGame(game)).foreach(fi => theMap.put(keyName, fi)))
   }
 
   applicationLifecycle.addStopHook(() => Future.successful(hz.shutdown()))

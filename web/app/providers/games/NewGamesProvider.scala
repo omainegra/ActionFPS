@@ -3,26 +3,22 @@ package games
 
 import javax.inject.{Inject, Singleton}
 
-import akka.stream.scaladsl.Source
-import com.actionfps.gameparser.Maps
-import com.actionfps.gameparser.enrichers.JsonGame
+import akka.NotUsed
 import akka.actor.ActorSystem
-import com.actionfps.accumulation.EnrichGames
+import akka.stream.scaladsl.Source
+import com.actionfps.formats.json.Formats._
+import com.actionfps.gameparser.enrichers.JsonGame
 import controllers.Common
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.{JsBoolean, JsObject, JsString, Json}
 import play.api.libs.streams.Streams
-import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import providers._
-
-import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
-import com.actionfps.gameparser.enrichers.Implicits._
-import com.actionfps.formats.json.Formats._
 import views.rendergame.MixedGame
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
 
 /**
   * Created by William on 09/12/2015.
@@ -35,12 +31,8 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
                                 (implicit actorSystem: ActorSystem,
                                  executionContext: ExecutionContext) {
 
-  private val processFn: JsonGame => Unit = processGame
-  gamesProvider.addHook(processFn)
-  applicationLifecycle.addStopHook(() => Future(gamesProvider.removeHook(processFn)))
-
   private val (newGamesEnum, thing) = Concurrent.broadcast[Event]
-  val newGamesSource = Source.fromPublisher(Streams.enumeratorToPublisher(newGamesEnum))
+  val newGamesSource: Source[Event, NotUsed] = Source.fromPublisher(Streams.enumeratorToPublisher(newGamesEnum))
   private val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(thing.push(Event("")))
 
   private val logger = Logger(getClass)
@@ -59,5 +51,7 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
     )
   }
 
+  gamesProvider.addAutoRemoveHook(applicationLifecycle)(processGame)
+  applicationLifecycle.addStopHook(() => Future.successful(keepAlive.cancel()))
 
 }
