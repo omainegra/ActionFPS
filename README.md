@@ -6,13 +6,22 @@
 
 * https://actionfps.com/
 
+# Architecture
+
+![](https://docs.google.com/drawings/d/1fGcN6fcKC_oCL1KtC_-pmWCT_1Da-ka0nijrzUuxiyw/pub?w=661&h=567)
+
+[View large image](https://docs.google.com/drawings/d/1fGcN6fcKC_oCL1KtC_-pmWCT_1Da-ka0nijrzUuxiyw/pub?w=1984&h=1701)
+
+# Technology Choices
+
+* __Scala__ for data processing and Play framework: solid, stable toolkit for dealing with complex data.
+* __jsoup__ for rendering templates: dynamic, works well with HTML5 and XML.
+
 # Developing
 
-Use IntelliJ Community Edition: https://www.jetbrains.com/idea/download/
-
-Simply import the directory as an 'SBT' project
-
 Install SBT: http://www.scala-sbt.org/download.html
+
+Use IntelliJ Community Edition: https://www.jetbrains.com/idea/download/. Simply import the directory as an 'SBT' project.
 
 ```
 sbt web/run
@@ -21,7 +30,7 @@ sbt web/run
 # Running tests
 
 ```
-sbt clean test
+sbt clean test it:test
 ```
 
 # Dev endpoints
@@ -39,17 +48,6 @@ So you can edit templates without having to have the true data.
 # Issue history
 
 [![Throughput Graph](https://graphs.waffle.io/ScalaWilliam/actionfps/throughput.svg)](https://waffle.io/ScalaWilliam/actionfps/metrics)
-
-# Technology Choices
-
-* __Scala__ for data processing and Play framework: solid, stable toolkit for dealing with complex data.
-* __jsoup__ for rendering templates: dynamic, works well with HTML5 and XML.
-
-# Architecture
-
-![](https://docs.google.com/drawings/d/1fGcN6fcKC_oCL1KtC_-pmWCT_1Da-ka0nijrzUuxiyw/pub?w=661&h=567)
-
-[View large image](https://docs.google.com/drawings/d/1fGcN6fcKC_oCL1KtC_-pmWCT_1Da-ka0nijrzUuxiyw/pub?w=1984&h=1701)
 
 ## DevOps
 Continuous Deployment: master --> <https://git.watch/> --> build & restart. Simple monolithic deployment.
