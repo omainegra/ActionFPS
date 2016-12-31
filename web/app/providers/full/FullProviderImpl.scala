@@ -2,9 +2,10 @@ package providers.full
 
 import javax.inject.{Inject, Singleton}
 
+import akka.actor.ActorSystem
 import com.actionfps.gameparser.enrichers.JsonGame
 import akka.agent.Agent
-import com.actionfps.clans.Clanwars
+import com.actionfps.clans.{Clanwars, CompleteClanwar}
 import com.actionfps.accumulation.{AchievementsIterator, FullIterator, HOF}
 import com.actionfps.players.PlayersStats
 import com.actionfps.stats.Clanstats
@@ -21,12 +22,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
                                  gamesProvider: GamesProvider,
+                                 actorSystem: ActorSystem,
                                  applicationLifecycle: ApplicationLifecycle)
                                 (implicit executionContext: ExecutionContext) extends FullProvider() {
-
-  gamesProvider.addAutoRemoveHook(applicationLifecycle) { game =>
-    fullStuff.map(_.send(_.includeGame(game)))
-  }
 
   override def reloadReference(): Future[FullIterator] = async {
     val users = await(referenceProvider.users).map(u => u.id -> u).toMap
@@ -54,6 +52,33 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
     val newIterator = allGames.valuesIterator.toList.sortBy(_.id).foldLeft(initial)(_.includeGame(_))
 
     Agent(newIterator)
+  }
+
+  gamesProvider.addAutoRemoveHook(applicationLifecycle) { game =>
+    fullStuff.foreach { originalIteratorAgent =>
+      val originalIterator = originalIteratorAgent.get()
+      originalIteratorAgent.alter(_.includeGame(game)).foreach { newIterator =>
+        val fid = FullIteratorDetector(originalIterator, newIterator)
+        fid.detectGame.map(NewGameDetected).foreach(actorSystem.eventStream.publish)
+        fid.detectClanwar.map(NewClanwarCompleted).foreach(actorSystem.eventStream.publish)
+      }
+    }
+  }
+
+}
+
+case class NewGameDetected(jsonGame: JsonGame)
+
+case class NewClanwarCompleted(clanwarCompleted: CompleteClanwar)
+
+case class FullIteratorDetector(original: FullIterator, updated: FullIterator) {
+
+  def detectClanwar: List[CompleteClanwar] = {
+    (updated.clanwars.complete -- original.clanwars.complete).toList
+  }
+
+  def detectGame: List[JsonGame] = {
+    (updated.games.keySet -- original.games.keySet).toList.map(updated.games)
   }
 
 }
