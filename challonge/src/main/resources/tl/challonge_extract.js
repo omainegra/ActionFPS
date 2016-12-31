@@ -1,3 +1,4 @@
+// todo consider closed tournament + open matches
 var OpenMatchPlayers = Java.type('tl.OpenMatchPlayers');
 
 function Tournament() {
@@ -19,7 +20,9 @@ Tournament.prototype.getOpenMatchesPlayers = function ()
     this.getOpenMatches().map(function (m) {
         return new OpenMatchPlayers(
             m.id,
+            m.player1_id,
             this.getParticipant(m.player1_id).name,
+            m.player2_id,
             this.getParticipant(m.player2_id).name
         )
     }.bind(this));

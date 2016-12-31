@@ -44,7 +44,7 @@ lazy val root =
       testSuite,
       jsonFormats,
       liveListener,
-      tournamentLeague,
+      challonge,
       streamReaders
     ).dependsOn(
     pureAchievements,
@@ -64,6 +64,7 @@ lazy val root =
     testSuite,
     jsonFormats,
     liveListener,
+    challonge,
     streamReaders
   )
     .settings(
@@ -115,6 +116,7 @@ lazy val web = project
   .dependsOn(pureStats)
   .dependsOn(streamReaders)
   .dependsOn(jsonFormats)
+  .dependsOn(challonge)
   .dependsOn(ladderParser)
   .enablePlugins(BuildInfoPlugin)
   .settings(dontDocument)
@@ -387,11 +389,12 @@ lazy val streamReaders =
 
 lazy val sampleLog = taskKey[File]("Sample Log")
 
-lazy val tournamentLeague = Project(
-  id = "tournament-league",
-  base = file("tournament-league")
+lazy val challonge = Project(
+  id = "challonge",
+  base = file("challonge")
 ).settings(
-  libraryDependencies += scalatest
+  libraryDependencies += scalatest,
+  libraryDependencies += ws % "provided"
 )
 
 def dontDocument = Seq(
