@@ -42,7 +42,6 @@ class StaticPageRouter @Inject()(common: Common, environment: Environment) exten
 
 case class PageSpec(document: Document, url: String, path: Path) {
   def isWide: Boolean = {
-    println(document.select("article").hasClass("html-wide"))
     document.select("article").hasClass("html-wide")
   }
 }
