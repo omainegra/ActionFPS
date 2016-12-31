@@ -137,6 +137,7 @@ lazy val web = project
       ws,
       async,
       scalatestPlus % "it,test",
+      akkaStreamTestkit % "it,test",
       scalatestIt,
       seleniumHtmlUnit % "it",
       seleniumJava % "it",
@@ -394,6 +395,7 @@ lazy val challonge = Project(
   base = file("challonge")
 ).settings(
   libraryDependencies += scalatest,
+  libraryDependencies += async,
   libraryDependencies += ws % "provided"
 )
 

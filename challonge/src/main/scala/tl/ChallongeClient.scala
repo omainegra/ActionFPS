@@ -1,15 +1,14 @@
-package services
+package tl
 
 import javax.inject.{Inject, Singleton}
 
 import play.api.Configuration
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
-import tl.{ForChallongeApi, OpenMatchPlayers}
+import tl.ChallongeClient._
 
-import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
-import ChallongeClient._
+import scala.async.Async._
 
 @Singleton
 class ChallongeClient(wSClient: WSClient, uri: String, username: String, password: String)(implicit executionContext: ExecutionContext) {
@@ -30,11 +29,18 @@ class ChallongeClient(wSClient: WSClient, uri: String, username: String, passwor
     def challongeAuth: WSRequest = wSRequest.withAuth(username, password, WSAuthScheme.BASIC)
   }
 
+  /**
+    * Get all the open candidate tournament IDs
+    */
   def fetchTournamentIds(): Future[List[String]] = async {
     val resp = await(wSClient.url(GetTournaments.getProgressTournamentsUrl).challongeAuth.get())
     tryWithInfo(resp)(r => GetTournaments.extractTournamentIds(r.json))
   }
 
+  /**
+    * Attempt to submit this pair of winners into the tournament.
+    * Match ID is returned if addition logically successful.
+    */
   def attemptSubmit(tournamentId: String, winnerClanId: String, loserClanId: String): Future[Option[Int]] = {
     async {
       val forTournament = ForTournament(tournamentId)

@@ -37,4 +37,6 @@ object Dependencies {
 
   private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.14"
 
+  val akkaStreamTestkit: ModuleID = akka("stream-testkit")
+
 }

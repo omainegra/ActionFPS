@@ -2,6 +2,7 @@ package services
 
 import javax.inject.{Inject, Singleton}
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -9,6 +10,7 @@ import com.actionfps.clans.CompleteClanwar
 import com.actionfps.gameparser.enrichers.JsonGame
 import play.api.inject.ApplicationLifecycle
 import providers.full.NewGameDetected
+import tl.ChallongeClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -21,26 +23,34 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient, applicationLi
 
   private implicit val actorMaterializer = ActorMaterializer()
 
-  private val activeTournamentsF = challongeClient.fetchTournamentIds()
+  /** Generate tournament IDs on demand **/
 
-  def receiveClanwar(winnerClanId: String, loserClanId: String): Future[List[Int]] =
-    for {
-      activeTournaments <- activeTournamentsF
-      matchIds <- Future.sequence(activeTournaments.map(challongeClient.attemptSubmit(_, winnerClanId, loserClanId))).map(_.flatten)
-    } yield matchIds
-
-  private val gameDetectionActor = Source.actorRef[NewGameDetected](10, OverflowStrategy.dropBuffer)
-    .mapConcat(g => ChallongeService.detectWinnerLoserGame(g.jsonGame).toList)
-    .mapAsync(1)(Function.tupled(receiveClanwar))
-    .to(Sink.foreach(println))
-    .run()
+  private val gameDetectionActor = {
+    Source
+      .actorRef[NewGameDetected](10, OverflowStrategy.dropBuffer)
+      .map(_.jsonGame)
+      .via(ChallongeService.flow(challongeClient))
+      .to(Sink.foreach(println))
+      .run()
+  }
 
   actorSystem.eventStream.subscribe(gameDetectionActor, classOf[NewGameDetected])
+
   applicationLifecycle.addStopHook(() => Future.successful(actorSystem.eventStream.unsubscribe(gameDetectionActor)))
 
 }
 
 object ChallongeService {
+
+  def flow(challongeClient: ChallongeClient)(implicit executionContext: ExecutionContext): Flow[JsonGame, Int, NotUsed] = {
+    val tournamentIdsSource = Source.repeat(()).mapAsync(1)(_ => challongeClient.fetchTournamentIds())
+    Flow[JsonGame]
+      .mapConcat(g => ChallongeService.detectWinnerLoserGame(g).toList)
+      .zipWith(tournamentIdsSource) { case ((win, lose), tournamentIds) => tournamentIds.map { t => (t, win, lose) } }
+      .mapConcat(identity)
+      .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit))
+      .mapConcat(_.toList)
+  }
 
   def detectWinnerLoserClanwar(cc: CompleteClanwar): Option[(String, String)] = {
     for {
