@@ -3,13 +3,14 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import akka.NotUsed
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl._
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import com.actionfps.clans.CompleteClanwar
 import com.actionfps.gameparser.enrichers.JsonGame
+import play.api.Logger
 import play.api.inject.ApplicationLifecycle
-import providers.full.NewGameDetected
+import providers.full.{NewClanwarCompleted, NewGameDetected}
 import tl.ChallongeClient
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -23,33 +24,66 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient, applicationLi
 
   private implicit val actorMaterializer = ActorMaterializer()
 
-  /** Generate tournament IDs on demand **/
+  private def subscribeActor(channel: Class[_])(actorRef: ActorRef): Unit = {
+    actorSystem.eventStream.subscribe(actorRef, channel)
+    applicationLifecycle.addStopHook(() => Future.successful(actorSystem.eventStream.unsubscribe(actorRef)))
+  }
 
-  private val gameDetectionActor = {
+  private val winFlow = ChallongeService.WinFlow(challongeClient)
+
+  subscribeActor(classOf[NewGameDetected]) {
     Source
       .actorRef[NewGameDetected](10, OverflowStrategy.dropBuffer)
       .map(_.jsonGame)
-      .via(ChallongeService.flow(challongeClient))
-      .to(Sink.foreach(println))
+      .via(winFlow.game)
+      .to(Sink.foreach(item => Logger.info(s"Sunk game: ${item}")))
       .run()
   }
 
-  actorSystem.eventStream.subscribe(gameDetectionActor, classOf[NewGameDetected])
-
-  applicationLifecycle.addStopHook(() => Future.successful(actorSystem.eventStream.unsubscribe(gameDetectionActor)))
+  subscribeActor(classOf[NewClanwarCompleted]) {
+    Source
+      .actorRef[NewClanwarCompleted](10, OverflowStrategy.dropBuffer)
+      .map(_.clanwarCompleted)
+      .via(winFlow.clanwar)
+      .to(Sink.foreach(item => Logger.info(s"Sunk clanwar: ${item}")))
+      .run()
+  }
 
 }
 
 object ChallongeService {
 
-  def flow(challongeClient: ChallongeClient)(implicit executionContext: ExecutionContext): Flow[JsonGame, Int, NotUsed] = {
-    val tournamentIdsSource = Source.repeat(()).mapAsync(1)(_ => challongeClient.fetchTournamentIds())
-    Flow[JsonGame]
-      .mapConcat(g => ChallongeService.detectWinnerLoserGame(g).toList)
-      .zipWith(tournamentIdsSource) { case ((win, lose), tournamentIds) => tournamentIds.map { t => (t, win, lose) } }
-      .mapConcat(identity)
-      .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit))
-      .mapConcat(_.toList)
+  val TestClanwarTournament = "af_test_tournament_clanwar"
+  val TestGameTournament = "af_test_tournament"
+
+  case class WinFlow(challongeClient: ChallongeClient)(implicit executionContext: ExecutionContext) {
+    def clanwar: Flow[CompleteClanwar, Int, NotUsed] = {
+      Flow[CompleteClanwar]
+        .map(ChallongeService.detectWinnerLoserClanwar)
+        .mapConcat(_.toList)
+        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(TestClanwarTournament, _, _)))
+        .mapConcat(_.toList)
+    }
+
+    def game: Flow[JsonGame, Int, NotUsed] = {
+      Flow[JsonGame]
+        .map(ChallongeService.detectWinnerLoserGame)
+        .mapConcat(_.toList)
+        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(TestClanwarTournament, _, _)))
+        .mapConcat(_.toList)
+    }
+
+    def gameAny: Flow[JsonGame, Int, NotUsed] = {
+      /** Generate tournament IDs on demand **/
+      val tournamentIdsSource = Source.repeat(()).mapAsync(1)(_ => challongeClient.fetchTournamentIds())
+      Flow[JsonGame]
+        .mapConcat(g => ChallongeService.detectWinnerLoserGame(g).toList)
+        .zipWith(tournamentIdsSource) { case ((win, lose), tournamentIds) => tournamentIds.map { t => (t, win, lose) } }
+        .mapConcat(identity)
+        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit))
+        .mapConcat(_.toList)
+    }
+
   }
 
   def detectWinnerLoserClanwar(cc: CompleteClanwar): Option[(String, String)] = {
