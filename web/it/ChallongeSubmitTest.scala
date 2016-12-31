@@ -50,7 +50,7 @@ class ChallongeSubmitTest extends TestKit(ActorSystem("MySpec")) with FreeSpecLi
     } { implicit port =>
       WsTestClient.withClient { client =>
         val chol = new ChallongeClient(client, "/", "q", "z")
-        val flow = ChallongeService.flow(chol)
+        val flow = ChallongeService.WinFlow(chol).gameAny
         val (pub, sub) = TestSource.probe[JsonGame]
           .via(flow)
           .toMat(TestSink.probe[Int])(Keep.both)
