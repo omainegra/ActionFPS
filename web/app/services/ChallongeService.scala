@@ -62,7 +62,7 @@ object ChallongeService {
       Flow[CompleteClanwar]
         .map(ChallongeService.detectWinnerLoserClanwar)
         .mapConcat(_.toList)
-        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(PiWoopTest, _, _)))
+        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(TestClanwarTournament, _, _)))
         .mapConcat(_.toList)
     }
 
