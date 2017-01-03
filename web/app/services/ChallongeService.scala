@@ -31,20 +31,11 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient, applicationLi
 
   private val winFlow = ChallongeService.WinFlow(challongeClient)
 
-  subscribeActor(classOf[NewGameDetected]) {
-    Source
-      .actorRef[NewGameDetected](10, OverflowStrategy.dropBuffer)
-      .map(_.jsonGame)
-      .via(winFlow.game)
-      .to(Sink.foreach(item => Logger.info(s"Sunk game: ${item}")))
-      .run()
-  }
-
   subscribeActor(classOf[NewClanwarCompleted]) {
     Source
       .actorRef[NewClanwarCompleted](10, OverflowStrategy.dropBuffer)
       .map(_.clanwarCompleted)
-      .via(winFlow.clanwar)
+      .via(winFlow.clanwarAny)
       .to(Sink.foreach(item => Logger.info(s"Sunk clanwar: ${item}")))
       .run()
   }
@@ -53,12 +44,12 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient, applicationLi
 
 object ChallongeService {
 
-  val TestClanwarTournament = "af_test_tournament_clanwar"
-  val TestGameTournament = "af_test_tournament"
-  val PiWoopTest = "af_pi_woop"
+  private val TestClanwarTournament = "af_test_tournament_clanwar"
+  private val TestGameTournament = "af_test_tournament"
+  private val PiWoopTest = "af_pi_woop"
 
   case class WinFlow(challongeClient: ChallongeClient)(implicit executionContext: ExecutionContext) {
-    def clanwar: Flow[CompleteClanwar, Int, NotUsed] = {
+    private def clanwar: Flow[CompleteClanwar, Int, NotUsed] = {
       Flow[CompleteClanwar]
         .map(ChallongeService.detectWinnerLoserClanwar)
         .mapConcat(_.toList)
@@ -66,7 +57,7 @@ object ChallongeService {
         .mapConcat(_.toList)
     }
 
-    def game: Flow[JsonGame, Int, NotUsed] = {
+    private def game: Flow[JsonGame, Int, NotUsed] = {
       Flow[JsonGame]
         .map(ChallongeService.detectWinnerLoserGame)
         .mapConcat(_.toList)
@@ -80,6 +71,17 @@ object ChallongeService {
       Flow[JsonGame]
         .mapConcat(g => ChallongeService.detectWinnerLoserGame(g).toList)
         .zipWith(tournamentIdsSource) { case ((win, lose), tournamentIds) => tournamentIds.map { t => (t, win, lose) } }
+        .mapConcat(identity)
+        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit))
+        .mapConcat(_.toList)
+    }
+
+    def clanwarAny: Flow[CompleteClanwar, Int, NotUsed] = {
+      Flow[CompleteClanwar]
+        .mapConcat(g => ChallongeService.detectWinnerLoserClanwar(g).toList)
+        .mapAsync(2) { case (win, lose) =>
+          challongeClient.fetchTournamentIds().map { ids => ids.map { id => (id, win, lose) } }
+        }
         .mapConcat(identity)
         .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit))
         .mapConcat(_.toList)
