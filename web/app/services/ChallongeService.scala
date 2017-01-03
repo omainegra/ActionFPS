@@ -55,13 +55,14 @@ object ChallongeService {
 
   val TestClanwarTournament = "af_test_tournament_clanwar"
   val TestGameTournament = "af_test_tournament"
+  val PiWoopTest = "af_pi_woop"
 
   case class WinFlow(challongeClient: ChallongeClient)(implicit executionContext: ExecutionContext) {
     def clanwar: Flow[CompleteClanwar, Int, NotUsed] = {
       Flow[CompleteClanwar]
         .map(ChallongeService.detectWinnerLoserClanwar)
         .mapConcat(_.toList)
-        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(TestClanwarTournament, _, _)))
+        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(PiWoopTest, _, _)))
         .mapConcat(_.toList)
     }
 
@@ -69,7 +70,7 @@ object ChallongeService {
       Flow[JsonGame]
         .map(ChallongeService.detectWinnerLoserGame)
         .mapConcat(_.toList)
-        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(TestClanwarTournament, _, _)))
+        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(TestGameTournament, _, _)))
         .mapConcat(_.toList)
     }
 
