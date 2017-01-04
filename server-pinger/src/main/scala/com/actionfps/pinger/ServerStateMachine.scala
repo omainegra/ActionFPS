@@ -10,6 +10,7 @@ import org.joda.time.format.ISODateTimeFormat
 private[pinger] sealed trait ServerStateMachine {
   def next(input: ParsedResponse): ServerStateMachine
 }
+
 object ServerStateMachine {
   def empty: ServerStateMachine = NothingServerStateMachine
 }
@@ -79,12 +80,12 @@ private[pinger] case class CompletedServerStateMachine
     players = for {
       p <- playerInfoReplies.sortBy(x => (x.flagScore, x.frags)).reverse
       if p.team == name
-    } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_ >= 0), frags = p.frags),
+    } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_ >= 0), frags = p.frags, user = None),
     spectators = Option(for {
       p <- playerInfoReplies.sortBy(x => (x.flagScore, x.frags)).reverse
       if p.team.contains(name)
       if !activeTeams.contains(p.team)
-    } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_ >= 0), frags = p.frags))
+    } yield CurrentGamePlayer(name = p.name, flags = Option(p.flagScore).filter(_ >= 0), frags = p.frags, user = None))
   )
 
   private def modeO = modes.get(serverInfoReply.mode)
@@ -110,8 +111,8 @@ private[pinger] case class CompletedServerStateMachine
       map = mapO,
       mode = modeO,
       minRemain = serverInfoReply.minRemain,
-      players = players,
-      spectators = spectators,
+      players = players.map(_.map(name => CurrentGameDmPlayer(name = name, user = None))),
+      spectators = spectators.map(_.map(name => CurrentGameSpectator(name = name, user = None))),
       teams = teams.toList
     )
 

@@ -9,7 +9,7 @@ import play.twirl.api.Html
 object Live {
 
   def render(game: com.actionfps.pinger.CurrentGameStatus, mapMapping: Map[String, String]): Html = {
-    if ( game.mode.isEmpty || game.map.isEmpty ) return Html("")
+    if (game.mode.isEmpty || game.map.isEmpty) return Html("")
     val html = Jsoup.parse(lib.Soup.wwwLocation.resolve("live.html").toFile, "UTF-8")
     html.select(".server-link").attr("href", s"assaultcube://${game.now.server.server}")
     html.select(".server-link").first().text(game.now.server.shortName)
@@ -26,7 +26,7 @@ object Live {
       case _ => html.select(".mode_map").first().remove()
     }
     List("rvsf", "cla").foreach { teamName =>
-      if ( !game.teams.exists(_.name.equalsIgnoreCase(teamName)) ) {
+      if (!game.teams.exists(_.name.equalsIgnoreCase(teamName))) {
         html.select(s".team.${teamName}").select(".players, .score, .subscore").remove()
       }
       game.teams
@@ -50,7 +50,10 @@ object Live {
                 playerScore.remove()
             }
             playerClone.select(".frags").first().text(s"${player.frags}")
-            playerClone.select(".name span").first().text(player.name)
+            player.user match {
+              case Some(user) => playerClone.select(".name span").first().tagName("a").attr("href", s"/player/?id=${user}").text(player.name)
+              case None => playerClone.select(".name span").first().text(player.name)
+            }
             playerElements.first().parent().appendChild(playerClone)
           }
           playerElements.remove()
@@ -72,7 +75,7 @@ object Live {
         }
 
     }
-    if ( game.teams.nonEmpty ) {
+    if (game.teams.nonEmpty) {
       if (!"rvsf".equalsIgnoreCase(game.teams.maxBy(t => t.flags.getOrElse(t.frags)).name)) {
         val cla = html.select(".team.cla").first()
         html.select(".team.rvsf").first().before(cla.clone())
@@ -87,7 +90,13 @@ object Live {
         val theLi = html.select(".dm-players li")
         players.foreach { player =>
           val cline = theLi.first().clone()
-          cline.text(player)
+          player.user match {
+            case None =>
+              cline.select("span").first().text(player.name)
+            case Some(user) =>
+              cline.select("span").first().html("").appendElement("a").attr("href", s"/player/?id=${user}").text(player.name)
+          }
+
           theLi.first().parent().appendChild(cline)
         }
         theLi.remove()
@@ -98,7 +107,13 @@ object Live {
         val theLi = html.select(".spectators li")
         specs.foreach { spec =>
           val cline = theLi.first().clone()
-          cline.select("span").first().text(spec)
+          spec.user match {
+            case None =>
+              cline.select("span").first().text(spec.name)
+            case Some(user) =>
+              cline.select("span").first().html("").appendElement("a").attr("href", s"/player/?id=${user}").text(spec.name)
+          }
+
           theLi.first().parent().appendChild(cline)
         }
         theLi.remove()

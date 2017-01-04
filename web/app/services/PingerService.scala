@@ -13,7 +13,6 @@ import akka.agent.Agent
 import akka.stream.scaladsl.Source
 import com.actionfps.gameparser.Maps
 import com.actionfps.pinger._
-import controllers.Common
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
@@ -46,12 +45,15 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
   implicit private val cgw = Json.writes[CurrentGame]
   implicit private val ssw = Json.writes[ServerStatus]
   implicit private val cgpw = Json.writes[CurrentGamePlayer]
+  implicit private val cgps = Json.writes[CurrentGameSpectator]
+  implicit private val cgpd = Json.writes[CurrentGameDmPlayer]
   implicit private val cgtw = Json.writes[CurrentGameTeam]
   implicit private val cgnsw = Json.writes[CurrentGameNowServer]
   implicit private val cgnw = Json.writes[CurrentGameNow]
   implicit private val cgsw = Json.writes[CurrentGameStatus]
 
   val status = Agent(Map.empty[String, Event])
+  private val usersProvider = referenceProvider.Users().provider
   private val listenerActor = actor(factory = actorSystem, name = "pinger")(new PingerService.ListenerActor({
     a =>
       liveGamesChan.push(
@@ -61,7 +63,11 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
           data = Json.toJson(a).toString()
         ))
 
-  }, { b =>
+  }, { be =>
+    val b = usersProvider.value.flatMap(_.toOption) match {
+      case Some(u) => be.withUsers(u.username)
+      case None => be
+    }
 
     val cgse =
       Event(

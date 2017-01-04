@@ -128,18 +128,18 @@ object Dev {
       )
     ),
     updatedTime = "abc",
-    players = Some(List("John", "Peter")),
-    spectators = Some(List("Smith", "Dave")),
+    players = Some(List(CurrentGameDmPlayer(name = "John", user = Some("drakas")), CurrentGameDmPlayer(name = "Peter", user = None))),
+    spectators = Some(List(CurrentGameSpectator("Smith", Some("smoth")), CurrentGameSpectator("Dave", None))),
     teams = List(
       CurrentGameTeam(
         name = "rvsf", flags = Some(12), frags = 123,
-        spectators = Some(List(CurrentGamePlayer(name = "Speccy", flags = Some(10), frags = 100))),
-        players = List(CurrentGamePlayer(name = "peepe", flags = Some(2), frags = 23))
+        spectators = Some(List(CurrentGamePlayer(name = "Speccy", flags = Some(10), frags = 100, user = None))),
+        players = List(CurrentGamePlayer(name = "peepe", flags = Some(2), frags = 23, user = Some("pepe")))
       ),
       CurrentGameTeam(
         name = "cla", flags = Some(13), frags = 114,
-        spectators = Some(List(CurrentGamePlayer(name = "Ceppy", flags = None, frags = 99))),
-        players = List(CurrentGamePlayer(name = "prepe", flags = None, frags = 29))
+        spectators = Some(List(CurrentGamePlayer(name = "Ceppy", flags = None, frags = 99, user = None))),
+        players = List(CurrentGamePlayer(name = "prepe", flags = None, frags = 29, user = Some("prep")))
       )
     )
   )
