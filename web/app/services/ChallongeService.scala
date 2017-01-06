@@ -46,7 +46,6 @@ object ChallongeService {
 
   private val TestClanwarTournament = "af_test_tournament_clanwar"
   private val TestGameTournament = "af_test_tournament"
-  private val PiWoopTest = "af_pi_woop"
 
   case class WinFlow(challongeClient: ChallongeClient)(implicit executionContext: ExecutionContext) {
     private def clanwar: Flow[CompleteClanwar, Int, NotUsed] = {
