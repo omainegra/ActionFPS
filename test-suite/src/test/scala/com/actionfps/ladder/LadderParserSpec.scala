@@ -7,6 +7,12 @@ import org.scalatest.{Matchers, WordSpec}
 
 class LadderParserSpec extends WordSpec with Matchers {
   "it" must {
+    "parse a server based line" in {
+      val ln = "server=woop.ac:10000 May 02 03:29:38 [127.0.0.1] w00p|Drakas splattered cruising"
+      val ServerBasedLine(sbl) = ln
+      sbl.server shouldEqual "woop.ac:10000"
+      sbl.rest shouldEqual "May 02 03:29:38 [127.0.0.1] w00p|Drakas splattered cruising"
+    }
     "parse datetime" in {
       val missingYearParser = MissingYearParser(2016)
       val missingYearParser(date) = "Apr 27 12:12:36"

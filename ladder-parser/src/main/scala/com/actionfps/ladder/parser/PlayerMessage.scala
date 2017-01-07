@@ -82,6 +82,18 @@ case class ScanTimedLine(scannedTiming: ScannedTiming, message: String)
 
 case class DirectTimedLine(lineTiming: LineTiming, message: String)
 
+case class ServerBasedLine(server: String, rest: String)
+
+object ServerBasedLine {
+  def unapply(input: String): Option[ServerBasedLine] = {
+    if (input.startsWith("server=")) {
+      if (input.indexOf(' ') > 0) {
+        Some(ServerBasedLine(input.substring(7, input.indexOf(' ')), input.substring(input.indexOf(' ') + 1)))
+      } else None
+    } else None
+  }
+}
+
 object DirectTimedLine {
   def unapply(input: String): Option[DirectTimedLine] = {
     PartialFunction.condOpt(input) {

@@ -42,14 +42,19 @@ class LadderController @Inject
       Logger.info(s"Starting process = ${command}")
       var currentState = LineTimerScanner.empty
       val t = new ProcessTailer(command)({
-        case DirectTimedLine(dtl) =>
-          currentState = currentState.include(dtl)
+        line =>
+          // note server is not actually being used, just extracted atm
+          val (s, d) = line match {
+            case DirectTimedLine(dx) => ("default", dx)
+            case ServerBasedLine(ServerBasedLine(server, DirectTimedLine(dx))) => (server, dx)
+          }
+
+          currentState = currentState.include(d)
           currentState.emitLine.foreach {
             case ScanTimedLine(After(tm), PlayerMessage(m)) =>
               agg.send(_.includeLine(m.timed(tm.atZone(ZoneId.of("UTC"))))(up))
             case _ =>
           }
-        case _ =>
       })
       t
     } catch {
@@ -82,9 +87,10 @@ class LadderController @Inject
 object LadderController {
   def getSourceCommands(configuration: Configuration, path: String): Option[List[List[String]]] = {
     import collection.JavaConverters._
-    configuration.getConfigList(path).map { items => items.asScala.map { source =>
-      source.underlying.getStringList("command").asScala.toList
-    }.toList
+    configuration.getConfigList(path).map { items =>
+      items.asScala.map { source =>
+        source.underlying.getStringList("command").asScala.toList
+      }.toList
     }
   }
 }
