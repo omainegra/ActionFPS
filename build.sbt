@@ -189,6 +189,16 @@ lazy val web = project
     buildInfoOptions += BuildInfoOption.ToJson
   )
 
+lazy val devApp =
+  Project(
+    id = "dev-app",
+    base = file("dev-app")
+  )
+    .dependsOn(web)
+    .enablePlugins(JavaAppPackaging)
+    .settings(dontDocument)
+    .settings(mainClass in Compile := Some("com.actionfps.app.DevApp"))
+
 lazy val gitCommitDescription = SettingKey[Option[String]]("gitCommitDescription", "Base64-encoded!")
 
 lazy val gameParser =

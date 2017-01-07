@@ -69,6 +69,12 @@ object ValidServers {
       address = "aura.woop.ac:3999"
     ),
     ValidServer(
+      logId = "62-210-131-155.rev.poneytelecom.eu sd-55104 AssaultCube[local#3999]",
+      name = "aura 3999",
+      timezone = "Europe/Paris",
+      address = "aura.woop.ac:3999"
+    ),
+    ValidServer(
       logId = "62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#4999]",
       name = "aura 4999",
       timezone = "Europe/Paris",
