@@ -59,7 +59,7 @@ class GamesController @Inject()(common: Common,
           events = events,
           latestClanwars = latestClanwars,
           bulletin = headingO,
-          ladder = ladderController.agg.get().top(10),
+          ladder = ladderController.aggregate.top(10),
           playersStats = await(fullProvider.playerRanks).onlyRanked.top(10),
           clanStats = cstats.top(10)
         )))

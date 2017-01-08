@@ -4,10 +4,8 @@ package controllers
   * Created by William on 01/01/2016.
   */
 
-import java.nio.file.Files
 import javax.inject._
 
-import org.jsoup.Jsoup
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
@@ -68,7 +66,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
           if (request.getQueryString("format").contains("json")) {
             Ok(Json.toJson(player.build))
           } else {
-            Ok(renderTemplate(None, supportsJson = true, None)(views.player.Player.render(player, ladderController.agg.get().ranked.find(_.user == id))))
+            Ok(renderTemplate(None, supportsJson = true, None)(views.player.Player.render(player, ladderController.aggregate.ranked.find(_.user == id))))
           }
         case None =>
           NotFound("Player could not be found")
@@ -85,7 +83,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
             build.rank.flatMap(_.rank),
             map = build.favouriteMap,
             playername = build.user.nickname.nickname,
-            ladderrank = ladderController.agg.get().ranked.find(_.user == id).map(_.rank),
+            ladderrank = ladderController.aggregate.ranked.find(_.user == id).map(_.rank),
             gamecount = player.achievements.map(_.playerStatistics.gamesPlayed)
           ).result
         case None =>

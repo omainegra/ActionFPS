@@ -27,7 +27,9 @@ class LadderController @Inject
    referenceProvider: ReferenceProvider)
 (implicit executionContext: ExecutionContext) extends Controller {
 
-  val agg = Agent(Aggregate.empty)
+  private val agg = Agent(KeyedAggregate.empty[String])
+
+  def aggregate: Aggregate = agg.get().total
 
   import concurrent.duration._
 
@@ -41,7 +43,7 @@ class LadderController @Inject
       Logger.info(s"Starting process = ${command}")
       val t = new ProcessTailer(command)({
         case TimesMessage(TimesMessage(ldt, PlayerMessage(m))) =>
-          agg.send(_.includeLine(m.timed(ldt.atZone(ZoneId.of("UTC"))))(up))
+          agg.send(_.includeLine(s"${command}")(m.timed(ldt.atZone(ZoneId.of("UTC"))))(up))
         case _ =>
       })
       t
@@ -61,13 +63,13 @@ class LadderController @Inject
           implicit val usWriter = Json.writes[UserStatistics]
           Json.writes[Aggregate]
         }
-        Ok(Json.toJson(agg.get()))
+        Ok(Json.toJson(agg.get().total))
       case _ =>
         Ok(common.renderTemplate(
           title = Some("Ladder"),
           supportsJson = true,
           login = None)
-        (views.ladder.Table.render(agg.get())(showTime = true)))
+        (views.ladder.Table.render(agg.get().total)(showTime = true)))
     }
   }
 }

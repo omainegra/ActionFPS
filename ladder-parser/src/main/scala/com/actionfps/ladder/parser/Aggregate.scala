@@ -6,6 +6,16 @@ import com.actionfps.ladder.parser.Aggregate.RankedStat
   * Created by me on 02/05/2016.
   */
 case class Aggregate(users: Map[String, UserStatistics]) {
+
+  def merge(other: Aggregate): Aggregate = {
+    Aggregate(
+      users = (users.toList ++ other.users.toList)
+        .groupBy { case (userId, _) => userId }
+        .mapValues(_.map { case (_, stats) => stats })
+        .mapValues(_.reduce(_.merge(_)))
+    )
+  }
+
   def includeLine(timedPlayerMessage: TimedPlayerMessage)(implicit userProvider: UserProvider): Aggregate = {
     import timedPlayerMessage.playerMessage
     require(userProvider != null, "User provider cannot be null")
