@@ -1,109 +1,126 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<!-- Generator: Adobe Illustrator 12.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 51448)  -->
 
 <svg
+   xmlns:ns1="http://ns.adobe.com/AdobeIllustrator/10.0/"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="480"
-   xmlns:xlink= "http://www.w3.org/1999/xlink"
-   height="180"
-   viewBox="0 0 480 180"
-   id="svg2"
    version="1.1"
+   width="356.527"
+   height="120"
+   viewBox="0 0 356.527 120"
+   overflow="visible"
+   enable-background="new 0 0 356.527 120"
+   xml:space="preserve"
+   id="svg2"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="sig-template.svg">
-  <defs
-     id="defs4" />
-  <sodipodi:namedview
-     id="base"
+   sodipodi:docname="inkscape.svg"><metadata
+     id="metadata38"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs36" /><sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="148.41453"
-     inkscape:cy="59.387987"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview34"
      showgrid="false"
-     units="px"
-     inkscape:snap-text-baseline="true"
-     inkscape:window-width="1440"
-     inkscape:window-height="851"
-     inkscape:window-x="0"
-     inkscape:window-y="1"
-     inkscape:window-maximized="1" />
-  <metadata
-     id="metadata7">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(0,-872.36216)">
-    <rect
-       style="fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       id="rect3336"
-       width="480"
-       height="180"
-       x="-480"
-       y="872.36218"
-       transform="scale(-1,1)" />
-    <image
-       id="bgimage"
-       width="480"
-       height="180"
-       x="-480"
-       xlink:href="https://cloud.githubusercontent.com/assets/5359646/12695173/1c2eec3e-c745-11e5-8b47-9ec2581bddcb.jpg"
-       y="872.36218"
-       transform="scale(-1,1)" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="31"
-       y="929.36218"
-       id="text4138"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="player-name"
-         x="31"
-         y="929.36218">UserNamea</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="461"
-       y="969.36218"
-       id="text4142"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="inter-rank"
-         x="461"
-         y="969.36218"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:end;writing-mode:lr-tb;text-anchor:end">Inter rank: 9</tspan><tspan
-         sodipodi:role="line"
-         x="461"
-         y="1000.6122"
-         id="ladder-rank"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:end;writing-mode:lr-tb;text-anchor:end">Ladder rank: 1</tspan><tspan
-         sodipodi:role="line"
-         x="461"
-         y="1031.8622"
-         id="game-count"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:end;writing-mode:lr-tb;text-anchor:end">Games: 123</tspan></text>
-  </g>
-</svg>
+     inkscape:zoom="0.88071869"
+     inkscape:cx="178.2635"
+     inkscape:cy="60"
+     inkscape:window-x="75"
+     inkscape:window-y="34"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" /><switch
+     id="switch4"><foreignObject
+       requiredExtensions="http://ns.adobe.com/AdobeIllustrator/10.0/"
+       x="0"
+       y="0"
+       width="1"
+       height="1"><ns1:pgfRef
+         xlink:href="#adobe_illustrator_pgf" /></foreignObject><g
+       ns1:extraneous="self"
+       id="g6"><g
+         id="Calque_1"><image
+           id="bgimage"
+           x="0" y="0"
+           width="480"
+           height="270"
+           xlink:href=""/></g><g
+         id="Calque_3"><rect
+           x="1.027"
+           y="63.03"
+           opacity="0.5"
+           fill="#757272"
+           stroke="#000000"
+           width="355"
+           height="26"
+           id="rect15" /><rect
+           x="1.027"
+           y="35.03"
+           opacity="0.5"
+           fill="#757272"
+           stroke="#000000"
+           width="355"
+           height="26"
+           id="rect17" /><rect
+           x="1.027"
+           y="91.03"
+           opacity="0.5"
+           fill="#757272"
+           stroke="#000000"
+           width="355"
+           height="26"
+           id="rect19" /></g><g
+         id="Calque_4"><text
+           text-anchor="end" transform="matrix(1 0 0 1 360 54.0005)"
+           fill="#FFFFFF"
+           font-family="'AgencyFB-Bold'"
+           font-size="18"
+           id="inter-rank">Inter rank: 1</text>
+<text
+           text-anchor="end" transform="matrix(1 0 0 1 360 82.0298)"
+           fill="#FFFFFF"
+           font-family="'AgencyFB-Bold'"
+           font-size="18"
+           id="ladder-rank">Ladder rank: 1</text>
+<text
+           text-anchor="end" transform="matrix(1 0 0 1 360 110.0298)"
+           fill="#FFFFFF"
+           font-family="'AgencyFB-Bold'"
+           font-size="18"
+           id="game-count">Game count: 873</text>
+</g><g
+         id="Calque_5"><text
+           transform="matrix(1 0 0 1 50 23.0298)"
+           fill="#FFFFFF"
+           font-family="'AgencyFB-Bold'"
+           font-size="18"
+           id="player-name">w00p|Drakas</text>
+</g><g
+         id="Calque_6"><image
+           width="18"
+           height="12"
+           xlink:href=""
+           transform="matrix(1 0 0 1 9.0269 98.0298)"
+           id="country-flag" />
+</g><g
+         id="Calque_7"><image
+           width="75"
+           height="32"
+           xlink:href="https://cloud.githubusercontent.com/assets/5359646/21749695/27009eb4-d5a4-11e6-8fd5-b199f1fcd7ea.png"
+           transform="matrix(1 0 0 1 6 3)" /></g></g></switch></svg>
+
+

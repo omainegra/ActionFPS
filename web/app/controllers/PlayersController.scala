@@ -85,6 +85,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
             build.rank.flatMap(_.rank),
             map = build.favouriteMap,
             playername = build.user.nickname.nickname,
+            countrycode = player.build.location.flatMap(_.countryCode),
             ladderrank = ladderController.agg.get().ranked.find(_.user == id).map(_.rank),
             gamecount = player.achievements.map(_.playerStatistics.gamesPlayed)
           ).result
