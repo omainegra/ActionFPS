@@ -5,11 +5,15 @@ package com.actionfps.ladder.parser
   */
 case class KeyedAggregate[T](aggregates: Map[T, Aggregate], total: Aggregate) {
   def includeLine(key: T)(timedPlayerMessage: TimedPlayerMessage)(implicit userProvider: UserProvider): KeyedAggregate[T] = {
-    val newAggregates = aggregates.updated(key, aggregates.getOrElse(key, Aggregate.empty).includeLine(timedPlayerMessage))
-    KeyedAggregate(
-      aggregates = newAggregates,
-      total = newAggregates.valuesIterator.reduce(_.merge(_))
-    )
+    val original = aggregates.getOrElse(key, Aggregate.empty)
+    val updated = original.includeLine(timedPlayerMessage)
+    if ( original == updated ) this else {
+      val newAggregates = aggregates.updated(key, updated)
+      KeyedAggregate(
+        aggregates = newAggregates,
+        total = newAggregates.valuesIterator.reduce(_.merge(_))
+      )
+    }
   }
 }
 
