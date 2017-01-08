@@ -10,21 +10,19 @@ import com.actionfps.reference.{NicknameRecord, Registration}
 sealed trait Nickname {
   def nickname: String
 
-  def countryCode: Option[String]
-
   def from: ZonedDateTime
 
   def validAt(zonedDateTime: ZonedDateTime): Boolean = this match {
-    case c: CurrentNickname => zonedDateTime.isAfter(from)
+    case _: CurrentNickname => zonedDateTime.isAfter(from)
     case p: PreviousNickname => zonedDateTime.isAfter(from) && zonedDateTime.isBefore(p.to)
   }
 }
 
-case class CurrentNickname(nickname: String, countryCode: Option[String], from: ZonedDateTime) extends Nickname
+case class CurrentNickname(nickname: String, from: ZonedDateTime) extends Nickname
 
-case class PreviousNickname(nickname: String, countryCode: Option[String], from: ZonedDateTime, to: ZonedDateTime) extends Nickname
+case class PreviousNickname(nickname: String, from: ZonedDateTime, to: ZonedDateTime) extends Nickname
 
-case class User(id: String, name: String, countryCode: Option[String], email: Option[String],
+case class User(id: String, name: String, email: Option[String],
                 registrationDate: ZonedDateTime, nickname: CurrentNickname, previousNicknames: Option[List[PreviousNickname]]) {
   def nicknames: List[Nickname] = List(nickname) ++ previousNicknames.toList.flatten
 
@@ -43,19 +41,16 @@ object User {
             PreviousNickname(
               nickname = nick.nickname,
               from = nick.from.atZone(ZoneId.of("UTC")),
-              to = nextNick.from.atZone(ZoneId.of("UTC")),
-              countryCode = None
+              to = nextNick.from.atZone(ZoneId.of("UTC"))
             )
         }.toList
         User(
           id = registration.id,
           name = registration.name,
-          countryCode = None,
           email = registration.email,
           registrationDate = registration.registrationDate.atZone(ZoneId.of("UTC")),
           nickname = CurrentNickname(
             nickname = currentNickname.nickname,
-            countryCode = None,
             from = currentNickname.from.atZone(ZoneId.of("UTC"))
           ),
           previousNicknames = Option(previousNicknames).filter(_.nonEmpty)
