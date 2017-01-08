@@ -97,6 +97,8 @@ object ServerBasedLine {
 object DirectTimedLine {
   def unapply(input: String): Option[DirectTimedLine] = {
     PartialFunction.condOpt(input) {
+      case LineTiming.ExactLocalDT.Extractor(d, m) =>
+        DirectTimedLine(d, m)
       case LineTiming.LocalDateWithoutYear(d, m@ServerStatus(ldt, _)) =>
         DirectTimedLine(lineTiming = LineTiming.ExactLocalDT(ldt), message = m)
       case LineTiming.LocalDateWithoutYear(d, m) =>
@@ -132,6 +134,22 @@ object LineTiming {
   }
 
   case class ExactLocalDT(localDateTime: LocalDateTime) extends LineTiming
+
+  object ExactLocalDT {
+    private val samInput = "2017-01-07T23:39:46"
+
+    object Extractor {
+      def unapply(input: String): Option[(ExactLocalDT, String)] = {
+        if (input.length > samInput.length && input(4) == samInput(4) && input(10) == 'T') {
+          try Some(ExactLocalDT(LocalDateTime.parse(input.take(samInput.length))) -> input.drop(samInput.length).tail)
+          catch {
+            case _: java.time.format.DateTimeParseException => None
+          }
+        } else None
+      }
+    }
+
+  }
 
 }
 

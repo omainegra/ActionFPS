@@ -322,7 +322,8 @@ lazy val ladderParser =
   )
     .dependsOn(gameParser)
     .settings(
-      git.useGitDescribe := true
+      git.useGitDescribe := true,
+      libraryDependencies += scalatest
     )
 
 lazy val pureStats =

@@ -1,11 +1,13 @@
 package com.actionfps.ladder
 
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import com.actionfps.ladder.parser._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.WordSpec
+import org.scalatest.Matchers._
 
-class LadderParserSpec extends WordSpec with Matchers {
+class LadderParserSpec extends WordSpec {
   "it" must {
     "parse a server based line" in {
       val ln = "server=woop.ac:10000 May 02 03:29:38 [127.0.0.1] w00p|Drakas splattered cruising"
@@ -43,7 +45,8 @@ class LadderParserSpec extends WordSpec with Matchers {
                   |May 01 15:16:58 [171.228.253.170] client connected
                   |[9.105.40.7] w00p|Sanzo busted w00p|Lucas
                   |Status at 03-07-2016 12:02:30: 2 remote clients, 1.3 send, 1.1 rec (K/sec); Ping: #89|5948|214; CSL: #36|2605|223 (bytes)
-                  |[18.231.137.36] w00p|Lucas punctured w00p|Sanzo""".stripMargin
+                  |[18.231.137.36] w00p|Lucas punctured w00p|Sanzo
+                  |2017-01-07T23:39:10 Demo recording started.""".stripMargin
     // todo separate/tidy up
     "work for non-timestamped data" in {
       val lines = input.split("\n").flatMap(l => DirectTimedLine.unapply(l))
@@ -59,6 +62,8 @@ class LadderParserSpec extends WordSpec with Matchers {
       lines(4).message should startWith ("Stat")
       lines(5).lineTiming shouldBe LineTiming.NoExactTime
       lines(5).message should startWith ("[18")
+      lines(6).lineTiming shouldBe LineTiming.ExactLocalDT(LocalDateTime.parse("2017-01-07T23:39:10"))
+      lines(6).message shouldBe "Demo recording started."
     }
 
     "automatically reestablish time after getting information" in {
