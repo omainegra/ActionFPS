@@ -27,7 +27,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     async {
       request.getQueryString("format") match {
         case Some("registrations-csv") =>
-          Ok(await(referenceProvider.Users(withEmails = false).rawRegistrations)).as("text/csv")
+          Ok(await(referenceProvider.Users(withEmails = false).filteredRegistrations)).as("text/csv")
         case Some("nicknames-csv") =>
           Ok(await(referenceProvider.Users(withEmails = false).rawNicknames)).as("text/csv")
         case Some("json") =>

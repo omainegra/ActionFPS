@@ -7,6 +7,7 @@ import javax.inject.{Inject, Singleton}
 import com.actionfps.accumulation.{Clan, User}
 import com.actionfps.ladder.parser.UserProvider
 import com.actionfps.reference._
+import com.google.common.io.CharStreams
 import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.libs.json.Json
@@ -93,8 +94,12 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
 
   case class Users(withEmails: Boolean = false) {
 
-    def rawRegistrations: Future[String] = fetch("registrations").map(
+    def filteredRegistrations: Future[String] = fetch("registrations").map(
       bdy => Registration.filterRegistrationsEmail(new StringReader(bdy))
+    )
+
+    def rawRegistrations: Future[String] = fetch("registrations").map(
+      bdy => CharStreams.toString(new StringReader(bdy))
     )
 
     def registrations: Future[List[Registration]] = rawRegistrations.map { bdy =>
