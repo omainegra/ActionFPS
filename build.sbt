@@ -15,6 +15,10 @@ fork in run in Global := true
 
 fork in Test in Global := true
 
+ghpages.settings
+
+git.remoteRepo := "git@github.com:ScalaWilliam/ActionFPS.git"
+
 
 import java.util.Base64
 import Dependencies._
