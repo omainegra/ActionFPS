@@ -7,7 +7,7 @@ package controllers
 import javax.inject._
 
 import play.api.Configuration
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, AnyContent, Controller}
 import providers.ReferenceProvider
@@ -92,4 +92,14 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
     }
   }
 
+  def playerByEmail(email: String): Action[AnyContent] = Action.async {
+    async {
+      await(referenceProvider.Users().users).find(_.email.contains(email)) match {
+        case Some(user) =>
+          Ok(Json.toJson(user))
+        case None =>
+          NotFound(JsObject(Map("Error" -> JsString("User by e-mail not found"))))
+      }
+    }
+  }
 }

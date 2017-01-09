@@ -17,6 +17,8 @@ fork in Test in Global := true
 
 ghpages.settings
 
+site.includeScaladoc()
+
 git.remoteRepo := "git@github.com:ScalaWilliam/ActionFPS.git"
 
 
