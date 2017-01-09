@@ -94,7 +94,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
 
   def playerByEmail(email: String): Action[AnyContent] = Action.async {
     async {
-      await(referenceProvider.Users().users).find(_.email.contains(email)) match {
+      await(referenceProvider.Users(withEmails = true).users).find(_.email.contains(email)) match {
         case Some(user) =>
           Ok(Json.toJson(user))
         case None =>
