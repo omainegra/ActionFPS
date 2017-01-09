@@ -1,3 +1,4 @@
+
 # ActionFPS
 
 [![Build Status](https://travis-ci.org/ScalaWilliam/ActionFPS.svg)](https://travis-ci.org/ScalaWilliam/ActionFPS)
@@ -5,6 +6,24 @@
 [![Workflow](https://badge.waffle.io/ScalaWilliam/actionfps.png?label=ready&title=Ready)](https://waffle.io/ScalaWilliam/actionfps)
 
 * https://actionfps.com/
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Architecture](#architecture)
+- [Technology Choices](#technology-choices)
+- [Developing](#developing)
+- [Running tests](#running-tests)
+- [API endpoints](#api-endpoints)
+  - [Recommended](#recommended)
+  - [Other](#other)
+- [Dev endpoints](#dev-endpoints)
+- [Debugging parsing issues etc](#debugging-parsing-issues-etc)
+- [Issue history](#issue-history)
+  - [DevOps](#devops)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Architecture
 
