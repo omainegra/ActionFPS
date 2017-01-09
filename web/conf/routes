@@ -12,6 +12,7 @@ GET         /clanwar/                       @controllers.ClansController.clanwar
 GET         /clanwars/                      @controllers.ClansController.clanwars
 GET         /players/                       @controllers.PlayersController.players
 GET         /player/                        @controllers.PlayersController.player(id: String)
+GET         /player/by-email/               @controllers.PlayersController.playerByEmail(email: String)
 GET         /player/signature.svg           @controllers.PlayersController.playerSig(id: String)
 GET         /playerranks/                   @controllers.PlayersController.rankings
 GET         /hof/                           @controllers.PlayersController.hof

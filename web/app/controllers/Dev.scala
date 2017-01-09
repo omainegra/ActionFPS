@@ -89,11 +89,10 @@ object Dev {
     user = User(
       id = "boo",
       name = "Boo",
-      countryCode = None,
       email = None,
       previousNicknames = None,
       registrationDate = ZonedDateTime.now().minusDays(5),
-      nickname = CurrentNickname(nickname = "w00p|Boo", countryCode = None, from = ZonedDateTime.now().minusDays(2))
+      nickname = CurrentNickname(nickname = "w00p|Boo", from = ZonedDateTime.now().minusDays(2))
     )
   )
 

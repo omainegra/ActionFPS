@@ -9,7 +9,6 @@ import javax.inject._
 
 import akka.agent.Agent
 import com.actionfps.ladder.ProcessTailer
-import com.actionfps.ladder.parser.ScannedTiming.After
 import com.actionfps.ladder.parser._
 import play.api.{Configuration, Logger}
 import play.api.inject.ApplicationLifecycle
@@ -28,7 +27,9 @@ class LadderController @Inject
    referenceProvider: ReferenceProvider)
 (implicit executionContext: ExecutionContext) extends Controller {
 
-  val agg = Agent(Aggregate.empty)
+  private val agg = Agent(KeyedAggregate.empty[String])
+
+  def aggregate: Aggregate = agg.get().total
 
   import concurrent.duration._
 
@@ -40,21 +41,10 @@ class LadderController @Inject
     .flatten.map { command =>
     try {
       Logger.info(s"Starting process = ${command}")
-      var currentState = LineTimerScanner.empty
       val t = new ProcessTailer(command)({
-        line =>
-          // note server is not actually being used, just extracted atm
-          val (s, d) = line match {
-            case DirectTimedLine(dx) => ("default", dx)
-            case ServerBasedLine(ServerBasedLine(server, DirectTimedLine(dx))) => (server, dx)
-          }
-
-          currentState = currentState.include(d)
-          currentState.emitLine.foreach {
-            case ScanTimedLine(After(tm), PlayerMessage(m)) =>
-              agg.send(_.includeLine(m.timed(tm.atZone(ZoneId.of("UTC"))))(up))
-            case _ =>
-          }
+        case TimesMessage(TimesMessage(ldt, PlayerMessage(m))) =>
+          agg.send(_.includeLine(s"${command}")(m.timed(ldt.atZone(ZoneId.of("UTC"))))(up))
+        case _ =>
       })
       t
     } catch {
@@ -73,13 +63,13 @@ class LadderController @Inject
           implicit val usWriter = Json.writes[UserStatistics]
           Json.writes[Aggregate]
         }
-        Ok(Json.toJson(agg.get()))
+        Ok(Json.toJson(agg.get().total))
       case _ =>
         Ok(common.renderTemplate(
           title = Some("Ladder"),
           supportsJson = true,
           login = None)
-        (views.ladder.Table.render(agg.get())(showTime = true)))
+        (views.ladder.Table.render(agg.get().total)(showTime = true)))
     }
   }
 }

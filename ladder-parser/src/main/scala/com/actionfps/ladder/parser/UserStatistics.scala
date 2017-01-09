@@ -8,6 +8,14 @@ import java.time.{Duration, Instant, ZonedDateTime}
   */
 case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDateTime, timePlayed: Long) {
 
+  def merge(other: UserStatistics) = UserStatistics(
+    frags = frags + other.frags,
+    gibs = gibs + other.gibs,
+    flags = flags + other.flags,
+    timePlayed = timePlayed + other.timePlayed,
+    lastSeen = if (lastSeen.isAfter(other.lastSeen)) lastSeen else other.lastSeen
+  )
+
   def lastSeenInstant: Instant = lastSeen.withNano(0).toInstant
 
   def lastSeenText: String = {
