@@ -18,6 +18,7 @@ case class Signature(playername: String, countrycode: Option[String], interrank:
     val tplString = new String(tplBytes, "UTF-8")
     val baseUrl = "https://actionfps.com/"
     val doc = Jsoup.parse(tplString, baseUrl, Parser.xmlParser())
+    doc.outputSettings().indentAmount(0).prettyPrint(false)
     doc.select("#player-name").first().text(s"${playername}")
     doc.select("#inter-rank").first().text(s"Inter rank: ${interrank.getOrElse("-")}")
     doc.select("#ladder-rank").first().text(s"Ladder rank: ${ladderrank.getOrElse("-")}")
