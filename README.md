@@ -1,6 +1,7 @@
 # ActionFPS [![Build Status](https://travis-ci.org/ScalaWilliam/ActionFPS.svg)](https://travis-ci.org/ScalaWilliam/ActionFPS)
 
 * [ActionFPS Homepage](https://actionfps.com/)
+* [ActionFPS Game](https://github.com/ActionFPS/ActionFPS-Game)
 * [ActionFPS Wiki](https://github.com/ScalaWilliam/ActionFPS/wiki)
 * [ActionFPS Development Guide](https://github.com/ScalaWilliam/ActionFPS/wiki/Development-Guide)
 * [ActionFPS Blog](https://actionfps.blogspot.com)
