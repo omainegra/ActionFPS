@@ -37,6 +37,7 @@ class Dev @Inject()(common: Common) extends SimpleRouter {
     case GET(p"/sig.svg") => Action { request =>
       views.player.Signature(interrank = Some(1),
         playername = "w00p|Drakas",
+        countrycode = Some("GB"),
         ladderrank = Some(2),
         gamecount = Some(4),
         map = request.getQueryString("map")
