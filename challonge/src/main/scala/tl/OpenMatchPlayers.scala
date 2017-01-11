@@ -42,6 +42,16 @@ case class ForChallongeApi(path: String) {
       def updateUrl: String =
         s"""${path}/tournaments/$tournamentId/matches/$matchId.json"""
 
+      case class ForClanwar(clanwarId: String) {
+        def postLinkAttachmentUrl: String = s"""${path}/tournaments/${tournamentId}/matches/$matchId/attachments.json"""
+
+        def clanwarUrl: String = s"https://actionfps.com/clanwar/?id=${clanwarId}"
+
+        def matchAttachmentParameter: (String, String) = "match_attachment[url]" -> clanwarUrl
+
+        def matchDescriptionParameter: (String, String) = "match_attachment[description]" -> "Clanwar URL"
+      }
+
       case class ForWinner(participantId: Int, winnerScore: Int, loserScore: Int) {
 
         def winnerParameter: (String, String) = "match[winner_id]" -> s"$participantId"

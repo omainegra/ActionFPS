@@ -71,18 +71,18 @@ object ChallongeService {
         .mapConcat(g => ChallongeService.detectWinnerLoserGame(g).toList)
         .zipWith(tournamentIdsSource) { case ((win, ws, lose, ls), tournamentIds) => tournamentIds.map { t => (t, win, ws, lose, ls) } }
         .mapConcat(identity)
-        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit))
+        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(_, _, _, _, _)))
         .mapConcat(_.toList)
     }
 
     def clanwarAny: Flow[CompleteClanwar, Int, NotUsed] = {
       Flow[CompleteClanwar]
-        .mapConcat(g => ChallongeService.detectWinnerLoserClanwar(g).toList)
-        .mapAsync(2) { case (win, ws, lose, ls) =>
-          challongeClient.fetchTournamentIds().map { ids => ids.map { id => (id, win, ws, lose, ls) } }
+        .mapConcat(ccw => ChallongeService.detectWinnerLoserClanwar(ccw).toList.map(s => ccw -> s))
+        .mapAsync(2) { case (ccw, (win, ws, lose, ls)) =>
+          challongeClient.fetchTournamentIds().map { ids => ids.map { id => (id, win, ws, lose, ls, Option(ccw.id)) } }
         }
         .mapConcat(identity)
-        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit))
+        .mapAsync(3) { case (i, w, ws, l, ls, sid) => challongeClient.attemptSubmit(i, w, ws, l, ls, sid) }
         .mapConcat(_.toList)
     }
 
