@@ -98,11 +98,13 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
       bdy => Registration.filterRegistrationsEmail(new StringReader(bdy))
     )
 
-    def rawRegistrations: Future[String] = fetch("registrations").map(
+    protected def rawRegistrations: Future[String] = fetch("registrations").map(
       bdy => CharStreams.toString(new StringReader(bdy))
     )
 
-    def registrations: Future[List[Registration]] = rawRegistrations.map { bdy =>
+    def postEmailRegistrations: Future[String] = if (withEmails) rawRegistrations else filteredRegistrations
+
+    def registrations: Future[List[Registration]] = postEmailRegistrations.map { bdy =>
       val sr = new StringReader(bdy)
       try Registration.parseRecords(sr)
       finally sr.close()
