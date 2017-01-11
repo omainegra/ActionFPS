@@ -21,7 +21,7 @@ class ChallongeAttemptSubmit extends PlaySpec with OneAppPerSuite {
   "It works" in {
     import concurrent.duration._
     val ids = Await.result(challongeClient.fetchTournamentIds(), 5.seconds)
-    val res = Await.result(challongeClient.attemptSubmit("af_test_tournament", "woop", "tee"), 5.seconds)
+    val res = Await.result(challongeClient.attemptSubmit("af_test_tournament", "woop", 2, "tee", 1), 5.seconds)
     info(s"$ids")
     info(s"$res")
   }

@@ -41,7 +41,7 @@ class ChallongeClient(wSClient: WSClient, uri: String, username: String, passwor
     * Attempt to submit this pair of winners into the tournament.
     * Match ID is returned if addition logically successful.
     */
-  def attemptSubmit(tournamentId: String, winnerClanId: String, loserClanId: String): Future[Option[Int]] = {
+  def attemptSubmit(tournamentId: String, winnerClanId: String, winnerScore: Int, loserClanId: String, loserScore: Int): Future[Option[Int]] = {
     async {
       val forTournament = ForTournament(tournamentId)
       val response = await(wSClient.url(forTournament.getTournamentUrl).withQueryString(forTournament.getTournamentParams: _*).challongeAuth.get())
@@ -51,7 +51,7 @@ class ChallongeClient(wSClient: WSClient, uri: String, username: String, passwor
         case Some(m) =>
           val winnerId = if (m.firstName == winnerClanId) m.firstId else m.secondId
           val fm = forTournament.ForMatch(m.matchId)
-          val fw = fm.ForWinner(winnerId)
+          val fw = fm.ForWinner(winnerId, winnerScore, loserScore)
           tryWithInfo {
             await(wSClient.url(fm.updateUrl).challongeAuth.withQueryString(fw.winnerParameter, fw.scoresParameter(m.firstId)).put(""))
           } { k => Some(fm.extractUpdateResponse(k.json).get) }

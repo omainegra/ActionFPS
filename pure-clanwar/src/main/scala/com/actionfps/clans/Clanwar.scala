@@ -80,10 +80,17 @@ case class TwoGamesNoWinnerClanwar(clans: Set[String], firstGame: Game, secondGa
 
 }
 
+/**
+  *
+  * @param winner
+  * @param clans
+  * @param scores map from clan ID to their score
+  * @param games
+  */
 case class CompleteClanwar(winner: Option[String], clans: Set[String], scores: Map[String, Int], games: List[Game]) extends Clanwar {
-  def isTie = winner.isEmpty
+  def isTie: Boolean = winner.isEmpty
 
-  def loser = (clans -- winner.toSet).headOption
+  def loser: Option[String] = (clans -- winner.toSet).headOption
 }
 
 case class NewClanwar(clans: Set[String], firstGame: Game) extends IncompleteClanwar {

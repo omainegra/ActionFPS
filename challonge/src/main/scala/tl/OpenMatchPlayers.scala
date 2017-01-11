@@ -42,12 +42,12 @@ case class ForChallongeApi(path: String) {
       def updateUrl: String =
         s"""${path}/tournaments/$tournamentId/matches/$matchId.json"""
 
-      case class ForWinner(participantId: Int) {
+      case class ForWinner(participantId: Int, winnerScore: Int, loserScore: Int) {
 
         def winnerParameter: (String, String) = "match[winner_id]" -> s"$participantId"
 
         def scoresParameter(firstPlayerId: Int): (String, String) = "match[scores_csv]" -> {
-          if (participantId == firstPlayerId) "1-0" else "0-1"
+          if (participantId == firstPlayerId) s"${winnerScore}-${loserScore}" else s"${loserScore}-${winnerScore}"
         }
       }
 

@@ -52,7 +52,7 @@ object ChallongeService {
       Flow[CompleteClanwar]
         .map(ChallongeService.detectWinnerLoserClanwar)
         .mapConcat(_.toList)
-        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(TestClanwarTournament, _, _)))
+        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(TestClanwarTournament, _, _, _, _)))
         .mapConcat(_.toList)
     }
 
@@ -60,7 +60,7 @@ object ChallongeService {
       Flow[JsonGame]
         .map(ChallongeService.detectWinnerLoserGame)
         .mapConcat(_.toList)
-        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(TestGameTournament, _, _)))
+        .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit(TestGameTournament, _, _, _, _)))
         .mapConcat(_.toList)
     }
 
@@ -69,7 +69,7 @@ object ChallongeService {
       val tournamentIdsSource = Source.repeat(()).mapAsync(1)(_ => challongeClient.fetchTournamentIds())
       Flow[JsonGame]
         .mapConcat(g => ChallongeService.detectWinnerLoserGame(g).toList)
-        .zipWith(tournamentIdsSource) { case ((win, lose), tournamentIds) => tournamentIds.map { t => (t, win, lose) } }
+        .zipWith(tournamentIdsSource) { case ((win, ws, lose, ls), tournamentIds) => tournamentIds.map { t => (t, win, ws, lose, ls) } }
         .mapConcat(identity)
         .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit))
         .mapConcat(_.toList)
@@ -78,8 +78,8 @@ object ChallongeService {
     def clanwarAny: Flow[CompleteClanwar, Int, NotUsed] = {
       Flow[CompleteClanwar]
         .mapConcat(g => ChallongeService.detectWinnerLoserClanwar(g).toList)
-        .mapAsync(2) { case (win, lose) =>
-          challongeClient.fetchTournamentIds().map { ids => ids.map { id => (id, win, lose) } }
+        .mapAsync(2) { case (win, ws, lose, ls) =>
+          challongeClient.fetchTournamentIds().map { ids => ids.map { id => (id, win, ws, lose, ls) } }
         }
         .mapConcat(identity)
         .mapAsync(3)(Function.tupled(challongeClient.attemptSubmit))
@@ -88,18 +88,22 @@ object ChallongeService {
 
   }
 
-  def detectWinnerLoserClanwar(cc: CompleteClanwar): Option[(String, String)] = {
+  def detectWinnerLoserClanwar(cc: CompleteClanwar): Option[(String, Int, String, Int)] = {
     for {
       winnerId <- cc.winner
       loserId <- cc.clans.find(_ != winnerId)
-    } yield (winnerId, loserId)
+      winnerScore <- cc.scores.get(winnerId)
+      loserScore <- cc.scores.get(loserId)
+    } yield (winnerId, winnerScore, loserId, loserScore)
   }
 
-  def detectWinnerLoserGame(jsonGame: JsonGame): Option[(String, String)] = {
+  def detectWinnerLoserGame(jsonGame: JsonGame): Option[(String, Int, String, Int)] = {
     for {
       winnerClan <- jsonGame.winnerClan
+      winnerScore <- jsonGame.teams.find(_.clan.contains(winnerClan)).map(t => t.flags.getOrElse(t.frags))
       loserClan <- jsonGame.clangame.flatMap(_.find(_ != winnerClan))
-    } yield (winnerClan, loserClan)
+      loserScore <- jsonGame.teams.find(_.clan.contains(loserClan)).map(t => t.flags.getOrElse(t.frags))
+    } yield (winnerClan, winnerScore, loserClan, loserScore)
   }
 }
 
