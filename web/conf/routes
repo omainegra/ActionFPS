@@ -17,7 +17,6 @@ GET         /player/signature.svg           @controllers.PlayersController.playe
 GET         /playerranks/                   @controllers.PlayersController.rankings
 GET         /hof/                           @controllers.PlayersController.hof
 GET         /servers/                       @controllers.MiscController.servers
-GET         /headings/                      @controllers.MiscController.headings
 GET         /ms/                            @controllers.Masterserver.ms
 GET         /retrieve.do                    @controllers.Masterserver.ms
 GET         /server-updates/                @controllers.LiveGamesController.serverUpdates

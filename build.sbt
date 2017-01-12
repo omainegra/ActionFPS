@@ -138,6 +138,7 @@ lazy val web = project
       jsoup,
       hazelcastClient,
       fluentHc,
+      httpClientCache,
       commonsIo,
       filters,
       ws,

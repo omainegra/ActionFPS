@@ -18,12 +18,15 @@ import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import play.api.routing.sird._
 import play.twirl.api.Html
+import services.NewsService
+
+import scala.concurrent.ExecutionContext
 
 /**
   * Created by me on 11/12/2016.
   */
 
-class Dev @Inject()(common: Common) extends SimpleRouter {
+class Dev @Inject()(common: Common, newsService: NewsService)(implicit executionContext: ExecutionContext) extends SimpleRouter {
 
   private implicit class RichHtml(html: Html) {
     def transform(f: String => String): Html = {
@@ -32,6 +35,9 @@ class Dev @Inject()(common: Common) extends SimpleRouter {
   }
 
   override def routes: Routes = {
+    case GET(p"/news/") => Action.async {
+      newsService.latestItem().map(_.toString).map(s => Ok(s))
+    }
     case GET(p"/live-template/") => liveTemplate
     case GET(p"/clanwars/") => clanwarTemplate
     case GET(p"/sig.svg") => Action { request =>

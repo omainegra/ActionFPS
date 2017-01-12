@@ -1,7 +1,6 @@
 package providers
 
-import java.io.{StringReader, StringWriter}
-import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
+import java.io.StringReader
 import javax.inject.{Inject, Singleton}
 
 import com.actionfps.accumulation.{Clan, User}
@@ -12,8 +11,6 @@ import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import play.twirl.api.{Html, HtmlFormat}
-import providers.ReferenceProvider.Heading
 
 import scala.async.Async._
 import scala.concurrent.duration.Duration
@@ -27,10 +24,8 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
                                  (implicit wSClient: WSClient,
                                   executionContext: ExecutionContext) {
 
-  import controllers.cf
-
   def unCache(): Unit = {
-    List("clans", "servers", "registrations", "nicknames", "headings", "user-provider").foreach(cacheApi.remove)
+    List("clans", "servers", "registrations", "nicknames", "user-provider").foreach(cacheApi.remove)
   }
 
   private def fetch(key: String) = async {
@@ -56,31 +51,6 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
       finally sr.close()
     }
   }
-
-  object Headings {
-    def csv: Future[String] = fetch("headings")
-
-    def headings: Future[List[HeadingsRecord]] = csv.map { bdy =>
-      val sr = new StringReader(bdy)
-      try HeadingsRecord.parseRecords(sr)
-      finally sr.close()
-    }
-
-    def latest: Future[Option[Heading]] = async {
-      val hs = await(headings).filterNot(_.text.startsWith("http://"))
-      if (hs.isEmpty) None
-      else {
-        val heading = hs.maxBy(_.from.toEpochSecond(ZoneOffset.UTC))
-        val html = if (heading.text.contains("<")) HtmlFormat.raw(heading.text)
-        else HtmlFormat.escape(heading.text)
-        Option(Heading(at = ZonedDateTime.of(heading.from, ZoneId.of("UTC")), html = html))
-      }
-    }
-
-
-  }
-
-  case class Headings(headings: List[ReferenceProvider.Heading])
 
   object Servers {
     def raw: Future[String] = fetch("servers")
@@ -135,14 +105,9 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
 
   def servers: Future[List[ServerRecord]] = Servers.servers
 
-  def bulletin: Future[Option[Heading]] = Headings.latest
-
 }
 
 object ReferenceProvider {
-
-  case class Heading(at: ZonedDateTime, html: Html)
-
 
   class ListUserProvider(users: List[User]) extends UserProvider {
     private val nick2UserId = users.map { u => u.nickname.nickname -> u.id }.toMap

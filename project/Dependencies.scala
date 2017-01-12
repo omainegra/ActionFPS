@@ -17,6 +17,7 @@ object Dependencies {
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.1"
   val hazelcastClient: ModuleID = "com.hazelcast" % "hazelcast-client" % "3.6.5"
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.2"
+  val httpClientCache: ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.2"
   val commonsIo: ModuleID = "commons-io" % "commons-io" % "2.5"
   val scalatestPlus: ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1"
 
