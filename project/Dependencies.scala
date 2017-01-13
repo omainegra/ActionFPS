@@ -24,7 +24,6 @@ object Dependencies {
   val seleniumJava: ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "2.53.1"
   val seleniumHtmlUnit: ModuleID = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0"
 
-
   val geoipApi: ModuleID = "com.maxmind.geoip" % "geoip-api" % "1.3.1"
   val shapeless: ModuleID = "com.chuusai" %% "shapeless" % "2.3.2"
 
@@ -38,5 +37,10 @@ object Dependencies {
   private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.14"
 
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
+
+  val streamReaders: ModuleID = "default" %% "stream-readers" % "1.0.0"
+
+  val scalaWilliamResolver: MavenRepository = Resolver.bintrayRepo("scalawilliam", "maven")
+
 
 }

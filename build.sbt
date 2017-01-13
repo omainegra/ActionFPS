@@ -49,8 +49,7 @@ lazy val root =
       testSuite,
       jsonFormats,
       liveListener,
-      challonge,
-      streamReaders
+      challonge
     ).dependsOn(
     pureAchievements,
     gameParser,
@@ -68,8 +67,7 @@ lazy val root =
     testSuite,
     jsonFormats,
     liveListener,
-    challonge,
-    streamReaders
+    challonge
   )
     .settings(
       commands += Command.command("ignoreWIP", "ignore tests for WIP things", "") { state =>
@@ -118,7 +116,6 @@ lazy val web = project
   .dependsOn(accumulation)
   .dependsOn(interParser)
   .dependsOn(pureStats)
-  .dependsOn(streamReaders)
   .dependsOn(jsonFormats)
   .dependsOn(challonge)
   .dependsOn(ladderParser)
@@ -129,10 +126,12 @@ lazy val web = project
   .dependsOn(testSuite % "test->compile;it->compile")
   .settings(
     scalaSource in IntegrationTest := baseDirectory.value / "it",
+    resolvers += scalaWilliamResolver,
     libraryDependencies ++= Seq(
       akkaActor,
       akkaAgent,
       akkaslf,
+      streamReaders,
       jsoup,
       hazelcastClient,
       fluentHc,
@@ -372,14 +371,6 @@ lazy val liveListener =
     base = file("live-listener")
   )
     .dependsOn(demoParser)
-
-lazy val streamReaders =
-  Project(
-    id = "stream-readers",
-    base = file("stream-readers")
-  )
-    .settings(libraryDependencies += commonsIo)
-    .settings(libraryDependencies += scalatest)
 
 lazy val sampleLog = taskKey[File]("Sample Log")
 
