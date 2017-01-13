@@ -1,7 +1,10 @@
 
+import Dependencies._
 name := "actionfps"
 
 scalaVersion in ThisBuild := "2.11.8"
+
+resolvers in ThisBuild += scalaWilliamResolver
 
 organization in ThisBuild := "com.actionfps"
 
@@ -22,7 +25,6 @@ site.includeScaladoc()
 git.remoteRepo := "git@github.com:ScalaWilliam/ActionFPS.git"
 
 import java.util.Base64
-import Dependencies._
 import com.hazelcast.core.{HazelcastInstance, Hazelcast}
 import org.eclipse.jgit.revwalk.RevWalk
 
@@ -32,7 +34,6 @@ lazy val root =
     base = file(".")
   )
     .aggregate(
-      gameParser,
       pureAchievements,
       web,
       referenceReader,
@@ -42,7 +43,6 @@ lazy val root =
       ladderParser,
       pureClanwar,
       pureStats,
-      pureGame,
       pureClanwar,
       testSuite,
       jsonFormats,
@@ -50,7 +50,6 @@ lazy val root =
       challonge
     ).dependsOn(
     pureAchievements,
-    gameParser,
     web,
     referenceReader,
     ladderParser,
@@ -59,7 +58,6 @@ lazy val root =
     accumulation,
     pureClanwar,
     pureStats,
-    pureGame,
     pureClanwar,
     testSuite,
     jsonFormats,
@@ -202,18 +200,6 @@ lazy val devApp =
 
 lazy val gitCommitDescription = SettingKey[Option[String]]("gitCommitDescription", "Base64-encoded!")
 
-lazy val gameParser =
-  Project(
-    id = "game-parser",
-    base = file("game-parser")
-  )
-    .dependsOn(pureGame)
-    .settings(
-      git.useGitDescribe := true,
-      libraryDependencies += fastParse,
-      libraryDependencies += jodaTime
-    )
-
 lazy val pureAchievements =
   Project(
     id = "pure-achievements",
@@ -221,8 +207,9 @@ lazy val pureAchievements =
   )
     .enablePlugins(GitVersioning)
     .settings(
-      git.useGitDescribe := true
-    ).dependsOn(gameParser)
+      git.useGitDescribe := true,
+      libraryDependencies += gameParser
+    )
 
 lazy val interParser =
   Project(
@@ -272,9 +259,9 @@ lazy val pureClanwar =
     id = "pure-clanwar",
     base = file("pure-clanwar")
   )
-    .dependsOn(pureGame)
     .settings(
-      git.useGitDescribe := true
+      git.useGitDescribe := true,
+      libraryDependencies += pureGame
     )
 
 lazy val startHazelcast = taskKey[HazelcastInstance]("Start the web hazelcast instance")
@@ -285,10 +272,10 @@ lazy val ladderParser =
     id = "ladder-parser",
     base = file("ladder-parser")
   )
-    .dependsOn(gameParser)
     .settings(
       git.useGitDescribe := true,
-      libraryDependencies += scalatest
+      libraryDependencies += scalatest,
+      libraryDependencies += gameParser
     )
 
 lazy val pureStats =
@@ -300,11 +287,6 @@ lazy val pureStats =
     .settings(
       libraryDependencies += xml
     )
-
-lazy val pureGame = Project(
-  id = "pure-game",
-  base = file("pure-game")
-)
 
 lazy val testSuite = Project(
   id = "test-suite",
