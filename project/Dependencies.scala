@@ -23,9 +23,8 @@ object Dependencies {
 
   val seleniumJava: ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "2.53.1"
   val seleniumHtmlUnit: ModuleID = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0"
-  val syslog4j: ModuleID = "org.syslog4j" % "syslog4j" % "0.9.30"
-  val logbackClassic: ModuleID = "ch.qos.logback" % "logback-classic" % "1.1.8"
-  val scalaLogging: ModuleID = "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"
+
+
   val geoipApi: ModuleID = "com.maxmind.geoip" % "geoip-api" % "1.3.1"
   val shapeless: ModuleID = "com.chuusai" %% "shapeless" % "2.3.2"
 

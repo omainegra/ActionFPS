@@ -40,7 +40,6 @@ lazy val root =
       serverPinger,
       interParser,
       demoParser,
-      syslogAc,
       accumulation,
       ladderParser,
       pureClanwar,
@@ -61,7 +60,6 @@ lazy val root =
     serverPinger,
     interParser,
     demoParser,
-    syslogAc,
     accumulation,
     pureClanwar,
     pureStats,
@@ -278,28 +276,6 @@ lazy val demoParser =
       git.useGitDescribe := true
     )
 
-lazy val syslogAc =
-  Project(
-    id = "syslog-ac",
-    base = file("syslog-ac")
-  )
-    .enablePlugins(JavaAppPackaging)
-    .enablePlugins(RpmPlugin)
-    .settings(
-      rpmVendor := "typesafe",
-      rpmBrpJavaRepackJars := true,
-      rpmLicense := Some("BSD"),
-      libraryDependencies ++= Seq(
-        syslog4j,
-        logbackClassic,
-        scalaLogging,
-        jodaTime,
-        jodaConvert
-      ),
-      bashScriptExtraDefines += """addJava "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"""",
-      git.useGitDescribe := true
-    )
-
 lazy val accumulation = project
   .dependsOn(pureAchievements)
   .dependsOn(referenceReader)
@@ -356,7 +332,6 @@ lazy val testSuite = Project(
   .dependsOn(ladderParser)
   .dependsOn(pureStats)
   .dependsOn(interParser)
-  .dependsOn(syslogAc)
   .dependsOn(jsonFormats)
   .dependsOn(serverPinger)
   .settings(
