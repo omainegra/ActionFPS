@@ -38,7 +38,6 @@ lazy val root =
       web,
       referenceReader,
       interParser,
-      demoParser,
       accumulation,
       ladderParser,
       pureClanwar,
@@ -46,7 +45,6 @@ lazy val root =
       pureClanwar,
       testSuite,
       jsonFormats,
-      liveListener,
       challonge
     ).dependsOn(
     pureAchievements,
@@ -54,14 +52,12 @@ lazy val root =
     referenceReader,
     ladderParser,
     interParser,
-    demoParser,
     accumulation,
     pureClanwar,
     pureStats,
     pureClanwar,
     testSuite,
     jsonFormats,
-    liveListener,
     challonge
   )
     .settings(
@@ -230,21 +226,6 @@ lazy val referenceReader =
   )
 
 
-lazy val demoParser =
-  Project(
-    id = "demo-parser",
-    base = file("demo-parser")
-  )
-    .settings(
-      libraryDependencies ++= Seq(
-        commonsIo,
-        json4s,
-        akkaActor,
-        scalatest
-      ),
-      git.useGitDescribe := true
-    )
-
 lazy val accumulation = project
   .dependsOn(pureAchievements)
   .dependsOn(referenceReader)
@@ -329,13 +310,6 @@ lazy val jsonFormats =
     .settings(
       libraryDependencies += json
     )
-
-lazy val liveListener =
-  Project(
-    id = "live-listener",
-    base = file("live-listener")
-  )
-    .dependsOn(demoParser)
 
 lazy val sampleLog = taskKey[File]("Sample Log")
 
