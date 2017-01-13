@@ -39,6 +39,7 @@ object Dependencies {
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 
   val streamReaders: ModuleID = "default" %% "stream-readers" % "1.0.0"
+  val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.4.0"
 
   val scalaWilliamResolver: MavenRepository = Resolver.bintrayRepo("scalawilliam", "maven")
 

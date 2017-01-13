@@ -21,7 +21,6 @@ site.includeScaladoc()
 
 git.remoteRepo := "git@github.com:ScalaWilliam/ActionFPS.git"
 
-
 import java.util.Base64
 import Dependencies._
 import com.hazelcast.core.{HazelcastInstance, Hazelcast}
@@ -37,7 +36,6 @@ lazy val root =
       pureAchievements,
       web,
       referenceReader,
-      serverPinger,
       interParser,
       demoParser,
       accumulation,
@@ -56,7 +54,6 @@ lazy val root =
     web,
     referenceReader,
     ladderParser,
-    serverPinger,
     interParser,
     demoParser,
     accumulation,
@@ -112,7 +109,6 @@ geoIpFiles in ThisBuild := {
 
 lazy val web = project
   .enablePlugins(PlayScala)
-  .dependsOn(serverPinger)
   .dependsOn(accumulation)
   .dependsOn(interParser)
   .dependsOn(pureStats)
@@ -136,6 +132,7 @@ lazy val web = project
       hazelcastClient,
       fluentHc,
       httpClientCache,
+      serverPinger,
       commonsIo,
       filters,
       ws,
@@ -245,20 +242,6 @@ lazy val referenceReader =
     libraryDependencies += kantanCsv
   )
 
-lazy val serverPinger =
-  Project(
-    id = "server-pinger",
-    base = file("server-pinger")
-  ).settings(
-    libraryDependencies ++= Seq(
-      akkaActor,
-      akkaslf,
-      akkaTestkit,
-      commonsNet,
-      jodaTime
-    ),
-    git.useGitDescribe := true
-  )
 
 lazy val demoParser =
   Project(
@@ -332,11 +315,11 @@ lazy val testSuite = Project(
   .dependsOn(pureStats)
   .dependsOn(interParser)
   .dependsOn(jsonFormats)
-  .dependsOn(serverPinger)
   .settings(
     (test in Test) <<= (test in Test) dependsOn(geoIpFiles in ThisBuild, sampleLog),
     run <<= (run in Runtime) dependsOn(geoIpFiles in ThisBuild, sampleLog in ThisBuild),
-    libraryDependencies += scalatest
+    libraryDependencies += scalatest,
+    libraryDependencies += akkaActor
   )
 
 sampleLog in ThisBuild := {
