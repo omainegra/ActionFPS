@@ -1,5 +1,7 @@
 package com.actionfps.pinger
 
+import play.api.libs.json.Json
+
 /**
   * Created by me on 29/05/2016.
   */
@@ -25,6 +27,16 @@ case class CurrentGameStatus
     )
   }
 
+}
+
+object CurrentGameStatus {
+  implicit private val cgpw = Json.writes[CurrentGamePlayer]
+  implicit private val cgps = Json.writes[CurrentGameSpectator]
+  implicit private val cgpd = Json.writes[CurrentGameDmPlayer]
+  implicit private val cgtw = Json.writes[CurrentGameTeam]
+  implicit private val cgnsw = Json.writes[CurrentGameNowServer]
+  implicit private val cgnw = Json.writes[CurrentGameNow]
+  implicit val cgsw = Json.writes[CurrentGameStatus]
 }
 
 case class CurrentGameDmPlayer(name: String, user: Option[String]) {
@@ -60,3 +72,4 @@ case class CurrentGamePlayer(name: String, flags: Option[Int], frags: Int, user:
 case class CurrentGameNow(server: CurrentGameNowServer)
 
 case class CurrentGameNowServer(server: String, connectName: String, shortName: String, description: String)
+
