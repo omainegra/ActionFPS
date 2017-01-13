@@ -1,0 +1,37 @@
+Date: 2016-04-30T23:45:09.475Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: Game status: ctf on ac_ingress, 1 minutes remaining, open, 4 clients
+Date: 2016-04-30T23:45:09.476Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: cn name             team flag  score frag death tk ping role    host
+Date: 2016-04-30T23:45:09.477Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload:  4 un               RVSF    0    379   48    64  0   41 normal  127.0.0.1
+Date: 2016-04-30T23:45:09.478Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload:  6 iR|.E            RVSF    1    651   70    55  0   36 normal  127.0.0.1
+Date: 2016-04-30T23:45:09.479Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload:  7 Morry=MyS=       CLA     6    856   66    56  0   90 normal  127.0.0.1
+Date: 2016-04-30T23:45:09.480Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload:  9 ZZ|CR7           CLA     3    572   53    56  0   66 normal  127.0.0.1
+Date: 2016-04-30T23:45:09.480Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: Team  CLA:  2 players,  119 frags,    9 flags
+Date: 2016-04-30T23:45:09.481Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: Team RVSF:  2 players,  118 frags,    1 flags
+Date: 2016-04-30T23:45:09.482Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload:
+Date: 2016-04-30T23:45:09.484Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: Status at 01-05-2016 01:37:34: 4 remote clients, 4.7 send, 2.4 rec (K/sec); Ping: #31|2073|50; CSL: #24|2004|72 (bytes)
+Date: 2016-04-30T23:45:10.993Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] un headshot Morry=MyS=
+Date: 2016-04-30T23:45:13.311Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] iR|.E says to team RVSF: 'go'
+Date: 2016-04-30T23:45:13.371Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] un stole the flag
+Date: 2016-04-30T23:45:16.041Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] un punctured ZZ|CR7
+Date: 2016-04-30T23:45:21.005Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] Morry=MyS= busted iR|.E
+Date: 2016-04-30T23:45:21.163Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] un scored with the flag for RVSF, new score 1
+Date: 2016-04-30T23:45:21.774Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] Morry=MyS= busted un
+Date: 2016-04-30T23:45:22.660Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] iR|.E says to team RVSF: 'low'
+Date: 2016-04-30T23:45:24.094Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] Morry=MyS= stole the flag
+Date: 2016-04-30T23:45:27.852Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] iR|.E busted ZZ|CR7
+Date: 2016-04-30T23:45:31.015Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] Morry=MyS= scored with the flag for CLA, new score 7
+Date: 2016-04-30T23:45:32.098Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] Morry=MyS= punctured iR|.E
+Date: 2016-04-30T23:45:33.497Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] iR|.E says to team RVSF: 'low'
+Date: 2016-04-30T23:45:34.437Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] Morry=MyS= says: 'gg'
+Date: 2016-04-30T23:45:34.913Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] disconnected client iR|.E cn 6, 2138 seconds played, score saved
+Date: 2016-04-30T23:45:35.421Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] ZZ|CR7 says: 'gg'
+Date: 2016-04-30T23:45:35.429Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: [127.0.0.1] un says: 'gg'
+Date: 2016-04-30T23:45:43.240Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload:
+Date: 2016-04-30T23:45:43.241Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: Game status: ctf on ac_ingress, game finished, open, 3 clients
+Date: 2016-04-30T23:45:43.241Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: cn name             team flag  score frag death tk ping role    host
+Date: 2016-04-30T23:45:43.242Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload:  4 un               RVSF    1    439   51    65  0   41 normal  127.0.0.1
+Date: 2016-04-30T23:45:43.243Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload:  7 Morry=MyS=       CLA     7    923   69    57  0   84 normal  127.0.0.1
+Date: 2016-04-30T23:45:43.244Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload:  9 ZZ|CR7           CLA     3    564   53    58  0   79 normal  127.0.0.1
+Date: 2016-04-30T23:45:43.245Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: Team  CLA:  2 players,  122 frags,   10 flags
+Date: 2016-04-30T23:45:43.246Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: Team RVSF:  1 players,   51 frags,    1 flags
+Date: 2016-04-30T23:45:43.247Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload:
+Date: 2016-04-30T23:45:43.250Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#2999], Payload: Demo "Sun May  1 01:38:08 2016: ctf, ac_ingress, 607.91kB" recorded.
