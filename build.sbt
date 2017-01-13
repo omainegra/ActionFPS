@@ -13,9 +13,9 @@ enablePlugins(GitVersioning)
 git.useGitDescribe in ThisBuild := true
 fork in ThisBuild := true
 organization in ThisBuild := "com.actionfps"
-crossScalaVersions := Seq("2.11.8", "2.12.1")
-bintrayVcsUrl := Some("git@github.com:ActionFPS/server-pinger.git")
-licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
+crossScalaVersions in ThisBuild := Seq("2.11.8", "2.12.1")
+bintrayVcsUrl in ThisBuild := Some("git@github.com:ActionFPS/server-pinger.git")
+licenses in ThisBuild += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
 
 lazy val gameParser = Project(id = "game-parser", base = file("game-parser"))
   .dependsOn(pureGame)
