@@ -68,3 +68,4 @@ buildinfo.properties
 cache.tmp
 *.dat
 serverlog_*
+geoip-resources

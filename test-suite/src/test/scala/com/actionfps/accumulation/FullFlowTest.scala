@@ -22,11 +22,7 @@ class FullFlowTest
   lazy val users: List[User] = Registration.parseRecords(com.actionfps.reference.getSample("registrations.csv")).flatMap(User.fromRegistration(_, nicknames))
   lazy val er = EnrichGames(users, clans)
 
-  val sampleFile: File = {
-    val A = new File("target/sample.log")
-    val B = new File("../target/sample.log")
-    if ( A.exists() ) A else B
-  }
+  val sampleFile: File = new File(System.getProperty("sample.log"))
 
   val testSuitePath: File = {
     val A = new File("test-suite")

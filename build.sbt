@@ -1,5 +1,6 @@
 
 import Dependencies._
+
 name := "actionfps"
 
 scalaVersion in ThisBuild := "2.11.8"
@@ -42,7 +43,6 @@ lazy val root =
       ladderParser,
       pureClanwar,
       pureStats,
-      pureClanwar,
       testSuite,
       jsonFormats,
       challonge
@@ -55,7 +55,6 @@ lazy val root =
     accumulation,
     pureClanwar,
     pureStats,
-    pureClanwar,
     testSuite,
     jsonFormats,
     challonge
@@ -69,37 +68,6 @@ lazy val root =
         extracted.append(newSettings, state)
       }
     )
-
-lazy val geoIpFiles = taskKey[List[File]]("Files for GeoIp")
-lazy val downloadGeoIpFiles = taskKey[Unit]("Files for GeoIp")
-
-geoIpFiles in ThisBuild := {
-  import sbt._
-  import IO._
-  val resourcesDirectory = target.value / "geoip-resources"
-  if (!resourcesDirectory.exists()) {
-    createDirectory(resourcesDirectory)
-  }
-  val cityFileGz = resourcesDirectory / "GeoLiteCityv6.dat.gz"
-  val cityFile = resourcesDirectory / "GeoLiteCityv6.dat"
-  val ipFileGz = resourcesDirectory / "GeoIPASNumv6.dat.gz"
-  val ipFile = resourcesDirectory / "GeoIPASNumv6.dat"
-  if (!cityFile.exists()) {
-    val cityUrl = "http://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz"
-    streams.value.log.info(s"Downloading and decompressing ${cityUrl} to ${cityFile}...")
-    download(url(cityUrl), cityFileGz)
-    gunzip(cityFileGz, cityFile)
-    delete(cityFileGz)
-  }
-  if (!ipFile.exists()) {
-    val ipUrl = "http://geolite.maxmind.com/download/geoip/database/asnum/GeoIPASNumv6.dat.gz"
-    streams.value.log.info(s"Downloading and decompressing ${ipUrl} to ${ipFile}...")
-    download(url(ipUrl), ipFileGz)
-    gunzip(ipFileGz, ipFile)
-    delete(ipFileGz)
-  }
-  List(cityFile, ipFile)
-}
 
 lazy val web = project
   .enablePlugins(PlayScala)
@@ -139,6 +107,10 @@ lazy val web = project
       cache,
       mockito % "it,test"
     ),
+    javaOptions in IntegrationTest ++= Seq(
+      s"-Dsample.log=${sampleLog.value}",
+      s"-Dgeolitecity.dat=${geoLiteCity.value}"
+    ),
     (run in Compile) <<= (run in Compile).dependsOn(startHazelcast),
     startHazelcast := {
       streams.value.log.info("Starting hazelcast in dev mode...")
@@ -159,11 +131,8 @@ lazy val web = project
       git.gitHeadCommit,
       gitCommitDescription
     ),
-
-    mappings in Universal ++= {
-      (geoIpFiles in ThisBuild).value.map { f =>
-        f -> s"resources/${f.getName}"
-      }
+    mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map { f =>
+      f -> s"resources/${f.getName}"
     },
     gitCommitDescription := {
       com.typesafe.sbt.SbtGit.GitKeys.gitReader.value.withGit { interface =>
@@ -269,8 +238,10 @@ lazy val testSuite = Project(
   .dependsOn(interParser)
   .dependsOn(jsonFormats)
   .settings(
-    (test in Test) <<= (test in Test) dependsOn(geoIpFiles in ThisBuild, sampleLog),
-    run <<= (run in Runtime) dependsOn(geoIpFiles in ThisBuild, sampleLog in ThisBuild),
+    javaOptions in Test ++= Seq(
+      s"-Dsample.log=${sampleLog.value}",
+      s"-Dgeolitecity.dat=${geoLiteCity.value}"
+    ),
     libraryDependencies += scalatest,
     libraryDependencies += akkaActor
   )

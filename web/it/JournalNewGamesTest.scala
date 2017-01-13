@@ -24,11 +24,7 @@ class JournalNewGamesTest
 
   val tmpFileOlder = File.createTempFile("actionfps-journal-older", ".log")
   val tmpFile = File.createTempFile("actionfps-journal", ".log")
-  val sampleFile = {
-    val A = new File("target/sample.log")
-    val B = new File("../target/sample.log")
-    if ( A.exists() ) A else B
-  }
+  val sampleFile = new File(System.getProperty("sample.log"))
 
 
   override protected def afterAll(): Unit = {
