@@ -2,9 +2,8 @@ import sbt._
 
 object Dependencies {
 
-  val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.0" % "test"
-  val scalatestOld: ModuleID = "org.scalatest" %% "scalatest" % "2.2.6" % "test"
-  val scalatestIt: ModuleID = "org.scalatest" %% "scalatest" % "2.2.6" % "it,test"
+  val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.0"
+  val scalatestOld: ModuleID = "org.scalatest" %% "scalatest" % "2.2.6"
   val json4s: ModuleID = "org.json4s" %% "json4s-jackson" % "3.4.2"
   val fastParse: ModuleID = "com.lihaoyi" %% "fastparse" % "0.4.2"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
@@ -30,7 +29,7 @@ object Dependencies {
   val akkaActor: ModuleID = akka("actor")
   val akkaAgent: ModuleID = akka("agent")
   val akkaslf: ModuleID = akka("slf4j")
-  val akkaTestkit: ModuleID = akka("testkit") % "test"
+  val akkaTestkit: ModuleID = akka("testkit")
 
   val mockito: ModuleID = "org.mockito" % "mockito-all" % "1.10.19"
 

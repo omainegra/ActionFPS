@@ -3,7 +3,6 @@ import org.scalatest.Inspectors._
 import org.scalatestplus.play.{HtmlUnitFactory, OneBrowserPerSuite, OneServerPerSuite, PlaySpec}
 
 
-//@RequiresPHP
 class IntegrationSpec
   extends PlaySpec
     with OneServerPerSuite

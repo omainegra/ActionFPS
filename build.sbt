@@ -100,8 +100,7 @@ lazy val web = project
       ws,
       async,
       scalatestPlus % "it,test",
-      akkaStreamTestkit % "it,test",
-      scalatestIt,
+      scalatestOld % "it,test",
       seleniumHtmlUnit % "it",
       seleniumJava % "it",
       cache,
@@ -214,7 +213,7 @@ lazy val ladderParser =
   )
     .settings(
       git.useGitDescribe := true,
-      libraryDependencies += scalatest,
+      libraryDependencies += scalatest % "test",
       libraryDependencies += gameParser
     )
 
@@ -242,7 +241,7 @@ lazy val testSuite = Project(
       s"-Dsample.log=${sampleLog.value}",
       s"-Dgeolitecity.dat=${geoLiteCity.value}"
     ),
-    libraryDependencies += scalatest,
+    libraryDependencies += scalatest % "test",
     libraryDependencies += akkaActor
   )
 
@@ -277,11 +276,16 @@ lazy val sampleLog = taskKey[File]("Sample Log")
 lazy val challonge = Project(
   id = "challonge",
   base = file("challonge")
-).settings(
-  libraryDependencies += scalatest,
-  libraryDependencies += async,
-  libraryDependencies += ws % "provided"
 )
+  .dependsOn(pureClanwar)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings: _*)
+  .settings(
+    libraryDependencies += scalatest % "it,test",
+    libraryDependencies += async,
+    libraryDependencies += ws % "provided",
+    libraryDependencies += akkaStreamTestkit % "it"
+  )
 
 def dontDocument = Seq(
   publishArtifact in(Compile, packageDoc) := false,

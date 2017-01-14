@@ -9,7 +9,7 @@ import scala.concurrent.duration._
   */
 class MasterServerSpec extends PlaySpec with OneServerPerSuite {
 
-  implicit def ws = app.injector.instanceOf[WSClient]
+  implicit def ws: WSClient = app.injector.instanceOf[WSClient]
 
   "Web" must {
     "Provide a master server" in {
