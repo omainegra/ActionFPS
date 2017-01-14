@@ -8,7 +8,7 @@ import java.io.File
 import java.util.concurrent.Executors
 import javax.inject._
 
-import af.streamreaders.IteratorTailerListenerAdapter
+import af.streamreaders.{IteratorTailerListenerAdapter, Scanner, TailedScannerReader}
 import akka.agent.Agent
 import com.actionfps.accumulation.GeoIpLookup
 import com.actionfps.accumulation.ValidServers.ImplicitValidServers._
@@ -23,12 +23,13 @@ import play.api.{Configuration, Logger}
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, blocking}
 import com.actionfps.formats.json.Formats._
+import com.actionfps.gameparser.GameScanner
 
 object JournalGamesProvider {
 
   def getJournalGames(logger: Logger, file: File): List[Game] = {
     val src = scala.io.Source.fromFile(file)
-    try src.getLines().scanLeft(GameScanner.zero)(GameScanner.scan).collect(GameScanner.collect).toList
+    try src.getLines().scanLeft(GameScanner.initial)(GameScanner.scan).collect(GameScanner.collect).toList
     finally src.close()
   }
 
@@ -91,7 +92,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
         case recent :: rest =>
           val adapter = new IteratorTailerListenerAdapter()
           val tailer = new Tailer(recent, adapter, 2000)
-          val reader = GameScanner.tailReader(adapter)
+          val reader = TailedScannerReader(adapter, Scanner(GameScanner.initial)(GameScanner.scan))
           ex.submit(tailer)
           applicationLifecycle.addStopHook(() => Future(tailer.stop()))
           val (initialRecentGames, tailIterator) = reader.collect(GameScanner.collect)
