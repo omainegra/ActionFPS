@@ -8,7 +8,7 @@ import org.apache.commons.csv.{CSVPrinter, CSVParser, CSVFormat}
 
 import scala.util.Try
 
-case class Registration(id: String, name: String, email: Option[String], registrationDate: LocalDateTime)
+case class Registration(id: String, name: String, email: Option[String], registrationDate: LocalDateTime, currentNickname: String)
 
 object Registration {
   val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
@@ -41,6 +41,7 @@ object Registration {
     CSVFormat.EXCEL.withHeader().parse(input).asScala.flatMap { rec =>
       for {
         id <- Option(rec.get("ID")).filter(_.nonEmpty)
+        currentNickname <- Option(rec.get("Current Nickname")).filter(_.nonEmpty)
         name <- Option(rec.get("Name")).filter(_.nonEmpty)
         email = Option(rec.get("E-mail")).filter(_.nonEmpty)
         registrationDate <- Try(LocalDateTime.parse(rec.get("Registration date"), dtf))
@@ -49,7 +50,8 @@ object Registration {
         id = id,
         name = name,
         email = email,
-        registrationDate = registrationDate
+        registrationDate = registrationDate,
+        currentNickname = currentNickname
       )
     }.toList
   }

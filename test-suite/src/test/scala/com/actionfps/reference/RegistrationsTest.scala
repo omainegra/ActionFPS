@@ -22,7 +22,7 @@ class RegistrationsTest
   }
   test("it should extract with e-mails") {
     val recs = Registration.parseRecords(getSample("registrations.csv"))
-    recs.head shouldBe Registration("sanzo", "Sanzo", Some("sanzo@actionfps.com"), LocalDateTime.parse("2015-01-14T11:25"))
+    recs.head shouldBe Registration("sanzo", "Sanzo", Some("sanzo@actionfps.com"), LocalDateTime.parse("2015-01-14T11:25"), "w00p|Sanzo")
     recs should have size 96
   }
 }
