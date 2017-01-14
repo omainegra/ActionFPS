@@ -9,7 +9,7 @@ import com.actionfps.gameparser.enrichers.IpLookup
 import play.api.inject._
 import play.api.{Configuration, Environment, Logger, Mode}
 import providers.full.{CachedProvider, FullProvider}
-import providers.games.{GamesProvider, JournalGamesProvider}
+import providers.games.{CombinedGamesProvider, GamesProvider}
 
 class GamesProviderDeciderModule extends Module {
 
@@ -18,7 +18,7 @@ class GamesProviderDeciderModule extends Module {
   override def bindings(environment: Environment, configuration: Configuration): List[Binding[_]] = {
     val a =
       if (configuration.getString("af.games.source").contains("journal")) {
-        List(bind[GamesProvider].to[JournalGamesProvider])
+        List(bind[GamesProvider].to[CombinedGamesProvider])
       } else Nil
 
     val b =

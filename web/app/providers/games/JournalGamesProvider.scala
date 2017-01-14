@@ -35,27 +35,6 @@ object JournalGamesProvider {
     finally src.close()
   }
 
-  /**
-    * Games from a TSV file of pre-built games.
-    * Much faster to load in than the Journal.
-    */
-  def gamesFromJournal(logger: Logger, file: File): List[Game] = {
-    val src = scala.io.Source.fromFile(file)
-    try src.getLines().filter(_.nonEmpty).map { line =>
-      line.split("\t").toList match {
-        case id :: _ :: _ :: jsonText :: Nil =>
-          Json.fromJson[Game](Json.parse(jsonText)) match {
-            case JsSuccess(good, _) => good
-            case e: JsError =>
-              throw new RuntimeException(s"Failed to parse JSON in ${file}: $jsonText")
-          }
-        case _ =>
-          throw new RuntimeException(s"Failed to parse line in ${file}: $line")
-      }
-    }.toList.filter(_.validate.isRight).filter(_.validateServer)
-    finally src.close
-  }
-
 }
 
 /**
@@ -63,8 +42,7 @@ object JournalGamesProvider {
   */
 @Singleton
 class JournalGamesProvider @Inject()(configuration: Configuration,
-                                     applicationLifecycle: ApplicationLifecycle,
-                                     batchGamesProvider: BatchFilesGamesProvider)
+                                     applicationLifecycle: ApplicationLifecycle)
                                     (implicit executionContext: ExecutionContext,
                                      ipLookup: IpLookup)
   extends GamesProvider {
@@ -83,11 +61,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
 
   applicationLifecycle.addStopHook(() => Future(lastTailerExecutor.shutdown()))
 
-  private val gamesA =
-    for {
-      batchGames <- batchGamesProvider.games
-      batchJournalGames <- gamesI(batchGames)
-    } yield batchJournalGames
+  private val gamesA = gamesI
 
   private def recentJournalFiles = journalFiles.toList.sortBy(_.lastModified()).reverse
 
@@ -107,7 +81,7 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
     initialRecentGames -> tailIterator
   }
 
-  private def gamesI(input: Map[String, JsonGame]) = Future {
+  private def gamesI = Future {
     blocking {
       val ib = batchJournalLoad()
       val (ij, tailIterator) = latestTailLoad().getOrElse(Nil -> Iterator.empty)
@@ -117,19 +91,22 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
         .filter(_.validateServer)
         .map(g => g.id -> g.withGeo)
         .toMap
-      val gamesAgent = Agent(jigm ++ input)
-      lastTailerExecutor.submit(new Runnable {
-        override def run(): Unit = {
-          tailIterator.foreach { game =>
-            if (game.validate.isRight && game.validateServer) {
-              val gg = game.withGeo.flattenPlayers
-              gamesAgent.send(_.updated(gg.id, gg))
-              hooks.get().foreach(h => h(gg))
-            }
-          }
-        }
-      })
+      val gamesAgent = Agent(jigm)
+      lastTailerExecutor.submit(new TailProcess(gamesAgent, tailIterator))
       gamesAgent
+    }
+  }
+
+  private class TailProcess(gamesAgent: Agent[Map[String, JsonGame]],
+                            tailIterator: Iterator[JsonGame]) extends Runnable {
+    override def run(): Unit = {
+      tailIterator.foreach { game =>
+        if (game.validate.isRight && game.validateServer) {
+          val gg = game.withGeo.flattenPlayers
+          gamesAgent.send(_.updated(gg.id, gg))
+          hooks.get().foreach(h => h(gg))
+        }
+      }
     }
   }
 

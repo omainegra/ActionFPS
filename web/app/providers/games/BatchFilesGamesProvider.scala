@@ -9,7 +9,6 @@ import javax.inject.Inject
 import java.io.File
 import javax.inject._
 
-import com.actionfps.accumulation.GeoIpLookup
 import com.actionfps.accumulation.ValidServers.ImplicitValidServers._
 import com.actionfps.accumulation.ValidServers.Validator._
 import com.actionfps.api.Game
@@ -30,7 +29,7 @@ object BatchFilesGamesProvider {
     * Games from a TSV file of pre-built games.
     * Much faster to load in than the Journal.
     */
-  def gamesFromJournal(logger: Logger, file: File): List[Game] = {
+  private def gamesFromJournal(logger: Logger, file: File): List[Game] = {
     val src = scala.io.Source.fromFile(file)
     try src.getLines().filter(_.nonEmpty).map { line =>
       line.split("\t").toList match {
@@ -50,8 +49,10 @@ object BatchFilesGamesProvider {
   def gamesFromFiles(logger: Logger, files: List[File])
                     (implicit ipLookup: IpLookup): Map[String, JsonGame] = {
     files.par.flatMap { file =>
-      JournalGamesProvider.gamesFromJournal(logger, file)
-    }.map(g => g.id -> g.withGeo.flattenPlayers).toList.toMap
+      gamesFromJournal(logger, file)
+    }.filter(_.validate.isRight)
+      .filter(_.validateServer)
+      .map(g => g.id -> g.withGeo.flattenPlayers).toList.toMap
   }
 
 }
