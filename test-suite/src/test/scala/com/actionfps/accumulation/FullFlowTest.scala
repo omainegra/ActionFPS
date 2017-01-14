@@ -2,8 +2,8 @@ package com.actionfps.accumulation
 
 import java.io.{File, FileWriter}
 
+import com.actionfps.gameparser.GameScanner
 import com.actionfps.gameparser.enrichers._
-import com.actionfps.gameparser.mserver.{MultipleServerParser, MultipleServerParserFoundGame}
 import com.actionfps.reference.{ClanRecord, NicknameRecord, Registration}
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.Json
@@ -27,7 +27,7 @@ class FullFlowTest
   val testSuitePath: File = {
     val A = new File("test-suite")
     val B = new File("../test-suite")
-    if ( A.exists() ) A else B
+    if (A.exists()) A else B
   }
 
 
@@ -36,9 +36,9 @@ class FullFlowTest
     val validServers = ValidServers.fromResource
     scala.io.Source.fromFile(sampleFile)(Codec.UTF8)
       .getLines()
-      .scanLeft(MultipleServerParser.empty)(_.process(_))
-      .collect { case m: MultipleServerParserFoundGame => m }
-      .flatMap { m => m.cg.validate.right.toOption }
+      .scanLeft(GameScanner.initial)(GameScanner.scan)
+      .collect(GameScanner.collect)
+      .flatMap(_.validate.right.toOption)
       .map { m => m.withUsers.withClans.withGeo(GeoIpLookup) }
       .flatMap { g =>
         validServers.items.get(g.server).map { vs =>
