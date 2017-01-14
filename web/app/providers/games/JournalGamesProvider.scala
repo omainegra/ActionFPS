@@ -10,7 +10,6 @@ import javax.inject._
 
 import af.streamreaders.{IteratorTailerListenerAdapter, Scanner, TailedScannerReader}
 import akka.agent.Agent
-import com.actionfps.accumulation.GeoIpLookup
 import com.actionfps.accumulation.ValidServers.ImplicitValidServers._
 import com.actionfps.accumulation.ValidServers.Validator._
 import com.actionfps.api.Game
@@ -27,13 +26,20 @@ import com.actionfps.gameparser.GameScanner
 
 object JournalGamesProvider {
 
-  def getJournalGames(logger: Logger, file: File): List[Game] = {
+  /**
+    * Games from server log (syslog format)
+    */
+  def gamesFromServerLog(logger: Logger, file: File): List[Game] = {
     val src = scala.io.Source.fromFile(file)
     try src.getLines().scanLeft(GameScanner.initial)(GameScanner.scan).collect(GameScanner.collect).toList
     finally src.close()
   }
 
-  def getGamesSnapshot(logger: Logger, file: File): List[Game] = {
+  /**
+    * Games from a TSV file of pre-built games.
+    * Much faster to load in than the Journal.
+    */
+  def gamesFromJournal(logger: Logger, file: File): List[Game] = {
     val src = scala.io.Source.fromFile(file)
     try src.getLines().filter(_.nonEmpty).map { line =>
       line.split("\t").toList match {
@@ -57,8 +63,10 @@ object JournalGamesProvider {
   */
 @Singleton
 class JournalGamesProvider @Inject()(configuration: Configuration,
-                                     applicationLifecycle: ApplicationLifecycle)
-                                    (implicit executionContext: ExecutionContext)
+                                     applicationLifecycle: ApplicationLifecycle,
+                                     batchGamesProvider: BatchFilesGamesProvider)
+                                    (implicit executionContext: ExecutionContext,
+                                     ipLookup: IpLookup)
   extends GamesProvider {
 
   val logger = Logger(getClass)
@@ -70,42 +78,47 @@ class JournalGamesProvider @Inject()(configuration: Configuration,
   override def removeHook(f: (JsonGame) => Unit): Unit = hooks.send(_ - f)
 
   private val journalFiles = configuration.underlying.getStringList("af.journal.paths").asScala.map(new File(_))
-  private val gamesDatas = configuration.underlying.getStringList("af.ladder.games-data").asScala.map(new File(_))
 
-  implicit private val geoIp = GeoIpLookup
-  private val ex = Executors.newFixedThreadPool(journalFiles.size + 1)
-  applicationLifecycle.addStopHook(() => Future(ex.shutdown()))
+  private val lastTailerExecutor = Executors.newFixedThreadPool(1)
 
-  val gamesDataF = Future {
-    blocking {
-      gamesDatas.par.flatMap { file =>
-        JournalGamesProvider.getGamesSnapshot(logger, file)
-      }.map(g => g.id -> g.withGeo.flattenPlayers).toList.toMap
-    }
+  applicationLifecycle.addStopHook(() => Future(lastTailerExecutor.shutdown()))
+
+  private val gamesA =
+    for {
+      batchGames <- batchGamesProvider.games
+      batchJournalGames <- gamesI(batchGames)
+    } yield batchJournalGames
+
+  private def recentJournalFiles = journalFiles.toList.sortBy(_.lastModified()).reverse
+
+  private def batchJournalLoad() = {
+    recentJournalFiles.drop(1).par.map { file =>
+      JournalGamesProvider.gamesFromServerLog(logger, file)
+    }.toList.flatten
   }
 
-  private val gamesA = for {d <- gamesDataF; d <- gamesI(d)} yield d
+  private def latestTailLoad() = recentJournalFiles.headOption.map { recent =>
+    val adapter = new IteratorTailerListenerAdapter()
+    val tailer = new Tailer(recent, adapter, 2000)
+    val reader = TailedScannerReader(adapter, Scanner(GameScanner.initial)(GameScanner.scan))
+    lastTailerExecutor.submit(tailer)
+    applicationLifecycle.addStopHook(() => Future(tailer.stop()))
+    val (initialRecentGames, tailIterator) = reader.collect(GameScanner.collect)
+    initialRecentGames -> tailIterator
+  }
 
   private def gamesI(input: Map[String, JsonGame]) = Future {
     blocking {
-      val (initialGames, tailIterator) = journalFiles.toList.sortBy(_.lastModified()).reverse match {
-        case recent :: rest =>
-          val adapter = new IteratorTailerListenerAdapter()
-          val tailer = new Tailer(recent, adapter, 2000)
-          val reader = TailedScannerReader(adapter, Scanner(GameScanner.initial)(GameScanner.scan))
-          ex.submit(tailer)
-          applicationLifecycle.addStopHook(() => Future(tailer.stop()))
-          val (initialRecentGames, tailIterator) = reader.collect(GameScanner.collect)
-          val otherGames = rest.par.map { file =>
-            JournalGamesProvider.getJournalGames(logger, file)
-          }.toList.flatten
-          (otherGames ++ initialRecentGames, tailIterator)
-        case Nil =>
-          (List.empty, Iterator.empty)
-      }
-      val jigm = initialGames.filter(_.validate.isRight).filter(_.validateServer).map(g => g.id -> g.withGeo).toMap
+      val ib = batchJournalLoad()
+      val (ij, tailIterator) = latestTailLoad().getOrElse(Nil -> Iterator.empty)
+      val initialGames = ib ++ ij
+      val jigm = initialGames
+        .filter(_.validate.isRight)
+        .filter(_.validateServer)
+        .map(g => g.id -> g.withGeo)
+        .toMap
       val gamesAgent = Agent(jigm ++ input)
-      ex.submit(new Runnable {
+      lastTailerExecutor.submit(new Runnable {
         override def run(): Unit = {
           tailIterator.foreach { game =>
             if (game.validate.isRight && game.validateServer) {

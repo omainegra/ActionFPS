@@ -15,13 +15,10 @@ import play.api.libs.json.Json
 /**
   * Created by William on 01/01/2016.
   *
-  * Get games from the /all/ endpoint of the public API.
-  * This endpoint is guaranteed to be there forever.
-  * TODO caching / indexing
   */
 @Singleton
-class ApiAllGamesProvider @Inject()(configuration: Configuration)
-                                   (implicit executionContext: ExecutionContext,
+class BatchURLGamesProvider @Inject()(configuration: Configuration)
+                                     (implicit executionContext: ExecutionContext,
                                     wSClient: WSClient) extends GamesProvider {
 
   private def allPath = configuration.underlying.getString("af.reference.games")
