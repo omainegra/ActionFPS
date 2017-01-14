@@ -13,7 +13,7 @@ libraryDependencies ++= Seq(
   "commons-io" % "commons-io" % "2.5"
 )
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4.12"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test,fun"
 git.useGitDescribe := true
 fork := true
 organization := "com.actionfps"
@@ -23,4 +23,7 @@ bintrayVcsUrl := Some("git@github.com:ActionFPS/server-pinger.git")
 licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
 enablePlugins(JavaAppPackaging)
 libraryDependencies += json
-cancelable := true
+cancelable in Global := true
+lazy val FunTest = config("fun") extend (Test)
+configs(FunTest)
+inConfig(FunTest)(Defaults.testSettings)

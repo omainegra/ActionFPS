@@ -1,9 +1,6 @@
 package com.actionfps.pinger
 
-import java.io.{FileOutputStream, ObjectOutputStream}
 import java.net.InetSocketAddress
-import java.time.{LocalDateTime, ZonedDateTime}
-import java.util.zip.GZIPOutputStream
 
 import akka.actor.{ActorLogging, Props, Terminated}
 import akka.io.{IO, Udp}
@@ -57,7 +54,6 @@ class Pinger(implicit serverMappings: ServerMappings) extends Act with ActorLogg
                 log.debug(s"Changed:  $r")
               case o =>
                 log.debug(s"Unchanged: $o")
-              //                println("Not collected", from, o, stuff)
             }
           }
         case sp@SendPings(ip, port) =>

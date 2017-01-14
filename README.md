@@ -59,7 +59,7 @@ Currently it's set to `https://actionfps.com/servers/?format=csv`.
 ## Running the tests
 
 ```bash
-$ sbt test
+$ sbt test fun:test
 ```
 
 ## Publishing
