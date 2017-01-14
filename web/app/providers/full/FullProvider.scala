@@ -15,7 +15,6 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[FullProviderImpl])
 abstract class FullProvider()(implicit executionContext: ExecutionContext) {
 
-
   protected[providers] def fullStuff: Future[Agent[FullIterator]]
 
   def getRecent(n: Int): Future[List[JsonGame]] =

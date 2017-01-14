@@ -26,7 +26,7 @@ class GamesProviderDeciderModule extends Module {
     val b =
       if (configuration.getBoolean("af.full.cache").contains(false))
         Nil
-      else if (environment.mode == Mode.Dev) {
+      else if (environment.mode == Mode.Dev || configuration.getBoolean("af.full.cache").contains(true)) {
         List(bind[FullProvider].to[CachedProvider])
       } else Nil
 
