@@ -20,13 +20,18 @@ licenses in ThisBuild += ("Apache-2.0", url("https://www.apache.org/licenses/LIC
 lazy val gameParser = Project(id = "game-parser", base = file("game-parser"))
   .dependsOn(pureGame)
   .settings(
-    libraryDependencies += "com.lihaoyi" %% "fastparse" % "0.4.2",
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+    libraryDependencies += "com.lihaoyi" %% "fastparse" % "0.4.2"
   )
+    libraryDependencies in ThisBuild += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 
 lazy val pureGame = Project(id = "pure-game", base = file("pure-game"))
 
 lazy val root = project
   .in(file("."))
-  .aggregate(gameParser, pureGame)
+  .aggregate(gameParser, pureGame, app)
+  .settings(publish := {})
+
+lazy val app = project
+  .enablePlugins(JavaAppPackaging)
+  .dependsOn(gameParser)
   .settings(publish := {})
