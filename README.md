@@ -124,3 +124,104 @@ pipe> ./individual_to_common_format.pl --server-name=woop.ac:1999 --server-ip=62
 2016-09-01T15:51:21Z woop.ac:1999 62.210.131.155:1999 Status at 01-09-2016 15:51:21: 0 ...
 2016-09-01T16:21:15Z woop.ac:1999 62.210.131.155:1999 [195.236.145.100] client connected
 ```
+
+# Ideal state format
+
+Ideally a game's state is outputted as an XML or JSON string. A single long line is 
+preferred to a bunch of split up lines, to minimise the parsing work.
+
+The output should contain as much information as possible, with as few 
+indirections as possible. E.g. if it's a TDM then don't include a 'flags' field.
+
+Take inspiration from https://actionfps.com/game/?id=2015-04-04T14:09:12Z&format=json :
+
+```json
+{
+  "id": "2015-04-04T14:09:12Z",
+  "endTime": "2015-04-04T10:06:05-04:00",
+  "map": "ac_ingress",
+  "mode": "ctf",
+  "state": "match",
+  "teams": [
+    {
+      "name": "RVSF",
+      "flags": 13,
+      "frags": 119,
+      "players": [
+        {
+          "name": "STK#TiAg0",
+          "score": 1013,
+          "flags": 8,
+          "frags": 51,
+          "deaths": 36,
+          "clan": "stk",
+          "countryCode": "BR",
+          "countryName": "Brazil",
+          "timezone": "America/Sao_Paulo"
+        },
+        {
+          "name": "Lozi",
+          "score": 856,
+          "flags": 5,
+          "frags": 68,
+          "deaths": 41,
+          "user": "lozi",
+          "countryCode": "BR",
+          "countryName": "Brazil",
+          "timezone": "America/Sao_Paulo"
+        }
+      ]
+    },
+    {
+      "name": "CLA",
+      "flags": 3,
+      "frags": 76,
+      "players": [
+        {
+          "name": "FD*Federico.",
+          "score": 393,
+          "flags": 2,
+          "frags": 35,
+          "deaths": 60,
+          "user": "fede",
+          "clan": "fd",
+          "countryCode": "IT",
+          "countryName": "Italy",
+          "timezone": "Europe/Rome"
+        },
+        {
+          "name": "STK#Yang*",
+          "score": 474,
+          "flags": 1,
+          "frags": 41,
+          "deaths": 55,
+          "clan": "stk",
+          "countryCode": "BR",
+          "countryName": "Brazil",
+          "timezone": "America/Sao_Paulo"
+        }
+      ]
+    }
+  ],
+  "server": "104.219.54.14 tyrwoopac AssaultCube[local#1999]",
+  "duration": 15,
+  "achievements": [
+    {
+      "user": "lozi",
+      "text": "Lozi became Flag Master"
+    }
+  ],
+  "startTime": "2015-04-04T09:51:05-04:00",
+  "winner": "RVSF"
+}
+```
+
+# Ideal future logging
+
+The less context per each line, the better. For example, instead of showing
+`[1.2.3.4] w00p|Drakas fragged w00p|pwns`, let's remove the indirection by
+including an IP address of the other person, as well as a CN of that person.
+
+Including the current team? Not sure if that's useful.
+
+Let's just start from the most basic stuff, which is time.
