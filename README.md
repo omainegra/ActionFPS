@@ -16,7 +16,9 @@ They will have to be fixed in the server itself though.
 
 ## Current syslog format
 
+```
 Date: 2016-05-14T13:00:40.944Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#1999], Payload: Team  CLA:  3 players,    5 frags
+```
 
 ## Server ID / hostname problem
 
@@ -33,6 +35,7 @@ as the format is varying and unpredictable.
 
 As we are using syslog to collect the events, we make use of the syslog timestamp
  to attach a timestamp to the full message, to produce in syslog-ac the following:
+
 ```
 Date: 2016-05-14T13:00:40.944Z, Server: 62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#1999], Payload: Team  CLA:  3 players,    5 frags
 ```
