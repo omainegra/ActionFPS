@@ -2,37 +2,41 @@ package providers.games
 
 import javax.inject.{Inject, Singleton}
 
-import akka.agent.Agent
-import com.actionfps.api.Game
-import com.actionfps.gameparser.enrichers.JsonGame
-import play.api.Configuration
-import play.api.libs.ws.WSClient
+import com.actionfps.gameparser.enrichers.{IpLookup, JsonGame}
+import lib.GamesFromSource
+import play.api.{Configuration, Logger}
 
+import collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
-import com.actionfps.formats.json.Formats._
-import play.api.libs.json.Json
 
 /**
   * Created by William on 01/01/2016.
-  *
+  * TODO in dev mode this reloads all the data in the background for no reason
   */
 @Singleton
-class BatchURLGamesProvider @Inject()(configuration: Configuration)
-                                     (implicit executionContext: ExecutionContext,
-                                    wSClient: WSClient) extends GamesProvider {
+class BatchURLGamesProvider(urls: List[String])
+                           (implicit executionContext: ExecutionContext,
+                            ipLookup: IpLookup) extends GamesProvider {
 
-  private def allPath = configuration.underlying.getString("af.reference.games")
-
-  private def fetchAllGames = wSClient.url(allPath).get().map(response =>
-    response.body.split("\n").toIterator.map { line =>
-      line.split("\t").toList match {
-        case List(id, json) =>
-          id -> Json.fromJson[Game](Json.parse(json)).get.flattenPlayers
-      }
-    }.toMap
+  @Inject() def this(configuration: Configuration)
+                    (implicit executionContext: ExecutionContext,
+                     ipLookup: IpLookup) = this(
+    configuration.underlying.getStringList("af.games.urls").asScala.toList
   )
 
-  private val allGamesFA = fetchAllGames.map(m => Agent(m))
+  private implicit val logger = Logger(getClass)
 
-  override def games: Future[Map[String, JsonGame]] = allGamesFA.map(_.get())
+  override val games: Future[Map[String, JsonGame]] = Future {
+    concurrent.blocking {
+      urls.par.map { path =>
+        GamesFromSource.load {
+          logger.info(s"Loading games from ${path}")
+          scala.io.Source.fromURL(path)
+        }
+      }.flatten
+        .map(g => g.id -> g)
+        .toList
+        .toMap
+    }
+  }
 }

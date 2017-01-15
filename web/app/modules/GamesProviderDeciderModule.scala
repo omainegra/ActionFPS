@@ -9,26 +9,20 @@ import com.actionfps.gameparser.enrichers.IpLookup
 import play.api.inject._
 import play.api.{Configuration, Environment, Logger, Mode}
 import providers.full.{CachedProvider, FullProvider}
-import providers.games.{CombinedGamesProvider, GamesProvider}
+
+import scala.collection.mutable
 
 class GamesProviderDeciderModule extends Module {
 
   val logger = Logger(getClass)
 
   override def bindings(environment: Environment, configuration: Configuration): List[Binding[_]] = {
-    val a =
-      if (configuration.getString("af.games.source").contains("journal")) {
-        List(bind[GamesProvider].to[CombinedGamesProvider])
-      } else Nil
-
-    val b =
-      if (configuration.getBoolean("af.full.cache").contains(false))
-        Nil
-      else if (environment.mode == Mode.Dev || configuration.getBoolean("af.full.cache").contains(true)) {
-        List(bind[FullProvider].to[CachedProvider])
-      } else Nil
-
-    a ++ b ++ List(bind[IpLookup].toInstance(GeoIpLookup))
+    val bindings = mutable.Buffer.empty[Binding[_]]
+    bindings += bind[IpLookup].toInstance(GeoIpLookup)
+    if (environment.mode == Mode.Dev || configuration.getBoolean("af.full.cache").contains(true)) {
+      bindings += bind[FullProvider].to[CachedProvider]
+    }
+    bindings.toList
   }
 
 }

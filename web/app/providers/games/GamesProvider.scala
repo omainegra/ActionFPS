@@ -9,9 +9,7 @@ import scala.concurrent.Future
 /**
   * Created by William on 01/01/2016.
   */
-//@ImplementedBy(classOf[ApiGamesProvider]) // this one will always be up to date as it calls from live api
-@ImplementedBy(classOf[BatchURLGamesProvider])
-//@ImplementedBy(classOf[SingleJournalGamesProvider])
+@ImplementedBy(classOf[CombinedGamesProvider])
 trait GamesProvider {
 
   def addHook(hook: JsonGame => Unit): Unit = ()

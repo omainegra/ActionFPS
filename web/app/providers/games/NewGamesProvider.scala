@@ -25,7 +25,6 @@ import scala.concurrent.duration._
   */
 @Singleton
 class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
-                                 configuration: Configuration,
                                  common: Common,
                                  gamesProvider: GamesProvider)
                                 (implicit actorSystem: ActorSystem,
