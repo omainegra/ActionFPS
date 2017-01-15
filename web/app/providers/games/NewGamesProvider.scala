@@ -8,7 +8,7 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
 import com.actionfps.formats.json.Formats._
 import com.actionfps.gameparser.enrichers.JsonGame
-import controllers.Common
+import lib.WebTemplateRender
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
@@ -25,7 +25,7 @@ import scala.concurrent.duration._
   */
 @Singleton
 class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
-                                 common: Common,
+                                 common: WebTemplateRender,
                                  gamesProvider: GamesProvider)
                                 (implicit actorSystem: ActorSystem,
                                  executionContext: ExecutionContext) {

@@ -14,6 +14,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by me on 31/12/2016.
+  *
+  * Take Clanwars [[NewClanwarCompleted]] into [[ChallongeClient]] via [[WinFlow]].
+  *
+  * Publishes Clanwar results to Challonge.
+  *
   */
 @Singleton
 class ChallongeService @Inject()(challongeClient: ChallongeClient, applicationLifecycle: ApplicationLifecycle)

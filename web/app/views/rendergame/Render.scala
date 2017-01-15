@@ -2,6 +2,7 @@ package views.rendergame
 
 import com.actionfps.api.GameTeam
 import com.actionfps.gameparser.enrichers.JsonGamePlayer
+import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import play.twirl.api.Html
@@ -10,6 +11,8 @@ import play.twirl.api.Html
   * Created by me on 17/12/2016.
   */
 object Render {
+
+  private def renderGameHtmlPath = WebTemplateRender.wwwLocation.resolve("render_game.html").toFile
 
   def fillHeader(target: Element, mixedGame: MixedGame): Unit = {
     mixedGame.url.foreach(url => target.select("a").first().attr("href", url))
@@ -41,7 +44,7 @@ object Render {
   }
 
   def renderMixedGame(mixedGame: MixedGame): Html = {
-    val doc = Jsoup.parse(lib.Soup.wwwLocation.resolve("render_game.html").toFile, "UTF-8")
+    val doc = Jsoup.parse(renderGameHtmlPath, "UTF-8")
     fillHeader(doc.select("header").first(), mixedGame)
     doc.select("article").addClass(mixedGame.className).attr("style", mixedGame.bgStyle)
 

@@ -10,6 +10,7 @@ import javax.inject._
 import akka.agent.Agent
 import com.actionfps.ladder.ProcessTailer
 import com.actionfps.ladder.parser._
+import lib.WebTemplateRender
 import play.api.{Configuration, Logger}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.Json
@@ -22,7 +23,7 @@ import scala.util.control.NonFatal
 @Singleton
 class LadderController @Inject
 ()(applicationLifecycle: ApplicationLifecycle,
-   common: Common,
+   common: WebTemplateRender,
    configuration: Configuration,
    referenceProvider: ReferenceProvider)
 (implicit executionContext: ExecutionContext) extends Controller {
@@ -67,8 +68,7 @@ class LadderController @Inject
       case _ =>
         Ok(common.renderTemplate(
           title = Some("Ladder"),
-          supportsJson = true,
-          login = None)
+          supportsJson = true)
         (views.ladder.Table.render(agg.get().total)(showTime = true)))
     }
   }

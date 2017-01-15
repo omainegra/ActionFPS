@@ -3,7 +3,7 @@
 ->          /all/                           controllers.AllGames
 GET         /assets/*file                   @controllers.Forwarder.getAsset(file: String)
 
-GET         /                               @controllers.GamesController.index
+GET         /                               @controllers.IndexController.index
 GET         /game/                          @controllers.GamesController.game(id: String)
 GET         /clans/                         @controllers.ClansController.clans
 GET         /rankings/                      @controllers.ClansController.rankings

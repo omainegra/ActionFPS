@@ -3,6 +3,7 @@ package controllers
 import java.nio.file.{Files, Path}
 import javax.inject.{Inject, Singleton}
 
+import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.Environment
@@ -11,14 +12,16 @@ import play.api.routing.SimpleRouter
 
 /**
   * Created by me on 29/12/2016.
+  *
+  * Serve static pages and render them in the template.
   */
 @Singleton
-class StaticPageRouter @Inject()(common: Common, environment: Environment) extends SimpleRouter {
+class StaticPageRouter @Inject()(common: WebTemplateRender, environment: Environment) extends SimpleRouter {
 
   import collection.JavaConverters._
 
   private def urlPathToLocalPath: List[PageSpec] = Files
-    .list(lib.Soup.wwwLocation)
+    .list(WebTemplateRender.wwwLocation)
     .iterator()
     .asScala
     .filter(_.toString.endsWith(".html"))

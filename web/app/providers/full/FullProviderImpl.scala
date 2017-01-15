@@ -18,6 +18,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by William on 01/01/2016.
+  *
+  * @usecase Combined Reference Data with Game Data.
+  *          Emits events on new games.
+  * @todo Come up with a better name, perhaps separate many of the concerns as well.
   */
 @Singleton
 class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,

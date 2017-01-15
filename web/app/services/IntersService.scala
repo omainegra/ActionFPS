@@ -1,9 +1,5 @@
 package services
 
-/**
-  * Created by William on 13/01/2016.
-  */
-
 import java.io.File
 import java.time.ZonedDateTime
 import javax.inject._
@@ -32,13 +28,16 @@ import scala.util.{Failure, Success}
 
 /**
   * Created by William on 09/12/2015.
+  *
+  * Notify clients of an '!inter' message on a server by a registered user.
   */
 @Singleton
 class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
                               referenceProvider: ReferenceProvider,
-                              configuration: Configuration)(implicit
-                                                            actorSystem: ActorSystem,
-                                                            executionContext: ExecutionContext) {
+                              configuration: Configuration
+                             )(implicit
+                               actorSystem: ActorSystem,
+                               executionContext: ExecutionContext) {
 
   private val logger = Logger(getClass)
 

@@ -5,7 +5,7 @@ package providers.games
   */
 
 import java.io.File
-import java.util.concurrent.Executors
+import java.util.concurrent.{ExecutorService, Executors}
 import javax.inject._
 
 import af.streamreaders.{IteratorTailerListenerAdapter, Scanner, TailedScannerReader}
@@ -36,7 +36,8 @@ object JournalGamesProvider {
 }
 
 /**
-  * Load in the list of journals - and tail the last one to grab the games.
+  * @usecase Load in the list of journals - and tail the last one to grab the games.
+  * @todo Remove dependency on ExecutorService.
   */
 @Singleton
 class JournalGamesProvider(journalFiles: List[File])
@@ -60,21 +61,25 @@ class JournalGamesProvider(journalFiles: List[File])
 
   override def removeHook(f: (JsonGame) => Unit): Unit = hooks.send(_ - f)
 
-  private val lastTailerExecutor = Executors.newFixedThreadPool(1)
+  private val lastTailerExecutor: ExecutorService = Executors.newFixedThreadPool(1)
 
   applicationLifecycle.addStopHook(() => Future(lastTailerExecutor.shutdown()))
 
-  private val gamesA = gamesI
+  private val gamesAgentStatic: Future[Agent[Map[String, JsonGame]]] = gamesAgent
 
-  private def recentJournalFiles = journalFiles.sortBy(_.lastModified()).reverse
+  private def recentJournalFiles: List[File] = journalFiles.sortBy(_.lastModified()).reverse
 
-  private def batchJournalLoad() = {
+  private def batchJournalLoad(): List[JsonGame] = {
     recentJournalFiles.drop(1).par.map { file =>
       JournalGamesProvider.gamesFromServerLog(logger, file)
-    }.toList.flatten
+    }.flatten.toList
   }
 
-  private def latestTailLoad() = recentJournalFiles.headOption.map { recent =>
+  /**
+    * @warning Uses [[lastTailerExecutor]]. Do not call multiple times.
+    * @return A list of Batched and Streamed JsonGames.
+    */
+  private def latestTailLoad(): Option[(List[JsonGame], Iterator[JsonGame])] = recentJournalFiles.headOption.map { recent =>
     val adapter = new IteratorTailerListenerAdapter()
     val tailer = new Tailer(recent, adapter, 2000)
     val reader = TailedScannerReader(adapter, Scanner(GameScanner.initial)(GameScanner.scan))
@@ -84,7 +89,10 @@ class JournalGamesProvider(journalFiles: List[File])
     initialRecentGames -> tailIterator
   }
 
-  private def gamesI = {
+  /**
+    * Build an agent of Batches Game map.
+    */
+  private def gamesAgent: Future[Agent[Map[String, JsonGame]]] = {
     val previousLoadFuture = Future(blocking(batchJournalLoad()))
     val currentLoadPlusIteratorFuture = Future(blocking(latestTailLoad()))
     import scala.async.Async._
@@ -128,6 +136,6 @@ class JournalGamesProvider(journalFiles: List[File])
     }
   }
 
-  override def games: Future[Map[String, JsonGame]] = gamesA.map(_.get())
+  override def games: Future[Map[String, JsonGame]] = gamesAgentStatic.map(_.get())
 
 }

@@ -3,6 +3,7 @@ package views.player
 import java.nio.file.Files
 
 import com.actionfps.gameparser.Maps
+import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser
 import play.api.mvc.Result
@@ -13,8 +14,11 @@ import play.api.mvc.Results.Ok
   */
 case class Signature(playername: String, countrycode: Option[String], interrank: Option[Int], ladderrank: Option[Int], gamecount: Option[Int],
                      map: Option[String]) {
+
+  private def sigTemplateSvgPath = WebTemplateRender.wwwLocation.resolve("sig-template.svg")
+
   def result: Result = {
-    val tplBytes = Files.readAllBytes(lib.Soup.wwwLocation.resolve("sig-template.svg"))
+    val tplBytes = Files.readAllBytes(sigTemplateSvgPath)
     val tplString = new String(tplBytes, "UTF-8")
     val baseUrl = "https://actionfps.com/"
     val doc = Jsoup.parse(tplString, baseUrl, Parser.xmlParser())

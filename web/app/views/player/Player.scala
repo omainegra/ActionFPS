@@ -7,6 +7,7 @@ import com.actionfps.achievements.AchievementsRepresentation
 import com.actionfps.achievements.immutable.CaptureMapCompletion.{Achieved, Achieving}
 import com.actionfps.achievements.immutable.CaptureMaster
 import com.actionfps.ladder.parser.Aggregate.RankedStat
+import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import play.twirl.api.Html
@@ -15,6 +16,8 @@ import play.twirl.api.Html
   * Created by me on 17/12/2016.
   */
 object Player {
+
+  private def playerHtmlPath = WebTemplateRender.wwwLocation.resolve("player.html").toFile
 
   def progress_val(percent: Int): Either[Int, Int] = {
     if (percent <= 50) Right(Math.round(90 + 3.6 * percent).toInt)
@@ -80,7 +83,7 @@ object Player {
   }
 
   def render(player: FullProfile, rankedStat: Option[RankedStat]): Html = {
-    val htmlB = Jsoup.parse(lib.Soup.wwwLocation.resolve("player.html").toFile, "UTF-8")
+    val htmlB = Jsoup.parse(playerHtmlPath, "UTF-8")
     val doc = htmlB
     doc.select("h1").first().text(player.user.nickname.nickname)
     val signatureHref = s"/player/signature.svg?id=${player.user.id}"

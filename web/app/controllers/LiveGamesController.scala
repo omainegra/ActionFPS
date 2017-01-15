@@ -10,7 +10,6 @@ import services.PingerService
   * Created by me on 30/08/2016.
   */
 class LiveGamesController @Inject()(pingerService: PingerService) extends Controller {
-
   def serverUpdates = Action {
     Ok.chunked(
       content = {

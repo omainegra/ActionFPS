@@ -18,7 +18,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, blocking}
 
 /**
-  * Load games TSV files. A result of materializing the Journal stream.
+  * @usecase Load games TSV files. A result of materializing the Journal stream.
   */
 @Singleton
 class BatchFilesGamesProvider(files: List[File])

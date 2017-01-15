@@ -11,7 +11,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by William on 01/01/2016.
-  * TODO in dev mode this reloads all the data in the background for no reason
+  *
+  * @usecase Load games from a list of URLs.
+  * @todo Prevent reload in dev mode as not necessary.
   */
 @Singleton
 class BatchURLGamesProvider(urls: List[String])

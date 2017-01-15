@@ -1,6 +1,7 @@
 package views
 
 import com.actionfps.players.PlayersStats
+import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import play.twirl.api.Html
 
@@ -8,8 +9,11 @@ import play.twirl.api.Html
   * Created by me on 17/12/2016.
   */
 object PlayerRanks {
+
+  private def playerRanksHtmlPath = WebTemplateRender.wwwLocation.resolve("player_ranks.html")
+
   def render(playersStats: PlayersStats): Html = {
-    val htmlB = Jsoup.parse(lib.Soup.wwwLocation.resolve("player_ranks.html").toFile, "UTF-8")
+    val htmlB = Jsoup.parse(playerRanksHtmlPath.toFile, "UTF-8")
 
     val trs = htmlB.select("tbody > tr")
     playersStats.onlyRanked.players.values.toList.sortBy(_.rank).map { player =>

@@ -3,6 +3,7 @@ package views.ladder
 import java.time.format.DateTimeFormatter
 
 import com.actionfps.ladder.parser.Aggregate
+import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import play.twirl.api.Html
 
@@ -10,8 +11,11 @@ import play.twirl.api.Html
   * Created by me on 17/12/2016.
   */
 object Table {
+
+  private def ladderTableHtmlPath = WebTemplateRender.wwwLocation.resolve("ladder_table.html")
+
   def render(aggregate: com.actionfps.ladder.parser.Aggregate)(showTime: Boolean = false): Html = {
-    val doc = Jsoup.parse(lib.Soup.wwwLocation.resolve("ladder_table.html").toFile, "UTF-8")
+    val doc = Jsoup.parse(ladderTableHtmlPath.toFile, "UTF-8")
     val tr = doc.select("tbody > tr")
     aggregate.ranked.map { case Aggregate.RankedStat(id, rankM1, us) =>
       val target = tr.first().clone()

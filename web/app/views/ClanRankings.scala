@@ -1,6 +1,7 @@
 package views
 
 import com.actionfps.stats.Clanstats
+import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import play.twirl.api.Html
 
@@ -8,8 +9,11 @@ import play.twirl.api.Html
   * Created by me on 17/12/2016.
   */
 object ClanRankings {
+
+  private def clanRankingsHtmlPath = WebTemplateRender.wwwLocation.resolve("clan_rankings.html")
+
   def render(clanstats: Clanstats): Html = {
-    val doc = Jsoup.parse(lib.Soup.wwwLocation.resolve("clan_rankings.html").toFile, "UTF-8")
+    val doc = Jsoup.parse(clanRankingsHtmlPath.toFile, "UTF-8")
     val tbodyTr = doc.select("tbody tr")
     clanstats.onlyRanked.clans.values.toList.sortBy(_.wars).reverse.take(10).map { clan =>
       val target = tbodyTr.first().clone()

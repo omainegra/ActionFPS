@@ -8,6 +8,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by me on 15/01/2017.
+  *
+  * @usecase Combine all the different game providers into one.
   */
 @Singleton
 class CombinedGamesProvider @Inject()(journalGamesProvider: JournalGamesProvider,

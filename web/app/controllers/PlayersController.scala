@@ -6,6 +6,7 @@ package controllers
 
 import javax.inject._
 
+import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
@@ -17,7 +18,7 @@ import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class PlayersController @Inject()(common: Common, referenceProvider: ReferenceProvider,
+class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: ReferenceProvider,
                                   ladderController: LadderController,
                                   fullProvider: FullProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
 
@@ -34,7 +35,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
           Ok(Json.toJson(await(referenceProvider.Users(withEmails = false).users)))
         case _ =>
           val players = await(referenceProvider.users)
-          Ok(renderTemplate(None, supportsJson = true, None)(views.html.players(players)))
+          Ok(renderTemplate(title = Some("ActionFPS Players"), supportsJson = true)(views.html.players(players)))
       }
     }
   }
@@ -45,7 +46,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(h))
       else
-        Ok(renderTemplate(None, supportsJson = true, None)(views.Hof.render(h)))
+        Ok(renderTemplate(title = Some("Hall of Fame"), supportsJson = true)(views.Hof.render(h)))
     }
   }
 
@@ -55,7 +56,7 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(ranks))
       else
-        Ok(renderTemplate(None, supportsJson = true, None)(views.PlayerRanks.render(ranks)))
+        Ok(renderTemplate(title = Some("Player Rankings"), supportsJson = true)(views.PlayerRanks.render(ranks)))
     }
   }
 
@@ -66,7 +67,14 @@ class PlayersController @Inject()(common: Common, referenceProvider: ReferencePr
           if (request.getQueryString("format").contains("json")) {
             Ok(Json.toJson(player.build))
           } else {
-            Ok(renderTemplate(None, supportsJson = true, None)(views.player.Player.render(player, ladderController.aggregate.ranked.find(_.user == id))))
+            Ok {
+              renderTemplate(
+                title = Some(s"${player.user.nickname.nickname} (${player.user.id})"),
+                supportsJson = true
+              ) {
+                views.player.Player.render(player, ladderController.aggregate.ranked.find(_.user == id))
+              }
+            }
           }
         case None =>
           NotFound("Player could not be found")

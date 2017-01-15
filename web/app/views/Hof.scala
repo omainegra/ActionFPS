@@ -1,6 +1,7 @@
 package views
 
 import com.actionfps.accumulation.HOF
+import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import play.twirl.api.Html
 
@@ -8,8 +9,11 @@ import play.twirl.api.Html
   * Created by me on 17/12/2016.
   */
 object Hof {
+
+  private def hofHtmlPath = WebTemplateRender.wwwLocation.resolve("hof.html")
+
   def render(hof: HOF): Html = {
-    val doc = Jsoup.parse(lib.Soup.wwwLocation.resolve("hof.html").toFile, "UTF-8")
+    val doc = Jsoup.parse(hofHtmlPath.toFile, "UTF-8")
 
     val achievement = doc.select(".achievement").first()
 

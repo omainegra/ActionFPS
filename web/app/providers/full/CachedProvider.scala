@@ -16,9 +16,17 @@ import scala.util.{Success, Failure, Try}
 
 /**
   * Created by William on 03/01/2016.
+  *
+  * For local development, use Hazelcast.
+  * We wish to persist the state of FullIterator between reloads of the app.
+  *
+  * If we don't, we have performance degradation.
+  *
+  * So it's only slow on very first load.
   */
 @Singleton
-class CachedProvider @Inject()(fullProviderR: FullProviderImpl, applicationLifecycle: ApplicationLifecycle,
+class CachedProvider @Inject()(fullProviderR: FullProviderImpl,
+                               applicationLifecycle: ApplicationLifecycle,
                                gamesProvider: GamesProvider)
                               (implicit executionContext: ExecutionContext) extends FullProvider() {
   private val hz = HazelcastClient.newHazelcastClient()

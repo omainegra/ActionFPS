@@ -16,6 +16,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by me on 31/12/2016.
+  *
+  * @todo make it tidy
   */
 class ChallongeSubmitTest extends TestKit(ActorSystem("MySpec")) with FreeSpecLike with BeforeAndAfterAll {
 

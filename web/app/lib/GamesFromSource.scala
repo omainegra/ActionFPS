@@ -12,8 +12,18 @@ import scala.io.Source
 
 /**
   * Created by me on 15/01/2017.
+  *
+  * Utility method to load a list of [[Game]] from [[scala.io.Source]]
+  *
   */
 object GamesFromSource {
+  /**
+    * Load a list of [[Game]] from [[scala.io.Source]]
+    * Will rethrow any exceptions and also filter out games.
+    *
+    * Accepts TSV format that's either "[id]\t[good/bad]\t[reason]\t[jsonText]"
+    *   or "[id]\t[jsonText]".
+    */
   def load(source: => Source)(implicit ipLookup: IpLookup, logger: Logger): List[Game] = {
     val src = source
     try src.getLines().zipWithIndex.filter(_._1.nonEmpty).map { case (line, lineno) =>

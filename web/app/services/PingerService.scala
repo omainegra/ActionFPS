@@ -22,6 +22,12 @@ import providers.ReferenceProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+  * Pings live ActionFPS Servers using the <a href="https://github.com/ActionFPS/server-pinger">Server Pinger library</a>.
+  * Provides the result to [[controllers.LiveGamesController]]
+  *
+  * @todo Clean it up, it's very ugly right now.
+  */
 @Singleton
 class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
                               referenceProvider: ReferenceProvider

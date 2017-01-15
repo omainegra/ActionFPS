@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject._
 
+import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import play.api.libs.ws.WSClient
@@ -17,7 +18,7 @@ import scala.concurrent.ExecutionContext
   */
 
 @Singleton
-class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvider)
+class MiscController @Inject()(common: WebTemplateRender, referenceProvider: ReferenceProvider)
                               (implicit configuration: Configuration,
                                executionContext: ExecutionContext,
                                wSClient: WSClient) extends Controller {
@@ -33,16 +34,9 @@ class MiscController @Inject()(common: Common, referenceProvider: ReferenceProvi
           Ok(Json.toJson(await(referenceProvider.Servers.servers)))
         case _ =>
           val got = await(referenceProvider.servers)
-          Ok(renderTemplate(None, supportsJson = true, None)(views.html.servers(got)))
+          Ok(renderTemplate(title = Some("ActionFPS Servers"), supportsJson = true)(views.html.servers(got)))
       }
     }
-  }
-
-  def sync: Action[JsValue] = Action.async(BodyParsers.parse.json) { request =>
-    wSClient
-      .url(s"$mainPath/sync/")
-      .post(request.body)
-      .map(response => Ok(Html(response.body)))
   }
 
   def version = Action {

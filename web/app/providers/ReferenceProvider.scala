@@ -18,9 +18,12 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
   * Created by William on 01/01/2016.
+  *
+  * Provides reference data from CSV URLs.
   */
 @Singleton
-class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheApi)
+class ReferenceProvider @Inject()(configuration: Configuration,
+                                  cacheApi: CacheApi)
                                  (implicit wSClient: WSClient,
                                   executionContext: ExecutionContext) {
 
@@ -38,6 +41,10 @@ class ReferenceProvider @Inject()(configuration: Configuration, cacheApi: CacheA
     }
   }
 
+  /**
+    * Used for [[controllers.LadderController]]
+    * @todo remove
+    */
   def syncUserProvider(atMost: Duration): UserProvider = cacheApi.getOrElse[UserProvider]("user-provider") {
     Await.result(Users(withEmails = false).provider, atMost)
   }

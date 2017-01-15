@@ -1,6 +1,6 @@
 package views.clanwar
 
-import lib.Clanner
+import lib.{Clanner, WebTemplateRender}
 import org.jsoup.Jsoup
 import play.twirl.api.Html
 
@@ -8,9 +8,12 @@ import play.twirl.api.Html
   * Created by me on 16/12/2016.
   */
 object Clanwar {
+
+  private def clanwarHtmlPath = WebTemplateRender.wwwLocation.resolve("clanwar.html")
+
   def render(clanwar: com.actionfps.clans.ClanwarMeta, showPlayers: Boolean)(implicit clanner: Clanner): Html = {
 
-    val htmlB = Jsoup.parse(lib.Soup.wwwLocation.resolve("clanwar.html").toFile, "UTF-8")
+    val htmlB = Jsoup.parse(clanwarHtmlPath.toFile, "UTF-8")
 
     def renderHeader(): Unit = {
       // Header

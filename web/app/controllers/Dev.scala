@@ -11,7 +11,7 @@ import com.actionfps.gameparser.Maps
 import com.actionfps.ladder.parser.Aggregate.RankedStat
 import com.actionfps.ladder.parser.UserStatistics
 import com.actionfps.pinger._
-import lib.Clanner
+import lib.{Clanner, WebTemplateRender}
 import play.api.mvc.Action
 import play.api.mvc.Results._
 import play.api.routing.Router.Routes
@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext
   * Created by me on 11/12/2016.
   */
 
-class Dev @Inject()(common: Common, newsService: NewsService)(implicit executionContext: ExecutionContext) extends SimpleRouter {
+class Dev @Inject()(webTemplateRender: WebTemplateRender, newsService: NewsService)(implicit executionContext: ExecutionContext) extends SimpleRouter {
 
   private implicit class RichHtml(html: Html) {
     def transform(f: String => String): Html = {
@@ -53,7 +53,7 @@ class Dev @Inject()(common: Common, newsService: NewsService)(implicit execution
       Ok(Html("""<img src="../sig.svg">"""))
     }
     case GET(p"/player/") => Action { implicit req =>
-      Ok(common.renderTemplate(None, supportsJson = true, None)(views.player.Player.render(
+      Ok(webTemplateRender.renderTemplate(title = None, supportsJson = true)(views.player.Player.render(
         Dev.fullProfile,
         Some(Dev.rankedStat)
       )
@@ -71,14 +71,14 @@ class Dev @Inject()(common: Common, newsService: NewsService)(implicit execution
       showPlayers = true
     )
     val fh = Html(html.body + "<hr/>")
-    Ok(common.renderTemplate(None, supportsJson = false, None)(fh))
+    Ok(webTemplateRender.renderTemplate(title = None, supportsJson = false)(fh))
   }
 
   private def liveTemplate = Action { implicit req =>
     val mapping = Maps.mapToImage
     val html = views.rendergame.Live.render(mapMapping = mapping, game = Dev.game)
     val fh = Html(html.body + "<hr/>")
-    Ok(common.renderTemplate(None, supportsJson = false, None)(fh))
+    Ok(webTemplateRender.renderTemplate(title = None, supportsJson = false)(fh))
   }
 }
 
