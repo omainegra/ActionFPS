@@ -39,8 +39,8 @@ object Dependencies {
 
   val streamReaders: ModuleID = "default" %% "stream-readers" % "1.0.1"
   val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.4.1"
-  val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.4.1"
-  val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.4.1"
+  val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.5.0"
+  val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.5.0"
 
   val scalaWilliamResolver: MavenRepository = Resolver.bintrayRepo("scalawilliam", "maven")
 
