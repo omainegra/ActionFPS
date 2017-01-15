@@ -3,6 +3,11 @@ package gameparser
 package ingesters
 package stateful
 
+/**
+  * Build a game from a bunch of log lines.
+  * Includes determining team/non-team mode,
+  * Player info and team info.
+  */
 sealed trait GameBuilderState {
   def next(input: String): GameBuilderState
 }
@@ -46,9 +51,15 @@ case class UnexpectedInput(line: String) extends GameBuilderState {
   def next(input: String): GameBuilderState = NothingFound.next(input)
 }
 
-case class FragGameBuilder(header: GameFinishedHeader, scores: List[TeamModes.FragStyle.IndividualScore], disconnectedScores: List[TeamModes.FragStyle.IndividualScoreDisconnected], teamScores: List[TeamModes.FragStyle.TeamScore])
+case class FragGameBuilder(header: GameFinishedHeader,
+                           scores: List[TeamModes.FragStyle.IndividualScore],
+                           disconnectedScores: List[TeamModes.FragStyle.IndividualScoreDisconnected],
+                           teamScores: List[TeamModes.FragStyle.TeamScore])
 
-case class FlagGameBuilder(header: GameFinishedHeader, scores: List[TeamModes.FlagStyle.IndividualScore], disconnectedScores: List[TeamModes.FlagStyle.IndividualScoreDisconnected], teamScores: List[TeamModes.FlagStyle.TeamScore])
+case class FlagGameBuilder(header: GameFinishedHeader,
+                           scores: List[TeamModes.FlagStyle.IndividualScore],
+                           disconnectedScores: List[TeamModes.FlagStyle.IndividualScoreDisconnected],
+                           teamScores: List[TeamModes.FlagStyle.TeamScore])
 
 case class ReadingFragScores(builder: FragGameBuilder) extends GameBuilderState {
   def next(input: String): GameBuilderState = {
@@ -56,7 +67,8 @@ case class ReadingFragScores(builder: FragGameBuilder) extends GameBuilderState 
       case text if TeamModes.FragStyle.IndividualScore.unapply(text).isDefined =>
         val newScore = TeamModes.FragStyle.IndividualScore.unapply(text).get
         if ((FoundGame.teamsMap contains newScore.team) && (newScore.score != 0)) {
-          ReadingFragScores(builder.copy(scores = builder.scores :+ newScore.copy(team = FoundGame.teamsMap(newScore.team))))
+          ReadingFragScores(builder.copy(
+            scores = builder.scores :+ newScore.copy(team = FoundGame.teamsMap(newScore.team))))
         } else this
       case text if TeamModes.FragStyle.TeamScore.unapply(text).isDefined =>
         val newScore = TeamModes.FragStyle.TeamScore.unapply(text).get
@@ -66,7 +78,9 @@ case class ReadingFragScores(builder: FragGameBuilder) extends GameBuilderState 
       case text if TeamModes.FragStyle.IndividualScoreDisconnected.unapply(text).isDefined =>
         val newScore = TeamModes.FragStyle.IndividualScoreDisconnected.unapply(text).get
         if (FoundGame.teamsMap.contains(newScore.team) && (newScore.frag != 0)) {
-          ReadingFragScores(builder.copy(disconnectedScores = builder.disconnectedScores :+ newScore.copy(team = FoundGame.teamsMap(newScore.team))))
+          ReadingFragScores(builder.copy(
+            disconnectedScores =
+              builder.disconnectedScores :+ newScore.copy(team = FoundGame.teamsMap(newScore.team))))
         } else this
       case "" if builder.scores.isEmpty =>
         NotEnoughPlayersFailure
@@ -84,12 +98,15 @@ case class ReadingFlagScores(builder: FlagGameBuilder) extends GameBuilderState 
       case text if TeamModes.FlagStyle.IndividualScore.unapply(text).isDefined =>
         val newScore = TeamModes.FlagStyle.IndividualScore.unapply(text).get
         if (FoundGame.teamsMap.contains(newScore.team) && (newScore.score != 0)) {
-          ReadingFlagScores(builder.copy(scores = builder.scores :+ newScore.copy(team = FoundGame.teamsMap(newScore.team))))
+          ReadingFlagScores(builder.copy(
+            scores = builder.scores :+ newScore.copy(team = FoundGame.teamsMap(newScore.team))))
         } else this
       case text if TeamModes.FlagStyle.IndividualScoreDisconnected.unapply(text).isDefined =>
         val newScore = TeamModes.FlagStyle.IndividualScoreDisconnected.unapply(text).get
         if (FoundGame.teamsMap.contains(newScore.team) && (newScore.frag != 0)) {
-          ReadingFlagScores(builder.copy(disconnectedScores = builder.disconnectedScores :+ newScore.copy(team = FoundGame.teamsMap(newScore.team))))
+          ReadingFlagScores(builder.copy(
+            disconnectedScores =
+              builder.disconnectedScores :+ newScore.copy(team = FoundGame.teamsMap(newScore.team))))
         } else this
       case text if TeamModes.FlagStyle.TeamScore.unapply(text).isDefined =>
         val newScore = TeamModes.FlagStyle.TeamScore.unapply(text).get
@@ -106,7 +123,8 @@ case class ReadingFlagScores(builder: FlagGameBuilder) extends GameBuilderState 
   }
 }
 
-case class FoundGame(header: GameFinishedHeader, game: Either[FlagGameBuilder, FragGameBuilder]) extends GameBuilderState {
+case class FoundGame(header: GameFinishedHeader,
+                     game: Either[FlagGameBuilder, FragGameBuilder]) extends GameBuilderState {
   def next(input: String) = NothingFound.next(input)
 }
 

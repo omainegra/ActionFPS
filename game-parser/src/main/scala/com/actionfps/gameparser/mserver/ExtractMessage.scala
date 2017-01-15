@@ -1,10 +1,9 @@
 package com.actionfps.gameparser.mserver
 
 import java.time.{Instant, ZoneId, ZonedDateTime}
-import java.util.Locale
 
 import org.joda.time.DateTimeZone
-import org.joda.time.format.{ISODateTimeFormat, DateTimeFormatterBuilder, DateTimeFormat}
+import org.joda.time.format.{DateTimeFormatterBuilder, ISODateTimeFormat}
 
 import scala.util.control.NonFatal
 
@@ -12,11 +11,16 @@ import scala.util.control.NonFatal
   * Created by William on 11/11/2015.
   */
 object ExtractMessage {
+  def unapply(line: String): Option[(ZonedDateTime, String, String)] =
+    ParseSyslogMessage.unapply(line)
+}
+
+object ParseSyslogMessage {
 
   /**
     * Fast matcher. 90% faster than a regex.
     */
-  object matcher {
+  private object matcher {
 
     def unapply(input: String): Option[(String, String, String)] = {
       var proc = input
@@ -43,7 +47,7 @@ object ExtractMessage {
 
   import collection.JavaConverters._
 
-  val parsers = Array(// Joda ZZZ == JUT VV
+  private[gameparser] val parsers = Array(// Joda ZZZ == JUT VV
     /// Sat Dec 13 19:36:16 CET 2014
     new DateTimeFormatterBuilder().appendPattern("EEE MMM dd HH:mm:ss ").appendTimeZoneShortName(zones.asJava)
       .appendPattern(" yyyy").toParser,

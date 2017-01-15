@@ -2,6 +2,10 @@ package com.actionfps.gameparser.ingesters.stateful
 
 import com.actionfps.gameparser.ingesters.{GameFinishedHeader, GameInProgressHeader}
 
+/**
+  * Figure out a game's duration from the logs.
+  * It's orthogonal to parsing the game player scores.
+  */
 sealed trait GameDuration {
   def next(input: String): GameDuration
 

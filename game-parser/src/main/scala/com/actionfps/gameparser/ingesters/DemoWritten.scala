@@ -4,6 +4,8 @@ import fastparse.all._
 
 /**
   * Created by me on 29/05/2016.
+  * Extract message such as:
+  * <code>demo written to file "demos/20141218_1824_local_ac_gothic_15min_CTF.dmo" (625252 bytes)</code>
   */
 object DemoWritten {
 

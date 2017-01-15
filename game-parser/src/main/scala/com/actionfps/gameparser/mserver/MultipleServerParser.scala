@@ -6,6 +6,8 @@ import com.actionfps.gameparser.enrichers.JsonGame
 
 /**
   * Created by William on 11/11/2015.
+  *
+  * Multiplexes multiple syslog messages to compute games for each server.
   */
 object MultipleServerParser {
   def empty: MultipleServerParser = MultipleServerParserProcessing(
@@ -15,6 +17,10 @@ object MultipleServerParser {
 
   def collect: PartialFunction[MultipleServerParser, JsonGame] = {
     case g: MultipleServerParserFoundGame => g.cg
+  }
+
+  def scan(multipleServerParser: MultipleServerParser, line: String): MultipleServerParser = {
+    multipleServerParser.process(line)
   }
 }
 

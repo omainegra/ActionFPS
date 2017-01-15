@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter
 
 /**
   * Created by William on 26/12/2015.
+  *
+  * Parse server status line.
   */
 object ServerStatus {
 

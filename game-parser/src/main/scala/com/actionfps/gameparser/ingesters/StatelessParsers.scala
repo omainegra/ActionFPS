@@ -3,6 +3,10 @@ package com.actionfps.gameparser.ingesters
 import com.actionfps.gameparser.SharedParsers
 import fastparse.all._
 
+
+/**
+  * See tests for example messages.
+  */
 case class GameFinishedHeader(mode: GameMode.GameMode, map: String, state: String)
 
 object GameFinishedHeader {

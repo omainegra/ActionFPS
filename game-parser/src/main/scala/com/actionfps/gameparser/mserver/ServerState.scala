@@ -6,10 +6,22 @@ import com.actionfps.gameparser.ingesters.stateful.{FoundGame, GameBuilderState,
 
 /**
   * Created by William on 11/11/2015.
+  *
+  * Individual server state for parsing
   */
-
 sealed trait ServerState {
   def next(line: String): ServerState
+}
+
+object ServerState {
+  def empty: ServerState = ServerStateProcessing(
+    parserState = GameBuilderState.initial,
+    gameDuration = GameDuration.empty
+  )
+
+  def scan(serverState: ServerState, line: String): ServerState = {
+    serverState.next(line)
+  }
 }
 
 case class ServerFoundGame(foundGame: FoundGame, duration: Int) extends ServerState {
@@ -32,11 +44,4 @@ case class ServerStateProcessing(parserState: GameBuilderState,
         )
     }
   }
-}
-
-object ServerState {
-  def empty: ServerState = ServerStateProcessing(
-    parserState = GameBuilderState.initial,
-    gameDuration = GameDuration.empty
-  )
 }

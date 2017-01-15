@@ -2,6 +2,8 @@ package com.actionfps.gameparser.enrichers
 
 /**
   * Created by me on 29/05/2016.
+  *
+  * Used to attach user geographical information based on their IP address.
   */
 object IpLookup {
 

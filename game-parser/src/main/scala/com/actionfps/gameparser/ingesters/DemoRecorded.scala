@@ -8,6 +8,9 @@ import SharedParsers._
 
 /**
   * Created by me on 29/05/2016.
+  *
+  * Extract DemoRecorded message such as:
+  * <code>Demo "Thu Dec 18 19:24:56 2014: ctf, ac_gothic, 610.60kB" recorded.</code>
   */
 case class DemoRecorded(dateTime: String, mode: String, map: String, size: String)
 
