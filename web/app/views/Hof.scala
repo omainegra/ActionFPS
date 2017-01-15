@@ -1,6 +1,6 @@
 package views
 
-import com.actionfps.accumulation.HOF
+import com.actionfps.accumulation.achievements.HallOfFame
 import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import play.twirl.api.Html
@@ -12,7 +12,7 @@ object Hof {
 
   private def hofHtmlPath = WebTemplateRender.wwwLocation.resolve("hof.html")
 
-  def render(hof: HOF): Html = {
+  def render(hof: HallOfFame): Html = {
     val doc = Jsoup.parse(hofHtmlPath.toFile, "UTF-8")
 
     val achievement = doc.select(".achievement").first()

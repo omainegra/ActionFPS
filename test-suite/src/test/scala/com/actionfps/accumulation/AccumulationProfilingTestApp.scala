@@ -3,6 +3,8 @@ package com.actionfps.accumulation
 import java.io.File
 import java.net.URL
 
+import com.actionfps.accumulation.achievements.{AchievementsIterator, HallOfFame}
+import com.actionfps.accumulation.user.User
 import com.actionfps.api.Game
 import com.actionfps.clans.Clanwars
 import com.actionfps.gameparser.enrichers._
@@ -40,14 +42,14 @@ object AccumulationProfilingTestApp extends App {
     val clansUrl = new URL("https://actionfps.com/clans/?format=csv")
     ClanRecord.parseRecords(new URLReader(clansUrl)).map(Clan.fromClanRecord).map(c => c.id -> c).toMap
   }
-  val fit = FullIterator(
+  val fit = GameAxisAccumulator(
     users = users,
     games = Map.empty,
     clans = clans,
     clanwars = Clanwars.empty,
     clanstats = Clanstats.empty,
     achievementsIterator = AchievementsIterator.empty,
-    hof = HOF.empty,
+    hof = HallOfFame.empty,
     playersStats = PlayersStats.empty,
     playersStatsOverTime = Map.empty
   )

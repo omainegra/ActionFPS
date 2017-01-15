@@ -1,17 +1,17 @@
-package com.actionfps.accumulation
+package com.actionfps.accumulation.achievements
 
 import com.actionfps.achievements.immutable._
 
 /**
   * Created by me on 01/04/2016.
   */
-case class HOF(achievements: List[HOF.AchievementRecord]) {
+case class HallOfFame(achievements: List[HallOfFame.AchievementRecord]) {
   def isEmpty: Boolean = achievements.isEmpty || achievements.forall(_.players.isEmpty)
 
-  def includeAchievement(user: String, game: String, achievement: CompletedAchievement): HOF = {
+  def includeAchievement(user: String, game: String, achievement: CompletedAchievement): HallOfFame = {
     val nl = achievements.map {
       case ar if ar.achievement.title == achievement.title =>
-        ar.copy(players = ar.players :+ HOF.AchievementRecordPlayer(
+        ar.copy(players = ar.players :+ HallOfFame.AchievementRecordPlayer(
           user = user,
           atGame = game
         ))
@@ -22,13 +22,13 @@ case class HOF(achievements: List[HOF.AchievementRecord]) {
     )
   }
 
-  def reversed: HOF = copy(achievements = achievements.map(ar => ar.reversed))
+  def reversed: HallOfFame = copy(achievements = achievements.map(ar => ar.reversed))
 }
 
-object HOF {
+object HallOfFame {
 
 
-  def empty = HOF(
+  def empty = HallOfFame(
     achievements = achievements.map(achievement =>
       AchievementRecord(
         achievement = achievement,

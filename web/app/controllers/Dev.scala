@@ -3,7 +3,9 @@ package controllers
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
-import com.actionfps.accumulation.{Clan, CurrentNickname, FullProfile, User}
+import com.actionfps.accumulation.user.{FullProfile, User}
+import com.actionfps.accumulation.Clan
+import com.actionfps.accumulation.user.Nickname.CurrentNickname
 import com.actionfps.api.{Game, GameAchievement, GamePlayer, GameTeam}
 import com.actionfps.clans.CompleteClanwar
 import com.actionfps.clans.Conclusion.Namer
@@ -26,7 +28,9 @@ import scala.concurrent.ExecutionContext
   * Created by me on 11/12/2016.
   */
 
-class Dev @Inject()(webTemplateRender: WebTemplateRender, newsService: NewsService)(implicit executionContext: ExecutionContext) extends SimpleRouter {
+class Dev @Inject()(webTemplateRender: WebTemplateRender,
+                    newsService: NewsService)
+                   (implicit executionContext: ExecutionContext) extends SimpleRouter {
 
   private implicit class RichHtml(html: Html) {
     def transform(f: String => String): Html = {
@@ -98,7 +102,10 @@ object Dev {
       email = None,
       previousNicknames = None,
       registrationDate = ZonedDateTime.now().minusDays(5),
-      nickname = CurrentNickname(nickname = "w00p|Boo", from = ZonedDateTime.now().minusDays(2))
+      nickname = CurrentNickname(
+        nickname = "w00p|Boo",
+        from = ZonedDateTime.now().minusDays(2)
+      )
     )
   )
 

@@ -2,7 +2,7 @@ package views.player
 
 import java.time.format.DateTimeFormatter
 
-import com.actionfps.accumulation.FullProfile
+import com.actionfps.accumulation.user.FullProfile
 import com.actionfps.achievements.AchievementsRepresentation
 import com.actionfps.achievements.immutable.CaptureMapCompletion.{Achieved, Achieving}
 import com.actionfps.achievements.immutable.CaptureMaster

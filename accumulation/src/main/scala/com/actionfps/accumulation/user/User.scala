@@ -1,32 +1,22 @@
-package com.actionfps.accumulation
+package com.actionfps.accumulation.user
 
 /**
   * Created by William on 26/12/2015.
   */
 
 import java.time.{ZoneId, ZonedDateTime}
+
+import com.actionfps.accumulation.user.Nickname.{CurrentNickname, PreviousNickname}
 import com.actionfps.reference.{NicknameRecord, Registration}
 
-sealed trait Nickname {
-  def nickname: String
-
-  def from: ZonedDateTime
-
-  def validAt(zonedDateTime: ZonedDateTime): Boolean = this match {
-    case _: CurrentNickname => zonedDateTime.isAfter(from)
-    case p: PreviousNickname => zonedDateTime.isAfter(from) && zonedDateTime.isBefore(p.to)
-  }
-}
-
-case class CurrentNickname(nickname: String, from: ZonedDateTime) extends Nickname
-
-case class PreviousNickname(nickname: String, from: ZonedDateTime, to: ZonedDateTime) extends Nickname
-
 case class User(id: String, name: String, email: Option[String],
-                registrationDate: ZonedDateTime, nickname: CurrentNickname, previousNicknames: Option[List[PreviousNickname]]) {
+                registrationDate: ZonedDateTime, nickname: CurrentNickname,
+                previousNicknames: Option[List[PreviousNickname]]) {
   def nicknames: List[Nickname] = List(nickname) ++ previousNicknames.toList.flatten
 
-  def validAt(nickname: String, zonedDateTime: ZonedDateTime): Boolean = nicknames.exists(n => n.nickname == nickname && n.validAt(zonedDateTime))
+  def validAt(nickname: String, zonedDateTime: ZonedDateTime): Boolean = {
+    nicknames.exists(n => n.nickname == nickname && n.validAt(zonedDateTime))
+  }
 }
 
 object User {

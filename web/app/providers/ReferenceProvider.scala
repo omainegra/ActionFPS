@@ -3,7 +3,8 @@ package providers
 import java.io.StringReader
 import javax.inject.{Inject, Singleton}
 
-import com.actionfps.accumulation.{Clan, User}
+import com.actionfps.accumulation.Clan
+import com.actionfps.accumulation.user.User
 import com.actionfps.ladder.parser.UserProvider
 import com.actionfps.reference._
 import com.google.common.io.CharStreams

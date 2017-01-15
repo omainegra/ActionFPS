@@ -2,48 +2,63 @@ package com.actionfps.accumulation
 
 import java.time.YearMonth
 
-import com.actionfps.achievements.{AchievementsRepresentation, PlayerState}
+import com.actionfps.accumulation.achievements.{AchievementsIterator, HallOfFame}
+import com.actionfps.accumulation.enrich.EnrichGames
+import com.actionfps.accumulation.user.{FullProfile, User}
 import com.actionfps.api.GameAchievement
-import com.actionfps.gameparser.enrichers._
 import com.actionfps.clans.{Clanwars, CompleteClanwar}
-import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
+import com.actionfps.gameparser.enrichers._
+import com.actionfps.players.PlayersStats
 import com.actionfps.stats.Clanstats
 
 
 /**
   * Created by William on 01/01/2016.
   */
-object FullIterator {
-  def empty: FullIterator = new FullIterator()
+object GameAxisAccumulator {
+  def empty: GameAxisAccumulator = new GameAxisAccumulator()
 }
 
-case class FullIterator
+/**
+  * The full iterator that combines the axis of ActionFPS model that's based on the Game.
+  * There are other axes such as the Ladder for example, that are independent of this one.
+  *
+  * We need to do this because for example achievements depend on a sequence of games
+  * and each game then gets enriched with newly added achievements.
+  *
+  * Or if a clanwar is completed, it will be attached to the game for better cross linking.
+  */
+case class GameAxisAccumulator
 (users: Map[String, User],
  games: Map[String, JsonGame],
  clans: Map[String, Clan],
  clanwars: Clanwars,
  clanstats: Clanstats,
  achievementsIterator: AchievementsIterator,
- hof: HOF,
+ hof: HallOfFame,
  playersStats: PlayersStats,
  playersStatsOverTime: Map[YearMonth, PlayersStats]) {
   fi =>
 
+  /** For Hazelcast caching **/
   def this() = this(users = Map.empty,
     games = Map.empty,
     clans = Map.empty,
     clanwars = Clanwars.empty,
     clanstats = Clanstats.empty,
     achievementsIterator = AchievementsIterator.empty,
-    hof = HOF.empty,
+    hof = HallOfFame.empty,
     playersStats = PlayersStats.empty,
-    playersStatsOverTime = Map.empty)
+    playersStatsOverTime = Map.empty
+  )
 
-  def isEmpty: Boolean = users.isEmpty && games.isEmpty && clans.isEmpty && clanwars.isEmpty && clanstats.isEmpty &&
-    achievementsIterator.isEmpty && hof.isEmpty && playersStats.isEmpty && playersStatsOverTime.isEmpty
+  def isEmpty: Boolean = {
+    users.isEmpty && games.isEmpty && clans.isEmpty && clanwars.isEmpty && clanstats.isEmpty &&
+      achievementsIterator.isEmpty && hof.isEmpty && playersStats.isEmpty && playersStatsOverTime.isEmpty
+  }
 
-  def updateReference(newUsers: Map[String, User], newClans: Map[String, Clan]): FullIterator = {
-    val blank = FullIterator(
+  def updateReference(newUsers: Map[String, User], newClans: Map[String, Clan]): GameAxisAccumulator = {
+    val blank = GameAxisAccumulator(
       users = newUsers,
       clans = newClans,
       games = Map.empty,
@@ -51,7 +66,7 @@ case class FullIterator
       clanwars = Clanwars.empty,
       clanstats = Clanstats.empty,
       playersStats = PlayersStats.empty,
-      hof = HOF.empty,
+      hof = HallOfFame.empty,
       playersStatsOverTime = Map.empty
     )
     blank.includeGames(games.valuesIterator.toList.sortBy(_.id))
@@ -59,11 +74,11 @@ case class FullIterator
 
   def events: List[Map[String, String]] = achievementsIterator.events.take(10)
 
-  def includeGames(list: List[JsonGame]): FullIterator = {
+  def includeGames(list: List[JsonGame]): GameAxisAccumulator = {
     list.foldLeft(this)(_.includeGame(_))
   }
 
-  private def includeGame(jsonGame: JsonGame): FullIterator = {
+  private def includeGame(jsonGame: JsonGame): GameAxisAccumulator = {
     val enricher = EnrichGames(users.values.toList, clans.values.toList)
     import enricher.withUsersClass
     var richGame = jsonGame.withoutHosts.withUsers.withClans
@@ -131,7 +146,7 @@ case class FullIterator
       val recentGames = games
         .collect { case (_, game) if game.hasUser(user.id) => game }
         .toList.sortBy(_.id).takeRight(7).reverse
-      val achievements = achievementsIterator.map.get(id)
+      val achievements = achievementsIterator.userToState.get(id)
       val rank = playersStats.onlyRanked.players.get(id)
       FullProfile(
         user = user,
@@ -145,44 +160,7 @@ case class FullIterator
 }
 
 
-object CommonUtil {
-  //noinspection ScalaUnusedSymbol
-  def mostCommon[T](from: List[T]): Option[T] = {
-    from
-      .groupBy(identity)
-      .mapValues(_.size)
-      .toList
-      .sortBy { case (item, count) => count }
-      .lastOption
-      .map { case (item, count) => item }
-  }
-}
 
-case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState],
-                       rank: Option[PlayerStat], playerGameCounts: Option[PlayerGameCounts]) {
 
-  def build = BuiltProfile(
-    user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo, playerGameCounts,
-    favouriteMap = CommonUtil.mostCommon(recentGames.map(_.map))
-  )
 
-  def locationInfo: Option[LocationInfo] =
-    if (recentGames.isEmpty) None
-    else {
-      val myPlayers = recentGames
-        .flatMap(_.teams)
-        .flatMap(_.players)
-        .filter(_.user.contains(user.id))
-      Some(LocationInfo(
-        timezone = CommonUtil.mostCommon(myPlayers.flatMap(_.timezone)),
-        countryCode = CommonUtil.mostCommon(myPlayers.flatMap(_.countryCode)),
-        countryName = CommonUtil.mostCommon(myPlayers.flatMap(_.countryName))
-      ))
-    }
-}
 
-case class LocationInfo(timezone: Option[String], countryCode: Option[String], countryName: Option[String])
-
-case class BuiltProfile(user: User, recentGames: List[JsonGame],
-                        achievements: Option[AchievementsRepresentation], rank: Option[PlayerStat],
-                        location: Option[LocationInfo], gameCounts: Option[PlayerGameCounts], favouriteMap: Option[String])

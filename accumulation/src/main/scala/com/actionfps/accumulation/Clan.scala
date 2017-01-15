@@ -1,17 +1,20 @@
 package com.actionfps.accumulation
 
+import com.actionfps.accumulation.user.ClanTagNicknameMatcher
 import com.actionfps.reference.ClanRecord
 
 /**
   * Created by William on 26/12/2015.
+  * The only difference between this and  the Referene clan is the tags.
+  *
+  * Might consider for removal and just use the Reference one.
   */
-
 case class Clan(id: String, name: String, fullName: String,
                 tag: Option[String], tags: Option[List[String]], website: Option[String],
                 teamspeak: Option[String],
                 logo: String) {
   def nicknameInClan(nickname: String): Boolean = {
-    (tag.toList ++ tags.toList.flatten).exists(NicknameMatcher.apply(_)(nickname))
+    (tag.toList ++ tags.toList.flatten).exists(ClanTagNicknameMatcher.apply(_)(nickname))
   }
 }
 

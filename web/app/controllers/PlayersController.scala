@@ -20,7 +20,10 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: ReferenceProvider,
                                   ladderController: LadderController,
-                                  fullProvider: FullProvider)(implicit configuration: Configuration, executionContext: ExecutionContext, wSClient: WSClient) extends Controller {
+                                  fullProvider: FullProvider)
+                                 (implicit configuration: Configuration,
+                                  executionContext: ExecutionContext,
+                                  wSClient: WSClient) extends Controller {
 
   import common._
 

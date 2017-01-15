@@ -2,6 +2,8 @@ package com.actionfps.accumulation
 
 import java.io.{File, FileWriter}
 
+import com.actionfps.accumulation.enrich.EnrichGames
+import com.actionfps.accumulation.user.{GeoIpLookup, User}
 import com.actionfps.gameparser.GameScanner
 import com.actionfps.gameparser.enrichers._
 import com.actionfps.reference.{ClanRecord, NicknameRecord, Registration}

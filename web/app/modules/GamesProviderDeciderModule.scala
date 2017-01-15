@@ -4,7 +4,7 @@ package modules
   * Created by William on 01/01/2016.
   */
 
-import com.actionfps.accumulation.GeoIpLookup
+import com.actionfps.accumulation.user.GeoIpLookup
 import com.actionfps.gameparser.enrichers.IpLookup
 import play.api.inject._
 import play.api.{Configuration, Environment, Logger, Mode}

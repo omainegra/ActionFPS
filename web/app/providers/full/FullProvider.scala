@@ -3,7 +3,9 @@ package providers.full
 import java.time.YearMonth
 
 import akka.agent.Agent
-import com.actionfps.accumulation.{FullIterator, FullProfile, HOF}
+import com.actionfps.accumulation.GameAxisAccumulator
+import com.actionfps.accumulation.user.FullProfile
+import com.actionfps.accumulation.achievements.HallOfFame
 import com.actionfps.clans.Clanwars
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
@@ -15,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[FullProviderImpl])
 abstract class FullProvider()(implicit executionContext: ExecutionContext) {
 
-  protected[providers] def fullStuff: Future[Agent[FullIterator]]
+  protected[providers] def fullStuff: Future[Agent[GameAxisAccumulator]]
 
   def getRecent(n: Int): Future[List[JsonGame]] =
     fullStuff.map(_.get().recentGames(n))
@@ -40,7 +42,7 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext) {
     fullStuff.map(_.get().clanstats)
   }
 
-  def hof: Future[HOF] = {
+  def hof: Future[HallOfFame] = {
     fullStuff.map(_.get().hof)
   }
 
@@ -56,6 +58,6 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext) {
     fullStuff.map(_.get()).map(_.getProfileFor(id))
   }
 
-  def reloadReference(): Future[FullIterator]
+  def reloadReference(): Future[GameAxisAccumulator]
 
 }

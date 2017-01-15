@@ -5,7 +5,7 @@ package controllers
   */
 
 import javax.inject._
-import com.actionfps.accumulation.FullIterator
+import com.actionfps.accumulation.GameAxisAccumulator$
 import play.api.Configuration
 import play.api.mvc.{Action, Controller}
 import providers.ReferenceProvider

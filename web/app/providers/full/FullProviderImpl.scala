@@ -3,10 +3,11 @@ package providers.full
 import javax.inject.{Inject, Singleton}
 
 import akka.actor.ActorSystem
-import com.actionfps.gameparser.enrichers.JsonGame
 import akka.agent.Agent
+import com.actionfps.accumulation.GameAxisAccumulator
+import com.actionfps.accumulation.achievements.{AchievementsIterator, HallOfFame}
 import com.actionfps.clans.{Clanwars, CompleteClanwar}
-import com.actionfps.accumulation.{AchievementsIterator, FullIterator, HOF}
+import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
 import com.actionfps.stats.Clanstats
 import play.api.inject.ApplicationLifecycle
@@ -30,18 +31,18 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
                                  applicationLifecycle: ApplicationLifecycle)
                                 (implicit executionContext: ExecutionContext) extends FullProvider() {
 
-  override def reloadReference(): Future[FullIterator] = async {
+  override def reloadReference(): Future[GameAxisAccumulator] = async {
     val users = await(referenceProvider.users).map(u => u.id -> u).toMap
     val clans = await(referenceProvider.clans).map(c => c.id -> c).toMap
     await(await(fullStuff).alter(_.updateReference(users, clans)))
   }
 
-  override protected[providers] val fullStuff: Future[Agent[FullIterator]] = async {
+  override protected[providers] val fullStuff: Future[Agent[GameAxisAccumulator]] = async {
     val users = await(referenceProvider.users)
     val clans = await(referenceProvider.clans)
     val allGames = await(gamesProvider.games)
 
-    val initial = FullIterator(
+    val initial = GameAxisAccumulator(
       users = users.map(u => u.id -> u).toMap,
       clans = clans.map(c => c.id -> c).toMap,
       games = Map.empty,
@@ -49,7 +50,7 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
       clanwars = Clanwars.empty,
       clanstats = Clanstats.empty,
       playersStats = PlayersStats.empty,
-      hof = HOF.empty,
+      hof = HallOfFame.empty,
       playersStatsOverTime = Map.empty
     )
 
@@ -75,7 +76,7 @@ case class NewGameDetected(jsonGame: JsonGame)
 
 case class NewClanwarCompleted(clanwarCompleted: CompleteClanwar)
 
-case class FullIteratorDetector(original: FullIterator, updated: FullIterator) {
+case class FullIteratorDetector(original: GameAxisAccumulator, updated: GameAxisAccumulator) {
 
   def detectClanwar: List[CompleteClanwar] = {
     (updated.clanwars.complete -- original.clanwars.complete).toList

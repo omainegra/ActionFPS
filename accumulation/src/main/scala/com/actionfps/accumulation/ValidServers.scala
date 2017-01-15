@@ -2,12 +2,17 @@ package com.actionfps.accumulation
 
 import java.time.ZoneId
 
+import com.actionfps.accumulation.ValidServers.ValidServer
 import com.actionfps.gameparser.enrichers.JsonGame
 
 /**
   * Created by William on 26/12/2015.
+  *
+  * List of valid servers for log parsing. This is an append-only list of present and past servers.
+  * Previously was encoding it in YAML but the parsing felt a bit pointless as this would be the
+  * one and only code path to consume the data anyway.
+  * There is no other consumer for this data than the accumulator.
   */
-
 object ValidServers {
 
   private implicit def strToTz(string: String): ZoneId = ZoneId.of(string)
@@ -183,11 +188,12 @@ object ValidServers {
 
   }
 
+  case class ValidServer(logId: String, name: String, timezone: ZoneId, address: Option[String] = None, invalid: Option[Boolean] = None) {
+    def isValid: Boolean = !invalid.contains(true)
+  }
+
 }
 
-case class ValidServer(logId: String, name: String, timezone: ZoneId, address: Option[String] = None, invalid: Option[Boolean] = None) {
-  def isValid: Boolean = !invalid.contains(true)
-}
 
 case class ValidServers(items: Map[String, ValidServer]) {
 

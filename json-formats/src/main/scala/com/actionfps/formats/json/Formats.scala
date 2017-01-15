@@ -4,7 +4,10 @@ import java.time.ZonedDateTime
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.util.Locale
 
-import com.actionfps.accumulation.{CurrentNickname, User, _}
+import com.actionfps.accumulation.Clan
+import com.actionfps.accumulation.achievements.HallOfFame
+import com.actionfps.accumulation.user.Nickname.{CurrentNickname, PreviousNickname}
+import com.actionfps.accumulation.user._
 import com.actionfps.achievements.{AchievementsRepresentation, CompletedAchievement, PartialAchievement, SwitchNotAchieved}
 import com.actionfps.achievements.immutable.{Achievement, CaptureMapCompletion, CaptureMaster, PlayerStatistics}
 import com.actionfps.api.GameAchievement
@@ -36,7 +39,7 @@ trait Formats {
 
   //noinspection TypeAnnotation
   // ADDING a type annotation causes FullFlowTest to fail!
-//  implicit val writesG: Writes[JsonGame] = {
+  //  implicit val writesG: Writes[JsonGame] = {
   implicit val writesG = {
     Writes[JsonGame](jg =>
       Json.writes[JsonGame].writes(jg) ++ Json.toJson(jg.viewFields).asInstanceOf[JsObject]
@@ -104,10 +107,10 @@ trait Formats {
   private implicit val saFormats = Json.writes[SwitchNotAchieved]
   private implicit val arFormats = Json.writes[AchievementsRepresentation]
   private implicit val lif = Json.writes[LocationInfo]
-  private implicit val hofarpW = Json.writes[HOF.AchievementRecordPlayer]
+  private implicit val hofarpW = Json.writes[HallOfFame.AchievementRecordPlayer]
   private implicit val achW = Writes[Achievement](ach => Json.toJson(Map("title" -> ach.title, "description" -> ach.description)))
-  private implicit val hofarW = Json.writes[HOF.AchievementRecord]
-  implicit val hofW: OWrites[HOF] = Json.writes[HOF]
+  private implicit val hofarW = Json.writes[HallOfFame.AchievementRecord]
+  implicit val hofW: OWrites[HallOfFame] = Json.writes[HallOfFame]
 
   private implicit val psw = Json.writes[PlayerStat]
 

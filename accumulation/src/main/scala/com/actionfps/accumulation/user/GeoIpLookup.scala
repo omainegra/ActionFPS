@@ -1,9 +1,9 @@
-package com.actionfps.accumulation
+package com.actionfps.accumulation.user
 
 import java.io.File
 
 import com.actionfps.gameparser.enrichers.IpLookup
-import com.maxmind.geoip.{timeZone, LookupService}
+import com.maxmind.geoip.{LookupService, timeZone}
 
 /**
   * Created by me on 10/04/2016.
