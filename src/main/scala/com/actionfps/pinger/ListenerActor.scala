@@ -7,7 +7,8 @@ import akka.actor.{ActorKilledException, ActorLogging, Kill, Props, SupervisorSt
 /**
   * Created by me on 14/01/2017.
   */
-class ListenerActor(g: ServerStatus => Unit, h: CurrentGameStatus => Unit)(implicit serverMappings: ServerMappings) extends Act with ActorLogging {
+class ListenerActor(g: ServerStatus => Unit, h: CurrentGameStatus => Unit)
+                   (implicit serverMappings: ServerMappings) extends Act with ActorLogging {
 
   import context.dispatcher
 

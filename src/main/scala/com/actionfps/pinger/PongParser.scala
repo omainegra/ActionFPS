@@ -2,6 +2,10 @@ package com.actionfps.pinger
 
 import akka.util.ByteString
 
+/**
+  * Decoder for the Cube binary encoding.
+  * It does things like compress an int of smaller size into 1 byte for example.
+  */
 private[pinger] object PongParser {
 
   object GetUChar {
@@ -130,32 +134,40 @@ private[pinger] object PongParser {
             case _ => l
           }
         }
+
         Option(PlayerCns(go(rest, List.empty)))
       case _ => None
     }
   }
 
 
-  case class ServerInfoReply(protocol: Int, mode: Int, numPlayers: Int, minRemain: Int, mapName: String, desc: String, maxClients: Int, ping: Int) extends ParsedResponse
+  case class ServerInfoReply(protocol: Int, mode: Int, numPlayers: Int,
+                             minRemain: Int, mapName: String, desc: String,
+                             maxClients: Int, ping: Int) extends ParsedResponse
 
   object GetServerInfoReply {
     def unapply(List: ByteString): Option[ServerInfoReply] = List match {
-      case protocol >>: mode >>: numPlayers >>: minRemain >>: mapName >>##:: desc >>##:: maxClients >>: ping >>: ByteString.empty =>
+      case protocol >>: mode >>: numPlayers >>: minRemain >>:
+        mapName >>##:: desc >>##:: maxClients >>: ping >>: ByteString.empty =>
         Option(ServerInfoReply(protocol, mode, numPlayers, minRemain, mapName, desc, maxClients, ping))
       case _ => None
     }
   }
 
-  case class PlayerInfoReply(clientNum: Int, ping: Int, name: String, team: String, frags: Int, flagScore: Int, deaths: Int,
-                             teamkills: Int, accuracy: Int, health: Int, armour: Int, weapon: Int, role: Int, state: Int, ip: String) extends ParsedResponse
+  case class PlayerInfoReply(clientNum: Int, ping: Int, name: String, team: String,
+                             frags: Int, flagScore: Int, deaths: Int,
+                             teamkills: Int, accuracy: Int, health: Int,
+                             armour: Int, weapon: Int, role: Int,
+                             state: Int, ip: String) extends ParsedResponse
 
   object GetPlayerInfos {
     def unapply(list: ByteString): Option[PlayerInfoReply] = list match {
-      case extAck >>: extVersion >>: 0 >>: -11 >>: clientNum >>: ping >>: name >>##:: team >>##::
-        frags >>: flagscore >>: deaths >>: teamkills >>: accuracy >>: health >>: armour >>: gunSelected >>: role >>: state >>: ip >~: ByteString.empty =>
-        Option(PlayerInfoReply(
-          clientNum, ping, name, team, frags, flagscore, deaths, teamkills, accuracy, health, armour, gunSelected, role, state, ip
-        ))
+      case extAck >>: extVersion >>: 0 >>: -11 >>: clientNum >>:
+        ping >>: name >>##:: team >>##::
+        frags >>: flagscore >>: deaths >>: teamkills >>: accuracy >>: health >>:
+        armour >>: gunSelected >>: role >>: state >>: ip >~: ByteString.empty =>
+        Option(PlayerInfoReply(clientNum, ping, name, team, frags, flagscore,
+          deaths, teamkills, accuracy, health, armour, gunSelected, role, state, ip))
       case _ => None
     }
   }
@@ -184,6 +196,7 @@ private[pinger] object PongParser {
             case _ => List.empty
           }
         }
+
         Option(TeamInfos(gamemode, minremain, go(rest)))
       case _ => None
     }

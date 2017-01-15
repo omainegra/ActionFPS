@@ -10,7 +10,13 @@ import org.scalatest.Matchers._
 class ParserTest extends FunSuite {
 
   test("Aura 2999 sample works") {
-    val result = ReferenceData.itemsA.collect { case ParsedResponse(f) => f }.scanLeft(ServerStateMachine.empty)(_.next(_)).dropRight(1).last
+    val result = ReferenceData
+      .binaryResponseStreamA
+      .flatMap(ParsedResponse.unapply)
+      .scanLeft(ServerStateMachine.empty)(ServerStateMachine.scan)
+      .dropRight(1)
+      .last
+
     val expected = CompletedServerStateMachine(
       ServerInfoReply(1201, 5, 6, 5, "ac_sunset", "www.woop.us - Aura 2999 - www.actionfps.com", 20, 128), List(
         PlayerInfoReply(0, 823, "AC...|ZZ", "RVSF", 4, 0, 7, 1, 0, 0, 0, 0, 0, 1, "41.102.17.x"),
@@ -25,7 +31,12 @@ class ParserTest extends FunSuite {
   }
 
   test("Aura 3999 sample works") {
-    val result = ReferenceData.itemsB.dropRight(1).collect { case ParsedResponse(f) => f }.foldLeft(ServerStateMachine.empty)(_.next(_))
+    val result = ReferenceData
+      .binaryResponseStreamB
+      .dropRight(1)
+      .flatMap(ParsedResponse.unapply)
+      .foldLeft(ServerStateMachine.empty)(ServerStateMachine.scan)
+
     val expectedResult = CompletedServerStateMachine(
       ServerInfoReply(1201, 10, 6, 8, "ac_desert", "www.woop.us - Aura 3999 - www.actionfps.com", 20, 0)
       , List(PlayerInfoReply(0, 48, "Pi_Pomps", "CLA", 5, 0, 5, 0, 65, 1, 0, 5, 0, 0, "86.46.27.x"),

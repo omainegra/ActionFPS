@@ -2,6 +2,12 @@ package com.actionfps.pinger
 
 /**
   * Created by me on 29/05/2016.
+  *
+  * Server mappings map from IP to hostname.
+  * We must do this because the responses don't contain the host names any more.
+  *
+  * Another approach is to include some sort of signature when sending a message out
+  * as the server I believe responds with payload you have sent to it.
   */
 trait ServerMappings {
   /**
@@ -22,7 +28,8 @@ object ServerMappings {
 }
 
 object DefaultServerMappings extends ServerMappings {
-  val connects = Map("62.210.131.155" -> "aura.woop.ac", "104.219.54.14" -> "tyr.woop.ac", "104.236.35.55" -> "ny.weed-lounge.me",
+  val connects = Map("62.210.131.155" -> "aura.woop.ac", "104.219.54.14" -> "tyr.woop.ac",
+    "104.236.35.55" -> "ny.weed-lounge.me",
     "104.255.33.235" -> "la.weed-lounge.me", "192.184.63.69" -> "califa.actionfps.com",
     "176.126.69.152" -> "bonza.actionfps.com", "191.96.4.147" -> "legal.actionfps.com",
     "150.107.152.50" -> "lah.actionfps.com")

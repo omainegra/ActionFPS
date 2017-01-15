@@ -11,9 +11,10 @@ import akka.actor.ActorSystem
 import akka.io.{IO, Udp}
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
-import play.api.libs.json.Json
 
 import scala.concurrent.Promise
+import akka.actor.ActorDSL._
+
 
 /**
   * Created by me on 30/08/2016.
@@ -52,25 +53,28 @@ class PingerServiceIntegrationSpec extends FreeSpec {
   }
 }
 
-import akka.actor.ActorDSL._
-
+/**
+  * Stub implementation of an AC server
+  */
 class BasicResponder extends Act {
 
   import context.system
 
   IO(Udp) ! Udp.Bind(self, new InetSocketAddress("127.0.0.1", 12385))
 
+  private val dataStream = ReferenceData.binaryResponseStreamA
+
   become {
     case Udp.Bound(local) =>
       become {
         case r@Udp.Received(data, s) =>
           if (data(0) == 1) {
-            sender() ! Udp.Send(ReferenceData.itemsA(0), s)
+            sender() ! Udp.Send(dataStream(0), s)
           }
           else if (data(0) == 0) {
-            if (data(1) == 1) ReferenceData.itemsA.drop(1).takeWhile(_ (1) == 1).foreach(b =>
+            if (data(1) == 1) dataStream.drop(1).takeWhile(_ (1) == 1).foreach(b =>
               sender() ! Udp.Send(b, s))
-            else if (data(1) == 2) ReferenceData.itemsA.filter(_ (1) == 2).foreach(b =>
+            else if (data(1) == 2) dataStream.filter(_ (1) == 2).foreach(b =>
               sender() ! Udp.Send(b, s))
           }
       }

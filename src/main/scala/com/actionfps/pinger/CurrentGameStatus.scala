@@ -4,8 +4,10 @@ import play.api.libs.json.Json
 
 /**
   * Created by me on 29/05/2016.
+  *
+  * All of these classes are for representing the current game
+  * as opposed to current server state. This format is much closer to the JsonGame format.
   */
-
 case class CurrentGameStatus
 (when: String,
  reasonablyActive: Boolean,
@@ -52,7 +54,11 @@ case class CurrentGameSpectator(name: String, user: Option[String]) {
 }
 
 
-case class CurrentGameTeam(name: String, flags: Option[Int], frags: Int, players: List[CurrentGamePlayer], spectators: Option[List[CurrentGamePlayer]]) {
+case class CurrentGameTeam(name: String,
+                           flags: Option[Int],
+                           frags: Int,
+                           players: List[CurrentGamePlayer],
+                           spectators: Option[List[CurrentGamePlayer]]) {
 
   def withUsers(username: (String) => Option[String]): CurrentGameTeam = {
     copy(players = players.map(_.withUsers(username)),

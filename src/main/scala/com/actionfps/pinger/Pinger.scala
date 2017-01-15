@@ -2,6 +2,7 @@ package com.actionfps.pinger
 
 import java.net.InetSocketAddress
 
+import akka.actor.ActorDSL._
 import akka.actor.{ActorLogging, Props, Terminated}
 import akka.io.{IO, Udp}
 import akka.util.ByteString
@@ -21,11 +22,20 @@ object Pinger {
 
 }
 
-import akka.actor.ActorDSL._
-
+/**
+  * Send out ping queries and collect the responses to rebuild a server state.
+  *
+  * For every successfully aggregated response, [[Pinger]] will send to its parent a
+  * [[CompletedServerStateMachine]] and a [[CurrentGameStatus]].
+  *
+  * To send a ping, send a [[SendPings]] message to the actor.
+  */
 class Pinger(implicit serverMappings: ServerMappings) extends Act with ActorLogging {
 
-  private val serverStates = scala.collection.mutable.Map.empty[(String, Int), ServerStateMachine].withDefaultValue(NothingServerStateMachine)
+  private val serverStates = {
+    scala.collection.mutable.Map.empty[(String, Int), ServerStateMachine]
+      .withDefaultValue(ServerStateMachine.empty)
+  }
 
   whenStarting {
     log.info("Starting pinger actor")
