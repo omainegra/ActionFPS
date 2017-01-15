@@ -1,5 +1,10 @@
-package com.actionfps.gameparser.ingesters
+package com.actionfps.gameparser.ingesters.stateful
 
+import com.actionfps.gameparser.ingesters.{DemoRecorded, DemoWritten}
+
+/**
+  * Created by me on 15/01/2017.
+  */
 sealed trait DemoCollector {
   def next(input: String): DemoCollector
 }

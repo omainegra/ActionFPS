@@ -1,8 +1,8 @@
 package com.actionfps
 package gameparser
 package ingesters
+package stateful
 
-import com.actionfps.gameparser.ingesters._
 import fastparse.all._
 import org.scalatest._
 

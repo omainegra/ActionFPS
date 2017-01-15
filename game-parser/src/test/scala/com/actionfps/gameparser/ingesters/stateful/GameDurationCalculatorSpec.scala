@@ -1,7 +1,8 @@
 package com.actionfps
 package gameparser
+package ingesters
+package stateful
 
-import com.actionfps.gameparser.ingesters._
 import org.scalatest._
 
 class GameDurationCalculatorSpec
@@ -21,7 +22,7 @@ class GameDurationCalculatorSpec
           |Game status: hunt the flag on ac_depot, 14 minutes remaining, open, 4 clients
           |Game status: team deathmatch on ac_aqueous, game finished, open, 6 clients
         """.stripMargin.split("\r?\n")
-      val outputSequence = inputSequence.scanLeft(NoDurationFound: GameDuration)(_.next(_)).toList
+      val outputSequence = inputSequence.scanLeft(GameDuration.empty)(GameDuration.scan).toList
       val List(_, _, first, second, third, fourth, fifth, _) = outputSequence
       first shouldBe NoDurationFound
       second shouldBe GameInProgress(10, 10)

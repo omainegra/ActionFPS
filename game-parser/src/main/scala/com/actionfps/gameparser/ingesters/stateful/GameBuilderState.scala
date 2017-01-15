@@ -1,68 +1,26 @@
-package com.actionfps.gameparser.ingesters
+package com.actionfps
+package gameparser
+package ingesters
+package stateful
 
-sealed trait GameDuration {
-  def next(input: String): GameDuration
+sealed trait GameBuilderState {
+  def next(input: String): GameBuilderState
+}
 
-  def getOrElse(num: Int): Int = this match {
-    case GameFinished(n) => n
-    case GameInProgress(duration, _) => duration
-    case NoDurationFound => num
+object GameBuilderState {
+  val initial: GameBuilderState = NothingFound
+
+  def scan(gameBuilderState: GameBuilderState, input: String): GameBuilderState = {
+    gameBuilderState.next(input)
   }
 }
 
-object GameDuration {
-  def empty: GameDuration = NoDurationFound
-}
-
-case object NoDurationFound extends GameDuration {
-  override def next(input: String): GameDuration = {
-    input match {
-      case GameInProgressHeader(GameInProgressHeader(mode, remaining, map, state)) =>
-        GameInProgress(remaining, remaining)
-      case _ => NoDurationFound
-    }
-  }
-}
-
-case class GameInProgress(duration: Int, remain: Int) extends GameDuration {
-  override def next(input: String): GameDuration = {
-    input match {
-      case GameFinishedHeader(GameFinishedHeader(_, _, _)) =>
-        GameFinished(duration)
-      case GameInProgressHeader(GameInProgressHeader(_, remaining, _, _)) =>
-        if (remaining > remain || remaining > duration) {
-          // new map - though we should never get here, really
-          GameInProgress(remaining, remaining)
-        } else {
-          GameInProgress(duration, remaining)
-        }
-      case _ => this
-    }
-  }
-}
-
-case class GameFinished(duration: Int) extends GameDuration {
-  override def next(input: String): GameDuration = input match {
-    case GameInProgressHeader(GameInProgressHeader(mode, remaining, map, state)) =>
-      GameInProgress(remaining, remaining)
-    case _ => this
-  }
-}
-
-sealed trait ParserState {
-  def next(input: String): ParserState
-}
-
-object ParserState {
-  val empty: ParserState = NothingFound
-}
-
-case object NothingFound extends ParserState {
-  def next(input: String): ParserState = {
+case object NothingFound extends GameBuilderState {
+  def next(input: String): GameBuilderState = {
     input match {
       case GameFinishedHeader(header@GameFinishedHeader(mode, _, _)) =>
-        new ParserState {
-          override def next(input: String): ParserState =
+        new GameBuilderState {
+          override def next(input: String): GameBuilderState =
             input match {
               case VerifyTableHeader() if mode.isFlag =>
                 ReadingFlagScores(FlagGameBuilder(header, List.empty, List.empty, List.empty))
@@ -76,24 +34,24 @@ case object NothingFound extends ParserState {
   }
 }
 
-case object NotEnoughPlayersFailure extends ParserState {
-  def next(input: String): ParserState = NothingFound.next(input)
+case object NotEnoughPlayersFailure extends GameBuilderState {
+  def next(input: String): GameBuilderState = NothingFound.next(input)
 }
 
-case object NotEnoughTeamsFailure extends ParserState {
-  def next(input: String): ParserState = NothingFound.next(input)
+case object NotEnoughTeamsFailure extends GameBuilderState {
+  def next(input: String): GameBuilderState = NothingFound.next(input)
 }
 
-case class UnexpectedInput(line: String) extends ParserState {
-  def next(input: String): ParserState = NothingFound.next(input)
+case class UnexpectedInput(line: String) extends GameBuilderState {
+  def next(input: String): GameBuilderState = NothingFound.next(input)
 }
 
 case class FragGameBuilder(header: GameFinishedHeader, scores: List[TeamModes.FragStyle.IndividualScore], disconnectedScores: List[TeamModes.FragStyle.IndividualScoreDisconnected], teamScores: List[TeamModes.FragStyle.TeamScore])
 
 case class FlagGameBuilder(header: GameFinishedHeader, scores: List[TeamModes.FlagStyle.IndividualScore], disconnectedScores: List[TeamModes.FlagStyle.IndividualScoreDisconnected], teamScores: List[TeamModes.FlagStyle.TeamScore])
 
-case class ReadingFragScores(builder: FragGameBuilder) extends ParserState {
-  def next(input: String): ParserState = {
+case class ReadingFragScores(builder: FragGameBuilder) extends GameBuilderState {
+  def next(input: String): GameBuilderState = {
     input match {
       case text if TeamModes.FragStyle.IndividualScore.unapply(text).isDefined =>
         val newScore = TeamModes.FragStyle.IndividualScore.unapply(text).get
@@ -120,8 +78,8 @@ case class ReadingFragScores(builder: FragGameBuilder) extends ParserState {
   }
 }
 
-case class ReadingFlagScores(builder: FlagGameBuilder) extends ParserState {
-  def next(input: String): ParserState = {
+case class ReadingFlagScores(builder: FlagGameBuilder) extends GameBuilderState {
+  def next(input: String): GameBuilderState = {
     input match {
       case text if TeamModes.FlagStyle.IndividualScore.unapply(text).isDefined =>
         val newScore = TeamModes.FlagStyle.IndividualScore.unapply(text).get
@@ -148,9 +106,8 @@ case class ReadingFlagScores(builder: FlagGameBuilder) extends ParserState {
   }
 }
 
-case class FoundGame(header: GameFinishedHeader, game: Either[FlagGameBuilder, FragGameBuilder]) extends ParserState {
+case class FoundGame(header: GameFinishedHeader, game: Either[FlagGameBuilder, FragGameBuilder]) extends GameBuilderState {
   def next(input: String) = NothingFound.next(input)
-
 }
 
 object FoundGame {

@@ -12,6 +12,7 @@ object MultipleServerParser {
     serverStates = Map.empty,
     serverTimeCorrectors = Map.empty
   )
+
   def collect: PartialFunction[MultipleServerParser, JsonGame] = {
     case g: MultipleServerParserFoundGame => g.cg
   }
@@ -33,7 +34,8 @@ case class MultipleServerParserFailedLine(line: String, next: MultipleServerPars
   def process(line: String): MultipleServerParser = next
 }
 
-case class MultipleServerParserProcessing(serverStates: Map[String, ServerState], serverTimeCorrectors: Map[String, TimeCorrector])
+case class MultipleServerParserProcessing(serverStates: Map[String, ServerState],
+                                          serverTimeCorrectors: Map[String, TimeCorrector])
   extends MultipleServerParser {
   def process(line: String): MultipleServerParser = {
     line match {

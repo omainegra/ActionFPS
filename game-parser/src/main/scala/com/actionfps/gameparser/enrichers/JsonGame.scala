@@ -3,7 +3,7 @@ package com.actionfps.gameparser.enrichers
 import java.time.ZonedDateTime
 
 import com.actionfps.api.{Game, GamePlayer, GameTeam}
-import com.actionfps.gameparser.ingesters.FoundGame
+import com.actionfps.gameparser.ingesters.stateful.FoundGame
 
 object JsonGame {
 

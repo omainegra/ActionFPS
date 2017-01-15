@@ -5,7 +5,8 @@ import java.time.{ZoneId, ZonedDateTime, ZoneOffset, LocalDateTime}
 /**
   * Created by William on 26/12/2015.
   */
-case class TimeCorrector(ourTime: ZonedDateTime, remoteTime: LocalDateTime) extends (ZonedDateTime => ZonedDateTime) {
+case class TimeCorrector(ourTime: ZonedDateTime, remoteTime: LocalDateTime)
+  extends (ZonedDateTime => ZonedDateTime) {
 
   private val sstI = remoteTime.toInstant(ZoneOffset.of("Z")).toEpochMilli
   private val messageTimeI = ourTime.toInstant.toEpochMilli

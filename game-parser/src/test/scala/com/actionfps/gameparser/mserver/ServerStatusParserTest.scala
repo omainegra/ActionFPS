@@ -1,7 +1,7 @@
 package com.actionfps
 package gameparser
+package mserver
 
-import com.actionfps.gameparser.mserver._
 import org.scalatest.{FunSuite, Matchers}
 
 /**

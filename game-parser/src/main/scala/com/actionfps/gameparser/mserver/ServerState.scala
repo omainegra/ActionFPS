@@ -1,6 +1,8 @@
-package com.actionfps.gameparser.mserver
+package com.actionfps
+package gameparser
+package mserver
 
-import com.actionfps.gameparser.ingesters.{GameDuration, ParserState, FoundGame}
+import com.actionfps.gameparser.ingesters.stateful.{FoundGame, GameBuilderState, GameDuration}
 
 /**
   * Created by William on 11/11/2015.
@@ -14,7 +16,8 @@ case class ServerFoundGame(foundGame: FoundGame, duration: Int) extends ServerSt
   def next(line: String): ServerState = ServerState.empty
 }
 
-case class ServerStateProcessing(parserState: ParserState, gameDuration: GameDuration) extends ServerState {
+case class ServerStateProcessing(parserState: GameBuilderState,
+                                 gameDuration: GameDuration) extends ServerState {
   def next(line: String): ServerState = {
     parserState.next(line) match {
       case fg: FoundGame =>
@@ -33,7 +36,7 @@ case class ServerStateProcessing(parserState: ParserState, gameDuration: GameDur
 
 object ServerState {
   def empty: ServerState = ServerStateProcessing(
-    parserState = ParserState.empty,
+    parserState = GameBuilderState.initial,
     gameDuration = GameDuration.empty
   )
 }

@@ -1,49 +1,16 @@
-package com.actionfps
-package gameparser
+package com.actionfps.gameparser.ingesters.stateful
 
-import com.actionfps.gameparser.ingesters._
+import com.actionfps.gameparser.ingesters.{GameFinishedHeader, GameMode, TeamModes}
+import com.actionfps.gameparser.ingesters.GameMode.TDM
+import com.actionfps.gameparser.ingesters.TeamModes.FragStyle
 import org.scalatest._
 
-class GameCaptureParserSpec
+class GameBuilderParserSpec
   extends WordSpec
     with Inside
     with Inspectors
     with Matchers
     with OptionValues {
-
-  "Game parse" must {
-    "Parse a finish line" in {
-      val input = "Game status: team deathmatch on ac_aqueous, game finished, open, 6 clients"
-      val GameFinishedHeader(h) = input
-      h.map shouldBe "ac_aqueous"
-      h.state shouldBe "open"
-    }
-    "Parse in progress" in {
-      val input = "Game status: hunt the flag on ac_depot, 14 minutes remaining, open, 4 clients"
-      val GameInProgressHeader(h) = input
-      h.map shouldBe "ac_depot"
-      h.remaining shouldBe 14
-    }
-    "Parse frag game score" in {
-      val line = " 0 Daimon           RVSF    -12    0     3  0   32 normal  2.12.186.32"
-      val line2 = " 1 ~FEL~.RayDen     RVSF     57    8     2  0  169 normal  186.83.65.12"
-      val TeamModes.FragStyle.IndividualScore(r) = line
-      val TeamModes.FragStyle.IndividualScore(r2) = line2
-    }
-    "Parse flag game score" in {
-      val line = "1 w00p|Lucas       RVSF    1    514   45    42  0  112 normal  138.231.142.200"
-      val TeamModes.FlagStyle.IndividualScore(r) = line
-    }
-    "Parse team flag score" in {
-      val line = "Team  CLA:  0 players,    0 frags,    0 flags"
-      val TeamModes.FlagStyle.TeamScore(t) = line
-    }
-    "Parse a disconnected TDM score" in {
-      val line = "   ~FEL~MR.JAM      RVSF    1    7       -    - disconnected"
-      val TeamModes.FragStyle.IndividualScoreDisconnected(t) = line
-    }
-
-  }
 
   "Game capture" must {
     "Not fail for a TDM game" in {
@@ -75,7 +42,7 @@ class GameCaptureParserSpec
 
       val playersShouldBe = Set("Daimon", "~FEL~.RayDen", "|oNe|OpTic", "inter", "hu3", "~FEL~MR.JAM")
 
-      val outputs = inputSequence.scanLeft(NothingFound: ParserState)(_.next(_))
+      val outputs = inputSequence.scanLeft(GameBuilderState.initial)(GameBuilderState.scan)
 
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
 
@@ -83,7 +50,7 @@ class GameCaptureParserSpec
         case FoundGame(header, Right(fragGame)) =>
           inside(header) {
             case GameFinishedHeader(mode, map, state) =>
-              mode shouldBe GameMode.TDM
+              mode shouldBe TDM
               map shouldBe "ac_aqueous"
               state shouldBe "open"
           }
@@ -95,7 +62,7 @@ class GameCaptureParserSpec
 
               forExactly(1, disconnectedScores) {
                 score => inside(score) {
-                  case TeamModes.FragStyle.IndividualScoreDisconnected(name, team, frag, death) =>
+                  case FragStyle.IndividualScoreDisconnected(name, team, frag, death) =>
                     name shouldBe "~FEL~MR.JAM"
                     team shouldBe "RVSF"
                     frag shouldBe 1
@@ -158,7 +125,7 @@ class GameCaptureParserSpec
           | """.stripMargin.split("\r?\n")
 
       for {t <- inputSequence} info(s"Line: $t")
-      val outputs = inputSequence.scanLeft(NothingFound: ParserState)(_.next(_))
+      val outputs = inputSequence.scanLeft(GameBuilderState.initial)(GameBuilderState.scan)
 
       for {o <- outputs} info(s"Output item: $o")
 
@@ -236,7 +203,7 @@ class GameCaptureParserSpec
           |demo written to file "/home/tyr/ac/demos/1999/20150123_2153_local_ac_depot_15min_CTF.dmo" (6|93067 bytes)
           |
         """.stripMargin.split("\r?\n")
-      val outputs = inputSequence.scanLeft(NothingFound: ParserState)(_.next(_))
+      val outputs = inputSequence.scanLeft(GameBuilderState.initial)(_.next(_))
 
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
     }
@@ -262,10 +229,9 @@ class GameCaptureParserSpec
           |
         """.stripMargin.split("\r?\n")
 
-      val outputs = inputSequence.scanLeft(NothingFound: ParserState)(_.next(_))
+      val outputs = inputSequence.scanLeft(GameBuilderState.initial)(_.next(_))
 
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
-
 
       inside(outputs(outputs.length - 2)) {
         case FoundGame(header, Left(flagGame)) =>
