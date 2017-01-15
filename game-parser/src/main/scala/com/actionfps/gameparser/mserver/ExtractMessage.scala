@@ -14,7 +14,7 @@ import scala.util.control.NonFatal
 object ExtractMessage {
 
   /**
-    * Fast matcher. 90% faster than the above regex. One small change! :-O
+    * Fast matcher. 90% faster than a regex.
     */
   object matcher {
 

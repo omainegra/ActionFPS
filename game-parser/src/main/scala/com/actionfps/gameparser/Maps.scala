@@ -9,7 +9,7 @@ case class Maps(maps: Map[String, AcMap])
 
 object Maps {
 
-  private val maps = Map(
+  private val mapImages = Map(
     "ac_douze" -> "https://cloud.githubusercontent.com/assets/5359646/12695151/1beaa7a4-c745-11e5-9577-2cef2722845c.jpg",
     "ac_edifice" -> "https://cloud.githubusercontent.com/assets/5359646/12695153/1bed793e-c745-11e5-8c0e-c03d3405de47.jpg",
     "ac_elevation" -> "https://cloud.githubusercontent.com/assets/5359646/12695152/1becdf1a-c745-11e5-8564-798f30191533.jpg",
@@ -45,7 +45,7 @@ object Maps {
   )
 
   val resource: Maps = Maps(
-    maps.map { case (n, u) =>
+    mapImages.map { case (n, u) =>
       n -> AcMap(name = n, image = u)
     }
   )

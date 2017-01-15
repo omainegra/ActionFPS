@@ -1,5 +1,6 @@
 package com.actionfps
 package gameparser
+package ingesters
 
 import com.actionfps.gameparser.ingesters._
 import fastparse.all._
@@ -22,20 +23,22 @@ class DemoCaptureParserSpec
     }
 
     "Parse date" in {
-      DemoRecorded.year.parse("2014").get
+      SharedParsers.yearParser.parse("2014").get
       val input = "Thu Dec 18 19:24:56 2014"
-      DemoRecorded.timestampParse.parse(input).get
-      val Parsed.Success(res, _) = DemoRecorded.timestampParse.!.parse(input)
+      SharedParsers.timestampParser.parse(input).get
+      val Parsed.Success(res, _) = SharedParsers.timestampParser.!.parse(input)
       res shouldEqual input
     }
+
     "Parse map" in {
       val input = "ac_mines"
-      val Parsed.Success(res, _) = DemoRecorded.mapName.!.parse(input)
+      val Parsed.Success(res, _) = SharedParsers.mapNameParser.!.parse(input)
       res shouldEqual input
     }
+
     "Parse size" in {
       val input = "610.60kB"
-      val Parsed.Success(res, _) = DemoRecorded.size.!.parse(input)
+      val Parsed.Success(res, _) = DemoRecorded.sizeParser.!.parse(input)
       res shouldEqual input
     }
 

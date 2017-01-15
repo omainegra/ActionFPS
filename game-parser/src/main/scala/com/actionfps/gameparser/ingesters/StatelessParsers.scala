@@ -1,15 +1,14 @@
 package com.actionfps.gameparser.ingesters
 
+import com.actionfps.gameparser.SharedParsers
 import fastparse.all._
 
 case class GameFinishedHeader(mode: GameMode.GameMode, map: String, state: String)
 
 object GameFinishedHeader {
 
-  val acceptedMode = GameMode.gamemodes.map(gm => P(gm.name).map(_ => gm)).reduce(_ | _)
-
-  private val cap = P("Game status: ") ~ acceptedMode ~ " on " ~ DemoRecorded.mapName.! ~
-    ", game finished, " ~ CharsWhile(_ != ',').! ~ ", " ~ DemoRecorded.digit.rep ~ " clients"
+  private val cap = P("Game status: ") ~ SharedParsers.acceptedModeParser ~ " on " ~ SharedParsers.mapNameParser.! ~
+    ", game finished, " ~ CharsWhile(_ != ',').! ~ ", " ~ SharedParsers.digitParser.rep ~ " clients"
 
   private val capEx = cap.map(Function.tupled(GameFinishedHeader.apply))
 
@@ -30,8 +29,11 @@ object GameInProgressHeader {
   private val clients = CharIn('0' to '9').rep(1).!.map(_.toInt) ~ " clients"
 
   private val spaces = " ".rep(1)
-  private val input = "Game status: hunt the flag on ac_depot, 14 minutes remaining, open, 4 clients"
-  private val cap = P("Game status:") ~ spaces ~ GameFinishedHeader.acceptedMode ~ " on " ~ DemoRecorded.mapName.! ~
+
+  /**
+    * @example "Game status: hunt the flag on ac_depot, 14 minutes remaining, open, 4 clients"
+    * */
+  private val cap = P("Game status:") ~ spaces ~ SharedParsers.acceptedModeParser ~ " on " ~ SharedParsers.mapNameParser.! ~
     ", " ~ timeRemaining ~ "," ~ spaces ~ CharsWhile(_ != ',').rep(1).! ~ ", " ~ clients
 
   private val cap2 = cap.map { case (mode, map, remain, state, clientCount) => GameInProgressHeader(mode, remain, map, state) }
