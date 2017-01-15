@@ -22,7 +22,7 @@ lazy val gameParser = Project(id = "game-parser", base = file("game-parser"))
   .settings(
     libraryDependencies += "com.lihaoyi" %% "fastparse" % "0.4.2"
   )
-    libraryDependencies in ThisBuild += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+libraryDependencies in ThisBuild += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 
 lazy val pureGame = Project(id = "pure-game", base = file("pure-game"))
 

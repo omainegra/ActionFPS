@@ -3,7 +3,11 @@ package com.actionfps.api
 /**
   * Created by me on 29/05/2016.
   */
-case class GameTeam(name: String, flags: Option[Int], frags: Int, players: List[GamePlayer], clan: Option[String]) {
+case class GameTeam(name: String,
+                    flags: Option[Int],
+                    frags: Int,
+                    players: List[GamePlayer],
+                    clan: Option[String]) {
   /**
     * A player might disconnect mid-game, get a new IP. Goal here is to sum up their scores properly.
     */
