@@ -61,7 +61,8 @@ class JournalGamesProvider(journalFiles: List[File])
 
   override def removeHook(f: (JsonGame) => Unit): Unit = hooks.send(_ - f)
 
-  private val lastTailerExecutor: ExecutorService = Executors.newFixedThreadPool(1)
+  // @todo remove dependency on Executors, it's PITA.
+  private val lastTailerExecutor: ExecutorService = Executors.newFixedThreadPool(2)
 
   applicationLifecycle.addStopHook(() => Future(lastTailerExecutor.shutdown()))
 
@@ -79,14 +80,16 @@ class JournalGamesProvider(journalFiles: List[File])
     * @warning Uses [[lastTailerExecutor]]. Do not call multiple times.
     * @return A list of Batched and Streamed JsonGames.
     */
-  private def latestTailLoad(): Option[(List[JsonGame], Iterator[JsonGame])] = recentJournalFiles.headOption.map { recent =>
-    val adapter = new IteratorTailerListenerAdapter()
-    val tailer = new Tailer(recent, adapter, 2000)
-    val reader = TailedScannerReader(adapter, Scanner(GameScanner.initial)(GameScanner.scan))
-    lastTailerExecutor.submit(tailer)
-    applicationLifecycle.addStopHook(() => Future(tailer.stop()))
-    val (initialRecentGames, tailIterator) = reader.collect(GameScanner.collect)
-    initialRecentGames -> tailIterator
+  private def latestTailLoad(): Option[(List[JsonGame], Iterator[JsonGame])] = {
+    recentJournalFiles.headOption.map { recentJournalFile =>
+      val adapter = new IteratorTailerListenerAdapter()
+      val tailer = new Tailer(recentJournalFile, adapter, 2000)
+      val reader = TailedScannerReader(adapter, Scanner(GameScanner.initial)(GameScanner.scan))
+      lastTailerExecutor.submit(tailer)
+      applicationLifecycle.addStopHook(() => Future(tailer.stop()))
+      val (initialRecentGames, tailIterator) = reader.collect(GameScanner.collect)
+      initialRecentGames -> tailIterator
+    }
   }
 
   /**
@@ -122,8 +125,9 @@ class JournalGamesProvider(journalFiles: List[File])
   }
 
   private class TailProcess(gamesAgent: Agent[Map[String, JsonGame]],
-                            tailIterator: Iterator[JsonGame]) extends Runnable {
+                            tailIterator: Iterator[JsonGame]) extends Runnable { tp =>
     override def run(): Unit = {
+      Logger(tp.getClass).info("TailProcess started.")
       tailIterator
         .filter(_.validate.isRight)
         .filter(_.validateServer)
