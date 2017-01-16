@@ -8,7 +8,7 @@ import java.io.File
 import java.nio.file.Path
 import javax.inject._
 
-import akka.NotUsed
+import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.stream.ActorMaterializer
@@ -20,8 +20,8 @@ import com.actionfps.gameparser.GameScanner
 import com.actionfps.gameparser.enrichers._
 import play.api.inject.ApplicationLifecycle
 import play.api.{Configuration, Logger}
-import concurrent.duration._
 
+import concurrent.duration._
 import scala.async.Async._
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -68,17 +68,14 @@ class JournalTailGamesProvider(journalFile: Option[Path],
 
   private val gamesAgent = Agent(Map.empty[String, JsonGame])
 
-  override val games: Future[Map[String, JsonGame]] = {
-    async {
-      journalFile match {
-        case None => logger.info("No source found for tailing, so not doing anything.")
-        case Some(path) =>
-          logger.info(s"Tailing from ${path}...")
-          flow(path, await(journalGamesProvider.latestGamesId))
-            .to(Sink.ignore)
-            .run()
-      }
-      gamesAgent.get()
+  override def games: Future[Map[String, JsonGame]] = Future.successful(gamesAgent.get())
+
+  journalFile.foreach { path =>
+    logger.info(s"Tailing from ${path}...")
+    journalGamesProvider.latestGamesId.foreach { latestGameId =>
+      logger.info(s"Got latest game ID ${latestGameId}")
+      flow(path, latestGameId)
+        .runForeach { g => () }
     }
   }
 

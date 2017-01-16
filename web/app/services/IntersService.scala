@@ -88,7 +88,7 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
       }
     }.mapAsync(1) { case (server, zdt, interCall, allowed) =>
       interStateAgent.alter { oldState =>
-        logger.info(s"Received $interCall. Allowed? $allowed")
+        logger.debug(s"Received $interCall. Allowed? $allowed")
         if (allowed) {
           intersChannel.push(Event(
             id = Option(interCall.time.toString),
