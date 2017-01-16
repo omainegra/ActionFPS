@@ -92,7 +92,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
             Ok(Json.toJson(clanwar))
           else
             Ok(webTemplateRender.renderTemplate(
-              title = Some(s"Clanwar between ${clanwar.clans.flatMap(clanner.get).mkString(" and ")}"),
+              title = Some(s"${clanwar.clans.flatMap(clanner.get).map(_.fullName).mkString(" and ")} - Clanwar"),
               supportsJson = true
             )(views.html.clanwar.clanwar(
               clanwarMeta = clanwar.meta.named,
