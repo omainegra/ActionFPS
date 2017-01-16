@@ -7,18 +7,20 @@ package controllers
 import java.time.ZoneId
 import javax.inject._
 
+import akka.actor.ActorSystem
 import akka.agent.Agent
-import com.actionfps.ladder.ProcessTailer
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl._
+import akka.util.ByteString
 import com.actionfps.ladder.parser._
 import lib.WebTemplateRender
-import play.api.{Configuration, Logger}
+import play.api.Configuration
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import providers.ReferenceProvider
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.control.NonFatal
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class LadderController @Inject
@@ -26,9 +28,12 @@ class LadderController @Inject
    common: WebTemplateRender,
    configuration: Configuration,
    referenceProvider: ReferenceProvider)
-(implicit executionContext: ExecutionContext) extends Controller {
+(implicit executionContext: ExecutionContext,
+ actorSystem: ActorSystem) extends Controller {
 
   private val agg = Agent(KeyedAggregate.empty[String])
+
+  implicit val actorMat = ActorMaterializer()
 
   def aggregate: Aggregate = agg.get().total
 
@@ -40,22 +45,20 @@ class LadderController @Inject
     .getSourceCommands(configuration, "af.ladder.sources")
     .toList
     .flatten.map { command =>
-    try {
-      Logger.info(s"Starting process = ${command}")
-      val t = new ProcessTailer(command)({
+    StreamConverters.fromInputStream(() => {
+      new java.lang.ProcessBuilder(command: _*)
+        .start()
+        .getInputStream
+    })
+      .via(Framing.delimiter(ByteString.fromString("\n", "UTF-8"), 2096, allowTruncation = false))
+      .map(_.decodeString("UTF-8"))
+      .collect {
         case TimesMessage(TimesMessage(ldt, PlayerMessage(m))) =>
           agg.send(_.includeLine(s"${command}")(m.timed(ldt.atZone(ZoneId.of("UTC"))))(up))
-        case _ =>
-      })
-      t
-    } catch {
-      case NonFatal(e) =>
-        Logger.error(s"Failed to start: ${command}", e)
-        throw e
-    }
+      }
+      .to(Sink.ignore)
+      .run()
   }
-
-  applicationLifecycle.addStopHook(() => Future.successful(tailers.foreach(_.shutdown())))
 
   def ladder = Action { implicit req =>
     req.getQueryString("format") match {
