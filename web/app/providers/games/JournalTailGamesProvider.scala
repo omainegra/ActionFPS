@@ -70,8 +70,10 @@ class JournalTailGamesProvider(journalFile: Option[Path],
 
   override def games: Future[Map[String, JsonGame]] = Future.successful(gamesAgent.get())
 
+
+  logger.info("Journal Tailer is ready.")
   journalFile.foreach { path =>
-    logger.info(s"Tailing from ${path}...")
+    logger.info(s"Tailing for new games from ${path}...")
     journalGamesProvider.latestGamesId.foreach { latestGameId =>
       logger.info(s"Got latest game ID ${latestGameId}")
       flow(path, latestGameId)

@@ -25,7 +25,7 @@ class CombinedGamesProvider @Inject()(journalGamesProvider: JournalGamesProvider
       journal <- journalGamesProvider.games
       batchUrl <- batchURLGamesProvider.games
       jt <- journalTailGamesProvider.games
-    } yield batch ++ journal ++ batchUrl
+    } yield batch ++ journal ++ batchUrl ++ jt
   }
 
   override def addHook(hook: (JsonGame) => Unit): Unit = {
