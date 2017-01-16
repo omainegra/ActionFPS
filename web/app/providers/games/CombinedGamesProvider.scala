@@ -14,7 +14,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class CombinedGamesProvider @Inject()(journalGamesProvider: JournalGamesProvider,
                                       batchFilesGamesProvider: BatchFilesGamesProvider,
-                                      batchURLGamesProvider: BatchURLGamesProvider)
+                                      batchURLGamesProvider: BatchURLGamesProvider,
+                                      journalTailGamesProvider: JournalTailGamesProvider)
                                      (implicit executionContext: ExecutionContext)
   extends GamesProvider {
 
@@ -23,6 +24,7 @@ class CombinedGamesProvider @Inject()(journalGamesProvider: JournalGamesProvider
       batch <- batchFilesGamesProvider.games
       journal <- journalGamesProvider.games
       batchUrl <- batchURLGamesProvider.games
+      jt <- journalTailGamesProvider.games
     } yield batch ++ journal ++ batchUrl
   }
 
@@ -30,6 +32,7 @@ class CombinedGamesProvider @Inject()(journalGamesProvider: JournalGamesProvider
     batchFilesGamesProvider.addHook(hook)
     journalGamesProvider.addHook(hook)
     batchURLGamesProvider.addHook(hook)
+    journalTailGamesProvider.addHook(hook)
     super.addHook(hook)
   }
 
@@ -37,6 +40,7 @@ class CombinedGamesProvider @Inject()(journalGamesProvider: JournalGamesProvider
     batchFilesGamesProvider.removeHook(hook)
     journalGamesProvider.removeHook(hook)
     batchURLGamesProvider.removeHook(hook)
+    journalTailGamesProvider.removeHook(hook)
     super.removeHook(hook)
   }
 }

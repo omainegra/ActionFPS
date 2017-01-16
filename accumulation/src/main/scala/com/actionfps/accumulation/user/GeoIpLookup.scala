@@ -13,14 +13,14 @@ object GeoIpLookup extends IpLookup {
     val A = new File("resources/GeoLiteCityv6.dat")
     val B = new File("web/resources/GeoLiteCityv6.dat")
     val C = new File("../resources/GeoLiteCityv6.dat")
-    val D = new File("target/geoip-resources/GeoLiteCityv6.dat")
-    val E = new File("../target/geoip-resources/GeoLiteCityv6.dat")
+    val D = new File("geoip-resources/GeoLiteCityv6.dat")
+    val E = new File("../geoip-resources/GeoLiteCityv6.dat")
     val F = Option(System.getProperty("geolitecity.dat")).map(f => new File(f))
     try {
       (List(A, B, C, D, E) ++ F).filter(_.exists()).head
     } catch {
       case e: Throwable =>
-        throw new IllegalArgumentException(s"Coult nof find GeoLiteCityv6.dat. Might want to set System property 'geolitecity.dat'")
+        throw new IllegalArgumentException(s"Coult not find GeoLiteCityv6.dat. Might want to set System property 'geolitecity.dat'")
     }
   }
 

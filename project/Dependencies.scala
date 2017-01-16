@@ -19,7 +19,7 @@ object Dependencies {
   val httpClientCache: ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.2"
   val commonsIo: ModuleID = "commons-io" % "commons-io" % "2.5"
   val scalatestPlus: ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1"
-
+  val alpakkaFile: ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.4"
   val seleniumJava: ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "2.53.1"
   val seleniumHtmlUnit: ModuleID = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0"
 
@@ -37,7 +37,6 @@ object Dependencies {
 
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 
-  val streamReaders: ModuleID = "default" %% "stream-readers" % "1.0.1"
   val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.4.1"
   val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.5.0"
   val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.5.0"
