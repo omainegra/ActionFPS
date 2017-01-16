@@ -75,7 +75,8 @@ class JournalTailGamesProvider(journalFile: Option[Path],
         case Some(path) =>
           logger.info(s"Tailing from ${path}...")
           flow(path, await(journalGamesProvider.latestGamesId))
-            .viaMat(Flow.apply)(Keep.right).to(Sink.ignore)
+            .to(Sink.ignore)
+            .run()
       }
       gamesAgent.get()
     }
