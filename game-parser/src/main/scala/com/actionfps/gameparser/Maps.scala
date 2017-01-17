@@ -41,7 +41,8 @@ object Maps {
     "ac_sunset" -> "https://cloud.githubusercontent.com/assets/5359646/12831400/58da2ee8-cb94-11e5-9d33-822a5357cb2d.jpg",
     "ac_swamp" -> "https://cloud.githubusercontent.com/assets/5359646/12831474/c86cac36-cb94-11e5-828a-4a8748b7a71b.jpg",
     "ac_werk" -> "https://cloud.githubusercontent.com/assets/5359646/12974606/8cf6f8d4-d0b5-11e5-839a-1fbe3d593894.jpg",
-    "ac_urban" -> "https://cloud.githubusercontent.com/assets/5359646/13022588/d1f10320-d1e2-11e5-89fa-0e495925d671.jpg"
+    "ac_urban" -> "https://cloud.githubusercontent.com/assets/5359646/13022588/d1f10320-d1e2-11e5-89fa-0e495925d671.jpg",
+    "ac_terros" -> "https://cloud.githubusercontent.com/assets/5359646/22028428/6a698f5a-dcd7-11e6-8dcc-32b24d98dd47.jpg"
   )
 
   val resource: Maps = Maps(
