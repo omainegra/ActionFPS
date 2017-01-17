@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
 
-  val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.0"
+  val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.1"
   val scalatestOld: ModuleID = "org.scalatest" %% "scalatest" % "2.2.6"
   val json4s: ModuleID = "org.json4s" %% "json4s-jackson" % "3.4.2"
   val fastParse: ModuleID = "com.lihaoyi" %% "fastparse" % "0.4.2"

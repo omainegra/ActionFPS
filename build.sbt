@@ -169,9 +169,11 @@ lazy val interParser =
   Project(
     id = "inter-parser",
     base = file("inter-parser")
-  ).settings(
-    libraryDependencies += fastParse
   )
+    .dependsOn(accumulation)
+    .settings(
+      libraryDependencies += scalatest % Test
+    )
 
 lazy val referenceReader =
   Project(
