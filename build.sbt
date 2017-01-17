@@ -85,6 +85,7 @@ lazy val web = project
   .settings(
     scalaSource in IntegrationTest := baseDirectory.value / "it",
     resolvers += scalaWilliamResolver,
+    resolvers += actionFpsResolver,
     libraryDependencies ++= Seq(
       akkaActor,
       akkaAgent,
