@@ -20,6 +20,7 @@ object InterOut {
           instant = zdt.toInstant,
           user = user.id,
           playerName = interMessage.nickname,
+          ip = interMessage.ip,
           serverName = server.name,
           serverConnect = serverAddress
         )
@@ -31,4 +32,5 @@ case class InterOut(instant: Instant,
                     user: String,
                     playerName: String,
                     serverName: String,
-                    serverConnect: String)
+                    serverConnect: String,
+                    ip: String)

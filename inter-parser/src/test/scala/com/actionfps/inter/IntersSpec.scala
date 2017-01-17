@@ -16,9 +16,14 @@ class IntersSpec extends FreeSpec {
   }
 
   "timeouts work" in {
-    val io1 = InterOut(instant = Instant.now(),
-      user = "abc", playerName = "bcd",
-      serverName = "def", serverConnect = "ghi")
+    val io1 = InterOut(
+      instant = Instant.now(),
+      user = "abc",
+      playerName = "bcd",
+      serverName = "def",
+      serverConnect = "ghi",
+      ip = "127.0.0.1"
+    )
     val io2 = io1.copy(instant = io1.instant.plusSeconds(50))
     val io3 = io2.copy(instant = io2.instant.plusSeconds(500))
     IntersIterator.empty
