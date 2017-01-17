@@ -42,6 +42,8 @@ object Dependencies {
   val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.5.0"
 
   val scalaWilliamResolver: MavenRepository = Resolver.bintrayRepo("scalawilliam", "maven")
+  val actionFpsResolver: MavenRepository = Resolver.bintrayRepo("actionfps", "maven")
+
 
 
 }
