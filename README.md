@@ -228,3 +228,17 @@ including an IP address of the other person, as well as a CN of that person.
 Including the current team? Not sure if that's useful.
 
 Let's just start from the most basic stuff, which is time.
+
+# Release procedure
+
+1. Make sure you're on the Bintray organization: https://bintray.com/actionfps
+2. Add a git tag to the current clean commit ( `git tag 5.4.x` for example )
+3. `git push origin -u HEAD` to push the tag.
+4. `sbt publish`
+
+## Using
+
+```scala
+resolvers += Resolver.bintrayRepo("actionfps", "maven")
+libraryDependencies += "com.actionfps" %% "package" % "version"
+```
