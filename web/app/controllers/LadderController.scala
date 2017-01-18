@@ -7,6 +7,7 @@ package controllers
 import java.time.{LocalDateTime, ZoneOffset, ZonedDateTime}
 import javax.inject._
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.stream.ActorMaterializer
@@ -20,7 +21,8 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import providers.ReferenceProvider
 
-import scala.concurrent.ExecutionContext
+import scala.async.Async._
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class LadderController @Inject
@@ -37,6 +39,13 @@ class LadderController @Inject
 
   def aggregate: Aggregate = agg.get().total
 
+  private val usersMap = {
+    referenceProvider.users.map {
+      users =>
+      users.map(user => user.nickname.nickname -> user.id).toMap.get _
+    }
+  }
+
   private val tailers = LadderController
     .getSourceCommands(configuration, "af.ladder.sources")
     .toList
@@ -48,18 +57,7 @@ class LadderController @Inject
     })
       .via(Framing.delimiter(ByteString.fromString("\n", "UTF-8"), 2096, allowTruncation = false))
       .map(_.decodeString("UTF-8"))
-      .scanAsync(Aggregate.empty) {
-        case (aggregate, message) =>
-          import scala.async.Async._
-          async {
-            val n2u = await(referenceProvider.users).map(u => u.nickname.nickname -> u.id).toMap
-            val tmu = LadderController.TimedUserMessageExtract(n2u.get)
-            message match {
-              case tmu(timedUserMessage) => aggregate.includeLine(timedUserMessage)
-              case _ => aggregate
-            }
-          }
-      }
+      .via(LadderController.individualServerFlow(() => usersMap))
       .alsoTo(Sink.foreach { g => agg.send(_.includeAggregate(s"$command")(g)) })
       .to(Sink.ignore)
       .run()
@@ -83,6 +81,21 @@ class LadderController @Inject
 }
 
 object LadderController {
+
+  def individualServerFlow(nickToUser: () => Future[String => Option[String]])
+                          (implicit executionContext: ExecutionContext): Flow[String, Aggregate, NotUsed] = {
+    Flow[String]
+      .scanAsync(Aggregate.empty) {
+        case (aggregate, message) =>
+          async {
+            val tmu = LadderController.TimedUserMessageExtract(await(nickToUser()))
+            message match {
+              case tmu(timedUserMessage) => aggregate.includeLine(timedUserMessage)
+              case _ => aggregate
+            }
+          }
+      }
+  }
 
   case class TimedUserMessageExtract(nickToUser: String => Option[String]) {
     def unapply(input: String): Option[TimedUserMessage] = {

@@ -26,7 +26,7 @@ case class Aggregate(users: Map[String, UserStatistics]) {
           else if (tmu.gibbed) previousUser.gib
           else if (tmu.scored) previousUser.gib
           else previousUser
-        }
+        }.see(tmu.instant)
       )
     )
   }

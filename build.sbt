@@ -83,6 +83,7 @@ lazy val web = project
   .settings(Defaults.itSettings: _*)
   .settings(
     scalaSource in IntegrationTest := baseDirectory.value / "it",
+    fork in run := true,
     libraryDependencies ++= Seq(
       akkaActor,
       akkaAgent,
