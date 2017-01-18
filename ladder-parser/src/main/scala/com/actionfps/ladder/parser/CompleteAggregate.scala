@@ -5,11 +5,3 @@ case class CompleteAggregate(all: Aggregate) {
     copy(all = all.includeLine(playerMessage))
   }
 }
-
-
-
-
-
-
-
-
