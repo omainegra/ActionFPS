@@ -6,6 +6,7 @@ name := "actionfps"
 scalaVersion in ThisBuild := "2.11.8"
 
 resolvers in ThisBuild += scalaWilliamResolver
+resolvers in ThisBuild += actionFpsResolver
 
 organization in ThisBuild := "com.actionfps"
 
