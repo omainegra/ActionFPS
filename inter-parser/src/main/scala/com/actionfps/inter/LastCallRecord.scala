@@ -1,6 +1,6 @@
 package com.actionfps.inter
 
-import java.time.Instant
+import java.time.{Duration, Instant}
 
 /**
   * Created by me on 17/01/2017.
@@ -13,17 +13,17 @@ case class LastCallRecord(user: Map[String, Instant],
     val acceptByUser = user.get(interOut.user) match {
       case None => true
       case Some(latestUserInstant) =>
-        interOut.instant.minus(java.time.Duration.ofMinutes(5)).isAfter(latestUserInstant)
+        interOut.instant.minus(LastCallRecord.UserTimeout).isAfter(latestUserInstant)
     }
     val acceptByServer = server.get(interOut.serverName) match {
       case None => true
       case Some(latestServerInstant) =>
-        interOut.instant.minus(java.time.Duration.ofMinutes(5)).isAfter(latestServerInstant)
+        interOut.instant.minus(LastCallRecord.ServerTimeout).isAfter(latestServerInstant)
     }
     val acceptByIp = ip.get(interOut.ip) match {
       case None => true
       case Some(latestIpInstant) =>
-        interOut.instant.minus(java.time.Duration.ofMinutes(5)).isAfter(latestIpInstant)
+        interOut.instant.minus(LastCallRecord.IpTimeout).isAfter(latestIpInstant)
     }
     if (acceptByServer && acceptByUser && acceptByIp) Option {
       LastCallRecord(
@@ -36,6 +36,9 @@ case class LastCallRecord(user: Map[String, Instant],
 }
 
 object LastCallRecord {
+  val UserTimeout: Duration = java.time.Duration.ofMinutes(5)
+  val IpTimeout: Duration = java.time.Duration.ofMinutes(5)
+  val ServerTimeout: Duration = java.time.Duration.ofMinutes(5)
   val empty: LastCallRecord = LastCallRecord(
     user = Map.empty,
     server = Map.empty,
