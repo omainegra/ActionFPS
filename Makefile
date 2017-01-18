@@ -1,6 +1,6 @@
 .PHONY: syslog check-syslog-version clean
 travis:
-	sbt test
+	sbt test it:test
 default:
 	sbt web/dist
 clean:

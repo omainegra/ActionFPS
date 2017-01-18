@@ -59,15 +59,6 @@ lazy val root =
     jsonFormats,
     challonge
   )
-    .settings(
-      commands += Command.command("ignoreWIP", "ignore tests for WIP things", "") { state =>
-        val extracted = Project.extract(state)
-        val newSettings = extracted.structure.allProjectRefs map { proj =>
-          testOptions in proj += sbt.Tests.Argument("-l", "af.WIP")
-        }
-        extracted.append(newSettings, state)
-      }
-    )
 
 lazy val web = project
   .enablePlugins(PlayScala)
