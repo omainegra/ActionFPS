@@ -9,10 +9,10 @@ import com.actionfps.gameparser.mserver.ExtractMessage
   * Created by me on 17/01/2017.
   */
 object InterOut {
-  def fromMessage(nickToUser: String => Option[String])
-                 (message: String)
-                 (implicit validServers: ValidServers): Option[InterOut] = {
-    message match {
+  def fromEvent(nickToUser: String => Option[String])
+               (event: String)
+               (implicit validServers: ValidServers): Option[InterOut] = {
+    event match {
       case ExtractMessage(zdt, validServers.FromLog(server), InterMessage(interMessage)) =>
         for {
           serverAddress <- server.address

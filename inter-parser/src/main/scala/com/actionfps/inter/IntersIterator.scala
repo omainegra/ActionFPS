@@ -12,7 +12,7 @@ case class IntersIterator(lastCallRecord: LastCallRecord, interOut: Option[Inter
   def accept(line: String)
             (nickToUser: String => Option[String])
             (implicit validServer: ValidServers): IntersIterator = {
-    InterOut.fromMessage(nickToUser)(line) match {
+    InterOut.fromEvent(nickToUser)(line) match {
       case None => copy(interOut = None)
       case Some(io) => acceptInterOut(io)
     }
@@ -31,4 +31,8 @@ object IntersIterator {
     lastCallRecord = LastCallRecord.empty,
     interOut = None
   )
+
+  def scan(intersIterator: IntersIterator, interOut: InterOut): IntersIterator = {
+    intersIterator.acceptInterOut(interOut)
+  }
 }
