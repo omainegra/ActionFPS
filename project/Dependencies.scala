@@ -38,7 +38,7 @@ object Dependencies {
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 
   val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.4.1"
-  val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.5.0"
+  val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.5.1"
   val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.5.0"
 
   val scalaWilliamResolver: MavenRepository = Resolver.bintrayRepo("scalawilliam", "maven")
