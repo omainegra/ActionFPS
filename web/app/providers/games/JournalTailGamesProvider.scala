@@ -14,7 +14,6 @@ import akka.agent.Agent
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.stream.scaladsl._
-import com.actionfps.accumulation.ValidServers.ImplicitValidServers._
 import com.actionfps.accumulation.ValidServers.Validator._
 import com.actionfps.gameparser.GameScanner
 import com.actionfps.gameparser.enrichers._

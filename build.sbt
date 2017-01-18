@@ -99,6 +99,7 @@ lazy val web = project
       filters,
       ws,
       async,
+      akkaStreamTestkit % "it",
       scalatestPlus % "it,test",
       scalatestOld % "it,test",
       seleniumHtmlUnit % "it",

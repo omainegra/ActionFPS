@@ -15,7 +15,7 @@ object InterOut {
       case ExtractMessage(zdt, validServers.FromLog(server), InterMessage(interMessage)) =>
         for {
           serverAddress <- server.address
-          user <- users.find(_.nickname == interMessage.nickname)
+          user <- users.find(_.nickname.nickname == interMessage.nickname)
         } yield InterOut(
           instant = zdt.toInstant,
           user = user.id,

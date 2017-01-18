@@ -8,8 +8,9 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.file.scaladsl.FileTailSource
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{Flow, Source}
 import com.actionfps.accumulation.ValidServers
+import com.actionfps.accumulation.user.User
 import com.actionfps.inter.{InterOut, IntersIterator}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
@@ -18,7 +19,6 @@ import play.api.libs.json.Json
 import play.api.libs.streams.Streams
 import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
-import services.IntersService._
 
 import scala.async.Async._
 import scala.collection.JavaConverters._
@@ -65,21 +65,37 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
   pickedFile.foreach { f =>
     logger.info(s"Tailing for inters from ${f}...")
+    import IntersService.RichInterOut
     FileTailSource
       .lines(f.toPath, maxLineSize = 4096, pollingInterval = 1.second)
-      .scanAsync(IntersIterator.empty) {
-        case (a, b) => async {
-          a.accept(b)(await(referenceProvider.users))
-        }
-      }
-      .mapConcat(_.interOut.toList)
-      .filter(_.instant.plus(java.time.Duration.ofMinutes(3)).isAfter(Instant.now()))
+      .via(IntersService.lineToEventFlow(() => referenceProvider.users, () => Instant.now()))
       .map(_.toEvent)
       .runForeach(intersChannel.push)
   }
+
 }
 
 object IntersService {
+
+  private val TimeLeeway = java.time.Duration.ofMinutes(3)
+
+  def lineToEventFlow(usersProvider: () => Future[List[User]],
+                      instant: () => Instant)
+                     (implicit validServers: ValidServers,
+                      executionContext: ExecutionContext): Flow[String, InterOut, NotUsed] = {
+    Flow[String]
+      .scanAsync(IntersIterator.empty) {
+        case (a, b) => async {
+          a.accept(b)(await(usersProvider()))
+        }
+      }
+      .mapConcat(_.interOut.toList)
+      .filter {
+        msg =>
+          /** Give a 3 minute time skew leeway **/
+          msg.instant.plus(TimeLeeway).isAfter(instant())
+      }
+  }
 
   implicit class RichInterOut(interOut: InterOut) {
 

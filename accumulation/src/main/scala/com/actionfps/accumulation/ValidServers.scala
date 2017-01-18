@@ -171,11 +171,7 @@ object ValidServers {
     )
   )
 
-  val fromResource = ValidServers(validServers.map(v => v.logId -> v).toMap)
-
-  object ImplicitValidServers {
-    implicit val fromResourceVS: ValidServers = fromResource
-  }
+  implicit val fromResource = ValidServers(validServers.map(v => v.logId -> v).toMap)
 
   object Validator {
 
