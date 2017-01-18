@@ -10,7 +10,6 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.stream.scaladsl.{Flow, Source}
 import com.actionfps.accumulation.ValidServers
-import com.actionfps.accumulation.user.User
 import com.actionfps.inter.{InterOut, IntersIterator}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
@@ -68,7 +67,11 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
     import IntersService.RichInterOut
     FileTailSource
       .lines(f.toPath, maxLineSize = 4096, pollingInterval = 1.second)
-      .via(IntersService.lineToEventFlow(() => referenceProvider.users, () => Instant.now()))
+      .via(IntersService.lineToEventFlow(
+        () => referenceProvider.users.map { users =>
+          (nickname: String) => users.find(_.nickname.nickname == nickname).map(_.id)
+        },
+        () => Instant.now()))
       .map(_.toEvent)
       .runForeach(intersChannel.push)
   }
@@ -79,7 +82,7 @@ object IntersService {
 
   private val TimeLeeway = java.time.Duration.ofMinutes(3)
 
-  def lineToEventFlow(usersProvider: () => Future[List[User]],
+  def lineToEventFlow(usersProvider: () => Future[String => Option[String]],
                       instant: () => Instant)
                      (implicit validServers: ValidServers,
                       executionContext: ExecutionContext): Flow[String, InterOut, NotUsed] = {
@@ -92,6 +95,7 @@ object IntersService {
       .mapConcat(_.interOut.toList)
       .filter {
         msg =>
+
           /** Give a 3 minute time skew leeway **/
           msg.instant.plus(TimeLeeway).isAfter(instant())
       }

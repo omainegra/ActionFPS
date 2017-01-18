@@ -3,22 +3,23 @@ package com.actionfps.inter
 import java.time.Instant
 
 import com.actionfps.accumulation.ValidServers
-import com.actionfps.accumulation.user.User
 import com.actionfps.gameparser.mserver.ExtractMessage
 
 /**
   * Created by me on 17/01/2017.
   */
 object InterOut {
-  def fromMessage(users: List[User])(message: String)(implicit validServers: ValidServers): Option[InterOut] = {
+  def fromMessage(nickToUser: String => Option[String])
+                 (message: String)
+                 (implicit validServers: ValidServers): Option[InterOut] = {
     message match {
       case ExtractMessage(zdt, validServers.FromLog(server), InterMessage(interMessage)) =>
         for {
           serverAddress <- server.address
-          user <- users.find(_.nickname.nickname == interMessage.nickname)
+          user <- nickToUser(interMessage.nickname)
         } yield InterOut(
           instant = zdt.toInstant,
-          user = user.id,
+          user = user,
           playerName = interMessage.nickname,
           ip = interMessage.ip,
           serverName = server.name,

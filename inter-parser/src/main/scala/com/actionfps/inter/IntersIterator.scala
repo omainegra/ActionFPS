@@ -1,7 +1,6 @@
 package com.actionfps.inter
 
 import com.actionfps.accumulation.ValidServers
-import com.actionfps.accumulation.user.User
 
 /**
   * Created by William on 09/12/2015.
@@ -10,8 +9,10 @@ import com.actionfps.accumulation.user.User
   */
 case class IntersIterator(lastCallRecord: LastCallRecord, interOut: Option[InterOut]) {
 
-  def accept(line: String)(users: List[User])(implicit validServer: ValidServers): IntersIterator = {
-    InterOut.fromMessage(users)(line) match {
+  def accept(line: String)
+            (nickToUser: String => Option[String])
+            (implicit validServer: ValidServers): IntersIterator = {
+    InterOut.fromMessage(nickToUser)(line) match {
       case None => copy(interOut = None)
       case Some(io) => acceptInterOut(io)
     }
