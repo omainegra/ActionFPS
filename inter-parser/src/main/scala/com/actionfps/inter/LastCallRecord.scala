@@ -5,31 +5,32 @@ import java.time.{Duration, Instant}
 /**
   * Created by me on 17/01/2017.
   */
-case class LastCallRecord(user: Map[String, Instant],
-                          server: Map[String, Instant],
-                          ip: Map[String, Instant]) {
+case class LastCallRecord(users: Map[String, Instant],
+                          servers: Map[String, Instant],
+                          ips: Map[String, Instant]) {
   /** Return if updated <=> had effect, so emit a record **/
   def include(interOut: InterOut): Option[LastCallRecord] = {
-    val acceptByUser = user.get(interOut.user) match {
+    import interOut.userMessage._
+    val acceptByUser = users.get(userId) match {
       case None => true
       case Some(latestUserInstant) =>
-        interOut.instant.minus(LastCallRecord.UserTimeout).isAfter(latestUserInstant)
+        instant.minus(LastCallRecord.UserTimeout).isAfter(latestUserInstant)
     }
-    val acceptByServer = server.get(interOut.serverName) match {
+    val acceptByServer = servers.get(serverId) match {
       case None => true
       case Some(latestServerInstant) =>
-        interOut.instant.minus(LastCallRecord.ServerTimeout).isAfter(latestServerInstant)
+        instant.minus(LastCallRecord.ServerTimeout).isAfter(latestServerInstant)
     }
-    val acceptByIp = ip.get(interOut.ip) match {
+    val acceptByIp = ips.get(ip) match {
       case None => true
       case Some(latestIpInstant) =>
-        interOut.instant.minus(LastCallRecord.IpTimeout).isAfter(latestIpInstant)
+        instant.minus(LastCallRecord.IpTimeout).isAfter(latestIpInstant)
     }
     if (acceptByServer && acceptByUser && acceptByIp) Option {
       LastCallRecord(
-        user = user.updated(interOut.user, interOut.instant),
-        ip = ip.updated(interOut.ip, interOut.instant),
-        server = server.updated(interOut.serverName, interOut.instant)
+        users = users.updated(userId, instant),
+        ips = ips.updated(ip, instant),
+        servers = servers.updated(serverId, instant)
       )
     } else None
   }
@@ -40,8 +41,8 @@ object LastCallRecord {
   val IpTimeout: Duration = java.time.Duration.ofMinutes(5)
   val ServerTimeout: Duration = java.time.Duration.ofMinutes(5)
   val empty: LastCallRecord = LastCallRecord(
-    user = Map.empty,
-    server = Map.empty,
-    ip = Map.empty
+    users = Map.empty,
+    servers = Map.empty,
+    ips = Map.empty
   )
 }

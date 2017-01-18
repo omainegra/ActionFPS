@@ -11,7 +11,7 @@ import akka.stream.scaladsl.{Flow, Source}
 import akka.stream.{ActorAttributes, ActorMaterializer, Supervision}
 import com.actionfps.accumulation.ValidServers
 import com.actionfps.gameparser.mserver.ExtractMessage
-import com.actionfps.inter.{InterOut, IntersIterator}
+import com.actionfps.inter.{InterOut, IntersIterator, UserMessage}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
@@ -82,7 +82,7 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
           logger.error(s"Failed an element due to ${e}", e)
           Supervision.Resume
       })
-      .map(_.toEvent)
+      .mapConcat(_.toEvent.toList)
       .runForeach(intersChannel.push)
       .onComplete { case Success(_) =>
         logger.info(s"Flow finished.")
@@ -97,36 +97,62 @@ object IntersService {
 
   private val TimeLeeway = java.time.Duration.ofMinutes(3)
 
+  case class UserMessageFromLine(nicknameToUser: String => Option[String])
+                                (implicit validServers: ValidServers) {
+    private val regex = """^\[([^\]]+)\] ([^ ]+) says: '(.+)'$""".r
+
+    def unapply(line: String): Option[UserMessage] = {
+      PartialFunction.condOpt(line) {
+        case ExtractMessage(zdt, validServers.FromLog(validServer), regex(ip, nickname, message@"!inter"))
+          if nicknameToUser(nickname).isDefined =>
+          UserMessage(
+            instant = zdt.toInstant,
+            serverId = validServer.logId,
+            ip = ip,
+            nickname = nickname,
+            userId = nicknameToUser(nickname).get,
+            messageText = message
+          )
+      }
+    }
+  }
+
   def lineToEventFlow(usersProvider: () => Future[String => Option[String]],
                       instant: () => Instant)
                      (implicit validServers: ValidServers,
                       executionContext: ExecutionContext): Flow[String, InterOut, NotUsed] = {
     Flow[String]
       .scanAsync(IntersIterator.empty) {
-        case (a, b) => async {
-          a.accept(b)(await(usersProvider()))
+        case (a, line) => async {
+          UserMessageFromLine(await(usersProvider()))
+            .unapply(line)
+            .flatMap(_.interOut)
+            .map(a.acceptInterOut)
+            .getOrElse(a.resetInterOut)
         }
       }
       .mapConcat(_.interOut.toList)
       .filter {
         msg =>
+
           /** Give a 3 minute time skew leeway **/
-          msg.instant.plus(TimeLeeway).isAfter(instant())
+          msg.userMessage.instant.plus(TimeLeeway).isAfter(instant())
       }
   }
 
   implicit class RichInterOut(interOut: InterOut) {
 
-    import interOut._
-
-    def toEvent: Event = {
-      Event(
-        id = Option(instant.toString),
+    def toEvent(implicit validServers: ValidServers): Option[Event] = {
+      for {
+        validServer <- validServers.items.get(interOut.userMessage.serverId)
+        serverAddress <- validServer.address
+      } yield Event(
+        id = Option(interOut.userMessage.instant.toString),
         name = Option("inter"),
         data = Json.toJson(Map(
-          "playerName" -> playerName,
-          "serverName" -> serverName,
-          "serverConnect" -> serverConnect
+          "playerName" -> interOut.userMessage.nickname,
+          "serverName" -> validServer.name,
+          "serverConnect" -> serverAddress
         )).toString
       )
     }

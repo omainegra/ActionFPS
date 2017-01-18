@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by me on 18/01/2017.
   */
-class IntersServiceSpec extends WordSpec with BeforeAndAfterAll {
+class IntersServiceSpec extends FreeSpec with BeforeAndAfterAll {
   implicit lazy val actorSystem = ActorSystem()
   implicit lazy val actorMaterializer = ActorMaterializer()
 
@@ -23,8 +23,16 @@ class IntersServiceSpec extends WordSpec with BeforeAndAfterAll {
     super.afterAll()
   }
 
-  "IntersService event flow" must {
-    "produce 1 output event only" in {
+  "A UserMessage" - {
+    "is produced from a syslog line" in {
+      IntersService
+        .UserMessageFromLine(IntersServiceSpec.nicknameToUser.get)
+        .unapply(IntersServiceSpec.oldSyslogEvent) shouldBe defined
+    }
+  }
+
+  "IntersService event flow" - {
+    "produces 1 output event only" in {
       val flow = IntersService
         .lineToEventFlow(
           usersProvider = () => Future.successful(IntersServiceSpec.nicknameToUser.get),
@@ -39,7 +47,7 @@ class IntersServiceSpec extends WordSpec with BeforeAndAfterAll {
 
 object IntersServiceSpec {
 
-  private val oldSyslogEvent = {
+  val oldSyslogEvent: String = {
     """Date: 2017-01-17T15:10:13.942Z, Server: 62-210-131-155.rev.poneytelecom.eu """ +
       """sd-55104 AssaultCube[local#2999], Payload: [168.45.30.115] w00p|Boo says: '!inter'"""
   }

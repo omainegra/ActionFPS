@@ -173,7 +173,6 @@ lazy val interParser =
     id = "inter-parser",
     base = file("inter-parser")
   )
-    .dependsOn(accumulation)
     .settings(
       libraryDependencies += scalatest % Test
     )
