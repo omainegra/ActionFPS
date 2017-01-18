@@ -23,14 +23,6 @@ class IntersServiceSpec extends FreeSpec with BeforeAndAfterAll {
     super.afterAll()
   }
 
-  "A UserMessage" - {
-    "is produced from a syslog line" in {
-      IntersService
-        .UserMessageFromLine(IntersServiceSpec.nicknameToUser.get)
-        .unapply(IntersServiceSpec.oldSyslogEvent) shouldBe defined
-    }
-  }
-
   "IntersService event flow" - {
     "produces 1 output event only" in {
       val flow = IntersService

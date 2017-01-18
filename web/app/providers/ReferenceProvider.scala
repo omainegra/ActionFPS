@@ -5,7 +5,6 @@ import javax.inject.{Inject, Singleton}
 
 import com.actionfps.accumulation.Clan
 import com.actionfps.accumulation.user.User
-import com.actionfps.ladder.parser.UserProvider
 import com.actionfps.reference._
 import com.google.common.io.CharStreams
 import play.api.Configuration
@@ -15,7 +14,7 @@ import play.api.libs.ws.WSClient
 
 import scala.async.Async._
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by William on 01/01/2016.
@@ -40,14 +39,6 @@ class ReferenceProvider @Inject()(configuration: Configuration,
         cacheApi.set(key, value, Duration.apply("1h"))
         value
     }
-  }
-
-  /**
-    * Used for [[controllers.LadderController]]
-    * @todo remove
-    */
-  def syncUserProvider(atMost: Duration): UserProvider = cacheApi.getOrElse[UserProvider]("user-provider") {
-    Await.result(Users(withEmails = false).provider, atMost)
   }
 
   object Clans {
@@ -102,7 +93,6 @@ class ReferenceProvider @Inject()(configuration: Configuration,
       regs.flatMap { reg => User.fromRegistration(reg, nicks) }
     }
 
-    def provider: Future[UserProvider] = users.map(l => new ReferenceProvider.ListUserProvider(l))
   }
 
   def clans: Future[List[Clan]] = Clans.clans
@@ -112,17 +102,5 @@ class ReferenceProvider @Inject()(configuration: Configuration,
   private implicit val serverRecordRead = Json.reads[ServerRecord]
 
   def servers: Future[List[ServerRecord]] = Servers.servers
-
-}
-
-object ReferenceProvider {
-
-  class ListUserProvider(users: List[User]) extends UserProvider {
-    private val nick2UserId = users.map { u => u.nickname.nickname -> u.id }.toMap
-
-    override def username(nickname: String): Option[String] = {
-      nick2UserId.get(nickname)
-    }
-  }
 
 }

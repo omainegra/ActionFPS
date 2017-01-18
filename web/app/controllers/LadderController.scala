@@ -4,7 +4,7 @@ package controllers
   * Created by me on 09/05/2016.
   */
 
-import java.time.ZoneId
+import java.time.{LocalDateTime, ZoneOffset, ZonedDateTime}
 import javax.inject._
 
 import akka.actor.ActorSystem
@@ -37,10 +37,6 @@ class LadderController @Inject
 
   def aggregate: Aggregate = agg.get().total
 
-  import concurrent.duration._
-
-  private def up = referenceProvider.syncUserProvider(10.seconds)
-
   private val tailers = LadderController
     .getSourceCommands(configuration, "af.ladder.sources")
     .toList
@@ -52,10 +48,19 @@ class LadderController @Inject
     })
       .via(Framing.delimiter(ByteString.fromString("\n", "UTF-8"), 2096, allowTruncation = false))
       .map(_.decodeString("UTF-8"))
-      .collect {
-        case TimesMessage(TimesMessage(ldt, PlayerMessage(m))) =>
-          agg.send(_.includeLine(s"${command}")(m.timed(ldt.atZone(ZoneId.of("UTC"))))(up))
+      .scanAsync(Aggregate.empty) {
+        case (aggregate, message) =>
+          import scala.async.Async._
+          async {
+            val n2u = await(referenceProvider.users).map(u => u.nickname.nickname -> u.id).toMap
+            val tmu = LadderController.TimedUserMessageExtract(n2u.get)
+            message match {
+              case tmu(timedUserMessage) => aggregate.includeLine(timedUserMessage)
+              case _ => aggregate
+            }
+          }
       }
+      .alsoTo(Sink.foreach { g => agg.send(_.includeAggregate(s"$command")(g)) })
       .to(Sink.ignore)
       .run()
   }
@@ -78,6 +83,34 @@ class LadderController @Inject
 }
 
 object LadderController {
+
+  case class TimedUserMessageExtract(nickToUser: String => Option[String]) {
+    def unapply(input: String): Option[TimedUserMessage] = {
+      val localTimeSample = "2016-07-02T22:09:14"
+      val regex = s"""\\[([\\d\\.]+)\\] ([^ ]+) (.*)""".r
+      val firstSpace = input.indexOf(' ')
+      if (firstSpace < 10) None else {
+        val (time, rest) = input.splitAt(firstSpace)
+        val msg = rest.drop(1)
+        val instant = {
+          if (time.length == localTimeSample.length)
+            LocalDateTime.parse(time).toInstant(ZoneOffset.UTC)
+          else
+            ZonedDateTime.parse(time).toInstant
+        }
+        msg match {
+          case regex(ip, nickname, mesg) =>
+            nickToUser(nickname) match {
+              case Some(user) =>
+                Some(TimedUserMessage(instant, user, mesg))
+              case _ => None
+            }
+          case _ => None
+        }
+      }
+    }
+  }
+
   def getSourceCommands(configuration: Configuration, path: String): Option[List[List[String]]] = {
     import collection.JavaConverters._
     configuration.getConfigList(path).map { items =>

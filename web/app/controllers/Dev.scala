@@ -1,6 +1,6 @@
 package controllers
 
-import java.time.ZonedDateTime
+import java.time.{Instant, ZonedDateTime}
 import javax.inject.Inject
 
 import com.actionfps.accumulation.user.{FullProfile, User}
@@ -87,7 +87,7 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
 object Dev {
   val rankedStat = RankedStat(user = "w00p|User", rank = 23,
     userStatistics = UserStatistics(frags = 12, gibs = 13, flags = 14,
-      lastSeen = ZonedDateTime.now(), timePlayed = 123L))
+      lastSeen = Instant.now(), timePlayed = 123L))
 
   val fullProfile = FullProfile(
     recentGames = Nil,

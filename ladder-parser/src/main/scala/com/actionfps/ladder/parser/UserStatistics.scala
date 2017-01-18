@@ -1,12 +1,13 @@
 package com.actionfps.ladder.parser
 
 import java.time.format.DateTimeFormatter
-import java.time.{Duration, Instant, ZonedDateTime}
+import java.time.temporal.ChronoUnit
+import java.time.{Duration, Instant}
 
 /**
   * Created by me on 02/05/2016.
   */
-case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDateTime, timePlayed: Long) {
+case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: Instant, timePlayed: Long) {
 
   def merge(other: UserStatistics) = UserStatistics(
     frags = frags + other.frags,
@@ -16,7 +17,7 @@ case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDate
     lastSeen = if (lastSeen.isAfter(other.lastSeen)) lastSeen else other.lastSeen
   )
 
-  def lastSeenInstant: Instant = lastSeen.withNano(0).toInstant
+  def lastSeenInstant: Instant = lastSeen.truncatedTo(ChronoUnit.SECONDS)
 
   def lastSeenText: String = {
     DateTimeFormatter.ISO_INSTANT.format(lastSeen)
@@ -30,12 +31,12 @@ case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDate
 
   def points: Int = (2 * frags) + (3 * gibs) + (15 * flags)
 
-  def see(atTime: ZonedDateTime): UserStatistics = {
+  def see(atTime: Instant): UserStatistics = {
     if (atTime.isBefore(lastSeen)) this
     else copy(
       lastSeen = atTime,
       timePlayed = timePlayed + {
-        val d = atTime.toEpochSecond - lastSeen.toEpochSecond
+        val d = atTime.getEpochSecond - lastSeen.getEpochSecond
         if (d < 120) d else 0
       }
     )
@@ -56,5 +57,5 @@ case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: ZonedDate
 }
 
 object UserStatistics {
-  def empty(time: ZonedDateTime) = UserStatistics(frags = 0, gibs = 0, flags = 0, lastSeen = time, timePlayed = 0)
+  def empty(time: Instant) = UserStatistics(frags = 0, gibs = 0, flags = 0, lastSeen = time, timePlayed = 0)
 }
