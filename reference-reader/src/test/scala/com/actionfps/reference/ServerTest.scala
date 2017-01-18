@@ -1,6 +1,6 @@
 package com.actionfps.reference
 
-import org.scalatest.{Matchers, FunSuite}
+import org.scalatest.{FunSuite, Matchers}
 
 /**
   * Created by William on 05/12/2015.

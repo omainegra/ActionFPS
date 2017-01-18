@@ -9,7 +9,7 @@ import com.actionfps.gameparser.enrichers._
 import com.actionfps.reference.{ClanRecord, NicknameRecord, Registration}
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.Json
-
+import ReferenceMapValidator._
 import scala.io.{Codec, Source}
 
 /**

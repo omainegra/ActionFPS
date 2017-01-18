@@ -37,12 +37,14 @@ object JournalGamesProvider {
 @Singleton
 class JournalGamesProvider(journalFiles: List[File])
                           (implicit executionContext: ExecutionContext,
-                           ipLookup: IpLookup)
+                           ipLookup: IpLookup,
+                           mapValidator: MapValidator)
   extends GamesProvider {
 
   @Inject() def this(configuration: Configuration)
                     (implicit executionContext: ExecutionContext,
-                     ipLookup: IpLookup) = this(
+                     ipLookup: IpLookup,
+                     mapValidator: MapValidator) = this(
     configuration.underlying.getStringList("af.journal.paths").asScala.map(new File(_)).toList
   )
 
@@ -60,7 +62,7 @@ class JournalGamesProvider(journalFiles: List[File])
   /**
     * Build an agent of Batches Game map.
     */
-  private def gamesAgent: Future[Agent[Map[String, JsonGame]]] = {
+  private def gamesAgent(implicit mapValidator: MapValidator): Future[Agent[Map[String, JsonGame]]] = {
     val previousLoadFuture = Future(blocking(batchJournalLoad()))
     import scala.async.Async._
     async {

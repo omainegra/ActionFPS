@@ -2,7 +2,7 @@ package com.actionfps.reference
 
 import java.net.URI
 
-import org.scalatest.{OptionValues, FunSuite, Matchers}
+import org.scalatest.{FunSuite, Matchers, OptionValues}
 
 /**
   * Created by William on 05/12/2015.

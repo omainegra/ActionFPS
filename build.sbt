@@ -6,6 +6,7 @@ name := "actionfps"
 scalaVersion in ThisBuild := "2.11.8"
 
 resolvers in ThisBuild += scalaWilliamResolver
+
 resolvers in ThisBuild += actionFpsResolver
 
 organization in ThisBuild := "com.actionfps"
@@ -85,8 +86,6 @@ lazy val web = project
   .dependsOn(testSuite % "test->compile;it->compile")
   .settings(
     scalaSource in IntegrationTest := baseDirectory.value / "it",
-    resolvers += scalaWilliamResolver,
-    resolvers += actionFpsResolver,
     libraryDependencies ++= Seq(
       akkaActor,
       akkaAgent,
@@ -183,8 +182,8 @@ lazy val referenceReader =
     base = file("reference-reader")
   ).settings(
     libraryDependencies += commonsCsv,
-    git.useGitDescribe := true,
-    libraryDependencies += kantanCsv
+    libraryDependencies += kantanCsv,
+    libraryDependencies += scalatest % Test
   )
 
 

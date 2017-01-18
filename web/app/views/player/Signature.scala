@@ -2,7 +2,7 @@ package views.player
 
 import java.nio.file.Files
 
-import com.actionfps.gameparser.Maps
+import com.actionfps.reference.Maps
 import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser

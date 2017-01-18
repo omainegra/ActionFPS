@@ -23,12 +23,14 @@ import scala.concurrent.{ExecutionContext, Future, blocking}
 @Singleton
 class BatchFilesGamesProvider(files: List[File])
                              (implicit executionContext: ExecutionContext,
-                              ipLookup: IpLookup)
+                              ipLookup: IpLookup,
+                              mapValidator: MapValidator)
   extends GamesProvider {
 
   @Inject() def this(configuration: Configuration)
                     (implicit executionContext: ExecutionContext,
-                     ipLookup: IpLookup) = this(configuration
+                     ipLookup: IpLookup,
+                     mapValidator: MapValidator) = this(configuration
     .underlying
     .getStringList("af.games.files")
     .asScala

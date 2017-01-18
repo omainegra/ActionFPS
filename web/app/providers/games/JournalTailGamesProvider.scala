@@ -8,7 +8,7 @@ import java.io.File
 import java.nio.file.Path
 import javax.inject._
 
-import akka.{Done, NotUsed}
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.stream.ActorMaterializer
@@ -20,9 +20,8 @@ import com.actionfps.gameparser.enrichers._
 import play.api.inject.ApplicationLifecycle
 import play.api.{Configuration, Logger}
 
-import concurrent.duration._
-import scala.async.Async._
 import scala.collection.JavaConverters._
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -35,7 +34,8 @@ class JournalTailGamesProvider(journalFile: Option[Path],
                               (implicit executionContext: ExecutionContext,
                                applicationLifecycle: ApplicationLifecycle,
                                actorSystem: ActorSystem,
-                               ipLookup: IpLookup)
+                               ipLookup: IpLookup,
+                               mapValidator: MapValidator)
   extends GamesProvider {
 
   implicit val actorMaterializer = ActorMaterializer()
@@ -45,6 +45,7 @@ class JournalTailGamesProvider(journalFile: Option[Path],
                     (implicit executionContext: ExecutionContext,
                      applicationLifecycle: ApplicationLifecycle,
                      ipLookup: IpLookup,
+                     mapValidator: MapValidator,
                      actorSystem: ActorSystem) = this(
     configuration
       .underlying
@@ -80,7 +81,8 @@ class JournalTailGamesProvider(journalFile: Option[Path],
     }
   }
 
-  def flow(journalPath: Path, latestGameId: Option[String]): Source[JsonGame, NotUsed] = {
+  def flow(journalPath: Path, latestGameId: Option[String])
+          (implicit mapValidator: MapValidator): Source[JsonGame, NotUsed] = {
     FileTailSource
       .lines(journalPath, maxLineSize = 4096, pollingInterval = 1.second)
       .scan(GameScanner.initial)(GameScanner.scan)

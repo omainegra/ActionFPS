@@ -23,7 +23,9 @@ object GamesFromSource {
     * Accepts TSV format that's either "[id]\t[good/bad]\t[reason]\t[jsonText]"
     *   or "[id]\t[jsonText]".
     */
-  def load(source: => Source)(implicit ipLookup: IpLookup, logger: Logger): List[Game] = {
+  def load(source: => Source)(implicit ipLookup: IpLookup,
+                              logger: Logger,
+                              mapValidator: MapValidator): List[Game] = {
     val src = source
     try src.getLines().zipWithIndex.filter(_._1.nonEmpty).map { case (line, lineno) =>
       line.split("\t").toList match {

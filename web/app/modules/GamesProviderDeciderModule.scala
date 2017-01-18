@@ -4,8 +4,9 @@ package modules
   * Created by William on 01/01/2016.
   */
 
+import com.actionfps.accumulation.ReferenceMapValidator
 import com.actionfps.accumulation.user.GeoIpLookup
-import com.actionfps.gameparser.enrichers.IpLookup
+import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
 import play.api.inject._
 import play.api.{Configuration, Environment, Logger, Mode}
 import providers.full.{CachedProvider, FullProvider}
@@ -22,6 +23,7 @@ class GamesProviderDeciderModule extends Module {
     if (environment.mode == Mode.Dev || configuration.getBoolean("af.full.cache").contains(true)) {
       bindings += bind[FullProvider].to[CachedProvider]
     }
+    bindings += bind[MapValidator].toInstance(ReferenceMapValidator.referenceMapValidator)
     bindings.toList
   }
 

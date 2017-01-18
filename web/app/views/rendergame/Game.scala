@@ -1,7 +1,7 @@
 package views.rendergame
 
-import com.actionfps.gameparser.Maps
-import com.actionfps.gameparser.enrichers.{JsonGamePlayer, JsonGame}
+import com.actionfps.gameparser.enrichers.{JsonGame, JsonGamePlayer}
+import com.actionfps.reference.Maps
 
 case class NowServer(server: String)
 
@@ -37,7 +37,7 @@ case class MixedGame(isNew: Boolean, game: JsonGame, now: Option[Now], players: 
 
   def heading = s"$mode @ $map"
 
-  def bgImage = Maps.resource.maps.get(map).map(_.image)
+  def bgImage = Maps.mapToImage.get(map)
 
   def bgStyle = bgImage.map(i => s"background-image: url('$i')").getOrElse("")
 

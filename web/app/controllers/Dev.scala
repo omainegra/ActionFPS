@@ -9,10 +9,10 @@ import com.actionfps.accumulation.user.Nickname.CurrentNickname
 import com.actionfps.api.{Game, GameAchievement, GamePlayer, GameTeam}
 import com.actionfps.clans.CompleteClanwar
 import com.actionfps.clans.Conclusion.Namer
-import com.actionfps.gameparser.Maps
 import com.actionfps.ladder.parser.Aggregate.RankedStat
 import com.actionfps.ladder.parser.UserStatistics
 import com.actionfps.pinger._
+import com.actionfps.reference.Maps
 import lib.{Clanner, WebTemplateRender}
 import play.api.mvc.Action
 import play.api.mvc.Results._
@@ -69,7 +69,6 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
   private def clanwarTemplate = Action { implicit req =>
     implicit val namer = Dev.namer
     implicit val clanner = Dev.clanner
-    val mapping = Maps.mapToImage
     val html = views.clanwar.Clanwar.render(
       clanwar = Dev.completeClanwar.meta.named,
       showPlayers = true
@@ -79,8 +78,7 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
   }
 
   private def liveTemplate = Action { implicit req =>
-    val mapping = Maps.mapToImage
-    val html = views.rendergame.Live.render(mapMapping = mapping, game = Dev.game)
+    val html = views.rendergame.Live.render(mapMapping = Maps.mapToImage, game = Dev.game)
     val fh = Html(html.body + "<hr/>")
     Ok(webTemplateRender.renderTemplate(title = None, supportsJson = false)(fh))
   }

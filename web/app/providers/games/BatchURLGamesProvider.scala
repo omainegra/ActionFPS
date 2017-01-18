@@ -2,7 +2,7 @@ package providers.games
 
 import javax.inject.{Inject, Singleton}
 
-import com.actionfps.gameparser.enrichers.{IpLookup, JsonGame}
+import com.actionfps.gameparser.enrichers.{IpLookup, JsonGame, MapValidator}
 import lib.GamesFromSource
 import play.api.{Configuration, Logger}
 
@@ -18,11 +18,13 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class BatchURLGamesProvider(urls: List[String])
                            (implicit executionContext: ExecutionContext,
-                            ipLookup: IpLookup) extends GamesProvider {
+                            ipLookup: IpLookup,
+                            mapValidator: MapValidator) extends GamesProvider {
 
   @Inject() def this(configuration: Configuration)
                     (implicit executionContext: ExecutionContext,
-                     ipLookup: IpLookup) = this(
+                     ipLookup: IpLookup,
+                     mapValidator: MapValidator) = this(
     configuration.underlying.getStringList("af.games.urls").asScala.toList
   )
 
