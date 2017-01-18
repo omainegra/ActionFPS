@@ -45,7 +45,6 @@ lazy val root =
       ladderParser,
       pureClanwar,
       pureStats,
-      testSuite,
       jsonFormats,
       challonge
     ).dependsOn(
@@ -57,7 +56,6 @@ lazy val root =
     accumulation,
     pureClanwar,
     pureStats,
-    testSuite,
     jsonFormats,
     challonge
   )
@@ -83,7 +81,6 @@ lazy val web = project
   .settings(dontDocument)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
-  .dependsOn(testSuite % "test->compile;it->compile")
   .settings(
     scalaSource in IntegrationTest := baseDirectory.value / "it",
     libraryDependencies ++= Seq(
@@ -109,7 +106,6 @@ lazy val web = project
       mockito % "it,test"
     ),
     javaOptions in IntegrationTest ++= Seq(
-      s"-Dsample.log=${sampleLog.value}",
       s"-Dgeolitecity.dat=${geoLiteCity.value}"
     ),
     (run in Compile) <<= (run in Compile).dependsOn(startHazelcast),
@@ -163,7 +159,6 @@ lazy val pureAchievements =
   )
     .enablePlugins(GitVersioning)
     .settings(
-      git.useGitDescribe := true,
       libraryDependencies += gameParser
     )
 
@@ -192,8 +187,8 @@ lazy val accumulation = project
   .dependsOn(referenceReader)
   .dependsOn(pureStats)
   .settings(
-    git.useGitDescribe := true,
-    libraryDependencies += geoipApi
+    libraryDependencies += geoipApi,
+    libraryDependencies += scalatest % Test
   )
 
 lazy val pureClanwar =
@@ -202,7 +197,6 @@ lazy val pureClanwar =
     base = file("pure-clanwar")
   )
     .settings(
-      git.useGitDescribe := true,
       libraryDependencies += pureGame
     )
 
@@ -215,7 +209,6 @@ lazy val ladderParser =
     base = file("ladder-parser")
   )
     .settings(
-      git.useGitDescribe := true,
       libraryDependencies += scalatest % "test",
       libraryDependencies += gameParser
     )
@@ -227,42 +220,9 @@ lazy val pureStats =
   )
     .dependsOn(pureClanwar)
     .settings(
-      libraryDependencies += xml
+      libraryDependencies += xml,
+      libraryDependencies += scalatest % Test
     )
-
-lazy val testSuite = Project(
-  id = "test-suite",
-  base = file("test-suite")
-)
-  .dependsOn(accumulation)
-  .dependsOn(ladderParser)
-  .dependsOn(pureStats)
-  .dependsOn(interParser)
-  .dependsOn(jsonFormats)
-  .settings(
-    javaOptions in Test ++= Seq(
-      s"-Dsample.log=${sampleLog.value}",
-      s"-Dgeolitecity.dat=${geoLiteCity.value}"
-    ),
-    libraryDependencies += scalatest % "test",
-    libraryDependencies += akkaActor
-  )
-
-sampleLog in ThisBuild := {
-  import sbt._
-  import IO._
-  val sourceUrl = "https://gist.github.com/ScalaWilliam/ebff0a56f57a7966a829/raw/" +
-    "732629d6bfb01a39dffe57ad22a54b3bad334019/gistfile1.txt"
-  val sampleLog = target.value / "sample.log"
-  if (!sampleLog.exists()) {
-    streams.value.log.info(s"Downloading ${sourceUrl} to ${sampleLog}...")
-    download(
-      url = url(sourceUrl),
-      to = sampleLog
-    )
-  }
-  sampleLog
-}
 
 lazy val jsonFormats =
   Project(

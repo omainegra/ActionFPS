@@ -5,6 +5,7 @@ package providers.games
   */
 
 import java.io.File
+import java.net.URL
 import javax.inject._
 
 import akka.agent.Agent
@@ -16,14 +17,15 @@ import play.api.{Configuration, Logger}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future, blocking}
+import scala.io.Source
 
 object JournalGamesProvider {
 
   /**
     * Games from server log (syslog format)
     */
-  def gamesFromServerLog(logger: Logger, file: File): List[Game] = {
-    val src = scala.io.Source.fromFile(file)
+  def fromSource(logger: Logger, source: => Source): List[Game] = {
+    val src = source
     try src.getLines().scanLeft(GameScanner.initial)(GameScanner.scan).collect(GameScanner.collect).toList
     finally src.close()
   }
@@ -35,7 +37,7 @@ object JournalGamesProvider {
   * @todo Remove dependency on ExecutorService.
   */
 @Singleton
-class JournalGamesProvider(journalFiles: List[File])
+class JournalGamesProvider(journalFiles: List[URL])
                           (implicit executionContext: ExecutionContext,
                            ipLookup: IpLookup,
                            mapValidator: MapValidator)
@@ -45,7 +47,15 @@ class JournalGamesProvider(journalFiles: List[File])
                     (implicit executionContext: ExecutionContext,
                      ipLookup: IpLookup,
                      mapValidator: MapValidator) = this(
-    configuration.underlying.getStringList("af.journal.paths").asScala.map(new File(_)).toList
+    configuration
+      .underlying
+      .getStringList("af.journal.paths")
+      .asScala
+      .map(new File(_))
+      .map(_.toURI.toURL).toList ++
+      configuration.underlying.getStringList("af.journal.urls")
+        .asScala
+        .map(new URL(_)).toList
   )
 
   private val logger = Logger(getClass)
@@ -53,9 +63,9 @@ class JournalGamesProvider(journalFiles: List[File])
   private val gamesAgentStatic: Future[Agent[Map[String, JsonGame]]] = gamesAgent
 
   private def batchJournalLoad(): List[JsonGame] = {
-    journalFiles.par.map { file =>
-      logger.info(s"Loading batch journal from: ${file}")
-      JournalGamesProvider.gamesFromServerLog(logger, file)
+    journalFiles.par.map { url =>
+      logger.info(s"Loading batch journal from: ${url}")
+      JournalGamesProvider.fromSource(logger, scala.io.Source.fromURL(url))
     }.flatten.toList
   }
 
