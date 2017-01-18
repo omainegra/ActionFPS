@@ -5,9 +5,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import akka.testkit.TestProbe
-import com.actionfps.accumulation.ValidServers
-import com.actionfps.inter.{InterMessage, InterOut, IntersIterator}
-import controllers.Dev
+import com.actionfps.inter.{InterOut, IntersIterator}
 import org.scalatest._
 import services.IntersService
 
@@ -37,7 +35,7 @@ class IntersServiceSpec extends WordSpec with BeforeAndAfterAll {
   val thirdDate = s"Date: ${Instant.now()}"
   val sampleC = sampleA.patch(0, thirdDate, thirdDate.length)
 
-  val users= List(Dev.fullProfile.user)
+  val users = Map("w00p|Boo" -> "boo").get _
 
   "inter service flow" must {
 
