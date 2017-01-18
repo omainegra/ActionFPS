@@ -1,6 +1,6 @@
-import controllers.LadderController
 import org.scalatest.{FreeSpec, Matchers}
 import org.scalatest.OptionValues._
+import services.LadderService
 
 /**
   * Created by me on 18/01/2017.
@@ -8,7 +8,7 @@ import org.scalatest.OptionValues._
 class LadderParseTest extends FreeSpec with Matchers {
   "TimedUserMessage" - {
     "is extracted" in {
-      val tme = LadderController
+      val tme = LadderService
         .TimedUserMessageExtract(Map("egg" -> "egghead").get)
         .unapply(LadderParseTest.sampleMessage)
         .value
@@ -19,12 +19,12 @@ class LadderParseTest extends FreeSpec with Matchers {
       assert(tme.message == "gibbed nescio")
     }
     "is not extracted when user doesn't match" in {
-      LadderController
+      LadderService
         .TimedUserMessageExtract(Function.const(None))
         .unapply(LadderParseTest.sampleMessage) shouldBe empty
     }
     "is not extracted for an empty input" in {
-      LadderController
+      LadderService
         .TimedUserMessageExtract(Function.const(None))
         .unapply("") shouldBe empty
     }

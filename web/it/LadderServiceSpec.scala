@@ -1,18 +1,17 @@
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
-import controllers.LadderController
 import org.scalatest.Matchers._
 import org.scalatest._
+import services.LadderService
 
-import scala.async.Async._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 /**
   * Created by me on 18/01/2017.
   */
-class LadderControllerSpec extends FreeSpec with BeforeAndAfterAll {
+class LadderServiceSpec extends FreeSpec with BeforeAndAfterAll {
   implicit lazy val actorSystem = ActorSystem()
   implicit lazy val actorMaterializer = ActorMaterializer()
   import actorSystem.dispatcher
@@ -24,9 +23,9 @@ class LadderControllerSpec extends FreeSpec with BeforeAndAfterAll {
 
   "LadderController event flow" - {
     "produces the right aggregate" in {
-      val flow = LadderController
-        .individualServerFlow(() => Future.successful(LadderControllerSpec.nicknameToUser.get))
-      val source = Source(LadderControllerSpec.sampleEvents).via(flow).runWith(Sink.last)
+      val flow = LadderService
+        .individualServerFlow(() => Future.successful(LadderServiceSpec.nicknameToUser.get))
+      val source = Source(LadderServiceSpec.sampleEvents).via(flow).runWith(Sink.last)
       val lastAggregate = Await.result(source, 5.seconds)
       lastAggregate.users should have size 2
       lastAggregate.users("shadow").gibs shouldEqual 2
@@ -35,7 +34,7 @@ class LadderControllerSpec extends FreeSpec with BeforeAndAfterAll {
   }
 }
 
-object LadderControllerSpec {
+object LadderServiceSpec {
 
   val sampleEvents = List(
     "2016-07-02T22:11:52 [79.208.75.37] ~sHaDoW~ gibbed rodrigoubamg",
