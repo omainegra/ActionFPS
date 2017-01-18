@@ -1,7 +1,6 @@
 package com.actionfps.gameparser.enrichers
 
 import com.actionfps.api.Game
-import com.actionfps.gameparser.Maps
 
 import scala.util.hashing.MurmurHash3
 
@@ -26,10 +25,12 @@ class RichGame(game: JsonGame) {
     winnerClan = winnerClan
   )
 
-  def validate: Either[String, JsonGame] = {
+  def validate(implicit mapValidator: MapValidator): Either[String, JsonGame] = {
     def minTeamPlayers = teams.map(_.players.size).min
+
     def minTeamAverageFrags = teams.map(x => x.players.map(_.frags).sum.toFloat / x.players.size).min
-    if (!Maps.resource.maps.contains(map)) Left(s"Map $map not in whitelist")
+
+    if (!mapValidator.mapIsValid(map)) Left(s"Map $map not in whitelist")
     else if (duration < 10) Left(s"Duration is $duration, expecting at least 10")
     else if (duration > 15) Left(s"Duration is $duration, expecting at most 15")
     else if (minTeamPlayers < 2) Left(s"One team has $minTeamPlayers players, expecting 2 or more.")
