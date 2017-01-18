@@ -34,6 +34,10 @@ class IntersSpec extends FreeSpec {
     InterOut.fromEvent(Map("w00p|Boo" -> "boo").get)(syslogEvent) should not be empty
   }
 
+  "InterOut.fromEvent does not fail on nonsense message" in {
+    InterOut.fromEvent(Function.const(None))("nothing meaningful") shouldBe empty
+  }
+
   "IntersIterator + LastCallRecord timeouts work" in {
 
     val closeInterOut = sampleInterOut.copy(instant = sampleInterOut.instant.plusSeconds(50))

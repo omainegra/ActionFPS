@@ -25,6 +25,7 @@ object InterOut {
           serverName = server.name,
           serverConnect = serverAddress
         )
+      case _ => None
     }
   }
 }

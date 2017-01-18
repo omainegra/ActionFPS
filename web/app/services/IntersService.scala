@@ -6,10 +6,11 @@ import javax.inject._
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.stream.scaladsl.{Flow, Source}
+import akka.stream.{ActorAttributes, ActorMaterializer, Supervision}
 import com.actionfps.accumulation.ValidServers
+import com.actionfps.gameparser.mserver.ExtractMessage
 import com.actionfps.inter.{InterOut, IntersIterator}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
@@ -23,6 +24,8 @@ import scala.async.Async._
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
 /**
   * Created by William on 09/12/2015.
@@ -65,15 +68,27 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
   pickedFile.foreach { f =>
     logger.info(s"Tailing for inters from ${f}...")
     import IntersService.RichInterOut
+    val startInstant = Instant.now()
     FileTailSource
       .lines(f.toPath, maxLineSize = 4096, pollingInterval = 1.second)
+      .filter { case ExtractMessage(zdt, _, _) => zdt.toInstant.isAfter(startInstant) }
       .via(IntersService.lineToEventFlow(
         () => referenceProvider.users.map { users =>
           (nickname: String) => users.find(_.nickname.nickname == nickname).map(_.id)
         },
         () => Instant.now()))
+      .withAttributes(ActorAttributes.supervisionStrategy {
+        case NonFatal(e) =>
+          logger.error(s"Failed an element due to ${e}", e)
+          Supervision.Resume
+      })
       .map(_.toEvent)
       .runForeach(intersChannel.push)
+      .onComplete { case Success(_) =>
+        logger.info(s"Flow finished.")
+      case Failure(reason) =>
+        logger.error(s"Failed due to ${reason}", reason)
+      }
   }
 
 }
@@ -95,7 +110,6 @@ object IntersService {
       .mapConcat(_.interOut.toList)
       .filter {
         msg =>
-
           /** Give a 3 minute time skew leeway **/
           msg.instant.plus(TimeLeeway).isAfter(instant())
       }
