@@ -5,9 +5,10 @@ name := "actionfps"
 
 scalaVersion in ThisBuild := "2.11.8"
 
-resolvers in ThisBuild += scalaWilliamResolver
 
-resolvers in ThisBuild += actionFpsResolver
+resolvers in ThisBuild += Resolver.bintrayRepo("scalawilliam", "maven")
+
+resolvers in ThisBuild += Resolver.bintrayRepo("actionfps", "maven")
 
 organization in ThisBuild := "com.actionfps"
 
@@ -21,11 +22,11 @@ fork in run in Global := true
 
 fork in Test in Global := true
 
-ghpages.settings
+fork in run in ThisBuild := true
 
-site.includeScaladoc()
+fork in Test in ThisBuild := true
 
-git.remoteRepo := "git@github.com:ScalaWilliam/ActionFPS.git"
+git.remoteRepo in ThisBuild := "git@github.com:ScalaWilliam/ActionFPS.git"
 
 import java.util.Base64
 import com.hazelcast.core.{HazelcastInstance, Hazelcast}
@@ -59,15 +60,6 @@ lazy val root =
     jsonFormats,
     challonge
   )
-    .settings(
-      commands += Command.command("ignoreWIP", "ignore tests for WIP things", "") { state =>
-        val extracted = Project.extract(state)
-        val newSettings = extracted.structure.allProjectRefs map { proj =>
-          testOptions in proj += sbt.Tests.Argument("-l", "af.WIP")
-        }
-        extracted.append(newSettings, state)
-      }
-    )
 
 lazy val web = project
   .enablePlugins(PlayScala)
@@ -93,7 +85,6 @@ lazy val web = project
       fluentHc,
       httpClientCache,
       serverPinger,
-      commonsIo,
       alpakkaFile,
       filters,
       ws,
@@ -103,8 +94,7 @@ lazy val web = project
       scalatestOld % "it,test",
       seleniumHtmlUnit % "it",
       seleniumJava % "it",
-      cache,
-      mockito % "it,test"
+      cache
     ),
     javaOptions in IntegrationTest ++= Seq(
       s"-Dgeolitecity.dat=${geoLiteCity.value}"
@@ -158,7 +148,6 @@ lazy val pureAchievements =
     id = "pure-achievements",
     base = file("pure-achievements")
   )
-    .enablePlugins(GitVersioning)
     .settings(
       libraryDependencies += gameParser
     )
@@ -221,7 +210,6 @@ lazy val pureStats =
   )
     .dependsOn(pureClanwar)
     .settings(
-      libraryDependencies += xml,
       libraryDependencies += scalatest % Test
     )
 
