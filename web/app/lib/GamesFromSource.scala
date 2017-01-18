@@ -1,6 +1,5 @@
 package lib
 
-import com.actionfps.accumulation.ValidServers.ImplicitValidServers._
 import com.actionfps.accumulation.ValidServers.Validator._
 import com.actionfps.api.Game
 import com.actionfps.formats.json.Formats._

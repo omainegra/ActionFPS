@@ -8,7 +8,6 @@ import java.io.File
 import javax.inject._
 
 import akka.agent.Agent
-import com.actionfps.accumulation.ValidServers.ImplicitValidServers._
 import com.actionfps.accumulation.ValidServers.Validator._
 import com.actionfps.api.Game
 import com.actionfps.gameparser.GameScanner
