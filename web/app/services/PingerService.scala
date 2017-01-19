@@ -47,45 +47,63 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
   private val status = Agent(Map.empty[String, Event])
 
-  val liveGamesWithRetainedSource: Source[Event, NotUsed] = Source(iterable = status.get().valuesIterator.toList)
+  def liveGamesWithRetainedSource: Source[Event, NotUsed] = Source(iterable = status.get().valuesIterator.toList)
     .concat(liveGamesSource)
+
+  private val cgsStatus = Agent(Map.empty[CurrentGameNowServer, CurrentGameStatus])
+
+  def statusSimilar(a: CurrentGameStatus, b: CurrentGameStatus): Boolean = {
+    a.copy(updatedTime = "", when = "") == b.copy(updatedTime = "", when = "")
+  }
+
+  private val ssStatus = Agent(Map.empty[String, ServerStatus])
+
+  def serverStatusSimilar(a: ServerStatus, b: ServerStatus): Boolean = {
+    a.copy(updatedTime = "") == b.copy(updatedTime = "")
+  }
+
 
   private val listenerActor = actor(factory = actorSystem, name = "pinger")(new ListenerActor({
     a =>
-      liveGamesChan.push(
-        Event(
-          id = Option(a.server),
-          name = Option("server-status"),
-          data = Json.toJson(a).toString()
-        ))
-
+      if (!ssStatus.get().contains(a.server) || !ssStatus.get().get(a.server).exists(serverStatusSimilar(_, a))) {
+        ssStatus.send(_.updated(a.server, a))
+        liveGamesChan.push(
+          Event(
+            id = Option(a.server),
+            name = Option("server-status"),
+            data = Json.toJson(a).toString()
+          ))
+      }
   }, { be =>
-    referenceProvider.Users().users.foreach { lu =>
-      val b = be.withUsers(lu.map(u => u.nickname.nickname -> u.id).toMap.get)
+    if (!cgsStatus.get().contains(be.now.server) || !cgsStatus.get().get(be.now.server).exists(statusSimilar(be, _))) {
+      cgsStatus.send(_.updated(be.now.server, be))
+      referenceProvider.Users().users.foreach { lu =>
+        val b = be.withUsers(lu.map(u => u.nickname.nickname -> u.id).toMap.get)
 
-      val cgse =
-        Event(
+        val cgse =
+          Event(
+            id = Option(b.now.server.server),
+            name = Option("current-game-status"),
+            data = Json.toJson(b).toString()
+          )
+        liveGamesChan.push(cgse)
+
+        status.alter(m => m.updated(s"${cgse.id}${cgse.name}", cgse))
+
+        val body =
+          try {
+            views.rendergame.Live.render(b, Maps.mapToImage)
+          } catch {
+            case e: Throwable => Logger.error(s"Failed to render game ${b}", e)
+          }
+        val event = Event(
           id = Option(b.now.server.server),
-          name = Option("current-game-status"),
-          data = Json.toJson(b).toString()
+          name = Option("current-game-status-fragment"),
+          data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(body.toString())).toString()
         )
-      liveGamesChan.push(cgse)
-
-      status.alter(m => m.updated(s"${cgse.id}${cgse.name}", cgse))
-
-      val body =
-        try {
-          views.rendergame.Live.render(b, Maps.mapToImage)
-        } catch {
-          case e: Throwable => Logger.error(s"Failed to render game ${b}", e)
-        }
-      val event = Event(
-        id = Option(b.now.server.server),
-        name = Option("current-game-status-fragment"),
-        data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(body.toString())).toString()
-      )
-      liveGamesChan.push(event)
-      status.alter(m => m.updated(s"${event.id}${event.name}", event))
+        liveGamesChan.push(event)
+        status.alter(m => m.updated(s"${event.id}${event.name}", event))
+      }
     }
   }))
 
@@ -94,7 +112,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
     .mapAsync(1)(_.servers)
     .mapConcat(identity)
     .mapMaterializedValue { can => applicationLifecycle.addStopHook(() => Future.successful(can.cancel())) }
-      .map{ server => SendPings(server.hostname, server.port)}
+    .map { server => SendPings(server.hostname, server.port) }
     .runForeach(listenerActor.!)
 
   applicationLifecycle.addStopHook(() => Future.successful(listenerActor ! Kill))

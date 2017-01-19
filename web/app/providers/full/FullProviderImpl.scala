@@ -11,6 +11,8 @@ import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
 import com.actionfps.stats.Clanstats
 import play.api.inject.ApplicationLifecycle
+import play.api.libs.EventSource.Event
+import play.api.libs.json.{Json, Writes}
 import providers.ReferenceProvider
 import providers.games.GamesProvider
 
@@ -74,7 +76,15 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
 
 case class NewGameDetected(jsonGame: JsonGame)
 
-case class NewClanwarCompleted(clanwarCompleted: CompleteClanwar)
+case class NewClanwarCompleted(clanwarCompleted: CompleteClanwar) {
+  def toEvent(implicit writes: Writes[CompleteClanwar]): Event = {
+    Event(
+      data = Json.toJson(clanwarCompleted).toString,
+      name = Some("new-clanwar"),
+      id = Some(clanwarCompleted.id)
+    )
+  }
+}
 
 case class FullIteratorDetector(original: GameAxisAccumulator, updated: GameAxisAccumulator) {
 
