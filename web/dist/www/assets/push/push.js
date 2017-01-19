@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
     var es = new EventSource("/event-stream/");
     String.prototype.hashCode = function () {
@@ -14,20 +14,23 @@
     var servers = {};
 
     function update_servers() {
-        if ( $("#dynamic-games").length == 0 ) return;
+        var dynamicGames = document.querySelector("#dynamic-games");
+        if (!dynamicGames) return;
         for (var serverName in servers) {
             var server = servers[serverName];
             var updatedTime = new Date(server.updatedTime);
             var remove = (new Date() - updatedTime) > 30000;
             var id = "server-" + serverName.hashCode();
-            var existingServer = $("#" + id);
-            if (remove) {
-                existingServer.remove();
-            } else if (existingServer.length == 0) {
-                var q = $("<div id=\"" + id + "\"></div>").html(server.html);
-                $("#dynamic-games").append(q);
+            var existingServer = document.querySelector("#" + id);
+            if (remove && existingServer) {
+                existingServer.parentNode.removeChild(existingServer);
+            } else if (!existingServer) {
+                var newDiv = document.createElement("div");
+                newDiv.setAttribute("id", id);
+                newDiv.innerHTML = server.html;
+                dynamicGames.appendChild(newDiv);
             } else {
-                existingServer.html(server.html)
+                existingServer.innerHTML = server.html;
             }
         }
     }
@@ -40,21 +43,24 @@
     }, false);
 
     es.addEventListener("new-game", function (event) {
-        if ( $("#new-games").length != 0 ) {
-            var game = JSON.parse(event.data);
-            var gameId = game.id;
-            var divId = "new-game_" + gameId.hashCode();
-            if ($("#" + divId).length == 0) {
-                var newDiv = $("<div id=\"" + divId + "\"></div>").html(game.html);
-                $("#new-games").prepend(newDiv);
-            }
+        var newGames = document.querySelector("#new-games");
+        if (!newGames) return;
+        var game = JSON.parse(event.data);
+        var gameId = game.id;
+        var divId = "new-game_" + gameId.hashCode();
+        var existingDiv = document.querySelector("#" + divId);
+        if (!existingDiv) {
+            var newDiv = document.createElement("div");
+            newDiv.setAttribute("id", divId);
+            newDiv.innerHTML = game.html;
+            newGames.insertBefore(newDiv, newGames.firstChild);
         }
     });
 
 
-    if ( !("Notification" in window) ) return;
+    if (!("Notification" in window)) return;
     Notification.requestPermission();
-    es.addEventListener("inter", function(event) {
+    es.addEventListener("inter", function (event) {
         showNotification(JSON.parse(event.data));
     });
 
@@ -65,7 +71,7 @@
             requireInteraction: true
         };
         var notification = new Notification("Inter on " + json.serverName.toUpperCase(), options);
-        notification.onclick = function() {
+        notification.onclick = function () {
             notification.close();
             window.open(json.serverConnect);
         }
