@@ -80,7 +80,7 @@ case class NewClanwarCompleted(clanwarCompleted: CompleteClanwar) {
   def toEvent(implicit writes: Writes[CompleteClanwar]): Event = {
     Event(
       data = Json.toJson(clanwarCompleted).toString,
-      name = Some("new-clanwar"),
+      name = Some("clanwar"),
       id = Some(clanwarCompleted.id)
     )
   }
