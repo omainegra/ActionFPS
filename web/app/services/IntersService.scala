@@ -48,9 +48,6 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
   def intersSource: Source[Event, NotUsed] = Source.fromPublisher(Streams.enumeratorToPublisher(intersEnum))
 
-  private val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(intersChannel.push(Event("")))
-  applicationLifecycle.addStopHook(() => Future(keepAlive.cancel()))
-
   private val pickedFile = {
     configuration
       .underlying

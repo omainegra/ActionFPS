@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
+import lib.KeepAliveEvents
 import play.api.mvc.{Action, Controller}
 import services.IntersService
 
@@ -14,7 +15,7 @@ class IntersController @Inject()(intersService: IntersService) extends Controlle
 
   def inters = Action {
     Ok.chunked(
-      content = intersService.intersSource
+      content = intersService.intersSource.merge(KeepAliveEvents.source)
     ).as("text/event-stream")
   }
 

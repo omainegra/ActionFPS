@@ -25,5 +25,5 @@ GET         /new-games/                     @controllers.GamesController.newGame
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
 GET         /inters/                        @controllers.IntersController.inters
 GET         /ladder/                        @controllers.LadderController.ladder
-
+GET         /event-stream/                  @controllers.EventStream.eventStream
 GET         /version/                       @controllers.MiscController.version

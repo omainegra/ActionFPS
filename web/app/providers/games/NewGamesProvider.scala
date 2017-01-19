@@ -32,7 +32,6 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
 
   private val (newGamesEnum, thing) = Concurrent.broadcast[Event]
   val newGamesSource: Source[Event, NotUsed] = Source.fromPublisher(Streams.enumeratorToPublisher(newGamesEnum))
-  private val keepAlive = actorSystem.scheduler.schedule(10.seconds, 10.seconds)(thing.push(Event("")))
 
   private val logger = Logger(getClass)
   logger.info("Starting new games provider")
@@ -51,6 +50,5 @@ class NewGamesProvider @Inject()(applicationLifecycle: ApplicationLifecycle,
   }
 
   gamesProvider.addAutoRemoveHook(applicationLifecycle)(processGame)
-  applicationLifecycle.addStopHook(() => Future.successful(keepAlive.cancel()))
 
 }

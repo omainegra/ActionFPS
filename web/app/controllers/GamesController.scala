@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import com.actionfps.clans.Conclusion.Namer
-import lib.WebTemplateRender
+import lib.{KeepAliveEvents, WebTemplateRender}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller}
 import providers.ReferenceProvider
@@ -63,7 +63,7 @@ class GamesController @Inject()(webTemplateRender: WebTemplateRender,
 
   def newGames = Action {
     Ok.chunked(
-      content = newGamesProvider.newGamesSource
+      content = newGamesProvider.newGamesSource.merge(KeepAliveEvents.source)
     ).as("text/event-stream")
   }
 

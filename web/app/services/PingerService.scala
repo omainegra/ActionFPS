@@ -6,9 +6,11 @@ package services
 
 import javax.inject._
 
+import akka.NotUsed
 import akka.actor.ActorDSL._
 import akka.actor.{ActorSystem, Kill}
 import akka.agent.Agent
+import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import com.actionfps.pinger._
 import com.actionfps.reference.Maps
@@ -21,6 +23,7 @@ import play.api.libs.streams.Streams
 import providers.ReferenceProvider
 
 import scala.concurrent.{ExecutionContext, Future}
+import concurrent.duration._
 
 /**
   * Pings live ActionFPS Servers using the <a href="https://github.com/ActionFPS/server-pinger">Server Pinger library</a>.
@@ -34,18 +37,19 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
                              )(implicit actorSystem: ActorSystem,
                                executionContext: ExecutionContext) {
 
+  implicit val actorMaterializer = ActorMaterializer()
+
   private val logger = Logger(getClass)
 
   private val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
+
   val liveGamesSource = Source.fromPublisher(Streams.enumeratorToPublisher(liveGamesEnum))
 
-  import concurrent.duration._
+  private val status = Agent(Map.empty[String, Event])
 
-  private val keepAlive = actorSystem.scheduler.schedule(1.second, 5.seconds)(liveGamesChan.push(Event("")))
+  val liveGamesWithRetainedSource: Source[Event, NotUsed] = Source(iterable = status.get().valuesIterator.toList)
+    .concat(liveGamesSource)
 
-  applicationLifecycle.addStopHook(() => Future.successful(keepAlive.cancel()))
-
-  val status = Agent(Map.empty[String, Event])
   private val listenerActor = actor(factory = actorSystem, name = "pinger")(new ListenerActor({
     a =>
       liveGamesChan.push(
@@ -85,16 +89,14 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
     }
   }))
 
-  import concurrent.duration._
-
-  private val schedule = actorSystem.scheduler.schedule(0.seconds, 5.seconds) {
-    referenceProvider.servers.foreach(_.foreach { server =>
-      listenerActor ! SendPings(server.hostname, server.port)
-    })
-  }
+  Source
+    .tick(0.seconds, 5.seconds, referenceProvider)
+    .mapAsync(1)(_.servers)
+    .mapConcat(identity)
+    .mapMaterializedValue { can => applicationLifecycle.addStopHook(() => Future.successful(can.cancel())) }
+      .map{ server => SendPings(server.hostname, server.port)}
+    .runForeach(listenerActor.!)
 
   applicationLifecycle.addStopHook(() => Future.successful(listenerActor ! Kill))
-  applicationLifecycle.addStopHook(() => Future.successful(schedule.cancel()))
-
 
 }
