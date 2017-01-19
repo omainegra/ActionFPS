@@ -20,8 +20,7 @@ import scala.concurrent.ExecutionContext
   * Created by William on 09/12/2015.
   */
 @Singleton
-class NewGamesProvider @Inject()(common: WebTemplateRender)
-                                (implicit actorSystem: ActorSystem,
+class NewGamesProvider @Inject()(implicit actorSystem: ActorSystem,
                                  executionContext: ExecutionContext) {
 
   val newGamesSource: Source[Event, Boolean] = {
@@ -29,10 +28,13 @@ class NewGamesProvider @Inject()(common: WebTemplateRender)
       .actorRef[NewGameDetected](10, OverflowStrategy.dropHead)
       .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[NewGameDetected]))
       .map(_.jsonGame)
-      .map(gameToEvent)
+      .map(NewGamesProvider.gameToEvent)
   }
 
-  private def gameToEvent(game: JsonGame): Event = {
+}
+
+object NewGamesProvider {
+  def gameToEvent(game: JsonGame): Event = {
     val b = Json.toJson(game.withoutHosts).asInstanceOf[JsObject].+("isNew" -> JsBoolean(true))
 
     val gameHtml = views.rendergame.Render.renderMixedGame(MixedGame.fromJsonGame(game))
@@ -42,6 +44,4 @@ class NewGamesProvider @Inject()(common: WebTemplateRender)
       data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(gameHtml.body)).toString()
     )
   }
-
-
 }

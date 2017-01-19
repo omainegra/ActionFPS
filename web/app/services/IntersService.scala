@@ -8,15 +8,12 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.stream.scaladsl.{Flow, Source}
-import akka.stream.{ActorAttributes, ActorMaterializer, Supervision}
+import akka.stream.{ActorAttributes, ActorMaterializer, OverflowStrategy, Supervision}
 import com.actionfps.accumulation.ValidServers
 import com.actionfps.gameparser.mserver.ExtractMessage
 import com.actionfps.inter.{InterOut, IntersIterator, UserMessage}
-import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
-import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.Json
-import play.api.libs.streams.Streams
 import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
 
@@ -33,23 +30,18 @@ import scala.util.{Failure, Success}
   * Notify clients of an '!inter' message on a server by a registered user.
   */
 @Singleton
-class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
+class IntersService @Inject()(pickedFile: Option[File])
+                             (implicit
                               referenceProvider: ReferenceProvider,
-                              configuration: Configuration
-                             )(implicit
-                               actorSystem: ActorSystem,
-                               executionContext: ExecutionContext) {
+                              actorSystem: ActorSystem,
+                              executionContext: ExecutionContext) {
 
-  private val logger = Logger(getClass)
-
-  implicit val actorMaterializer = ActorMaterializer()
-
-  private val (intersEnum, intersChannel) = Concurrent.broadcast[Event]
-
-  def intersSource: Source[Event, NotUsed] = Source.fromPublisher(Streams.enumeratorToPublisher(intersEnum))
-
-  private val pickedFile = {
-    configuration
+  @Inject() def this(configuration: Configuration)
+                    (implicit
+                     referenceProvider: ReferenceProvider,
+                     actorSystem: ActorSystem,
+                     executionContext: ExecutionContext) = {
+    this(configuration
       .underlying
       .getStringList("af.journal.paths")
       .asScala
@@ -57,14 +49,15 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
       .toList
       .filter(_.exists())
       .sortBy(_.lastModified())
-      .lastOption
+      .lastOption)
   }
 
-  private implicit val validServers = ValidServers.fromResource
+  private val logger = Logger(getClass)
+
+  implicit val actorMaterializer = ActorMaterializer()
 
   pickedFile.foreach { f =>
     logger.info(s"Tailing for inters from ${f}...")
-    import IntersService.RichInterOut
     val startInstant = Instant.now()
     FileTailSource
       .lines(f.toPath, maxLineSize = 4096, pollingInterval = 1.second)
@@ -79,8 +72,7 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
           logger.error(s"Failed an element due to ${e}", e)
           Supervision.Resume
       })
-      .mapConcat(_.toEvent.toList)
-      .runForeach(intersChannel.push)
+      .runForeach(actorSystem.eventStream.publish)
       .onComplete { case Success(_) =>
         logger.info(s"Flow finished.")
       case Failure(reason) =>
@@ -91,6 +83,14 @@ class IntersService @Inject()(applicationLifecycle: ApplicationLifecycle,
 }
 
 object IntersService {
+
+  def intersSource(implicit actorSystem: ActorSystem,
+                   validServers: ValidServers): Source[Event, Boolean] = {
+    Source
+      .actorRef[InterOut](10, OverflowStrategy.dropHead)
+      .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[InterOut]))
+      .mapConcat(_.toEvent.toList)
+  }
 
   private val TimeLeeway = java.time.Duration.ofMinutes(3)
 

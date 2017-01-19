@@ -1,6 +1,6 @@
 package controllers
 
-import javax.inject.Inject
+import javax.inject._
 
 import akka.actor.ActorSystem
 import akka.stream.OverflowStrategy
@@ -16,11 +16,11 @@ import services.{IntersService, PingerService}
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 
-class EventStream @Inject()(pingerService: PingerService,
-                            intersService: IntersService,
-                            referenceProvider: ReferenceProvider,
-                            newGamesProvider: NewGamesProvider)
-                           (implicit actorSystem: ActorSystem,
+@Singleton
+class EventStreamController @Inject()(pingerService: PingerService,
+                                      referenceProvider: ReferenceProvider,
+                                      newGamesProvider: NewGamesProvider)
+                                     (implicit actorSystem: ActorSystem,
                             executionContext: ExecutionContext) extends Controller {
 
   private def namerF: Future[Namer] = async {
@@ -38,19 +38,37 @@ class EventStream @Inject()(pingerService: PingerService,
   }
 
 
-  def eventStream() = Action.async {
+  def eventStream = Action.async {
     async {
       Ok.chunked(
         content = {
           pingerService
             .liveGamesWithRetainedSource
             .merge(newGamesProvider.newGamesSource)
-            .merge(intersService.intersSource)
+            .merge(IntersService.intersSource)
             .merge(await(clanwarsSource))
             .merge(KeepAliveEvents.source)
         }
       )
     }
+  }
+
+  def inters = Action {
+    Ok.chunked(
+      content = IntersService.intersSource.merge(KeepAliveEvents.source)
+    ).as("text/event-stream")
+  }
+
+  def serverUpdates = Action {
+    Ok.chunked(
+      content = pingerService.liveGamesWithRetainedSource.merge(KeepAliveEvents.source)
+    ).as("text/event-stream")
+  }
+
+  def newGames = Action {
+    Ok.chunked(
+      content = newGamesProvider.newGamesSource.merge(KeepAliveEvents.source)
+    ).as("text/event-stream")
   }
 
 }

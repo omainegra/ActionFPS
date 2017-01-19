@@ -19,11 +19,11 @@ GET         /hof/                           @controllers.PlayersController.hof
 GET         /servers/                       @controllers.MiscController.servers
 GET         /ms/                            @controllers.Masterserver.ms
 GET         /retrieve.do                    @controllers.Masterserver.ms
-GET         /server-updates/                @controllers.LiveGamesController.serverUpdates
+GET         /server-updates/                @controllers.EventStreamController.serverUpdates
 GET         /recent-games/                  @controllers.GamesController.recentGames
-GET         /new-games/                     @controllers.GamesController.newGames
+GET         /new-games/                     @controllers.EventStreamController.newGames
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
-GET         /inters/                        @controllers.IntersController.inters
+GET         /inters/                        @controllers.EventStreamController.inters
 GET         /ladder/                        @controllers.LadderController.ladder
-GET         /event-stream/                  @controllers.EventStream.eventStream
+GET         /event-stream/                  @controllers.EventStreamController.eventStream
 GET         /version/                       @controllers.MiscController.version
