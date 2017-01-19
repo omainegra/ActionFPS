@@ -50,21 +50,39 @@ object NewsService {
       .filter(l => (l \ "@type").text == "text/html")
       .head
     val published = ZonedDateTime.parse((entry \ "published").head.text)
+    val updated = ZonedDateTime.parse((entry \ "updated").head.text)
     val title = (link \ "@title").text
     val url = (link \ "@href").text
-    NewsItem(published, title, url)
+    NewsItem(postDate = published, updateDate = updated, title = title, url = url)
   }
 
-  case class NewsItem(postDate: ZonedDateTime, title: String, url: String) {
-    private def formattedTime = postDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+  case class NewsItem(postDate: ZonedDateTime, updateDate: ZonedDateTime, title: String, url: String) {
+    private def formattedPostedTime = postDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+
+    private def formattedUpdatedTime = updateDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
     def htmlContent: Html = {
-      Html(<time is="relative-time" datetime={formattedTime}>
-        {formattedTime}
-      </time>.toString +
-        <a href={url} target="_blank">
-          {title}
-        </a>.toString)
+      Html(
+        <div>
+          <h3>
+            <a href={url} target="_blank">
+              {title}
+            </a>
+          </h3>
+          <p>Published:
+            <time is="relative-time" datetime={formattedPostedTime}>
+              {formattedPostedTime}
+            </time>{if (!postDate.isEqual(updateDate))
+            <span>
+              <br/>
+              Updated:
+              <time is="relative-time" datetime={formattedUpdatedTime}>
+                {formattedUpdatedTime}
+              </time>
+            </span>}
+          </p>
+        </div>.toString
+      )
     }
   }
 
