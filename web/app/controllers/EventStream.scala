@@ -43,7 +43,7 @@ class EventStream @Inject()(pingerService: PingerService,
       Ok.chunked(
         content = {
           pingerService
-            .liveGamesSource
+            .liveGamesWithRetainedSource
             .merge(newGamesProvider.newGamesSource)
             .merge(intersService.intersSource)
             .merge(await(clanwarsSource))

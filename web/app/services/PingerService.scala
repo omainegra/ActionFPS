@@ -43,7 +43,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
   private val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
 
-  val liveGamesSource = Source.fromPublisher(Streams.enumeratorToPublisher(liveGamesEnum))
+  private val liveGamesSource = Source.fromPublisher(Streams.enumeratorToPublisher(liveGamesEnum))
 
   private val status = Agent(Map.empty[String, Event])
 
