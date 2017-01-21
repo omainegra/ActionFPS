@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject._
 
+import com.actionfps.reference.ServerRecord
 import play.api.Configuration
 import play.api.mvc.{Action, AnyContent, Controller}
 import providers.ReferenceProvider
@@ -21,10 +22,19 @@ class Masterserver @Inject()(configuration: Configuration,
   def ms: Action[AnyContent] = Action.async {
     async {
       Ok {
-        await(referenceProvider.servers).map(serverRecord =>
-          s"addserver ${serverRecord.hostname} ${serverRecord.port} ${serverRecord.password.getOrElse("")}"
-        ).mkString("\n\n")
-      }.as("text/plain")
+        val addServerMessages = await(referenceProvider.servers).map(Masterserver.addServerMessage)
+        (Masterserver.CurrentVersionString :: addServerMessages).mkString(Masterserver.LineSeparator)
+      }.as(Masterserver.ContentType)
     }
+  }
+}
+
+object Masterserver {
+  val LineSeparator = "\n\n"
+  val ContentType = "text/plain"
+  val CurrentVersionString = "current_version 1000"
+
+  def addServerMessage(serverRecord: ServerRecord): String = {
+    s"addserver ${serverRecord.hostname} ${serverRecord.port} ${serverRecord.password.getOrElse("")}"
   }
 }
