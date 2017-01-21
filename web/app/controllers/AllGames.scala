@@ -3,10 +3,11 @@ package controllers
 import javax.inject._
 
 import akka.stream.scaladsl.Source
+import com.actionfps.gameparser.enrichers.JsonGame
 import org.apache.commons.csv.CSVFormat
 import play.api.libs.json.Json
 import play.api.mvc.Results._
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, RequestHeader}
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import play.api.routing.sird._
@@ -31,10 +32,17 @@ class AllGames @Inject()(fullProvider: FullProvider)
     case GET(p"/games.csv") => allCsv
   }
 
-  private def allTsv: Action[AnyContent] = Action.async {
+  def gameFilter(implicit requestHeader: RequestHeader): JsonGame => Boolean = {
+    requestHeader.getQueryString("since") match {
+      case Some(id) => _.id >= id
+      case None => Function.const(true)
+    }
+  }
+
+  private def allTsv: Action[AnyContent] = Action.async { implicit req =>
     async {
       Ok.chunked(
-        Source(await(allGames))
+        Source(await(allGames).filter(gameFilter))
           .map(game => s"${game.id}\t${Json.toJson(game)}\n")
       )
         .as("text/tab-separated-values")
@@ -42,23 +50,25 @@ class AllGames @Inject()(fullProvider: FullProvider)
     }
   }
 
-  private def allCsv: Action[AnyContent] = Action.async {
+  private def allCsv: Action[AnyContent] = Action.async { implicit req =>
     async {
-      Ok.chunked(Source(await(allGames)).map(game => CSVFormat.DEFAULT.format(game.id, Json.toJson(game)) + "\n"))
+      Ok.chunked(Source(await(allGames).filter(gameFilter))
+        .map(game => CSVFormat.DEFAULT.format(game.id, Json.toJson(game)) + "\n"))
         .as("text/csv")
     }
   }
 
-  private def allNdJson: Action[AnyContent] = Action.async {
+  private def allNdJson: Action[AnyContent] = Action.async { implicit req =>
     async {
-      Ok.chunked(Source(await(allGames)).map(game => Json.toJson(game).toString() + "\n"))
+      Ok.chunked(Source(await(allGames).filter(gameFilter))
+        .map(game => Json.toJson(game).toString() + "\n"))
         .as("text/plain")
     }
   }
 
-  private def allJson: Action[AnyContent] = Action.async {
+  private def allJson: Action[AnyContent] = Action.async { implicit req =>
     async {
-      val source = await(allGames) match {
+      val source = await(allGames).filter(gameFilter) match {
         case head :: rest =>
           Source(List("[\n", Json.toJson(head).toString))
             .concat(Source(rest).map(game => ",\n  " + Json.toJson(game).toString()))
