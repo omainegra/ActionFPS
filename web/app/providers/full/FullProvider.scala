@@ -31,7 +31,7 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext) {
   }
 
   def playerRanks: Future[PlayersStats] = {
-    fullStuff.map(_.get().playersStats)
+    fullStuff.map(_.get().shiftedPlayersStats)
   }
 
   def playerRanksOverTime: Future[Map[YearMonth, PlayersStats]] = {

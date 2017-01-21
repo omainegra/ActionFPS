@@ -4,14 +4,11 @@ import javax.inject.{Inject, Singleton}
 
 import akka.actor.ActorSystem
 import akka.agent.Agent
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, OverflowStrategy}
 import com.actionfps.accumulation.GameAxisAccumulator
-import com.actionfps.accumulation.achievements.{AchievementsIterator, HallOfFame}
-import com.actionfps.clans.{Clanwars, CompleteClanwar}
+import com.actionfps.clans.CompleteClanwar
 import com.actionfps.gameparser.enrichers.JsonGame
-import com.actionfps.players.PlayersStats
-import com.actionfps.stats.Clanstats
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.json.{Json, Writes}
@@ -48,17 +45,12 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
     val clans = await(referenceProvider.clans)
     val allGames = await(gamesProvider.games)
 
-    val initial = GameAxisAccumulator(
-      users = users.map(u => u.id -> u).toMap,
-      clans = clans.map(c => c.id -> c).toMap,
-      games = Map.empty,
-      achievementsIterator = AchievementsIterator.empty,
-      clanwars = Clanwars.empty,
-      clanstats = Clanstats.empty,
-      playersStats = PlayersStats.empty,
-      hof = HallOfFame.empty,
-      playersStatsOverTime = Map.empty
-    )
+    val initial = GameAxisAccumulator
+      .empty
+      .copy(
+        users = users.map(u => u.id -> u).toMap,
+        clans = clans.map(c => c.id -> c).toMap
+      )
 
     val newIterator = initial.includeGames(allGames.valuesIterator.toList.sortBy(_.id))
 

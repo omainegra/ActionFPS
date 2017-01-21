@@ -37,6 +37,7 @@ case class GameAxisAccumulator
  achievementsIterator: AchievementsIterator,
  hof: HallOfFame,
  playersStats: PlayersStats,
+ shiftedPlayersStats: PlayersStats,
  playersStatsOverTime: Map[YearMonth, PlayersStats]) {
   fi =>
 
@@ -49,12 +50,14 @@ case class GameAxisAccumulator
     achievementsIterator = AchievementsIterator.empty,
     hof = HallOfFame.empty,
     playersStats = PlayersStats.empty,
+    shiftedPlayersStats = PlayersStats.empty,
     playersStatsOverTime = Map.empty
   )
 
   def isEmpty: Boolean = {
     users.isEmpty && games.isEmpty && clans.isEmpty && clanwars.isEmpty && clanstats.isEmpty &&
-      achievementsIterator.isEmpty && hof.isEmpty && playersStats.isEmpty && playersStatsOverTime.isEmpty
+      achievementsIterator.isEmpty && hof.isEmpty && playersStats.isEmpty && playersStatsOverTime.isEmpty &&
+      shiftedPlayersStats.isEmpty
   }
 
   def updateReference(newUsers: Map[String, User], newClans: Map[String, Clan]): GameAxisAccumulator = {
@@ -66,6 +69,7 @@ case class GameAxisAccumulator
       clanwars = Clanwars.empty,
       clanstats = Clanstats.empty,
       playersStats = PlayersStats.empty,
+      shiftedPlayersStats = PlayersStats.empty,
       hof = HallOfFame.empty,
       playersStatsOverTime = Map.empty
     )
@@ -135,6 +139,7 @@ case class GameAxisAccumulator
       hof = nhof,
       clanstats = newClanstats,
       playersStats = newPs,
+      shiftedPlayersStats = newPs.onDisplay(jsonGame.endTime.toInstant),
       playersStatsOverTime = playersStatsOverTime.updated(YearMonth.from(richGame.startTime), newPs)
     )
   }
@@ -147,13 +152,13 @@ case class GameAxisAccumulator
         .collect { case (_, game) if game.hasUser(user.id) => game }
         .toList.sortBy(_.id).takeRight(7).reverse
       val achievements = achievementsIterator.userToState.get(id)
-      val rank = playersStats.onlyRanked.players.get(id)
+      val rank = shiftedPlayersStats.onlyRanked.players.get(id)
       FullProfile(
         user = user,
         recentGames = recentGames,
         achievements = achievements,
         rank = rank,
-        playerGameCounts = playersStats.onlyRanked.gameCounts.get(id)
+        playerGameCounts = shiftedPlayersStats.onlyRanked.gameCounts.get(id)
       )
     }
 

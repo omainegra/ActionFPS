@@ -1,6 +1,6 @@
 package com.actionfps.players
 
-import java.time.ZonedDateTime
+import java.time.{Duration, Instant, ZonedDateTime}
 
 import com.actionfps.api.Game
 
@@ -9,10 +9,31 @@ import com.actionfps.api.Game
   */
 case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String, PlayerGameCounts]) {
   pss =>
+
+  /**
+    * Based on https://github.com/ScalaWilliam/ActionFPS/issues/216#issuecomment-271111260
+    * @return A shifted PlayersStats
+    */
+  def onDisplay(atTime: Instant): PlayersStats = {
+
+    val modifiedPlayerStat = for {
+      (id, playerStat) <- players
+      playerGameCounts <- gameCounts.get(id)
+      realElo = playerStat.elo
+      displayElo = realElo * Math.min(1, playerGameCounts.gamesSince(atTime.minus(PlayersStats.N)) / PlayersStats.S)
+    } yield id -> {
+      playerStat.copy(elo = displayElo)
+    }
+
+    copy(players = players ++ modifiedPlayerStat)
+      .updatedRanks
+  }
+
   def isEmpty: Boolean = players.isEmpty && gameCounts.isEmpty
 
   private def updatedRanks = {
     val ur = players.values.toList.sortBy(_.elo).reverse.filter(_.games >= Players.MIN_GAMES_RANK).zipWithIndex.collect {
+      case (stat, _) if stat.elo == 0 => stat.user -> stat.copy(rank = None)
       case (stat, int) => stat.user -> stat.copy(rank = Option(int + 1))
     }
     copy(
@@ -33,10 +54,11 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
     private def teamsElo: List[Double] = {
       game.teams.map { team =>
         team.players.map {
-          player => player.user
-            .flatMap(players.get)
-            .map(_.elo)
-            .getOrElse(1000: Double)
+          player =>
+            player.user
+              .flatMap(players.get)
+              .map(_.elo)
+              .getOrElse(1000: Double)
         }.sum
       }
     }
@@ -147,5 +169,8 @@ object PlayersStats {
     players = Map.empty,
     gameCounts = Map.empty
   )
+
+  val N: Duration = Duration.ofDays(31)
+  val S: Double = 7.0
 
 }
