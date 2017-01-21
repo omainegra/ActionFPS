@@ -20,12 +20,20 @@ object GamesFromSource {
     * Will rethrow any exceptions and also filter out games.
     *
     * Accepts TSV format that's either "[id]\t[good/bad]\t[reason]\t[jsonText]"
-    *   or "[id]\t[jsonText]".
+    * or "[id]\t[jsonText]".
     */
   def load(source: => Source)(implicit ipLookup: IpLookup,
-                              logger: Logger,
                               mapValidator: MapValidator,
                               reads: Reads[Game]): List[Game] = {
+    loadUnfiltered(source)
+      .filter(_.validate.isRight)
+      .filter(_.validateServer)
+      .map(_.withGeo)
+      .map(_.flattenPlayers)
+      .toList
+  }
+
+  def loadUnfiltered(source: => Source)(implicit reads: Reads[Game]): List[Game] = {
     val src = source
     try src.getLines().zipWithIndex.filter(_._1.nonEmpty).map { case (line, lineno) =>
       line.split("\t").toList match {
@@ -33,23 +41,18 @@ object GamesFromSource {
           Json.fromJson[Game](Json.parse(jsonText)) match {
             case JsSuccess(good, _) => good
             case e: JsError =>
-              throw new RuntimeException(s"Failed to parse JSON in line ${lineno}: $jsonText")
+              throw new RuntimeException(s"Failed to parse JSON in line ${lineno} due to ${e}: $jsonText")
           }
         case id :: jsonText :: Nil =>
           Json.fromJson[Game](Json.parse(jsonText)) match {
             case JsSuccess(good, _) => good
             case e: JsError =>
-              throw new RuntimeException(s"Failed to parse JSON in line ${lineno}: $jsonText")
+              throw new RuntimeException(s"Failed to parse JSON in line ${lineno} due to ${e}: $jsonText")
           }
         case _ =>
           throw new RuntimeException(s"Failed to parse in line ${lineno}: $line")
       }
-    }
-      .filter(_.validate.isRight)
-      .filter(_.validateServer)
-      .map(_.withGeo)
-      .map(_.flattenPlayers)
-      .toList
+    }.toList
     finally src.close
   }
 
