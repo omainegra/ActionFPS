@@ -18,10 +18,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class EventStreamController @Inject()(pingerService: PingerService,
-                                      referenceProvider: ReferenceProvider,
-                                      newGamesProvider: NewGamesProvider)
+                                      referenceProvider: ReferenceProvider)
                                      (implicit actorSystem: ActorSystem,
-                            executionContext: ExecutionContext) extends Controller {
+                                      executionContext: ExecutionContext) extends Controller {
 
   private def namerF: Future[Namer] = async {
     val clans = await(referenceProvider.clans)
@@ -44,7 +43,7 @@ class EventStreamController @Inject()(pingerService: PingerService,
         content = {
           pingerService
             .liveGamesWithRetainedSource
-            .merge(newGamesProvider.newGamesSource)
+            .merge(NewGamesProvider.newGamesSource)
             .merge(IntersService.intersSource)
             .merge(await(clanwarsSource))
             .merge(KeepAliveEvents.source)
@@ -67,7 +66,7 @@ class EventStreamController @Inject()(pingerService: PingerService,
 
   def newGames = Action {
     Ok.chunked(
-      content = newGamesProvider.newGamesSource.merge(KeepAliveEvents.source)
+      content = NewGamesProvider.newGamesSource.merge(KeepAliveEvents.source)
     ).as("text/event-stream")
   }
 

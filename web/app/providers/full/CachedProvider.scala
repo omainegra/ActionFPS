@@ -51,10 +51,6 @@ class CachedProvider @Inject()(fullProviderR: FullProviderImpl,
     }
   }
 
-  gamesProvider.addAutoRemoveHook(applicationLifecycle) { game =>
-    fullStuff.map(_.alter(_.includeGames(List(game))).foreach(fi => theMap.put(keyName, fi)))
-  }
-
   applicationLifecycle.addStopHook(() => Future.successful(hz.shutdown()))
 
   override def reloadReference(): Future[GameAxisAccumulator] = async {

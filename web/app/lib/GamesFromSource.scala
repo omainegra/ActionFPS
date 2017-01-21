@@ -2,10 +2,9 @@ package lib
 
 import com.actionfps.accumulation.ValidServers.Validator._
 import com.actionfps.api.Game
-import com.actionfps.formats.json.Formats._
 import com.actionfps.gameparser.enrichers.{IpLookup, _}
 import play.api.Logger
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
 
 import scala.io.Source
 
@@ -25,7 +24,8 @@ object GamesFromSource {
     */
   def load(source: => Source)(implicit ipLookup: IpLookup,
                               logger: Logger,
-                              mapValidator: MapValidator): List[Game] = {
+                              mapValidator: MapValidator,
+                              reads: Reads[Game]): List[Game] = {
     val src = source
     try src.getLines().zipWithIndex.filter(_._1.nonEmpty).map { case (line, lineno) =>
       line.split("\t").toList match {

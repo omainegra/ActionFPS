@@ -5,11 +5,10 @@ package modules
   */
 
 import com.google.inject.AbstractModule
-import services.{ChallongeService, GamePersistenceService}
+import services.ChallongeService
 
 class EagerLoadModule extends AbstractModule {
   def configure(): Unit = {
     bind(classOf[ChallongeService]).asEagerSingleton()
-    bind(classOf[GamePersistenceService]).asEagerSingleton()
   }
 }

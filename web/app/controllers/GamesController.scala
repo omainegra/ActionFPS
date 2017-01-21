@@ -16,7 +16,6 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class GamesController @Inject()(webTemplateRender: WebTemplateRender,
-                                newGamesProvider: NewGamesProvider,
                                 referenceProvider: ReferenceProvider,
                                 fullProvider: FullProvider)
                                (implicit executionContext: ExecutionContext) extends Controller {

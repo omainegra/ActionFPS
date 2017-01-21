@@ -4,6 +4,8 @@ import javax.inject.{Inject, Singleton}
 
 import akka.actor.ActorSystem
 import akka.agent.Agent
+import akka.stream.{ActorMaterializer, OverflowStrategy}
+import akka.stream.scaladsl.Source
 import com.actionfps.accumulation.GameAxisAccumulator
 import com.actionfps.accumulation.achievements.{AchievementsIterator, HallOfFame}
 import com.actionfps.clans.{Clanwars, CompleteClanwar}
@@ -29,9 +31,11 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
                                  gamesProvider: GamesProvider,
-                                 actorSystem: ActorSystem,
                                  applicationLifecycle: ApplicationLifecycle)
-                                (implicit executionContext: ExecutionContext) extends FullProvider() {
+                                (implicit executionContext: ExecutionContext,
+                                 actorSystem: ActorSystem) extends FullProvider() {
+
+  private implicit val actorMaterializer = ActorMaterializer()
 
   override def reloadReference(): Future[GameAxisAccumulator] = async {
     val users = await(referenceProvider.users).map(u => u.id -> u).toMap
@@ -61,20 +65,26 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
     Agent(newIterator)
   }
 
-  gamesProvider.addAutoRemoveHook(applicationLifecycle) { game =>
-    fullStuff.foreach { originalIteratorAgent =>
-      val originalIterator = originalIteratorAgent.get()
-      originalIteratorAgent.alter(_.includeGames(List(game))).foreach { newIterator =>
-        val fid = FullIteratorDetector(originalIterator, newIterator)
-        fid.detectGame.map(NewGameDetected).foreach(actorSystem.eventStream.publish)
-        fid.detectClanwar.map(NewClanwarCompleted).foreach(actorSystem.eventStream.publish)
+  Source
+    .actorRef[NewRawGameDetected](10, OverflowStrategy.dropHead)
+    .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[NewRawGameDetected]))
+    .map(_.jsonGame)
+    .runForeach { game =>
+      fullStuff.foreach { originalIteratorAgent =>
+        val originalIterator = originalIteratorAgent.get()
+        originalIteratorAgent.alter(_.includeGames(List(game))).foreach { newIterator =>
+          val fid = FullIteratorDetector(originalIterator, newIterator)
+          fid.detectGame.map(NewRichGameDetected).foreach(actorSystem.eventStream.publish)
+          fid.detectClanwar.map(NewClanwarCompleted).foreach(actorSystem.eventStream.publish)
+        }
       }
     }
-  }
 
 }
 
-case class NewGameDetected(jsonGame: JsonGame)
+case class NewRichGameDetected(jsonGame: JsonGame)
+
+case class NewRawGameDetected(jsonGame: JsonGame)
 
 case class NewClanwarCompleted(clanwarCompleted: CompleteClanwar) {
   def toEvent(implicit writes: Writes[CompleteClanwar]): Event = {
