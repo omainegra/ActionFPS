@@ -35,7 +35,9 @@ trait Formats {
   private implicit val gaf: OFormat[GameAchievement] = Json.format[GameAchievement]
   private implicit val Af: OFormat[JsonGamePlayer] = Json.format[JsonGamePlayer]
   private implicit val Bf: OFormat[JsonGameTeam] = Json.format[JsonGameTeam]
-  implicit val reads: Reads[JsonGame] = Json.reads[JsonGame]
+  implicit val reads: Reads[JsonGame] = {
+    Json.reads[JsonGame]
+  }
 
   //noinspection TypeAnnotation
   // ADDING a type annotation causes FullFlowTest to fail!
