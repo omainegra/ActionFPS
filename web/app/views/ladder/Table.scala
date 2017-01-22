@@ -1,7 +1,5 @@
 package views.ladder
 
-import java.time.format.DateTimeFormatter
-
 import com.actionfps.ladder.parser.Aggregate
 import lib.WebTemplateRender
 import org.jsoup.Jsoup

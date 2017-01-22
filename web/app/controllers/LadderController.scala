@@ -4,6 +4,7 @@ package controllers
   * Created by me on 09/05/2016.
   */
 
+import java.time.Instant
 import javax.inject._
 
 import akka.actor.ActorSystem
@@ -21,8 +22,7 @@ class LadderController @Inject()(ladderService: LadderService,
                                 (implicit executionContext: ExecutionContext,
                                  actorSystem: ActorSystem) extends Controller {
 
-  def aggregate: Aggregate = ladderService.aggregate
-
+  def aggregate: Aggregate = ladderService.aggregate.displayed(Instant.now()).trimmed(Instant.now())
 
   def ladder = Action { implicit req =>
     req.getQueryString("format") match {

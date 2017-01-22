@@ -7,14 +7,31 @@ import java.time.{Duration, Instant}
 /**
   * Created by me on 02/05/2016.
   */
-case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: Instant, timePlayed: Long) {
+case class UserStatistics(frags: Int,
+                          gibs: Int,
+                          flags: Int,
+                          lastSeen: Instant,
+                          timePlayed: Long,
+                          points: Int
+                         ) {
+
+  def displayed(instant: Instant): UserStatistics = {
+    /**
+      * After 30 days, every 30 days = 50% loss of points.
+      */
+    val dt = Math.max(0, instant.getEpochSecond - lastSeen.getEpochSecond - UserStatistics.TimeShift)
+    copy(
+      points = (points * Math.exp(-UserStatistics.TimeFactor * dt)).toInt
+    )
+  }
 
   def merge(other: UserStatistics) = UserStatistics(
     frags = frags + other.frags,
     gibs = gibs + other.gibs,
     flags = flags + other.flags,
     timePlayed = timePlayed + other.timePlayed,
-    lastSeen = if (lastSeen.isAfter(other.lastSeen)) lastSeen else other.lastSeen
+    lastSeen = if (lastSeen.isAfter(other.lastSeen)) lastSeen else other.lastSeen,
+    points = points + other.points
   )
 
   def lastSeenInstant: Instant = lastSeen.truncatedTo(ChronoUnit.SECONDS)
@@ -23,13 +40,20 @@ case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: Instant, 
     DateTimeFormatter.ISO_INSTANT.format(lastSeen)
   }
 
-  def kill: UserStatistics = copy(frags = frags + 1)
+  def kill: UserStatistics = copy(
+    frags = frags + 1,
+    points = points + 2
+  )
 
-  def gib: UserStatistics = copy(gibs = gibs + 1)
+  def gib: UserStatistics = copy(
+    gibs = gibs + 1,
+    points = points + 3
+  )
 
-  def flag: UserStatistics = copy(flags = flags + 1)
-
-  def points: Int = (2 * frags) + (3 * gibs) + (15 * flags)
+  def flag: UserStatistics = copy(
+    flags = flags + 1,
+    points = points + 15
+  )
 
   def see(atTime: Instant): UserStatistics = {
     if (atTime.isBefore(lastSeen)) this
@@ -57,5 +81,20 @@ case class UserStatistics(frags: Int, gibs: Int, flags: Int, lastSeen: Instant, 
 }
 
 object UserStatistics {
-  def empty(time: Instant) = UserStatistics(frags = 0, gibs = 0, flags = 0, lastSeen = time, timePlayed = 0)
+  val TimeFactor: Double = {
+    (-Math.log(0.5)) / (30 * 3600 * 24)
+  }
+
+  val TimeShift: Int = {
+    30 * 3600 * 24
+  }
+
+  def empty(time: Instant): UserStatistics = UserStatistics(
+    frags = 0,
+    gibs = 0,
+    flags = 0,
+    lastSeen = time,
+    timePlayed = 0,
+    points = 0
+  )
 }

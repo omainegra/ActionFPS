@@ -87,6 +87,7 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
 object Dev {
   val rankedStat = RankedStat(user = "w00p|User", rank = 23,
     userStatistics = UserStatistics(frags = 12, gibs = 13, flags = 14,
+      points = 123,
       lastSeen = Instant.now(), timePlayed = 123L))
 
   val fullProfile = FullProfile(

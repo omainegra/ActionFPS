@@ -1,5 +1,7 @@
 package com.actionfps.ladder.parser
 
+import java.time.{Duration, Instant}
+
 import com.actionfps.ladder.parser.Aggregate.RankedStat
 
 /**
@@ -38,10 +40,24 @@ case class Aggregate(users: Map[String, UserStatistics]) {
   def ranked: List[Aggregate.RankedStat] = {
     users.toList.sortBy(_._2.points).reverse.zipWithIndex.map { case ((id, s), r) => RankedStat(id, r + 1, s) }
   }
+
+  def displayed(instant: Instant): Aggregate = {
+    Aggregate(
+      users = users.map { case (u, us) => u -> us.displayed(instant) }
+    )
+  }
+
+  def trimmed(instant: Instant): Aggregate = {
+    Aggregate(
+      users = users.filter { case (u, us) =>
+        val lessThanOneDay = Duration.between(us.lastSeen, instant).minus(Duration.ofDays(1)).isNegative
+        us.points >= 100 || lessThanOneDay
+      }
+    )
+  }
 }
 
 object Aggregate {
-
   case class RankedStat(user: String, rank: Int, userStatistics: UserStatistics)
 
   def empty = Aggregate(users = Map.empty)
