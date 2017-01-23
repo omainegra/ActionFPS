@@ -30,11 +30,11 @@ import scala.util.{Failure, Success}
   * Notify clients of an '!inter' message on a server by a registered user.
   */
 @Singleton
-class IntersService @Inject()(pickedFile: Option[File])
-                             (implicit
-                              referenceProvider: ReferenceProvider,
-                              actorSystem: ActorSystem,
-                              executionContext: ExecutionContext) {
+class IntersService(pickedFile: Option[File])
+                   (implicit
+                    referenceProvider: ReferenceProvider,
+                    actorSystem: ActorSystem,
+                    executionContext: ExecutionContext) {
 
   @Inject() def this(configuration: Configuration)
                     (implicit
