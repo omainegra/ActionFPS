@@ -4,6 +4,7 @@ package controllers
   * Created by William on 01/01/2016.
   */
 
+import java.time.Instant
 import javax.inject._
 
 import com.actionfps.accumulation.Clan
@@ -42,7 +43,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
   def rankings: Action[AnyContent] = Action.async { implicit request =>
     async {
       implicit val namer = await(namerF)
-      val stats = await(fullProvider.clanstats).onlyRanked.named
+      val stats = await(fullProvider.clanstats).shiftedElo(Instant.now()).onlyRanked.named
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(stats))
       else
@@ -65,7 +66,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
         .reverse
         .take(15)
 
-      val st = await(fullProvider.clanstats).clans.get(id)
+      val st = await(fullProvider.clanstats).shiftedElo(Instant.now()).clans.get(id)
 
       await(referenceProvider.clans).find(_.id == id) match {
         case Some(clan) =>

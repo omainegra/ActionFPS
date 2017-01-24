@@ -1,5 +1,6 @@
 package controllers
 
+import java.time.Instant
 import javax.inject._
 
 import com.actionfps.clans.Conclusion.Namer
@@ -57,7 +58,7 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
         None
       })
 
-      val cstats = await(fullProvider.clanstats).onlyRanked.named
+      val cstats = await(fullProvider.clanstats).shiftedElo(Instant.now()).onlyRanked.named
       Ok(renderTemplate(
         title = None,
         supportsJson = false,

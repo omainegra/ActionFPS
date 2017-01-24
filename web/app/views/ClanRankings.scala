@@ -15,7 +15,7 @@ object ClanRankings {
   def render(clanstats: Clanstats): Html = {
     val doc = Jsoup.parse(clanRankingsHtmlPath.toFile, "UTF-8")
     val tbodyTr = doc.select("tbody tr")
-    clanstats.onlyRanked.clans.values.toList.sortBy(_.wars).reverse.take(10).map { clan =>
+    clanstats.onlyRanked.clans.values.toList.sortBy(_.elo).reverse.take(10).map { clan =>
       val target = tbodyTr.first().clone()
       target.select(".clan-name a").attr("href", s"/clan/?id=${clan.id}").first().text(clan.name.getOrElse("-"))
       target.select(".clan-wars").first().text(s"${clan.wars}")
@@ -23,6 +23,15 @@ object ClanRankings {
       target.select(".clan-games").first().text(s"${clan.games}")
       target.select(".clan-score").first().text(s"${clan.score}")
       target.select(".clan-rank").first().text(clan.rank.map(_.toString).getOrElse(""))
+      val clc = target.select(".clan-last-clanwar").first()
+      clan.lastClanwar match {
+        case None =>clc.remove()
+        case Some(clanwarId) => clc.select("a")
+          .attr("href",s"/clanwar/?id=${clanwarId}")
+            .select("time")
+            .attr("datetime", clanwarId)
+      }
+      <td class="clan-last-clanwar"><a href=""><time is="relative-time" datetime="2016-02-03">2016-02-03</time></a></td>
       target
     }.foreach(tbodyTr.first().parent().appendChild)
     tbodyTr.remove()

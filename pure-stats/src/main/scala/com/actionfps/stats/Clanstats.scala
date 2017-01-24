@@ -1,5 +1,7 @@
 package com.actionfps.stats
 
+import java.time.{Duration, Instant}
+
 import com.actionfps.clans.Conclusion.Namer
 import com.actionfps.clans.{CompleteClanwar, Conclusion}
 
@@ -7,7 +9,6 @@ import com.actionfps.clans.{CompleteClanwar, Conclusion}
   * Created by William on 02/01/2016.
   */
 object Clanstats {
-
 
   def empty = Clanstats(clans = Map.empty)
 
@@ -32,13 +33,40 @@ object Clanstats {
       gameWins = completeClanwar.games.count(_.winnerClan.contains(clan)),
       score = team.players.map(_._2.score).sum,
       flags = team.flags,
-      rank = None
+      rank = None,
+      lastClanwar = Option(completeClanwar.id)
     )
   }.toList
 }
 
 case class Clanstats(clans: Map[String, Clanstat]) {
   def isEmpty: Boolean = clans.isEmpty
+
+  def shiftedElo(instant: Instant): Clanstats = {
+    copy(
+      clans.toList.map { case (k, clanstat) => k -> {
+        clanstat.lastClanwar match {
+          case Some(lastClanwar) =>
+
+            /**
+              * Decay at 50% per 30 days after initial 30 days.
+              */
+            val duration = Duration.between(Instant.parse(lastClanwar), instant)
+            val minus30Days = duration.minusDays(30)
+            if (minus30Days.isNegative) clanstat else {
+              val powFactor = minus30Days.getSeconds / (3600.0 * 24 * 30)
+              val pow = Math.pow(0.5, powFactor)
+              clanstat.copy(
+                elo = Math.round(clanstat.elo * pow)
+              )
+            }
+          case None =>
+            clanstat
+        }
+      }
+      }.toMap
+    ).refreshedRanks
+  }
 
 
   def onlyRanked: Clanstats = copy(
@@ -113,8 +141,12 @@ case class Clanstat(id: String,
                     flags: Int,
                     frags: Int,
                     deaths: Int,
-                    rank: Option[Int] = None) {
-  def +(other: Clanstat): Clanstat = copy(
+                    rank: Option[Int] = None,
+                    lastClanwar: Option[String]) {
+  def +(other: Clanstat): Clanstat = Clanstat(
+    id = id,
+    elo = elo,
+    lastClanwar = (lastClanwar.toList ++ other.lastClanwar).sorted.lastOption,
     wins = wins + other.wins,
     losses = losses + other.losses,
     ties = ties + other.ties,
@@ -144,6 +176,7 @@ object Clanstat {
     score = 0,
     flags = 0,
     frags = 0,
-    deaths = 0
+    deaths = 0,
+    lastClanwar = None
   )
 }
