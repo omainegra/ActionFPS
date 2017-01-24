@@ -82,21 +82,21 @@
            fill="#FFFFFF"
            font-family="Verdana, Geneva, sans-serif"
            font-size="16"
-           style="font-weight: bold; stroke: black; stroke-width: 1"
+           style="font-weight: bold; stroke: black; stroke-width: 0.8"
            id="inter-rank"><tspan>Inter rank: 1</tspan></text>
 <text
            text-anchor="end" x="350" y="82"
            fill="#FFFFFF"
            font-family="Verdana, Geneva, sans-serif"
            font-size="16"
-           style="font-weight: bold; stroke: black; stroke-width: 1"
+           style="font-weight: bold; stroke: black; stroke-width: 0.8"
            id="ladder-rank">Ladder rank: 1</text>
 <text
            text-anchor="end" x="350" y="110"
            fill="#FFFFFF"
            font-family="Verdana, Geneva, sans-serif"
            font-size="16"
-           style="font-weight: bold; stroke: black; stroke-width: 1"
+           style="font-weight: bold; stroke: black; stroke-width: 0.8"
            id="game-count">Game count: 873</text>
 </g><g
          id="Calque_5"><text
@@ -104,7 +104,7 @@
            fill="#FFFFFF"
            font-family="Verdana, Geneva, sans-serif"
            font-size="18"
-           style="font-weight: bold; stroke: black; stroke-width: 1"
+           style="font-weight: bold; stroke: black; stroke-width: 0.8"
            id="player-name">w00p|Drakas</text>
 </g><g
          id="Calque_6"><image
