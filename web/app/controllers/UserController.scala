@@ -10,7 +10,7 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json.{JsObject, JsString}
 import providers.ReferenceProvider
-import userauth.Ah
+import userauth.AuthAtPath
 
 import scala.concurrent.ExecutionContext
 import scala.async.Async._
@@ -28,6 +28,8 @@ class UserController @Inject()(configuration: Configuration,
     Files.createFile(targetPath)
   }
 
+  val aap = AuthAtPath(targetPath)
+
   Logger(getClass).info(s"Target path: ${targetPath}")
 
   val googleUri = "https://www.googleapis.com/oauth2/v3/tokeninfo"
@@ -41,17 +43,9 @@ class UserController @Inject()(configuration: Configuration,
       val response = await(wSClient.url(googleUri).withQueryString("id_token" -> idToken).get())
       assert((response.json \ "aud").as[String].startsWith("566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9"))
       val email = (response.json \ "email").as[String]
-            val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.email.contains(email)).get
-//      val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.id == "drakas").get
-      Ah.getUser(theUser.id, targetPath) match {
-        case Some(gotUser) if gotUser.contains("privkey") =>
-          Ok(JsObject(Map("id" -> JsString(theUser.id), "privKey" -> JsString(gotUser("privkey").head))))
-        case None =>
-          val (privKey, pubKey) = Ah.generatePair()
-          val userMap = Map("id" -> List(theUser.id), "pubkey" -> List(pubKey), "privkey" -> List(privKey))
-          Ah.putUser(theUser.id, targetPath, userMap)
-          Ok(JsObject(Map("id" -> JsString(theUser.id), "privKey" -> JsString(privKey))))
-      }
+      val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.email.contains(email)).get
+      //      val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.id == "drakas").get
+      Ok(JsObject(Map("id" -> JsString(theUser.id), "privKey" -> JsString(aap.getOrPutPrivKey(theUser.id)))))
     }
   }
 
