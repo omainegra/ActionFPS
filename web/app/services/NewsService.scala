@@ -52,7 +52,7 @@ object NewsService {
       .head
     val published = ZonedDateTime.parse((entry \ "published").head.text)
     val updated = ZonedDateTime.parse((entry \ "updated").head.text)
-    val title = (link \ "@title").text
+    val title = Option((link \ "@title").text).filter(_.nonEmpty).getOrElse((entry \\ "title").take(1).text).trim
     val url = (link \ "@href").text
     NewsItem(postDate = published, updateDate = updated, title = title, url = url)
   }
