@@ -8,7 +8,7 @@
   * <a href="https://github.com/ActionFPS/game-log-parser">ActionFPS/game-log-parser</a>
   * <a href="https://github.com/ActionFPS/binary-game-parser">ActionFPS/binary-game-parser</a>
   * <a href="https://github.com/ActionFPS/server-pinger">ActionFPS/server-pinger</a>
-  * <a href=" https://github.com/Paul255/ActionFPS-DiscordBOT">Paul255/ActionFPS-DiscordBOT</a>
+  * <a href="https://github.com/Paul255/ActionFPS-DiscordBOT">Paul255/ActionFPS-DiscordBOT</a>
 * [ActionFPS Blog](https://actionfps.blogspot.com)
 * [ActionFPS Discord](https://discord.gg/HYHku8C)
 * [ActionFPS GitHub](https://github.com/ScalaWilliam/ActionFPS/)
