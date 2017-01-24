@@ -44,8 +44,10 @@ class UserController @Inject()(configuration: Configuration,
       assert((response.json \ "aud").as[String].startsWith("566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9"))
       val email = (response.json \ "email").as[String]
       val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.email.contains(email)).get
-      //      val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.id == "drakas").get
-      Ok(JsObject(Map("id" -> JsString(theUser.id), "privKey" -> JsString(aap.getOrPutPrivKey(theUser.id)))))
+//            val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.id == "drakas").get
+      Ok(JsObject(Map("user" -> JsString(theUser.id), "privKey" -> JsString(aap.synchronized {
+        aap.getOrPutPrivKey(theUser.id)
+      }))))
     }
   }
 

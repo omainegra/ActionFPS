@@ -7,7 +7,8 @@
     <p><a href="http://woop.ac/client/windows_client_1202.2.exe" class="button-error pure-button">Download ActionFPS
         Match Client</a></p>
     <p>Windows, 44MB download</p>
-    <p><a href="http://woop.ac:81/linux_client_1202.2.tar.bz2" class="button-error pure-button">Download AFPS for Linux</a></p> 
+    <p><a href="http://woop.ac:81/linux_client_1202.2.tar.bz2" class="button-error pure-button">Download AFPS for
+        Linux</a></p>
     <p>Linux, 47MB download</p>
 
     <h2>Play it</h2>
@@ -19,5 +20,38 @@
             src="https://cloud.githubusercontent.com/assets/2464813/12760873/99820c6e-c9e0-11e5-832d-00c1b61c2e4c.png"/></a>
     </p>
     <p><a href="http://www.teamspeak.com/?page=downloads" target="_blank">TeamSpeak is free VoIP for gaming.</a></p>
+
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+    <meta name="google-signin-client_id"
+          content="566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <style type="text/css">
+        pre {
+            max-width:30em;
+            overflow-x:scroll;
+        }
+    </style>
+    <pre>User ID: <span id="user-id"></span>
+Private key: <span id="private-key"></span>
+<a id="connect-link">Click here to connect up automatically.</a></pre>
+
+    <script type="text/javascript">
+        function onSignIn(googleUser) {
+            var profile = googleUser.getAuthResponse();
+            $.post("/user/auth-token/", {"id_token": profile.id_token})
+                .done(function (data) {
+                    console.log("Response for data: ", data);
+                    console.log("User ID: ", data.user);
+                    console.log("Private key: ", data.privKey);
+                    document.querySelector("#user-id").appendChild(document.createTextNode(data.user));
+                    document.querySelector("#private-key").appendChild(document.createTextNode(data.privKey));
+                    document.querySelector("#connect-link").setAttribute("href", "actionfps://register-key/?user="+data.user+"&privKey="+data.privKey);
+                });
+        }
+    </script>
+
 
 </div>
