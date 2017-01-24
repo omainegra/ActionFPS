@@ -100,6 +100,7 @@
             $("#reg-form").addClass("signed-in");
             var profile = googleUser.getAuthResponse();
             $("#token").val(profile.id_token);
+            console.log("token", profile.id_token);
             var queryUrl = rootUrl + "?email=" + googleUser.getBasicProfile().getEmail();
             $.get(queryUrl).then(function (x) {
                 if (x === false) {
@@ -109,7 +110,13 @@
                     $('#login_welcome a').attr("href", "/player/?id=" + x.id).text(x.name);
                     $('#welcome-user, #log-in').attr("href", "/player/?id=" + x.id).text(x.name);
                     $('#login_welcome').css("display", "block");
-                    $('#reg-form').remove()
+                    $('#reg-form').remove();
+
+                    $.post("/user/auth-token/", {"id_token": profile.id_token})
+                        .done(function (data) {
+                            console.log("Response for data: ", data);
+                            console.log("Private key: ", data.privKey);
+                        })
                 }
             })
         }

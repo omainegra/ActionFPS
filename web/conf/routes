@@ -27,3 +27,5 @@ GET         /inters/                        @controllers.EventStreamController.i
 GET         /ladder/                        @controllers.LadderController.ladder
 GET         /event-stream/                  @controllers.EventStreamController.eventStream
 GET         /version/                       @controllers.MiscController.version
+GET         /user/auth-token/               @controllers.UserController.authTokenGet
+POST        /user/auth-token/               @controllers.UserController.authTokenPost
