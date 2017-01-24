@@ -13,15 +13,20 @@ import javax.xml.bind.DatatypeConverter
 case class AuthAtPath(path: Path) {
   def load(): Properties = {
     val properties = new Properties()
-    properties.load(new FileReader(path.toFile))
-    properties
+    val fr = new FileReader(path.toFile)
+    try {
+      properties.load(fr)
+      properties
+    } finally fr.close()
   }
 
   def putUser(id: String, privKey: String, pubKey: String): Unit = {
     val properties = load()
     properties.put(s"${id}.public-key", pubKey)
     properties.put(s"${id}.private-key", privKey)
-    properties.store(new FileWriter(path.toFile), null)
+    val fw = new FileWriter(path.toFile)
+    try properties.store(fw, null)
+    finally fw.close()
   }
 
   def getPrivKey(id: String): Option[String] = {
