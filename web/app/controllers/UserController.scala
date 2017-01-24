@@ -41,7 +41,7 @@ class UserController @Inject()(configuration: Configuration,
       val response = await(wSClient.url(googleUri).withQueryString("id_token" -> idToken).get())
       assert((response.json \ "aud").as[String].startsWith("566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9"))
       val email = (response.json \ "email").as[String]
-            val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.email == email).get
+            val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.email.contains(email)).get
 //      val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.id == "drakas").get
       Ah.getUser(theUser.id, targetPath) match {
         case Some(gotUser) if gotUser.contains("privkey") =>
