@@ -27,7 +27,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class NewsService @Inject()(implicit executionContext: ExecutionContext) {
   private val client: CloseableHttpClient = CachingHttpClientBuilder.create().build()
   private val context = HttpCacheContext.create()
-  private val atomUrl = "https://actionfps.blogspot.com/feeds/posts/default"
+//  private val atomUrl = "https://actionfps.blogspot.com/feeds/posts/default"
+  private val atomUrl = "https://actionfps.wordpress.com/feed/atom/"
 
   def latestItem(): Future[NewsItem] = {
     Future {
