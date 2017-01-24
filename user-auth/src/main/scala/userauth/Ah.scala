@@ -68,7 +68,7 @@ object Ah {
       .toList
     val otherLines = allLines.filterNot { line => idOf(parseValues(line)).contains(id) }
     val newLine = serializeValues(params)
-    val newLines = otherLines :+ newLine
+    val newLines = otherLines :+ newLine :+ ""
     Files.write(path, newLines.mkString("\n").getBytes())
   }
 
