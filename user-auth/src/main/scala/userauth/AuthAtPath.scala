@@ -41,7 +41,7 @@ object AuthAtPath {
   private[userauth] def generatePair(): (String, String) = {
     val kpg = KeyPairGenerator.getInstance("DSA")
     val random = SecureRandom.getInstance("SHA1PRNG", "SUN")
-    kpg.initialize(512, random)
+    kpg.initialize(1024, random)
     val pair = kpg.generateKeyPair()
     val priv = pair.getPrivate
     val pub = pair.getPublic
