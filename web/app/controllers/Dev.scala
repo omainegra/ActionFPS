@@ -40,7 +40,7 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
 
   override def routes: Routes = {
     case GET(p"/news/") => Action.async {
-      newsService.latestItem().map(_.toString).map(s => Ok(s))
+      newsService.latestItemFuture().map(_.toString).map(s => Ok(s))
     }
     case GET(p"/live-template/") => liveTemplate
     case GET(p"/clanwars/") => clanwarTemplate

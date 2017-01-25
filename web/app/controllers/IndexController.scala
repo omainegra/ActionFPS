@@ -53,7 +53,7 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
       val games = await(fullProvider.getRecent(10)).map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
       val latestClanwars = await(fullProvider.clanwars).complete.toList.sortBy(_.id).reverse.take(10).map(_.meta.named)
-      val headingO = await(newsService.latestItem().map(Option.apply).recover { case e =>
+      val headingO = await(newsService.latestItemFuture().map(Option.apply).recover { case e =>
         Logger.error(s"Heading: ${e}", e)
         None
       })
