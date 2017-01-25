@@ -4,6 +4,7 @@
 * [ActionFPS Game](https://github.com/ActionFPS/ActionFPS-Game)
 * [ActionFPS Wiki](https://github.com/ScalaWilliam/ActionFPS/wiki)
 * [ActionFPS Contributor Guide](https://github.com/ScalaWilliam/ActionFPS/wiki/Contributor-Guide)
+* [ActionFPS Data Science](https://github.com/ScalaWilliam/ActionFPS/wiki/Data-Science)
 * [ActionFPS Development Guide](https://github.com/ScalaWilliam/ActionFPS/wiki/Development-Guide)
   * <a href="https://github.com/ActionFPS/game-log-parser">ActionFPS/game-log-parser</a>
   * <a href="https://github.com/ActionFPS/binary-game-parser">ActionFPS/binary-game-parser</a>
