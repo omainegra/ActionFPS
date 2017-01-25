@@ -7,7 +7,7 @@ object Dependencies {
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
   val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.4"
   val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.15"
-  val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.1"
+  val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.2"
   val hazelcastClient: ModuleID = "com.hazelcast" % "hazelcast-client" % "3.6.5"
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.2"
   val httpClientCache: ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.2"
@@ -23,7 +23,7 @@ object Dependencies {
   val akkaslf: ModuleID = akka("slf4j")
   val akkaTestkit: ModuleID = akka("testkit")
 
-  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.14"
+  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.16"
 
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 
