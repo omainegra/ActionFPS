@@ -102,22 +102,11 @@ lazy val web = project
     javaOptions in IntegrationTest ++= Seq(
       s"-Dgeolitecity.dat=${geoLiteCity.value}"
     ),
-    (run in Compile) <<= (run in Compile).dependsOn(startHazelcast),
-    startHazelcast := {
-      streams.value.log.info("Starting hazelcast in dev mode...")
-      val cfg = new com.hazelcast.config.Config()
-      cfg.setInstanceName("web")
-      Hazelcast.getOrCreateHazelcastInstance(cfg)
-    },
-    stopHazelcast := {
-      startHazelcast.value.shutdown()
-    },
+    PlayKeys.playRunHooks += HazelcastRunHook(),
     scriptClasspath := Seq("*", "../conf/"),
     buildInfoKeys := Seq[BuildInfoKey](
       name,
       version,
-      scalaVersion,
-      sbtVersion,
       buildInfoBuildNumber,
       git.gitHeadCommit,
       gitCommitDescription
@@ -201,9 +190,6 @@ lazy val pureClanwar =
     .settings(
       libraryDependencies += pureGame
     )
-
-lazy val startHazelcast = taskKey[HazelcastInstance]("Start the web hazelcast instance")
-lazy val stopHazelcast = taskKey[Unit]("Stop the web hazelcast instance")
 
 lazy val ladderParser =
   Project(

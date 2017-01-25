@@ -13,13 +13,15 @@ import tl.{ChallongeClient, WinFlow}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ChallongeService @Inject()(challongeClient: ChallongeClient, applicationLifecycle: ApplicationLifecycle)
-                                  (implicit executionContext: ExecutionContext, actorSystem: ActorSystem) {
+class ChallongeService @Inject()(challongeClient: ChallongeClient,
+                                 applicationLifecycle: ApplicationLifecycle)
+                                (implicit executionContext: ExecutionContext,
+                                 actorSystem: ActorSystem) {
 
   private implicit val actorMaterializer = ActorMaterializer()
 
   Source
-    .actorRef[NewClanwarCompleted](10, OverflowStrategy.dropBuffer)
+    .actorRef[NewClanwarCompleted](bufferSize = 10, OverflowStrategy.dropBuffer)
     .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[NewClanwarCompleted]))
     .map(_.clanwarCompleted)
     .via(WinFlow(challongeClient).clanwarAny)

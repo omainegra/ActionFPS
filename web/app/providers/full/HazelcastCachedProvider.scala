@@ -24,10 +24,9 @@ import scala.util.{Failure, Success, Try}
   * So it's only slow on very first load.
   */
 @Singleton
-class CachedProvider @Inject()(fullProviderR: FullProviderImpl,
-                               applicationLifecycle: ApplicationLifecycle,
-                               gamesProvider: GamesProvider)
-                              (implicit executionContext: ExecutionContext) extends FullProvider() {
+class HazelcastCachedProvider @Inject()(fullProviderR: FullProviderImpl,
+                                        applicationLifecycle: ApplicationLifecycle)
+                                       (implicit executionContext: ExecutionContext) extends FullProvider() {
   private val hz = HazelcastClient.newHazelcastClient()
   private val theMap = hz.getMap[String, GameAxisAccumulator]("stuff")
   private val keyName: String = "fullIterator"
