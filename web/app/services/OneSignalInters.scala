@@ -21,11 +21,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class OneSignalInters (key: String, appId: String)
                                (implicit executionContext: ExecutionContext,
 wSClient: WSClient,
-                                validServers: ValidServers,
                                 actorSystem: ActorSystem) {
   @Inject def this(configuration: Configuration)(implicit executionContext: ExecutionContext,
                                                  wSClient: WSClient,
-                                                 validServers: ValidServers,
                                                  actorSystem: ActorSystem) =
   this(key = configuration.underlying.getString("one-signals.api-key"),
   appId = configuration.underlying.getString("one-signals.app-id"))
@@ -33,7 +31,7 @@ wSClient: WSClient,
 
   private val targetUrl = "https://onesignal.com/api/v1/notifications"
 
-  def pushInterOut(interOut: InterOut): Future[Option[WSResponse]] = {
+  def pushInterOut(interOut: InterOut)(implicit validServers: ValidServers): Future[Option[WSResponse]] = {
     async {
 
       validServers.items.get(interOut.userMessage.serverId) match {
