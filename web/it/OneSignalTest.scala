@@ -45,7 +45,7 @@ class OneSignalTest
       import concurrent._
       import concurrent.duration._
       val r = Await.result(fr, 10.seconds)
-      info(s"$r")
+      info(s"$r, ${r.get.body}")
     }
   }
 
