@@ -57,6 +57,7 @@
         }
     });
 
+    /*
 
     if (!("Notification" in window)) return;
     Notification.requestPermission();
@@ -76,7 +77,7 @@
             window.open(json.serverConnect);
         }
     }
-
+*/
     //showNotification({
     //    name: "w00p|Drakas",
     //    server: "aura.woop.ac:1337"
