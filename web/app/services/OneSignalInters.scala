@@ -60,14 +60,20 @@ wSClient: WSClient,
     }
   }
 
-  val logger = Logger(getClass)
+  private val logger = Logger(getClass)
     logger.info("Beginning OneSignal Inters flow")
 
-  Source
+  private val r = Source
     .actorRef[InterOut](10, OverflowStrategy.dropHead)
     .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[InterOut]))
+      .alsoTo(Sink.foreach(i => logger.info(s"Received ${i}")))
     .mapAsync(1)(pushInterOut)
-    .to(Sink.ignore)
-      .run()
+      .runForeach(i => logger.info(s"Pushed ${i}"))
 
+  r
+    .onComplete { case Success(_) =>
+      logger.info(s"Flow finished.")
+    case Failure(reason) =>
+      logger.error(s"Failed due to ${reason}", reason)
+    }
 }
