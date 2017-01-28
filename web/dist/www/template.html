@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/assets/second.css">
     <link rel="icon" type="image/png"
           href="https://cloud.githubusercontent.com/assets/16243477/12022947/cb7b73d0-ad94-11e5-9653-86055a2b9209.png"/>
+          <link rel="manifest" href="/manifest.json"/>
 <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async='async'></script>
   <script>
     var OneSignal = window.OneSignal || [];
@@ -25,6 +26,7 @@
       httpPermissionRequest: {
         enable: true
       },
+      persistNotification: false,
       notifyButton: {
           enable: true
       }
