@@ -43,6 +43,7 @@ wSClient: WSClient,
                 "app_id" -> JsString(appId),
                 "ttl" -> JsNumber(300),
                 "template_id" -> JsString("cebb4561-07d7-4b61-a0fd-3077c36f8e51"),
+                "segments" -> JsArray(Seq(JsString("All Users"))),
 //                "include_player_ids" -> JsArray(Seq(JsString("a119267f-02f3-4a3d-b551-003752ed76d5"))),
                 "headings" -> JsObject(Map("en" -> JsString(s"Inter @ ${validServer.name}, ${interOut.userMessage.nickname}"))),
                 "url" -> JsString(s"https://actionfps.com/servers/?join=${addr}")
