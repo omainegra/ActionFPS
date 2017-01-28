@@ -788,3 +788,20 @@ input {
     order:8;
   }
 }
+
+
+#servers.join > *:not(#join) {
+  display:none;
+}
+#servers:not(.join) #join {
+  display:none;
+}
+#servers #join {
+  text-align: center;
+  font-weight: bold;
+  font-size:3em;
+  padding:2em;
+}
+#servers #join a {
+  text-decoration: underline;
+}

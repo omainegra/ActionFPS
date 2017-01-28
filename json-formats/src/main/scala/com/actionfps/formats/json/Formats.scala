@@ -130,7 +130,13 @@ trait Formats {
 
   implicit val bpwrites: OWrites[BuiltProfile] = Json.writes[BuiltProfile]
 
-  implicit val sw: OWrites[ServerRecord] = Json.writes[ServerRecord]
+  implicit val sw: OWrites[ServerRecord] = {
+    OWrites[ServerRecord]{ sr =>
+      Json.writes[ServerRecord].writes(sr) ++ JsObject(Map("address" -> JsString(sr.address), "url" -> JsString(sr.url),
+      "name" -> JsString(sr.name)))
+    }
+  }
+
   implicit val cf: OFormat[Clan] = Json.format[Clan]
 
   implicit val pcWrites: Writes[PunchCard] = Writes[PunchCard] { pc =>

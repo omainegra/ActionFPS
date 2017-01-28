@@ -5,44 +5,44 @@
         <h3>@sr._1</h3>
         <ul>
         @sr._2.sortBy(s => (s.hostname, s.port)).map { server =>
-            @defining({
-                val pwdBit = server.password.filter(_.nonEmpty).map { password => s"?password=$password" }
-                s"assaultcube://${server.hostname}:${server.port}${pwdBit.getOrElse("")}"
-            }) { url =>
-                <li><a href="@url">
-                @defining(s"${server.hostname} ${server.port}") { name => @name }
-                </a>
-                    @if(server.kind != "Standard") {
-                        (@server.kind)
-                    }
-                </li>
-            }
+            <li><a href="@server.url">@server.name
+
+            </a>
+                @if(server.kind != "Standard") {
+                    (@server.kind)
+                }
+            </li>
 
         }
         </ul>
     }
-    
+
     <h2>In-game commands</h2>
-    <p>
-        <ul>
-            <li>
-                <pre>!balance</pre> 
-                Balances teams accoring to ELO scores.
-            </li>
-            <li>
-                <pre>!inter</pre>
-                Notifies other players that you started an inter on some server. Notifications are sent to the website, our teamspeak server and a few IRC channels.
-            </li>
-            <li>
-                <pre>!teams</pre>
-                Groups players by clantag. Handy for clan wars.
-            </li>
-            <li>
-                <pre>!sides</pre>
-                Swaps teams.
-            </li>
-        </ul>
-    </p>
+    <ul>
+        <li>
+            <pre>!balance</pre>
+            Balances teams accoring to ELO scores.
+        </li>
+        <li>
+            <pre>!inter</pre>
+            Notifies other players that you started an inter on some server. Notifications are sent to the website, our teamspeak server and a few IRC channels.
+        </li>
+        <li>
+            <pre>!teams</pre>
+            Groups players by clantag. Handy for clan wars.
+        </li>
+        <li>
+            <pre>!sides</pre>
+            Swaps teams.
+        </li>
+    </ul>
+
+    <div id="join">
+        <a id="server-join-link" href="">Join <span id="server-name"></span></a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/assets/servers-join.js"></script>
 
 </article>
 
