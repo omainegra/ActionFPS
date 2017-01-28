@@ -13,6 +13,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 /**
   * Created by william on 28/1/17.
@@ -59,12 +60,14 @@ wSClient: WSClient,
     }
   }
 
-  Logger(getClass).info("Beginning OneSignal Inters flow")
+  val logger = Logger(getClass)
+    logger.info("Beginning OneSignal Inters flow")
 
   Source
     .actorRef[InterOut](10, OverflowStrategy.dropHead)
     .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[InterOut]))
     .mapAsync(1)(pushInterOut)
     .to(Sink.ignore)
+      .run()
 
 }
