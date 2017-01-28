@@ -15,7 +15,21 @@
     <link rel="stylesheet" href="/assets/second.css">
     <link rel="icon" type="image/png"
           href="https://cloud.githubusercontent.com/assets/16243477/12022947/cb7b73d0-ad94-11e5-9653-86055a2b9209.png"/>
-
+<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async='async'></script>
+  <script>
+    var OneSignal = window.OneSignal || [];
+    OneSignal.push(["init", {
+      appId: "8a280544-79c9-4884-acf5-968051e9ef33",
+      autoRegister: false, /* Set to true to automatically prompt visitors */
+      subdomainName: 'actionfps.com',
+      httpPermissionRequest: {
+        enable: true
+      },
+      notifyButton: {
+          enable: true
+      }
+    }]);
+  </script>
 </head>
 <body>
 
