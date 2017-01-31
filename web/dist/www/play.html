@@ -48,7 +48,7 @@ Private key: <span id="private-key"></span>
                     console.log("Private key: ", data.privKey);
                     document.querySelector("#user-id").appendChild(document.createTextNode(data.user));
                     document.querySelector("#private-key").appendChild(document.createTextNode(data.privKey));
-                    document.querySelector("#connect-link").setAttribute("href", "actionfps://woop.ac:7654/?id="+data.user+"&privkey="+data.privKey);
+                    document.querySelector("#connect-link").setAttribute("href", "actionfps://authenticate?id="+data.user+"&key="+data.privKey);
                 });
         }
     </script>
