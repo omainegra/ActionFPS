@@ -44,7 +44,6 @@ lazy val root =
       interParser,
       accumulation,
       ladderParser,
-      userAuth,
       pureClanwar,
       pureStats,
       jsonFormats,
@@ -55,7 +54,6 @@ lazy val root =
     referenceReader,
     ladderParser,
     interParser,
-    userAuth,
     accumulation,
     pureClanwar,
     pureStats,
@@ -71,7 +69,6 @@ lazy val web = project
   .dependsOn(jsonFormats)
   .dependsOn(challonge)
   .dependsOn(ladderParser)
-  .dependsOn(userAuth)
   .enablePlugins(BuildInfoPlugin)
   .settings(dontDocument)
   .configs(IntegrationTest)
@@ -148,15 +145,6 @@ lazy val interParser =
   Project(
     id = "inter-parser",
     base = file("inter-parser")
-  )
-    .settings(
-      libraryDependencies += scalatest % Test
-    )
-
-lazy val userAuth =
-  Project(
-    id = "user-auth",
-    base = file("user-auth")
   )
     .settings(
       libraryDependencies += scalatest % Test
