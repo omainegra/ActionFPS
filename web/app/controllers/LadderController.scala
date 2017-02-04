@@ -38,7 +38,7 @@ class LadderController @Inject()(ladderService: LadderService,
           }
           Ok(Json.toJson(aggregate))
         case _ =>
-          implicit val playerNamer = PlayerNamer.fromMap(await(referenceProvider.Users().users).map(u => u.id -> u.nickname.nickname).toMap)
+          implicit val playerNamer = PlayerNamer.fromMap(await(referenceProvider.Users().users).map(u => u.id -> u.name).toMap)
           Ok(common.renderTemplate(
             title = Some("Ladder"),
             supportsJson = true)
