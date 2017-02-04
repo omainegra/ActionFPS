@@ -49,14 +49,12 @@ class Pinger(implicit serverMappings: ServerMappings) extends Act with ActorLogg
       context.watch(udp)
       becomeStacked {
         case o@Udp.Received(message, f) =>
-          println("MSG", o)
           PartialFunction.condOpt(message) {
             case ParsedResponse(resp) => GotParsedResponse(f, resp)
           }.foreach { case GotParsedResponse(from, stuff) =>
             val nextState = serverStates(from).next(stuff)
             serverStates += from -> nextState
             log.debug(s"Received response: $from, $stuff")
-            println(stuff)
             nextState match {
               case r: CompletedServerStateMachine =>
                 val newStatus = r.toStatus(from._1, from._2)
