@@ -3,6 +3,23 @@ package com.actionfps.gameparser.ingesters
 import com.actionfps.gameparser.SharedParsers
 import fastparse.all._
 
+object GameStartHeader {
+  private val timeRemaining = CharIn('0' to '9').rep(1).!.map(_.toInt) ~ " " ~ ("minutes" | "minute")
+
+  private val players = CharIn('0' to '9').rep(1).!.map(_.toInt) ~ " players"
+
+  private val cap = P("Game start: ") ~ SharedParsers.acceptedModeParser ~ " on " ~ SharedParsers.mapNameParser ~
+    ", " ~ players ~ ", " ~ timeRemaining
+
+  def unapply(input: String): Option[GameStartHeader] = {
+    val res = cap.map(Function.tupled(GameStartHeader.apply)).parse(input)
+    PartialFunction.condOpt(res) {
+      case Parsed.Success(r, _) => r
+    }
+  }
+}
+
+case class GameStartHeader(mode: GameMode.GameMode, map: String, players: Int, minutes: Int)
 
 /**
   * See tests for example messages.
@@ -36,7 +53,7 @@ object GameInProgressHeader {
 
   /**
     * @example "Game status: hunt the flag on ac_depot, 14 minutes remaining, open, 4 clients"
-    * */
+    **/
   private val cap = P("Game status:") ~ spaces ~ SharedParsers.acceptedModeParser ~ " on " ~ SharedParsers.mapNameParser.! ~
     ", " ~ timeRemaining ~ "," ~ spaces ~ CharsWhile(_ != ',').rep(1).! ~ ", " ~ clients
 
@@ -59,6 +76,7 @@ object VerifyTableHeader {
 }
 
 object TeamModes {
+
 
   private val dig = CharIn('0' to '9')
   private val usp = CharsWhile(_ != ' ').!

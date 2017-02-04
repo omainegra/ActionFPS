@@ -30,6 +30,11 @@ class GameDurationCalculatorSpec
       fourth shouldBe GameInProgress(15, 14)
       fifth shouldBe GameFinished(15)
     }
+    "Game duration from start can be found" in {
+      val inputData = "Game start: ctf on ac_depot, 1 players, 15 minutes, mastermode 0, (map rev 3/15383, official, 'getmap' not prepared)"
+      val result = GameDuration.parse(inputData)
+      result shouldEqual GameInProgress(15, 15)
+    }
   }
 
 }

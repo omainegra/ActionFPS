@@ -3,8 +3,6 @@ package gameparser
 package ingesters
 package stateful
 
-import com.actionfps.gameparser.ingesters._
-import com.actionfps.gameparser.ingesters.stateful.{FlagGameBuilder, FoundGame, FragGameBuilder, GameBuilderState}
 import org.scalatest._
 
 class GameCaptureParserSpec
@@ -15,6 +13,11 @@ class GameCaptureParserSpec
     with OptionValues {
 
   "Game parse" must {
+    "Parse a game start line" in {
+      val input = "Game start: ctf on ac_depot, 1 players, 15 minutes, mastermode 0, (map rev 3/15383, official, 'getmap' not prepared)"
+      val result = GameStartHeader.unapply(input)
+      result.value shouldEqual GameStartHeader(GameMode.CTF, "ac_depot", 1, 15)
+    }
     "Parse a finish line" in {
       val input = "Game status: team deathmatch on ac_aqueous, game finished, open, 6 clients"
       val GameFinishedHeader(h) = input

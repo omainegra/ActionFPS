@@ -125,7 +125,7 @@ case class ReadingFlagScores(builder: FlagGameBuilder) extends GameBuilderState 
 
 case class FoundGame(header: GameFinishedHeader,
                      game: Either[FlagGameBuilder, FragGameBuilder]) extends GameBuilderState {
-  def next(input: String) = NothingFound.next(input)
+  def next(input: String): GameBuilderState = NothingFound.next(input)
 }
 
 object FoundGame {

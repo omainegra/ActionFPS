@@ -1,6 +1,6 @@
 package com.actionfps.gameparser.ingesters.stateful
 
-import com.actionfps.gameparser.ingesters.{GameFinishedHeader, GameInProgressHeader}
+import com.actionfps.gameparser.ingesters.{GameFinishedHeader, GameInProgressHeader, GameStartHeader}
 
 /**
   * Figure out a game's duration from the logs.
@@ -19,6 +19,8 @@ sealed trait GameDuration {
 object GameDuration {
   val empty: GameDuration = NoDurationFound
 
+  def parse(line: String): GameDuration = scan(empty, line)
+
   def scan(gameDuration: GameDuration, nextLine: String): GameDuration = {
     gameDuration.next(nextLine)
   }
@@ -27,6 +29,7 @@ object GameDuration {
 case object NoDurationFound extends GameDuration {
   override def next(input: String): GameDuration = {
     input match {
+      case GameStartHeader(gsh) => GameInProgress(gsh.minutes, gsh.minutes)
       case GameInProgressHeader(GameInProgressHeader(mode, remaining, map, state)) =>
         GameInProgress(remaining, remaining)
       case _ => NoDurationFound

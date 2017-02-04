@@ -22,6 +22,12 @@ object ServerState {
   def scan(serverState: ServerState, line: String): ServerState = {
     serverState.next(line)
   }
+
+  def collect(serverState: ServerState): Option[ServerFoundGame] = {
+    PartialFunction.condOpt(serverState) {
+      case sfg: ServerFoundGame => sfg
+    }
+  }
 }
 
 case class ServerFoundGame(foundGame: FoundGame, duration: Int) extends ServerState {
