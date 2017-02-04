@@ -15,9 +15,11 @@ class DownloadsController @Inject()(latestReleaseService: LatestReleaseService) 
       case "windows" => latestRelease.windowsLink
       case "linux" => latestRelease.linuxLink
       case "mac" => latestRelease.osxLink
-    }.flatten match {
-      case Some(downloadLink) =>
+    } match {
+      case Some(Some(downloadLink)) =>
         SeeOther(downloadLink)
+      case Some(None) =>
+        NotFound("Could not find a download link for your OS. Contact us if issue persists.")
       case None =>
         NotFound("Required 'os' parameter must be one of: 'windows', 'linux', 'mac'.")
     }
