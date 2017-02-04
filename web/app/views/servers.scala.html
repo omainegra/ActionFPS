@@ -1,41 +1,26 @@
 @(servers: List[com.actionfps.reference.ServerRecord])
 <article id="servers">
-    <h2>AssaultCube</h2>
-    @servers.groupBy(_.region).toList.sortBy(_._1).map { sr =>
-        <h3>@sr._1</h3>
-        <ul>
-        @sr._2.sortBy(s => (s.hostname, s.port)).map { server =>
-            <li><a href="@server.url">@server.name
+    @servers.groupBy(_.kind).toList.sortBy(_._1).map { sl =>
 
-            </a>
-                @if(server.kind != "Standard") {
-                    (@server.kind)
-                }
-            </li>
+        <h2>@sl._1</h2>
+        @sl._2.groupBy(_.region).toList.sortBy(_._1).map { sr =>
+            <h3>@sr._1</h3>
+            <ul>
+            @sr._2.sortBy(s => (s.hostname, s.port)).map { server =>
+                <li><a href="@server.url">@server.name
 
+                </a>
+                    @if(server.kind != "Standard") {
+                        (@server.kind)
+                    }
+                </li>
+
+            }
+            </ul>
         }
-        </ul>
     }
 
-    <h2>In-game commands</h2>
-    <ul>
-        <li>
-            <pre>!balance</pre>
-            Balances teams accoring to ELO scores.
-        </li>
-        <li>
-            <pre>!inter</pre>
-            Notifies other players that you started an inter on some server. Notifications are sent to the website, our teamspeak server and a few IRC channels.
-        </li>
-        <li>
-            <pre>!teams</pre>
-            Groups players by clantag. Handy for clan wars.
-        </li>
-        <li>
-            <pre>!sides</pre>
-            Swaps teams.
-        </li>
-    </ul>
+    <p><a href="https://github.com/ScalaWilliam/ActionFPS/wiki/Frequently-Asked-Questions#do-you-have-in-game-commands-for-the-servers">In-game commands</a></p>
 
     <div id="join">
         <a id="server-join-link" href="">Join <span id="server-name"></span></a>
