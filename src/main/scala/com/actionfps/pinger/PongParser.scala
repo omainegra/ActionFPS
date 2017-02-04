@@ -158,7 +158,7 @@ private[pinger] object PongParser {
                              frags: Int, flagScore: Int, deaths: Int,
                              teamkills: Int, accuracy: Int, health: Int,
                              armour: Int, weapon: Int, role: Int,
-                             state: Int, ip: String) extends ParsedResponse
+                             state: Int, ip: String, user: Option[String], group: Option[String]) extends ParsedResponse
 
   object GetPlayerInfos {
     def unapply(list: ByteString): Option[PlayerInfoReply] = list match {
@@ -167,7 +167,14 @@ private[pinger] object PongParser {
         frags >>: flagscore >>: deaths >>: teamkills >>: accuracy >>: health >>:
         armour >>: gunSelected >>: role >>: state >>: ip >~: ByteString.empty =>
         Option(PlayerInfoReply(clientNum, ping, name, team, frags, flagscore,
-          deaths, teamkills, accuracy, health, armour, gunSelected, role, state, ip))
+          deaths, teamkills, accuracy, health, armour, gunSelected, role, state, ip, None, None))
+      case extAck >>: extVersion >>: 0 >>: -11 >>: clientNum >>:
+        ping >>: name >>##:: user >>##:: group >>##:: team >>##::
+        frags >>: flagscore >>: deaths >>: teamkills >>: accuracy >>: health >>:
+        armour >>: gunSelected >>: role >>: state >>: ip >~: ByteString.empty =>
+        Option(PlayerInfoReply(clientNum, ping, name, team, frags, flagscore,
+          deaths, teamkills, accuracy, health, armour, gunSelected, role, state, ip,
+          Some(user).filter(_.nonEmpty), Some(group).filter(_.nonEmpty)))
       case _ => None
     }
   }

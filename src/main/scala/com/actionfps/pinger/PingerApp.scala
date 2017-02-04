@@ -23,6 +23,8 @@ object PingerApp extends App {
       lines.map(_.split(",", -1)).map(c => c(hostnameHeading) -> c(portHeading).toInt).toList
     }
     finally source.close()
+
+    List("aura.woop.ac" -> 7654)
   }
 
 
