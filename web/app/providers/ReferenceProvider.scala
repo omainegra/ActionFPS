@@ -38,7 +38,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
       case Some(value) => value
       case None =>
         val value = await(wSClient.url(configuration.underlying.getString(s"af.reference.${key}")).get().filter(_.status == 200).map(_.body))
-        cacheApi.set(key, value, Duration.apply("30m"))
+        cacheApi.set(key, value, Duration.apply("1h"))
         value
     }
   }
