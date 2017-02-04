@@ -168,6 +168,12 @@ object ValidServers {
       name = "legal 1999",
       timezone = "UTC",
       address = "legal.actionfps.com:1999"
+    ),
+    ValidServer(
+      logId = "62-210-131-155.rev.poneytelecom.eu sd-55104 ActionFPS[local#7654]",
+      name = "aura 7654",
+      timezone = "UTC",
+      address = "aura.woop.ac:7654"
     )
   )
 
