@@ -21,7 +21,9 @@ case class ServerRecord(region: String, hostname: String, port: Int, kind: Strin
 
   def name: String = s"${hostname} ${port}"
 
-  def connectAddress: String = s"""assaultcube://$hostname:$port""" + password.map(pw => s"/?password=$pw").getOrElse("")
+  def protocol: String = if (kind == "ActionFPS") "actionfps" else "assaultcube"
+
+  def connectAddress: String = s"""$protocol://$hostname:$port""" + password.map(pw => s"/?password=$pw").getOrElse("")
 }
 
 object ServerRecord {
