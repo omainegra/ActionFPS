@@ -46,8 +46,8 @@ object JsonGame {
                   flags = player.flag,
                   frags = player.frag,
                   deaths = player.death,
-                  user = None,
-                  clan = None,
+                  user = player.user,
+                  clan = player.group,
                   countryCode = None,
                   countryName = None,
                   timezone = None

@@ -1,6 +1,6 @@
 package com.actionfps.gameparser.ingesters
 
-import com.actionfps.gameparser.SharedParsers
+import com.actionfps.gameparser.{SharedParsers, UserHost}
 import fastparse.all._
 
 object GameStartHeader {
@@ -79,23 +79,23 @@ object TeamModes {
 
 
   private val dig = CharIn('0' to '9')
-  private val usp = CharsWhile(_ != ' ').!
   private val sp = " ".rep(1)
+  private val usp = CharsWhile(_ != ' ').!
   private val strSp = usp ~ " ".rep(1)
   private val dsp = ("-".? ~ dig.rep(1)).!.map(_.toInt)
   private val dSp = dsp ~ " ".rep(1)
 
   object FragStyle {
 
-    case class IndividualScore(cn: Int, name: String, team: String, score: Int, frag: Int, death: Int, tk: Int, ping: Int, role: String, host: String) extends CreatesGenericIndividualScore {
+    case class IndividualScore(cn: Int, name: String, team: String, score: Int, frag: Int, death: Int, tk: Int, ping: Int, role: String, host: String, user: Option[String], group: Option[String]) extends CreatesGenericIndividualScore {
       override def project: GenericIndividualScore =
-        GenericIndividualScore(name, team, None, Option(score), frag, death, Option(host))
+        GenericIndividualScore(name, team, None, Option(score), frag, death, Option(host), user, group)
     }
 
     object IndividualScore {
 
-      private val cap = " ".? ~ dSp ~ strSp ~ strSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ strSp ~ usp ~ " ".rep
-      private val cpp = cap.map { case (a, b, c, d, e, f, g, h, i, j) => IndividualScore(a, b, c, d, e, f, g, h, i, j) }
+      private val cap = " ".? ~ dSp ~ strSp ~ strSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ strSp ~ UserHost.parser ~ " ".rep
+      private val cpp = cap.map { case (a, b, c, d, e, f, g, h, i, j) => IndividualScore(a, b, c, d, e, f, g, h, i, j.host, j.userO, j.group) }
 
       def unapply(input: String): Option[IndividualScore] = {
         val res = cpp.parse(input)
@@ -107,7 +107,7 @@ object TeamModes {
 
     case class IndividualScoreDisconnected(name: String, team: String, frag: Int, death: Int) extends CreatesGenericIndividualScore {
       override def project: GenericIndividualScore = GenericIndividualScore(
-        name, team, None, None, frag, death, None
+        name, team, None, None, frag, death, None, None, None // todo figure out how to get user & group for disconnected.
       )
     }
 
@@ -149,7 +149,7 @@ object TeamModes {
     def project: GenericTeamScore
   }
 
-  case class GenericIndividualScore(name: String, team: String, flag: Option[Int], score: Option[Int], frag: Int, death: Int, host: Option[String])
+  case class GenericIndividualScore(name: String, team: String, flag: Option[Int], score: Option[Int], frag: Int, death: Int, host: Option[String], user: Option[String], group: Option[String])
 
   trait CreatesGenericIndividualScore {
     def project: GenericIndividualScore
@@ -157,14 +157,14 @@ object TeamModes {
 
   object FlagStyle {
 
-    case class IndividualScore(cn: Int, name: String, team: String, flag: Int, score: Int, frag: Int, death: Int, tk: Int, ping: Int, role: String, host: String) extends CreatesGenericIndividualScore {
-      def project = GenericIndividualScore(name, team, Option(flag), Option(score), frag, death, Option(host))
+    case class IndividualScore(cn: Int, name: String, team: String, flag: Int, score: Int, frag: Int, death: Int, tk: Int, ping: Int, role: String, host: String, user: Option[String], group: Option[String]) extends CreatesGenericIndividualScore {
+      def project = GenericIndividualScore(name, team, Option(flag), Option(score), frag, death, Option(host), user, group)
     }
 
     object IndividualScore {
 
-      private val cap = " ".? ~ dSp ~ strSp ~ strSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ strSp ~ usp ~ " ".rep
-      private val cpp = cap.map { case (a, b, c, d, e, f, g, h, i, j, k) => IndividualScore(a, b, c, d, e, f, g, h, i, j, k) }
+      private val cap = " ".? ~ dSp ~ strSp ~ strSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ dSp ~ strSp ~ UserHost.parser ~ " ".rep
+      private val cpp = cap.map { case (a, b, c, d, e, f, g, h, i, j, k) => IndividualScore(a, b, c, d, e, f, g, h, i, j, k.host, k.userO, k.group) }
 
       def unapply(input: String): Option[IndividualScore] = {
         val q = cpp.parse(input)
@@ -176,7 +176,7 @@ object TeamModes {
 
     case class IndividualScoreDisconnected(name: String, team: String, flag: Int, frag: Int, death: Int) extends CreatesGenericIndividualScore {
       override def project: GenericIndividualScore = GenericIndividualScore(
-        name, team, Option(flag), None, frag, death, None)
+        name, team, Option(flag), None, frag, death, None, None, None) // todo figure out how to get user & group for disconnected
     }
 
     object IndividualScoreDisconnected {

@@ -88,7 +88,7 @@ class GameBuilderParserSpec
 
               forExactly(1, scores) {
                 pscore => inside(pscore) {
-                  case TeamModes.FragStyle.IndividualScore(cn, name, team, score, frag, death, tk, ping, role, host) =>
+                  case TeamModes.FragStyle.IndividualScore(cn, name, team, score, frag, death, tk, ping, role, host, user, group) =>
                     cn shouldBe 3
                     name shouldBe "inter"
                     team shouldBe "CLA"
@@ -99,6 +99,8 @@ class GameBuilderParserSpec
                     ping shouldBe 49
                     role shouldBe "normal"
                     host shouldBe "79.169.140.46"
+                    user shouldBe empty
+                    group shouldBe empty
                 }
               }
           }
@@ -163,7 +165,7 @@ class GameBuilderParserSpec
 
               forExactly(1, scores) {
                 score => inside(score) {
-                  case TeamModes.FlagStyle.IndividualScore(cn, name, team, flag, ascore, frag, death, tk, ping, role, host) =>
+                  case TeamModes.FlagStyle.IndividualScore(cn, name, team, flag, ascore, frag, death, tk, ping, role, host, user, group) =>
                     cn shouldBe 0
                     name shouldBe "Drakas"
                     team shouldBe "RVSF"
@@ -175,6 +177,8 @@ class GameBuilderParserSpec
                     ping shouldBe 12
                     role shouldBe "normal"
                     host shouldBe "127.0.0.1"
+                    user shouldBe empty
+                    group shouldBe empty
                 }
               }
           }
