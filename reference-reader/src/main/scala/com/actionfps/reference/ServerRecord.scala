@@ -16,7 +16,7 @@ case class ServerRecord(region: String, hostname: String, port: Int, kind: Strin
 
   def url: String = {
     val pwdBit = password.filter(_.nonEmpty).map { password => s"?password=$password" }
-    s"assaultcube://${hostname}:${port}${pwdBit.getOrElse("")}"
+    s"${protocol}://${hostname}:${port}${pwdBit.getOrElse("")}"
   }
 
   def name: String = s"${hostname} ${port}"
