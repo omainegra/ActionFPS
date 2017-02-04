@@ -72,6 +72,7 @@ class UserController @Inject()(configuration: Configuration,
   def authTokenGet() = Action.async { req =>
     getByToken(req.getQueryString("token").get)
   }
+  def redirectPlay() = Action { SeeOther("/play/")}
 }
 
 object UserController {
@@ -83,4 +84,6 @@ object UserController {
       "id_token" -> text
     )(IdToken.apply)(IdToken.unapply)
   )
+
+
 }

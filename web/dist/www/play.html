@@ -1,44 +1,207 @@
 <link rel="canonical" href="/play/"/>
+
+<style scoped>
+    #questions[data-stage] > section {
+        display: none;
+    }
+
+    #questions[data-stage="wait-google"] > section#wait-google {
+        display: block;
+    }
+
+    #questions[data-stage="registering"] > section#registering {
+        display: block;
+    }
+
+    #questions[data-stage="signed-in"] > section#signed-in {
+        display: block;
+    }
+
+    #key-part #key-loaded {
+        display: none;
+    }
+
+    #key-part.has-key #key-loaded {
+        display: block;
+    }
+
+    #key-part.has-key #key-waiting {
+        display: none;
+    }
+</style>
 <div id="questions">
 
-    <h2>Install the game</h2>
+    <noscript><p>JavaScript is required for the initial registration &amp; authentication.
+        <br/>It is not required otherwise.</p></noscript>
 
-    <p><a href="/download-direct/game/?os=windows"
-          class="pure-button pure-button-primary">Download ActionFPS (Windows, 42MB download)</a></p>
-    <p><a href="/download-direct/game/?os=linux"
-          class="pure-button pure-button-primary">Download ActionFPS (Linux, 47MB download)</a></p>
+    <section id="wait-google">
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+        <p>Waiting to sign in with your Google account...</p>
+    </section>
 
-    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <section id="registering">
+
+        <h2>Register an account</h2>
+
+        <form class="pure-form pure-form-aligned" id="reg_form" method="post" enctype="multipart/form-data"
+              action="https://script.google.com/macros/s/AKfycbw2na0_P4atptBWe_AXn2TJECge8POwV-3ai5QGJ2hd25TffWtY/exec">
+            <fieldset>
+
+                <div class="pure-control-group">
+                    <label for="nickname">Nickname</label>
+                    <input name="nickname" id="field-nickname" type="text"
+                           placeholder="In-game nickname, e.g. w00p|Drakas" pattern="[^\s]+{3,15}">
+                    <p>Anything valid, 3 characters minimum.</p>
+                </div>
+
+                <div class="pure-control-group">
+                    <label for="name">Username</label>
+                    <input name="name" id="field-username" type="text"
+                           placeholder="Simple name, without clan tag, e.g. Drakas" pattern="[A-Z]?[a-z]{3,15}">
+                    <p>First letter can be uppercase, the rest must be lowercase</p>
+                </div>
+
+                <div class="pure-control-group">
+                    <label for="id">User ID</label>
+                    <input type="text" id="field-id" name="id"
+                           placeholder="3 or more a-z characters, e.g. drakas" pattern="[a-z]{3,10}"/>
+                    <p>Lowercase letters only.</p>
+                    <p>Your profile will be available at <code>https://actionfps.com/player/?id=<span
+                            id="player-id-value"></span></code></p>
+                </div>
+                <input type="hidden" name="token" id="token"/>
+                <input type="hidden" name="redirect" value="true"/>
+
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary">Register</button>
+                </div>
+            </fieldset>
+        </form>
+    </section>
+
+    <style scoped>
+        #download-game[data-platform] .platform-id {
+            display: none
+        }
+
+        #download-game[data-platform] .platform {
+            display: none;
+        }
+
+        #download-game[data-platform="linux"] #download-game-linux {
+            display: block;
+        }
+
+        #download-game[data-platform="windows"] #download-game-windows {
+            display: block;
+        }
+
+        #download-game[data-platform="mac"] #download-game-mac {
+            display: block;
+        }
+    </style>
+
+    <section id="signed-in">
+        <div id="download-game">
+            <h2>Download &amp; install the game</h2>
+            <p class="platform" id="download-game-windows"><a href="/download-direct/game/?os=windows"
+                                                              class="pure-button pure-button-primary">Download Windows
+                .exe (42MB)</a></p>
+            <div class="platform" id="download-game-linux">
+                <p><a href="/download-direct/game/?os=linux"
+                      class="pure-button pure-button-primary">Download Linux .tar.bz2 (47MB)</a>
+                </p>
+                <p>In terminal:</p>
+                <pre><code>$ tar jxvf ~/Downloads/ActionFPS.tar.bz2
+$ ./ActionFPS/install.sh</code></pre>
+
+            </div>
+            <p class="platform" id="download-game-mac"><a href="/download-direct/game/?os=mac"
+                                                          class="pure-button pure-button-primary">Download Mac OS X .dmg
+                (50MB)</a><br/>
+                Please note Mac is not well tested and the release <a
+                        href="https://github.com/ActionFPS/ActionFPS-Game/issues/101">does not work with macOS
+                    Sierra</a> and your help in fixing that would be awesome!</p>
+
+
+            <script type="text/javascript">
+                var isMac = navigator.platform.toLowerCase().indexOf('mac') > -1;
+                var isWindows = navigator.platform.toLowerCase().indexOf('win') > -1;
+                var isLinux = navigator.platform.toLowerCase().indexOf('linux') > -1;
+                var dg = document.querySelector("#download-game");
+                if (isLinux) {
+                    dg.setAttribute("data-platform", "linux");
+                } else if (isWindows) {
+                    dg.setAttribute("data-platform", "windows");
+                } else if (isMac) {
+                    dg.setAttribute("data-platform", "mac");
+                }
+            </script>
+        </div>
+
+        <section id="key-part">
+            <section id="key-loaded">
+                <h2>Play now</h2>
+                <p><a class="button-error pure-button" id="connect-link">Play now (with authentication)</a></p>
+                <p>This will load your user account credentials into the game so you can play on the official
+                    servers.</p>
+                <p><a href="/servers/" class="button-warning pure-button">Server list</a></p>
+            </section>
+            <section id="key-waiting">
+                <h2>We're loading your Play button...</h2>
+                <p>If it takes too long please contact an admin in our Discord channel.</p>
+            </section>
+        </section>
+
+    </section>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <meta name="google-signin-client_id"
           content="566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9.apps.googleusercontent.com">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-
-
-    <section id="re-auth">
-
-        <h2>Play it</h2>
-        <p><a href="/servers/" class="button-warning pure-button">Server list</a></p>
-        <p>Just click on a server you'd like to play on</p>
-
-        <a id="connect-link" class="button-error pure-button">Play now (with authentication)</a><br/> This will load your user
-        credentials into the game.
-
-    </section>
-
     <script type="text/javascript">
-        var reAuth = document.querySelector("#re-auth");
-        reAuth.setAttribute("style", "display:none");
+        $("#field-nickname").on("keyup", function (v) {
+            var nickname = $(v.target).val();
+            var newUsername = nickname.replace(/[^A-Za-z]/g, '');
+            newUsername = newUsername[0] + newUsername.substring(1).toLowerCase();
+            var newId = newUsername.toLowerCase();
+            $('#field-id').val(newId);
+            $('#field-username').val(newUsername);
+            $('#player-id-value').text(newId);
+        });
+        $("#field-id").on("keyup", function (v) {
+            $('#player-id-value').text($(v.target).val());
+        })
+    </script>
+    <script type="text/javascript">
+
+        var root = document.querySelector("#questions");
+        root.setAttribute("data-stage", "wait-google");
+
+        var rootUrl = "https://script.google.com/macros/s/AKfycbw2na0_P4atptBWe_AXn2TJECge8POwV-3ai5QGJ2hd25TffWtY/exec";
         function onSignIn(googleUser) {
             var profile = googleUser.getAuthResponse();
-            $.post("/user/auth-token/", {"id_token": profile.id_token})
-                .done(function (data) {
-                    document.querySelector("#connect-link").setAttribute("href", "actionfps://woop.ac:7654?id=" + data.user + "&key=" + data.privKey);
-                    reAuth.setAttribute("style", "display:block");
-                });
+            $("#token").val(profile.id_token);
+            var queryUrl = rootUrl + "?email=" + googleUser.getBasicProfile().getEmail();
+            $.get(queryUrl).then(function (x) {
+                if (x === false) {
+                    root.setAttribute("data-stage", "registering");
+                } else if ("id" in x) {
+                    root.setAttribute("data-stage", "signed-in");
+                    $.cookie("af_id", x.id, {path: '/', expires: 100});
+                    $.cookie("af_name", x.name, {path: '/', expires: 100});
+                    $('#login_welcome a').attr("href", "/player/?id=" + x.id).text(x.name);
+                    $('#welcome-user, #log-in').attr("href", "/player/?id=" + x.id).text(x.name);
+
+                    $.post("/user/auth-token/", {"id_token": profile.id_token})
+                        .done(function (data) {
+                            document.querySelector("#key-part").classList.add("has-key")
+                            document.querySelector("#connect-link").setAttribute("href", "actionfps://woop.ac:7654?id=" + data.user + "&key=" + data.privKey);
+                        })
+                }
+            })
         }
     </script>
-
-
 </div>

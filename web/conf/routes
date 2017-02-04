@@ -29,5 +29,6 @@ GET         /event-stream/                  @controllers.EventStreamController.e
 GET         /version/                       @controllers.MiscController.version
 GET         /user/auth-token/               @controllers.UserController.authTokenGet
 POST        /user/auth-token/               @controllers.UserController.authTokenPost
+GET        /register-play/               @controllers.UserController.redirectPlay
 
 GET         /download-direct/game/          @controllers.DownloadsController.game
