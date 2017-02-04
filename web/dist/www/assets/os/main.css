@@ -805,3 +805,7 @@ input {
 #servers #join a {
   text-decoration: underline;
 }
+
+#ladder th.user {
+  text-align: left;
+}

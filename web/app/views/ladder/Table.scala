@@ -1,6 +1,7 @@
 package views.ladder
 
 import com.actionfps.ladder.parser.Aggregate
+import controllers.LadderController.PlayerNamer
 import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import play.twirl.api.Html
@@ -12,13 +13,13 @@ object Table {
 
   private def ladderTableHtmlPath = WebTemplateRender.wwwLocation.resolve("ladder_table.html")
 
-  def render(aggregate: com.actionfps.ladder.parser.Aggregate)(showTime: Boolean = false): Html = {
+  def render(aggregate: com.actionfps.ladder.parser.Aggregate)(showTime: Boolean = false)(implicit playerNamer: PlayerNamer): Html = {
     val doc = Jsoup.parse(ladderTableHtmlPath.toFile, "UTF-8")
     val tr = doc.select("tbody > tr")
     aggregate.ranked.map { case Aggregate.RankedStat(id, rankM1, us) =>
       val target = tr.first().clone()
       target.select(".rank").first().text(s"${rankM1}")
-      target.select(".user a").attr("href", s"/player/?id=$id").first().text(id)
+      target.select(".user a").attr("href", s"/player/?id=$id").first().text(playerNamer.nameOf(id).getOrElse(id))
       target.select(".points").first().text(s"${us.points}")
       target.select(".flags").first().text(s"${us.flags}")
       target.select(".frags").first().text(s"${us.frags}")

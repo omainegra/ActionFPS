@@ -4,6 +4,7 @@
 
 @import com.actionfps.players.PlayersStats
 @import com.actionfps.stats.Clanstats
+@import controllers.LadderController.PlayerNamer
 @(games: List[MixedGame], events: List[Map[String, String]],
         latestClanwars: List[com.actionfps.clans.ClanwarMeta],
         bulletin: Option[services.NewsService.NewsItems],
@@ -11,7 +12,7 @@
     playersStats: PlayersStats,
     clanStats: Clanstats
 
-)(implicit clanner: Clanner)
+)(implicit clanner: Clanner, playerNamer: PlayerNamer)
 <div class="bordered" id="bulletins">
 @bulletin.map { h =>
     <div class="bulletin">
