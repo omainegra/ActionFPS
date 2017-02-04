@@ -43,14 +43,15 @@ class UserController @Inject()(configuration: Configuration,
     }
 
     def getOrUpdate(): String = {
-      if ( !Files.exists(privPath) ) {
+      if (!Files.exists(privPath)) {
         generate()
       }
       cleanGet()
     }
   }
 
-  Logger(getClass).info(s"Target path: ${authDir}")
+  val logger = Logger(getClass)
+  logger.info(s"Target path: ${authDir}")
 
   val googleUri = "https://www.googleapis.com/oauth2/v3/tokeninfo"
 
@@ -62,17 +63,28 @@ class UserController @Inject()(configuration: Configuration,
     async {
       val response = await(wSClient.url(googleUri).withQueryString("id_token" -> idToken).get())
       assert((response.json \ "aud").as[String].startsWith("566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9"))
-      val email = (response.json \ "email").as[String]
-      val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.email.contains(email)).get
-//                  val theUser = await(referenceProvider.Users(withEmails = true).users).find(_.id == "drakas").get
-      Ok(JsObject(Map("user" -> JsString(theUser.id), "privKey" -> JsString(ForUser(theUser.id).getOrUpdate()))))
+      (response.json \ "email").asOpt[String] match {
+        case Some(email) =>
+          await(referenceProvider.Users(withEmails = true).users).find(_.email.contains(email)) match {
+            case Some(theUser) =>
+              Ok(JsObject(Map("user" -> JsString(theUser.id), "privKey" -> JsString(ForUser(theUser.id).getOrUpdate()))))
+            case None =>
+              logger.info(s"User with mail ${email} is not registered, but tried to fetch a key.")
+              NotFound(s"Could not find user with your e-mail ${email}")
+          }
+        case _ =>
+          Forbidden("Cannot authenticate you")
+      }
     }
   }
 
   def authTokenGet() = Action.async { req =>
     getByToken(req.getQueryString("token").get)
   }
-  def redirectPlay() = Action { SeeOther("/play/")}
+
+  def redirectPlay() = Action {
+    SeeOther("/play/")
+  }
 }
 
 object UserController {

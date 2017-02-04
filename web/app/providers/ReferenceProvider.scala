@@ -27,8 +27,10 @@ class ReferenceProvider @Inject()(configuration: Configuration,
                                  (implicit wSClient: WSClient,
                                   executionContext: ExecutionContext) {
 
+  import ReferenceProvider._
+
   def unCache(): Unit = {
-    List("clans", "servers", "registrations", "nicknames", "user-provider").foreach(cacheApi.remove)
+    List(ClansKey, ServersKey, RegistrationsKey, NicknamesKey).foreach(cacheApi.remove)
   }
 
   private def fetch(key: String) = async {
@@ -36,13 +38,13 @@ class ReferenceProvider @Inject()(configuration: Configuration,
       case Some(value) => value
       case None =>
         val value = await(wSClient.url(configuration.underlying.getString(s"af.reference.${key}")).get().filter(_.status == 200).map(_.body))
-        cacheApi.set(key, value, Duration.apply("1h"))
+        cacheApi.set(key, value, Duration.apply("30m"))
         value
     }
   }
 
   object Clans {
-    def csv: Future[String] = fetch("clans")
+    def csv: Future[String] = fetch(ClansKey)
 
     def clans: Future[List[Clan]] = csv.map { bdy =>
       val sr = new StringReader(bdy)
@@ -52,7 +54,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
   }
 
   object Servers {
-    def raw: Future[String] = fetch("servers")
+    def raw: Future[String] = fetch(ServersKey)
 
     def servers: Future[List[ServerRecord]] = raw.map { bdy =>
       val sr = new StringReader(bdy)
@@ -63,11 +65,11 @@ class ReferenceProvider @Inject()(configuration: Configuration,
 
   case class Users(withEmails: Boolean = false) {
 
-    def filteredRegistrations: Future[String] = fetch("registrations").map(
+    def filteredRegistrations: Future[String] = fetch(RegistrationsKey).map(
       bdy => Registration.filterRegistrationsEmail(new StringReader(bdy))
     )
 
-    protected def rawRegistrations: Future[String] = fetch("registrations").map(
+    protected def rawRegistrations: Future[String] = fetch(RegistrationsKey).map(
       bdy => CharStreams.toString(new StringReader(bdy))
     )
 
@@ -79,7 +81,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
       finally sr.close()
     }
 
-    def rawNicknames: Future[String] = fetch("nicknames")
+    def rawNicknames: Future[String] = fetch(NicknamesKey)
 
     def nicknames: Future[List[NicknameRecord]] = rawNicknames.map { bdy =>
       val sr = new StringReader(bdy)
@@ -103,4 +105,11 @@ class ReferenceProvider @Inject()(configuration: Configuration,
 
   def servers: Future[List[ServerRecord]] = Servers.servers
 
+}
+
+object ReferenceProvider {
+  val ClansKey = "clans"
+  val ServersKey = "servers"
+  val RegistrationsKey = "registrations"
+  val NicknamesKey = "nicknames"
 }
