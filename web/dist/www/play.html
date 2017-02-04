@@ -1,7 +1,7 @@
 <link rel="canonical" href="/play/"/>
 <div id="questions">
 
-    <h2>Download the game</h2>
+    <h2>Install the game</h2>
 
     <p><a href="https://github.com/ActionFPS/ActionFPS-Game/releases/download/circle_jq/windows_client.exe"
           class="pure-button pure-button-primary">Download ActionFPS (Windows, 42MB download)</a></p>
@@ -22,7 +22,7 @@
         <p><a href="/servers/" class="button-warning pure-button">Server list</a></p>
         <p>Just click on a server you'd like to play on</p>
 
-        <a id="connect-link" class="button-warning pure-button">Reauthenticate</a><br/> This will load your user
+        <a id="connect-link" class="button-warning pure-button">Play now (with authentication)</a><br/> This will load your user
         credentials into the game.
 
     </section>
@@ -34,7 +34,7 @@
             var profile = googleUser.getAuthResponse();
             $.post("/user/auth-token/", {"id_token": profile.id_token})
                 .done(function (data) {
-                    document.querySelector("#connect-link").setAttribute("href", "actionfps://authenticate?id=" + data.user + "&key=" + data.privKey);
+                    document.querySelector("#connect-link").setAttribute("href", "actionfps://woop.ac:7654?id=" + data.user + "&key=" + data.privKey);
                     reAuth.setAttribute("style", "display:block");
                 });
         }

@@ -54,7 +54,7 @@
 
     </div>
 
-    <h2>3. Download the game</h2>
+    <h2>3. Install the game</h2>
 
     <p><a href="https://github.com/ActionFPS/ActionFPS-Game/releases/download/circle_jq/windows_client.exe"
           class="pure-button pure-button-primary">Download ActionFPS (Windows, 44MB Download)</a></p>
@@ -62,16 +62,14 @@
           class="pure-button pure-button-primary">Download ActionFPS (Linux, 42MB Download)</a></p>
 
     <section id="authenticate">
-    <h2>4. Authenticate</h2>
+    <h2>4. Play</h2>
 
-    <p><a class="button-warning pure-button" id="connect-link">Click here to authenticate.</a></p>
+    <p><a class="button-warning pure-button" id="connect-link">Click here to play (with authentication).</a></p>
 
     <p>This will load your user account credentials into the game so you can play on the official servers.</p>
     </section>
 
-    <h2>5. Play it</h2>
-
-    <p><a class="button-error pure-button" href="/play/">Go to /play/ page</a></p>
+    <p><a href="/servers/" class="button-warning pure-button">Server list</a></p>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
@@ -116,7 +114,7 @@
                     $.post("/user/auth-token/", {"id_token": profile.id_token})
                         .done(function (data) {
                             authSection.setAttribute("style", "");
-                            document.querySelector("#connect-link").setAttribute("href", "actionfps://authenticate?id=" + data.user + "&key=" + data.privKey);
+                            document.querySelector("#connect-link").setAttribute("href", "actionfps://woop.ac:7654?id=" + data.user + "&key=" + data.privKey);
                         })
                 }
             })
