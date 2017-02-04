@@ -1,54 +1,41 @@
 <link rel="canonical" href="/play/"/>
 <div id="questions">
 
-
     <h2>Download the game</h2>
 
-    <p><a href="http://woop.ac/client/windows_client_1202.2.exe" class="button-error pure-button">Download ActionFPS
-        Match Client</a></p>
-    <p>Windows, 44MB download</p>
-    <p><a href="http://woop.ac:81/linux_client_1202.2.tar.bz2" class="button-error pure-button">Download AFPS for
-        Linux</a></p>
-    <p>Linux, 47MB download</p>
+    <p><a href="https://github.com/ActionFPS/ActionFPS-Game/releases/download/circle_jq/windows_client.exe"
+          class="pure-button pure-button-primary">Download ActionFPS (Windows, 42MB download)</a></p>
+    <p><a href="https://github.com/ActionFPS/ActionFPS-Game/releases/download/circle_jq/ActionFPS.tar.bz2"
+          class="pure-button pure-button-primary">Download ActionFPS (Linux, 47MB download)</a></p>
 
-    <h2>Play it</h2>
-    <p><a href="/servers/" class="button-info pure-button">Server list</a></p>
-    <p>Just click on a server you'd like to play on</p>
-
-    <h2>Join us on Discord</h2>
-    <p><a href="https://discord.gg/YB35KE3"><img
-            src="https://cloud.githubusercontent.com/assets/16243477/22436789/cd7677ea-e725-11e6-88e5-4e5956723196.png"/></a>
-    </p>
-    <p><a href="https://discordapp.com/" target="_blank">Discord is free VoIP for gaming.</a></p>
-
-    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <div style="display:none" class="g-signin2" data-onsuccess="onSignIn"></div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
     <meta name="google-signin-client_id"
           content="566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9.apps.googleusercontent.com">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 
-    <style type="text/css">
-        pre {
-            max-width:30em;
-            overflow-x:scroll;
-        }
-    </style>
-    <pre>User ID: <span id="user-id"></span>
-Private key: <span id="private-key"></span>
-<a id="connect-link">Click here to connect up automatically.</a></pre>
+
+    <section id="re-auth">
+
+        <h2>Play it</h2>
+        <p><a href="/servers/" class="button-warning pure-button">Server list</a></p>
+        <p>Just click on a server you'd like to play on</p>
+
+        <a id="connect-link" class="button-warning pure-button">Reauthenticate</a><br/> This will load your user
+        credentials into the game.
+
+    </section>
 
     <script type="text/javascript">
+        var reAuth = document.querySelector("#re-auth");
+        reAuth.setAttribute("style", "display:none");
         function onSignIn(googleUser) {
             var profile = googleUser.getAuthResponse();
             $.post("/user/auth-token/", {"id_token": profile.id_token})
                 .done(function (data) {
-                    console.log("Response for data: ", data);
-                    console.log("User ID: ", data.user);
-                    console.log("Private key: ", data.privKey);
-                    document.querySelector("#user-id").appendChild(document.createTextNode(data.user));
-                    document.querySelector("#private-key").appendChild(document.createTextNode(data.privKey));
-                    document.querySelector("#connect-link").setAttribute("href", "actionfps://authenticate?id="+data.user+"&key="+data.privKey);
+                    document.querySelector("#connect-link").setAttribute("href", "actionfps://authenticate?id=" + data.user + "&key=" + data.privKey);
+                    reAuth.setAttribute("style", "display:block");
                 });
         }
     </script>

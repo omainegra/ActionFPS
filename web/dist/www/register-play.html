@@ -54,25 +54,24 @@
 
     </div>
 
-
     <h2>3. Download the game</h2>
 
-    <p><a href="http://woop.ac/client/windows_client_1202.2.exe" class="button-error pure-button">Download ActionFPS
-        Match Client</a></p>
-    <p>Windows, 44MB download</p>
+    <p><a href="https://github.com/ActionFPS/ActionFPS-Game/releases/download/circle_jq/windows_client.exe"
+          class="pure-button pure-button-primary">Download ActionFPS (Windows, 44MB Download)</a></p>
+    <p><a href="https://github.com/ActionFPS/ActionFPS-Game/releases/download/circle_jq/ActionFPS.tar.bz2"
+          class="pure-button pure-button-primary">Download ActionFPS (Linux, 42MB Download)</a></p>
 
-    <p><img src="https://cloud.githubusercontent.com/assets/2464813/12762693/4e9df7dc-c9e8-11e5-8a2c-704f4af9a25f.png"/>
-    </p>
+    <section id="authenticate">
+    <h2>4. Authenticate</h2>
 
-    <h2>4. Play it</h2>
-    <p><a href="/servers/" class="button-info pure-button">Server list</a></p>
-    <p>Just click on a server you'd like to play on</p>
+    <p><a class="button-warning pure-button" id="connect-link">Click here to authenticate.</a></p>
 
-    <h2>5. Join us on TeamSpeak</h2>
-    <p><a href="ts3server://aura.woop.ac:9988"><img
-            src="https://cloud.githubusercontent.com/assets/2464813/12760873/99820c6e-c9e0-11e5-832d-00c1b61c2e4c.png"/></a>
-    </p>
-    <p><a href="http://www.teamspeak.com/?page=downloads" target="_blank">TeamSpeak is free VoIP for gaming.</a></p>
+    <p>This will load your user account credentials into the game so you can play on the official servers.</p>
+    </section>
+
+    <h2>5. Play it</h2>
+
+    <p><a class="button-error pure-button" href="/play/">Go to /play/ page</a></p>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
@@ -95,6 +94,8 @@
         })
     </script>
     <script type="text/javascript">
+        var authSection = document.querySelector("#authenticate");
+        authSection.setAttribute("style", "display:none");
         var rootUrl = "https://script.google.com/macros/s/AKfycbw2na0_P4atptBWe_AXn2TJECge8POwV-3ai5QGJ2hd25TffWtY/exec";
         function onSignIn(googleUser) {
             $("#reg-form").addClass("signed-in");
@@ -114,24 +115,11 @@
 
                     $.post("/user/auth-token/", {"id_token": profile.id_token})
                         .done(function (data) {
-                            console.log("Response for data: ", data);
-                            console.log("Private key: ", data.privKey);
-                            document.querySelector("#user-id").appendChild(document.createTextNode(data.user));
-                            document.querySelector("#private-key").appendChild(document.createTextNode(data.privKey));
-                            document.querySelector("#connect-link").setAttribute("href", "actionfps://authenticate?id="+data.user+"&key="+data.privKey);
+                            authSection.setAttribute("style", "");
+                            document.querySelector("#connect-link").setAttribute("href", "actionfps://authenticate?id=" + data.user + "&key=" + data.privKey);
                         })
                 }
             })
         }
     </script>
-<style type="text/css">
-    pre {
-        max-width:30em;
-        overflow-x:scroll;
-    }
-</style>
-    <pre>User ID: <span id="user-id"></span>
-Private key: <span id="private-key"></span>
-<a id="connect-link">Click here to connect up automatically.</a></pre>
-
 </div>
