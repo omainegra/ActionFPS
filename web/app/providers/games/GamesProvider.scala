@@ -18,6 +18,8 @@ import providers.full.{NewRawGameDetected, NewRichGameDetected}
 
 import scala.concurrent._
 import scala.concurrent.duration._
+import scala.async.Async._
+import scala.util.{Failure, Success}
 
 @Singleton
 final class GamesProvider @Inject()(configuration: Configuration)
@@ -53,7 +55,7 @@ final class GamesProvider @Inject()(configuration: Configuration)
   forConfig.lastLogPathO.foreach { lastLogPath =>
     lastGameFO.foreach { lastGameO =>
       FileTailSource
-        .lines(lastLogPath, maxLineSize = 4096, pollingInterval = 1.second)
+        .lines(lastLogPath, maxLineSize = 4096, pollingInterval = 1.second, lf = "\n")
         .scan(GameScanner.initial)(GameScanner.scan)
         .collect(GameScanner.collect)
         .filter(ForJournal.afterLastGameFilter(lastGameO))
@@ -71,11 +73,20 @@ final class GamesProvider @Inject()(configuration: Configuration)
     .actorRef[NewRichGameDetected](10, OverflowStrategy.dropHead)
     .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[NewRichGameDetected]))
     .map(_.jsonGame)
-    .runForeach { game =>
-      gamesActorFuture.foreach { agent =>
-        agent.send(_.updated(game.id, game))
-        forJournal.addGameToJournal(game)
+    .mapAsync(1) { game =>
+      async {
+        val agent = await(gamesActorFuture)
+        await(agent.alter(_.updated(game.id, game)))
+        game
       }
     }
+    .runForeach { game =>
+      forJournal.addGameToJournal(game)
+    }
+    .onComplete {
+      case Success(_) => logger.info("Stopped.")
+      case Failure(reason) => logger.error(s"Flow failed due to ${reason}", reason)
+    }
+
 
 }

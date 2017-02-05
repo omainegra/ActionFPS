@@ -60,7 +60,7 @@ class IntersService(pickedFile: Option[File])
     logger.info(s"Tailing for inters from ${f}...")
     val startInstant = Instant.now()
     FileTailSource
-      .lines(f.toPath, maxLineSize = 4096, pollingInterval = 1.second)
+      .lines(f.toPath, maxLineSize = 4096, pollingInterval = 1.second, lf = "\n")
       .filter { case ExtractMessage(zdt, _, _) => zdt.toInstant.isAfter(startInstant) }
       .via(IntersService.lineToEventFlow(
         () => referenceProvider.users.map { users =>

@@ -9,6 +9,7 @@ import akka.stream.{ActorMaterializer, OverflowStrategy}
 import com.actionfps.accumulation.GameAxisAccumulator
 import com.actionfps.clans.CompleteClanwar
 import com.actionfps.gameparser.enrichers.JsonGame
+import play.api.Logger
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.json.{Json, Writes}
@@ -17,6 +18,7 @@ import providers.games.GamesProvider
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 /**
   * Created by William on 01/01/2016.
@@ -31,6 +33,10 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
                                  applicationLifecycle: ApplicationLifecycle)
                                 (implicit executionContext: ExecutionContext,
                                  actorSystem: ActorSystem) extends FullProvider() {
+
+  private val logger = Logger(getClass)
+
+  logger.info("Full provider initialized")
 
   private implicit val actorMaterializer = ActorMaterializer()
 
@@ -61,15 +67,21 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
     .actorRef[NewRawGameDetected](10, OverflowStrategy.dropHead)
     .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[NewRawGameDetected]))
     .map(_.jsonGame)
-    .runForeach { game =>
-      fullStuff.foreach { originalIteratorAgent =>
+    .mapAsync(1) { game =>
+      async {
+        val originalIteratorAgent = await(fullStuff)
         val originalIterator = originalIteratorAgent.get()
-        originalIteratorAgent.alter(_.includeGames(List(game))).foreach { newIterator =>
-          val fid = FullIteratorDetector(originalIterator, newIterator)
-          fid.detectGame.map(NewRichGameDetected).foreach(actorSystem.eventStream.publish)
-          fid.detectClanwar.map(NewClanwarCompleted).foreach(actorSystem.eventStream.publish)
-        }
+        val newIterator = await(originalIteratorAgent.alter(_.includeGames(List(game))))
+        FullIteratorDetector(originalIterator, newIterator)
       }
+    }
+    .runForeach { fid =>
+      fid.detectGame.map(NewRichGameDetected).foreach(actorSystem.eventStream.publish)
+      fid.detectClanwar.map(NewClanwarCompleted).foreach(actorSystem.eventStream.publish)
+    }
+    .onComplete {
+      case Success(_) => logger.info("Stopped.")
+      case Failure(reason) => logger.error(s"Flow failed due to ${reason}", reason)
     }
 
 }
