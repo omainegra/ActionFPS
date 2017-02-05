@@ -1,5 +1,6 @@
 <link rel="canonical" href="/play/"/>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <style scoped>
     #questions[data-stage] > section {
         display: none;
@@ -123,9 +124,22 @@ $ ./ActionFPS/install.sh</code></pre>
                         href="https://github.com/ActionFPS/ActionFPS-Game/issues/101">does not work with macOS
                     Sierra</a> and your help in fixing that would be awesome!</p>
 
-            <p><a href="https://github.com/ActionFPS/ActionFPS-Game/releases">All releases @ GitHub</a></p>
+            <p id="release-info">
+                GitHub Release: <a id="release-link"></a>, <time id="release-date" is="relative-time"></time>. <span id="num-dl"></span> downloads.
+            </p>
 
             <script type="text/javascript">
+                var releaseUrl = "https://api.github.com/repos/ActionFPS/ActionFPS-Game/releases/latest";
+                $.get(releaseUrl).then(function(release) {
+                    document.querySelector("#release-date").appendChild(document.createTextNode(release.published_at));
+                    document.querySelector("#release-date").setAttribute("datetime", release.published_at);
+                    document.querySelector("#release-link").setAttribute("href", release.html_url);
+                    document.querySelector("#release-link").appendChild(document.createTextNode('"'+(release.name || release.tag_name)+'"'));
+                    var download_count = 0;
+                    release.assets.forEach(function(asset) { download_count += asset.download_count; });
+                    document.querySelector("#num-dl").appendChild(document.createTextNode(download_count));
+                    console.log(release);
+                });
                 var isMac = navigator.platform.toLowerCase().indexOf('mac') > -1;
                 var isWindows = navigator.platform.toLowerCase().indexOf('win') > -1;
                 var isLinux = navigator.platform.toLowerCase().indexOf('linux') > -1;
@@ -156,7 +170,6 @@ $ ./ActionFPS/install.sh</code></pre>
 
     </section>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <meta name="google-signin-client_id"
