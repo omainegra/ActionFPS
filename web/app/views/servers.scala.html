@@ -1,24 +1,30 @@
 @(servers: List[com.actionfps.reference.ServerRecord])
 <article id="servers">
-    @servers.groupBy(_.kind).toList.sortBy(_._1).map { sl =>
+    <table>
+        <thead>
+            <tr>
+                <th>Game</th>
+                <th>Server</th>
+                <th>Game Status</th>
+            </tr>
+        </thead>
+        @servers.groupBy(_.kind).toList.sortBy(_._1).map { sl =>
+            <tbody>
 
-        <h2>@sl._1</h2>
-        @sl._2.groupBy(_.region).toList.sortBy(_._1).map { sr =>
-            <h3>@sr._1</h3>
-            <ul>
-            @sr._2.sortBy(s => (s.hostname, s.port)).map { server =>
-                <li><a href="@server.url">@server.name
+                @sl._2.groupBy(_.region).toList.sortBy(_._1).map { sr =>
+                    @sr._2.sortBy(s => (s.hostname, s.port)).map { server =>
 
-                </a>
-                    @if(server.kind != "Standard") {
-                        (@server.kind)
+                        <tr class="server" data-server="@server.name">
+                            <td>@sl._1</td>
+                            <td><a href="@server.url">@server.name</a></td>
+                            <td><a href="@server.joinUrl" class="game-status"></a> </td>
+                        </tr>
+
                     }
-                </li>
-
-            }
-            </ul>
+                }
+            </tbody>
         }
-    }
+    </table>
 
     <p><a href="https://github.com/ScalaWilliam/ActionFPS/wiki/Frequently-Asked-Questions#do-you-have-in-game-commands-for-the-servers">In-game commands</a></p>
 
@@ -31,3 +37,4 @@
 
 </article>
 
+<script src="/assets/push/servers-page.js" type="text/javascript"></script>

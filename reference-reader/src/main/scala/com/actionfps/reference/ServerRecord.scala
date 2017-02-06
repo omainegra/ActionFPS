@@ -19,6 +19,10 @@ case class ServerRecord(region: String, hostname: String, port: Int, kind: Strin
     s"${protocol}://${hostname}:${port}${pwdBit.getOrElse("")}"
   }
 
+  def joinUrl: String = {
+    s"/servers/?join=${hostname}:${port}"
+  }
+
   def name: String = s"${hostname} ${port}"
 
   def protocol: String = if (kind == "ActionFPS") "actionfps" else "assaultcube"
