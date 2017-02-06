@@ -206,7 +206,9 @@ lazy val jsonFormats =
   )
     .dependsOn(accumulation)
     .settings(
-      libraryDependencies += json
+      libraryDependencies += json,
+      libraryDependencies += jsonQuote,
+      resolvers += Resolver.jcenterRepo
     )
 
 lazy val sampleLog = taskKey[File]("Sample Log")

@@ -14,6 +14,7 @@ import play.api.{Configuration, Logger}
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import net.maffoo.jsonquote.play._
 
 /**
   * Created by william on 28/1/17.
@@ -40,15 +41,15 @@ class DiscordInters(hookUrl: String)
         case Some(validServer) =>
           validServer.address match {
             case Some(addr) =>
-              val postBody = JsObject(Map(
-                "content" -> JsString(s"Inter @ ${validServer.name}, @everyone!"),
-                "avatar_url" -> JsString("https://cloud.githubusercontent.com/assets/2464813/12016782/38687d10-ad47-11e5-9e58-2bfc7d9e473f.png"),
-                "embeds" -> JsArray(Seq(JsObject(Map(
-                  "title" -> JsString(s"Inter @ ${validServer.name}, ${interOut.userMessage.nickname}"),
-                  "description" -> JsString("Click to join!"),
-                  "url" -> JsString(s"https://actionfps.com/servers/?join=${addr}")
-                ))))
-              ))
+              val postBody =
+                json"""{
+                content: ${"Inter @ " + validServer.name + "@everyone!"},
+                avatar_url: "https://cloud.githubusercontent.com/assets/2464813/12016782/38687d10-ad47-11e5-9e58-2bfc7d9e473f.png",
+                embeds: [ {
+                title: ${s"Inter @ ${validServer.name}, ${interOut.userMessage.nickname}"},
+                description: "Click to join!",
+                url: ${s"https://actionfps.com/servers/?join=${addr}"}
+                } ] }"""
               Some(await {
                 wSClient
                   .url(hookUrl)

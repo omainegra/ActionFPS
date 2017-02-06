@@ -31,4 +31,6 @@ object Dependencies {
   val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.7.0"
   val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.7.0"
 
+  val jsonQuote: ModuleID = "net.maffoo" %% "jsonquote-play" % "0.4.0"
+
 }
