@@ -18,6 +18,7 @@ if ( join ) {
         })
             .forEach(function (r) {
                 document.querySelector("#servers").classList.add("join");
+                document.querySelector("#join").setAttribute("data-server", join);
                 document.querySelector("#server-join-link").setAttribute("href", r.url);
                 document.querySelector("#server-name").appendChild(document.createTextNode(r.name));
             });

@@ -797,21 +797,41 @@ input {
   display:none;
 }
 #servers #join {
-  text-align: center;
-  font-weight: bold;
-  font-size:3em;
   padding:2em;
 }
-#servers #join a {
+#servers #join a#server-join-link {
+  font-weight: bold;
+  font-size:3em;
+  margin-bottom:0.5em;
   text-decoration: underline;
+}
+
+#servers #join > a:last-child {
+  padding-left:-1.5em;
+}
+#servers #join > a {
+  display:block;
+  text-align: center;
 }
 
 #ladder th.user {
   text-align: left;
 }
-#servers {
-  width:90%;
+#servers table {
+  min-width:35em;
 }
-#servers table a {
-  display:block;
+#servers table tr > *:nth-child(1) {
+  max-width:4em;
+  text-align: left;
+}
+#servers table tr > *:nth-child(2) {
+  max-width:8em;
+  text-align: right;
+}
+#servers table tr > *:nth-child(3) {
+  text-align: left;
+}
+
+#server-status:not(.active) {
+  display:none;
 }

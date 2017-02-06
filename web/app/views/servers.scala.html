@@ -1,6 +1,10 @@
 @(servers: List[com.actionfps.reference.ServerRecord])
 <article id="servers">
     <table>
+        <col class="group-game"/>
+        <col class="group-server"/>
+        <col class="group-status"/>
+
         <thead>
             <tr>
                 <th>Game</th>
@@ -30,6 +34,12 @@
 
     <div id="join">
         <a id="server-join-link" href="">Join <span id="server-name"></span></a>
+
+        <div id="server-status">
+
+        </div>
+
+        <a href="/servers/">&laquo; Back to server list </a>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
