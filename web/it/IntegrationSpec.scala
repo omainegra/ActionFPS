@@ -73,10 +73,10 @@ class IntegrationSpec
         element.attribute("title").value mustEqual "Woop Clan"
       }
     }
-    "Aura 1337 is listed in Servers" in {
+    "Aura 1999 is listed in Servers" in {
       go to s"$root/servers/"
-      forExactly(1, findAll(cssSelector("#servers ul li a")).toList) { element =>
-        element.text mustEqual "aura.woop.ac 1337"
+      forExactly(1, findAll(cssSelector("a[href='assaultcube://aura.woop.ac:1999']")).toList) { element =>
+        element.text mustEqual "aura.woop.ac 1999"
       }
     }
     "Provide a master server" in {
