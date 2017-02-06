@@ -33,11 +33,12 @@ deploy:
 		make deploy-app; \
 	fi
 deploy-content:
-	rsync --delete -av ./web/dist/www/. /home/af/web-5.0/www/.
+	rsync --filter 'protect /home/af/web-5.0/www/assets/bower_components/' \
+	      --delete -av ./web/dist/www/. /home/af/web-5.0/www/.
 	@cd /home/af/web-5.0/www/assets/ && bower -f install
 deploy-app:
 	sbt web/dist
-	cd /home/af/ && rm -fr /home/af/web-5.0/{conf,lib} && \
+	cd /home/af/ && rm -fr /home/af/web-5.0/{conf,lib,www,bin} && \
 		unzip -q -o /home/af/ActionFPS/web/target/universal/web-5.0.zip
 	sudo systemctl restart af-web
 	@cd /home/af/web-5.0/www/assets/ && bower -f install
