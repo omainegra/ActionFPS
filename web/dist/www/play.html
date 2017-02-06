@@ -49,6 +49,12 @@
             <fieldset>
 
                 <div class="pure-control-group">
+                    <label>E-mail</label>
+                    <input id="email" type="email" disabled value=""/>
+                    <p>If you want to use a different account, click the Google button.</p>
+                </div>
+
+                <div class="pure-control-group">
                     <label for="nickname">Nickname</label>
                     <input name="nickname" id="field-nickname" type="text"
                            placeholder="In-game nickname, e.g. w00p|Drakas" pattern="[^\s]{3,15}">
@@ -198,7 +204,9 @@ $ ./ActionFPS/install.sh</code></pre>
         function onSignIn(googleUser) {
             var profile = googleUser.getAuthResponse();
             $("#token").val(profile.id_token);
-            var queryUrl = rootUrl + "?email=" + googleUser.getBasicProfile().getEmail();
+            var email = googleUser.getBasicProfile().getEmail();
+            var queryUrl = rootUrl + "?email=" + email;
+            document.querySelector("#email").setAttribute("value", email);
             $.get(queryUrl).then(function (x) {
                 if (x === false) {
                     root.setAttribute("data-stage", "registering");
