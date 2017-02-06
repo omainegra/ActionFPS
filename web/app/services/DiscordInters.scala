@@ -43,7 +43,7 @@ class DiscordInters(hookUrl: String)
             case Some(addr) =>
               val postBody =
                 json"""{
-                content: ${"Inter @ " + validServer.name + "@everyone!"},
+                content: ${s"Inter @ ${validServer.name} @everyone!"},
                 avatar_url: "https://cloud.githubusercontent.com/assets/2464813/12016782/38687d10-ad47-11e5-9e58-2bfc7d9e473f.png",
                 embeds: [ {
                 title: ${s"Inter @ ${validServer.name}, ${interOut.userMessage.nickname}"},
