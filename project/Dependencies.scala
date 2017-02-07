@@ -33,4 +33,6 @@ object Dependencies {
 
   val jsonQuote: ModuleID = "net.maffoo" %% "jsonquote-play" % "0.4.0"
 
+  val raptureJsonPlay: ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M8"
+
 }

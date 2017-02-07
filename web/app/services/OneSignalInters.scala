@@ -19,15 +19,16 @@ import scala.util.{Failure, Success}
   * Created by william on 28/1/17.
   */
 @Singleton
-class OneSignalInters (key: String, appId: String)
-                               (implicit executionContext: ExecutionContext,
-wSClient: WSClient,
-                                actorSystem: ActorSystem) {
+class OneSignalInters(key: String, appId: String)
+                     (implicit executionContext: ExecutionContext,
+                      wSClient: WSClient,
+                      actorSystem: ActorSystem) {
   @Inject def this(configuration: Configuration)(implicit executionContext: ExecutionContext,
                                                  wSClient: WSClient,
                                                  actorSystem: ActorSystem) =
-  this(key = configuration.underlying.getString("one-signals.api-key"),
-  appId = configuration.underlying.getString("one-signals.app-id"))
+    this(key = configuration.underlying.getString("one-signals.api-key"),
+      appId = configuration.underlying.getString("one-signals.app-id"))
+
   private implicit val actorMaterializer = ActorMaterializer()
 
   private val targetUrl = "https://onesignal.com/api/v1/notifications"
@@ -39,15 +40,18 @@ wSClient: WSClient,
         case Some(validServer) =>
           validServer.address match {
             case Some(addr) =>
-              val postBody: JsObject = JsObject(Map(
-                "app_id" -> JsString(appId),
-                "ttl" -> JsNumber(300),
-                "template_id" -> JsString("cebb4561-07d7-4b61-a0fd-3077c36f8e51"),
-                "included_segments" -> JsArray(Seq(JsString("All"))),
-//                "include_player_ids" -> JsArray(Seq(JsString("a119267f-02f3-4a3d-b551-003752ed76d5"))),
-                "headings" -> JsObject(Map("en" -> JsString(s"Inter @ ${validServer.name}, ${interOut.userMessage.nickname}"))),
-                "url" -> JsString(s"https://actionfps.com/servers/?join=${addr}")
-              ))
+              // use this to send to ScalaWilliam
+              // "include_player_ids": ["a119267f-02f3-4a3d-b551-003752ed76d5"]
+              import rapture.json._
+              import rapture.json.jsonBackends.play._
+              val postBody: JsObject = json"""{
+              "app_id": $appId,
+                "ttl": 300,
+                "template_id": "cebb4561-07d7-4b61-a0fd-3077c36f8e51",
+                "included_segments": ["All"],
+                "headings": {"en":${s"Inter @ ${validServer.name}, ${interOut.userMessage.nickname}"}},
+                "url": ${s"https://actionfps.com/servers/?join=${addr}"}
+              }""".as[JsObject]
               Some(await {
                 wSClient
                   .url(targetUrl)
@@ -62,14 +66,14 @@ wSClient: WSClient,
   }
 
   private val logger = Logger(getClass)
-    logger.info("Beginning OneSignal Inters flow")
+  logger.info("Beginning OneSignal Inters flow")
 
   private val r = Source
     .actorRef[InterOut](10, OverflowStrategy.dropHead)
     .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[InterOut]))
-      .alsoTo(Sink.foreach(i => logger.info(s"Received ${i}")))
+    .alsoTo(Sink.foreach(i => logger.info(s"Received ${i}")))
     .mapAsync(1)(pushInterOut)
-      .runForeach(i => logger.info(s"Pushed ${i}"))
+    .runForeach(i => logger.info(s"Pushed ${i}"))
 
   r
     .onComplete { case Success(_) =>

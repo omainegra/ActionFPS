@@ -78,6 +78,7 @@ lazy val web = project
     fork in run := true,
     libraryDependencies ++= Seq(
       akkaActor,
+      raptureJsonPlay,
       akkaAgent,
       akkaslf,
       jsoup,
