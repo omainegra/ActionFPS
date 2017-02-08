@@ -13,7 +13,8 @@ class TemplateSpec extends FunSuite with Matchers {
         when = "", reasonablyActive = true, hasFlags = true, map = None, mode = None, minRemain = 123,
         updatedTime = "", players = None, spectators = None, now = Dev.game.now,
         teams = List.empty
-      )
+      ),
+      servers = Nil
     )
     result.body should not include "w00p"
   }

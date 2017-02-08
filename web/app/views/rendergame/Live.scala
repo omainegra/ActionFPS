@@ -1,5 +1,6 @@
 package views.rendergame
 
+import com.actionfps.reference.ServerRecord
 import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import play.twirl.api.Html
@@ -9,10 +10,20 @@ import play.twirl.api.Html
   */
 object Live {
 
-  def render(game: com.actionfps.pinger.CurrentGameStatus, mapMapping: Map[String, String]): Html = {
+  def render(game: com.actionfps.pinger.CurrentGameStatus,
+             mapMapping: Map[String, String],
+             servers: List[ServerRecord]): Html = {
     if (game.mode.isEmpty || game.map.isEmpty) return Html("")
+
+    val serverUrl = {
+      val serverA = game.now.server.server
+      servers.find(_.address == serverA).map(_.connectUrl).getOrElse {
+        s"assaultcube://${serverA}"
+      }
+    }
+
     val html = Jsoup.parse(WebTemplateRender.wwwLocation.resolve("live.html").toFile, "UTF-8")
-    html.select(".server-link").attr("href", s"assaultcube://${game.now.server.server}")
+    html.select(".server-link").attr("href", serverUrl)
     html.select(".server-link").first().text(game.now.server.shortName)
     html.select(".time-remain").first().text {
       game.minRemain match {

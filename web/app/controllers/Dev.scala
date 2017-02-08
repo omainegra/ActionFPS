@@ -78,7 +78,7 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
   }
 
   private def liveTemplate = Action { implicit req =>
-    val html = views.rendergame.Live.render(mapMapping = Maps.mapToImage, game = Dev.game)
+    val html = views.rendergame.Live.render(mapMapping = Maps.mapToImage, game = Dev.game, servers = Nil)
     val fh = Html(html.body + "<hr/>")
     Ok(webTemplateRender.renderTemplate(title = None, supportsJson = false)(fh))
   }

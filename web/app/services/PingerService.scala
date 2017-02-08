@@ -90,19 +90,21 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
         status.alter(m => m.updated(s"${cgse.id}${cgse.name}", cgse))
 
-        val body =
-          try {
-            views.rendergame.Live.render(b, Maps.mapToImage)
-          } catch {
-            case e: Throwable => Logger.error(s"Failed to render game ${b}", e)
-          }
-        val event = Event(
-          id = Option(b.now.server.server),
-          name = Option("current-game-status-fragment"),
-          data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(body.toString())).toString()
-        )
-        liveGamesChan.push(event)
-        status.alter(m => m.updated(s"${event.id}${event.name}", event))
+        referenceProvider.servers.foreach { servers =>
+          val body =
+            try {
+              views.rendergame.Live.render(b, Maps.mapToImage, servers)
+            } catch {
+              case e: Throwable => Logger.error(s"Failed to render game ${b}", e)
+            }
+          val event = Event(
+            id = Option(b.now.server.server),
+            name = Option("current-game-status-fragment"),
+            data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(body.toString())).toString()
+          )
+          liveGamesChan.push(event)
+          status.alter(m => m.updated(s"${event.id}${event.name}", event))
+        }
       }
     }
   }))

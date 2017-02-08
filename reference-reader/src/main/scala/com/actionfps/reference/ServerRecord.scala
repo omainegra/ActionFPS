@@ -14,7 +14,7 @@ import scala.util.Try
 case class ServerRecord(region: String, hostname: String, port: Int, kind: String, password: Option[String]) {
   def address = s"""$hostname:$port"""
 
-  def url: String = {
+  def connectUrl: String = {
     val pwdBit = password.filter(_.nonEmpty).map { password => s"?password=$password" }
     s"${protocol}://${hostname}:${port}${pwdBit.getOrElse("")}"
   }
@@ -27,7 +27,6 @@ case class ServerRecord(region: String, hostname: String, port: Int, kind: Strin
 
   def protocol: String = if (kind == "ActionFPS") "actionfps" else "assaultcube"
 
-  def connectAddress: String = s"""$protocol://$hostname:$port""" + password.map(pw => s"/?password=$pw").getOrElse("")
 }
 
 object ServerRecord {

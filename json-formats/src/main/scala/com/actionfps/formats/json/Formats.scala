@@ -132,7 +132,7 @@ trait Formats {
 
   implicit val sw: OWrites[ServerRecord] = {
     OWrites[ServerRecord]{ sr =>
-      Json.writes[ServerRecord].writes(sr) ++ JsObject(Map("address" -> JsString(sr.address), "url" -> JsString(sr.url),
+      Json.writes[ServerRecord].writes(sr) ++ JsObject(Map("address" -> JsString(sr.address), "url" -> JsString(sr.connectUrl),
       "name" -> JsString(sr.name)))
     }
   }
