@@ -17,7 +17,7 @@ watch:
 		--push-execute='make push-%ref% || true'
 push:
 	git fetch
-	if [[ $$(git diff --name-only origin/master) == "" ]]; then make push-refs/heads/master; fi
+	if [[ $$(git diff --name-only origin/master) != "" ]]; then make push-refs/heads/master; fi
 push-refs/heads/master:
 	git rev-parse --verify HEAD; \
 	SHA=$$(git rev-parse --verify HEAD); \
