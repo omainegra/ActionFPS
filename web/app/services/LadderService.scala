@@ -49,6 +49,7 @@ class LadderService(commands: List[List[String]])
     }
   }
 
+  // TODO flatten it so it reports errors better.
   commands.foreach { command =>
     StreamConverters.fromInputStream(() => {
       new java.lang.ProcessBuilder(command: _*)
