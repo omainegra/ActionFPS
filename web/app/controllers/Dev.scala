@@ -26,8 +26,8 @@ import scala.concurrent.ExecutionContext
 
 /**
   * Created by me on 11/12/2016.
+  * This is for development use to iterate quickly without having to load in the real data.
   */
-
 class Dev @Inject()(webTemplateRender: WebTemplateRender,
                     newsService: NewsService)
                    (implicit executionContext: ExecutionContext) extends SimpleRouter {
