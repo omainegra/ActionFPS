@@ -1,5 +1,10 @@
 (function () {
 
+    /**
+    Load servers into specific divs based on hashes, and put content of notifications
+    in as innerHTML.
+    **/
+    
     var es = new EventSource("/event-stream/");
     String.prototype.hashCode = function () {
         var hash = 0, i, chr, len;
