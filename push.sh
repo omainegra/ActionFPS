@@ -38,5 +38,5 @@ deploy_app() {
 }
 
 git fetch
-if [[ $(git diff --name-only origin/master) != "" ]]; then push; fi
+if [[ $(git diff --name-only HEAD origin/master) != "" ]]; then push; fi
 
