@@ -4,7 +4,7 @@ push() {
   git rev-parse --verify HEAD
   SHA=$(git rev-parse --verify HEAD)
   git pull origin refs/heads/master
-  SHA=$SHA make deploy
+  SHA=$SHA deploy
 }
 
 changed_files() { \
@@ -17,9 +17,9 @@ deploy() {
   echo Changed files from "$SHA" to master:
   changed_files
   if [[ $(changed_files) == "" ]]; then
-    make deploy-content;
+    deploy_content;
   else
-    make deploy-app;
+    deploy_app;
   fi
 }
 
