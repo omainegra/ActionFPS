@@ -14,7 +14,9 @@ class IntegrationSpec
     }
     "Contain some games, events and a clanwar in the index page" in {
       go to root
-      pageTitle mustBe "ActionFPS First Person Shooter"
+      withClue(s"$pageSource") {
+        pageTitle mustBe "ActionFPS First Person Shooter"
+      }
       withClue("Live events") {
         cssSelector("#live-events ol li").findAllElements mustNot be(empty)
       }
