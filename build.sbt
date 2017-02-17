@@ -22,7 +22,11 @@ crossScalaVersions := Seq("2.11.8", "2.12.1")
 bintrayVcsUrl := Some("git@github.com:ActionFPS/server-pinger.git")
 licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
 enablePlugins(JavaAppPackaging)
-libraryDependencies += json
+def playJson(sv: String): ModuleID = sv match {
+  case "2.11.8" => "com.typesafe.play" %% "play-json" % "2.5.10"
+  case "2.12.1" => "com.typesafe.play" %% "play-json" % "2.6.0-M3"
+}
+libraryDependencies += playJson(scalaVersion.value)
 cancelable in Global := true
 lazy val FunTest = config("fun") extend (Test)
 configs(FunTest)
