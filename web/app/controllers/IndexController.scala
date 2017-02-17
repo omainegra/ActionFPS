@@ -62,7 +62,7 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
 
       val cstats = await(fullProvider.clanstats).shiftedElo(Instant.now()).onlyRanked.named
       Ok(renderTemplate(
-        title = None,
+        title = Some("ActionFPS First Person Shooter"),
         supportsJson = false,
         wide = true
       )(

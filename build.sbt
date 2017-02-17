@@ -92,7 +92,9 @@ lazy val web = project
       async,
       akkaStreamTestkit % "it",
       scalatestPlus % "it,test",
-      scalatestOld % "it,test",
+      scalatest % "it,test",
+      playIteratees,
+      playIterateesStreams,
       seleniumHtmlUnit % "it",
       seleniumJava % "it",
       cache
@@ -207,7 +209,7 @@ lazy val jsonFormats =
   )
     .dependsOn(accumulation)
     .settings(
-      libraryDependencies += json,
+      libraryDependencies += playJson,
       libraryDependencies += jsonQuote,
       resolvers += Resolver.jcenterRepo
     )
