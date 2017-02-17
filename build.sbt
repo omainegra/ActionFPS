@@ -3,7 +3,7 @@ import Dependencies._
 
 name := "actionfps"
 
-scalaVersion in ThisBuild := "2.11.8"
+scalaVersion in ThisBuild := "2.12.1"
 
 
 resolvers in ThisBuild += Resolver.bintrayRepo("scalawilliam", "maven")
@@ -210,7 +210,6 @@ lazy val jsonFormats =
     .dependsOn(accumulation)
     .settings(
       libraryDependencies += playJson,
-      libraryDependencies += jsonQuote,
       resolvers += Resolver.jcenterRepo
     )
 

@@ -5,7 +5,7 @@ object Dependencies {
   val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.1"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
   val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.4"
-  val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.15"
+  val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.16"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.2"
   val hazelcastClient: ModuleID = "com.hazelcast" % "hazelcast-client" % "3.6.5"
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.2"
@@ -29,11 +29,9 @@ object Dependencies {
 
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 
-  val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.5.1"
+  val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.5.2"
   val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.7.0"
   val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.7.0"
-
-  val jsonQuote: ModuleID = "net.maffoo" %% "jsonquote-play" % "0.4.0" exclude ("com.typesafe.play", "play-json")
 
   val raptureJsonPlay: ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M8" exclude ("com.typesafe.play", "play-json")
 

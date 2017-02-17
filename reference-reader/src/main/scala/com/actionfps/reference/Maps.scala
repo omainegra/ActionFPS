@@ -15,7 +15,7 @@ object Maps {
       properties.load(inputStream)
       import collection.JavaConverters._
       properties.asScala.toMap
-    }
+    } finally inputStream.close()
   }
 
   val mapNames: Set[String] = getMap.keySet
