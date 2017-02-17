@@ -9,7 +9,7 @@ import javax.inject._
 
 import org.jsoup.Jsoup
 import play.api.mvc.Results._
-import play.api.mvc.{Action, RequestHeader}
+import play.api.mvc.{Action, RequestHeader, Result}
 import play.twirl.api.Html
 
 /**
@@ -62,7 +62,7 @@ class WebTemplateRender @Inject()() {
     Html(js.toString)
   }
 
-  def renderStatic(path: Path, wide: Boolean = false) = Action { implicit r =>
+  def renderStatic(path: Path, wide: Boolean = false)(implicit requestHeader: RequestHeader): Result = {
     Ok(renderTemplate(title = None, supportsJson = false, wide = wide) {
       Html(new String(Files.readAllBytes(WebTemplateRender.wwwLocation.resolve(path))))
     })

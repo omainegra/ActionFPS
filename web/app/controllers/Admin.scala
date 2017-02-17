@@ -25,7 +25,7 @@ class Admin @Inject()(fullProvider: FullProvider,
     */
   def reloadReference = Action { request =>
     val apiKeyO = request.getQueryString("api-key").orElse(request.headers.get("api-key"))
-    val apiKeyCO = configuration.getString("af.admin-api-key")
+    val apiKeyCO = configuration.get[String]("af.admin-api-key")
     if (apiKeyO == apiKeyCO) {
       referenceProvider.unCache()
       fullProvider.reloadReference()

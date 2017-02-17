@@ -8,7 +8,7 @@ import com.actionfps.accumulation.user.User
 import com.actionfps.reference._
 import com.google.common.io.CharStreams
 import play.api.Configuration
-import play.api.cache.CacheApi
+import play.api.cache.AsyncCacheApi
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 
@@ -23,7 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 @Singleton
 class ReferenceProvider @Inject()(configuration: Configuration,
-                                  cacheApi: CacheApi)
+                                  cacheApi: AsyncCacheApi)
                                  (implicit wSClient: WSClient,
                                   executionContext: ExecutionContext) {
 
@@ -34,11 +34,11 @@ class ReferenceProvider @Inject()(configuration: Configuration,
   }
 
   private def fetch(key: String) = async {
-    cacheApi.get[String](key) match {
+    await(cacheApi.get[String](key)) match {
       case Some(value) => value
       case None =>
         val value = await(wSClient.url(configuration.underlying.getString(s"af.reference.${key}")).get().filter(_.status == 200).map(_.body))
-        cacheApi.set(key, value, Duration.apply("1h"))
+        await(cacheApi.set(key, value, Duration.apply("1h")))
         value
     }
   }

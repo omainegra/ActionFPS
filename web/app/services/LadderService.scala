@@ -3,6 +3,7 @@ package services
 /**
   * Created by me on 09/05/2016.
   */
+
 import java.time.{LocalDateTime, ZoneOffset, ZonedDateTime}
 import javax.inject._
 
@@ -113,12 +114,9 @@ object LadderService {
 
     import collection.JavaConverters._
 
-    configuration.getConfigList(path).map {
-      items =>
-        items.asScala.map {
-          source =>
-            source.underlying.getStringList("command").asScala.toList
-        }.toList
-    }.toList.flatten
+    if (configuration.underlying.hasPath(path)) {
+      val items = configuration.underlying.getConfigList(path)
+      items.asScala.toList.map(_.getStringList("command").asScala.toList)
+    } else List.empty
   }
 }

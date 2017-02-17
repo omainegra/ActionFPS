@@ -7,6 +7,7 @@ import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.Environment
+import play.api.mvc.{AbstractController, ControllerComponents}
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 
@@ -16,7 +17,9 @@ import play.api.routing.SimpleRouter
   * Serve static pages and render them in the template.
   */
 @Singleton
-class StaticPageRouter @Inject()(common: WebTemplateRender, environment: Environment) extends SimpleRouter {
+class StaticPageRouter @Inject()(common: WebTemplateRender,
+                                 environment: Environment,
+                                 components: ControllerComponents) extends AbstractController(components) with SimpleRouter {
 
   import collection.JavaConverters._
 
@@ -33,7 +36,7 @@ class StaticPageRouter @Inject()(common: WebTemplateRender, environment: Environ
 
   private def buildRoutes = urlPathToLocalPath.map { spec => {
     case request if request.path == spec.url =>
-      common.renderStatic(spec.path, wide = spec.isWide)
+      Action { implicit r => common.renderStatic(spec.path, wide = spec.isWide) }
   }: Routes
   }.foldLeft(PartialFunction.empty: Routes)(_.orElse(_))
 
