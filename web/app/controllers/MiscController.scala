@@ -4,10 +4,9 @@ import javax.inject._
 
 import lib.WebTemplateRender
 import play.api.Configuration
-import play.api.libs.json.{JsObject, JsString, JsValue, Json}
+import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, AnyContent, BodyParsers, Controller}
-import play.twirl.api.Html
+import play.api.mvc._
 import providers.ReferenceProvider
 
 import scala.async.Async._
@@ -18,10 +17,11 @@ import scala.concurrent.ExecutionContext
   */
 
 @Singleton
-class MiscController @Inject()(common: WebTemplateRender, referenceProvider: ReferenceProvider)
+class MiscController @Inject()(common: WebTemplateRender, referenceProvider: ReferenceProvider,
+                               components: ControllerComponents)
                               (implicit configuration: Configuration,
                                executionContext: ExecutionContext,
-                               wSClient: WSClient) extends Controller {
+                               wSClient: WSClient) extends AbstractController(components)  {
 
   import common._
 

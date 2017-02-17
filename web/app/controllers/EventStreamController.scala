@@ -7,7 +7,7 @@ import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.Source
 import com.actionfps.clans.Conclusion.Namer
 import lib.KeepAliveEvents
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{AbstractController, ControllerComponents}
 import providers.ReferenceProvider
 import providers.full.NewClanwarCompleted
 import providers.games.NewGamesProvider
@@ -18,9 +18,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class EventStreamController @Inject()(pingerService: PingerService,
-                                      referenceProvider: ReferenceProvider)
+                                      referenceProvider: ReferenceProvider,
+                                      components: ControllerComponents)
                                      (implicit actorSystem: ActorSystem,
-                                      executionContext: ExecutionContext) extends Controller {
+                                      executionContext: ExecutionContext) extends AbstractController(components) {
 
   private def namerF: Future[Namer] = async {
     val clans = await(referenceProvider.clans)

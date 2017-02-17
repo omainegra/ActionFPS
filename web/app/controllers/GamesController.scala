@@ -5,7 +5,7 @@ import javax.inject._
 import com.actionfps.clans.Conclusion.Namer
 import lib.WebTemplateRender
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 import providers.ReferenceProvider
 import providers.full.FullProvider
 import providers.games.NewGamesProvider
@@ -17,8 +17,9 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class GamesController @Inject()(webTemplateRender: WebTemplateRender,
                                 referenceProvider: ReferenceProvider,
-                                fullProvider: FullProvider)
-                               (implicit executionContext: ExecutionContext) extends Controller {
+                                fullProvider: FullProvider,
+                                components: ControllerComponents)
+                               (implicit executionContext: ExecutionContext) extends AbstractController(components) {
 
   private implicit def namerF = async {
     val clans = await(referenceProvider.clans)

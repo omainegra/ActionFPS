@@ -12,7 +12,7 @@ import com.actionfps.ladder.parser._
 import controllers.LadderController.PlayerNamer
 import lib.WebTemplateRender
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{AbstractController, Action, Controller, ControllerComponents}
 import providers.ReferenceProvider
 import services.LadderService
 
@@ -22,9 +22,10 @@ import scala.async.Async._
 @Singleton
 class LadderController @Inject()(ladderService: LadderService,
                                  referenceProvider: ReferenceProvider,
-                                 common: WebTemplateRender)
+                                 common: WebTemplateRender,
+                                 components: ControllerComponents)
                                 (implicit executionContext: ExecutionContext,
-                                 actorSystem: ActorSystem) extends Controller {
+                                 actorSystem: ActorSystem) extends AbstractController(components) {
 
   def aggregate: Aggregate = ladderService.aggregate.displayed(Instant.now()).trimmed(Instant.now())
 

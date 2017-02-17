@@ -15,7 +15,7 @@ import controllers.ClansController.ClanView
 import lib.{Clanner, WebTemplateRender}
 import play.api.Configuration
 import play.api.libs.json.{Json, Writes}
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 import providers.ReferenceProvider
 import providers.full.FullProvider
 import views.ClanRankings
@@ -26,9 +26,10 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ClansController @Inject()(webTemplateRender: WebTemplateRender,
                                 referenceProvider: ReferenceProvider,
+                                components: ControllerComponents,
                                 fullProvider: FullProvider)
                                (implicit configuration: Configuration,
-                                executionContext: ExecutionContext) extends Controller {
+                                executionContext: ExecutionContext) extends AbstractController(components) {
 
   private def namerF = async {
     val clans = await(referenceProvider.clans)

@@ -7,7 +7,7 @@ import com.actionfps.clans.Conclusion.Namer
 import controllers.LadderController.PlayerNamer
 import lib.{Clanner, WebTemplateRender}
 import play.api.Logger
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 import providers.ReferenceProvider
 import providers.full.FullProvider
 import providers.games.NewGamesProvider
@@ -22,8 +22,9 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
                                 newsService: NewsService,
                                 referenceProvider: ReferenceProvider,
                                 fullProvider: FullProvider,
-                                ladderController: LadderController)
-                               (implicit executionContext: ExecutionContext) extends Controller {
+                                ladderController: LadderController,
+                                components: ControllerComponents)
+                               (implicit executionContext: ExecutionContext) extends AbstractController(components) {
 
   import webTemplateRender._
 

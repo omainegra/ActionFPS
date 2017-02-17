@@ -6,7 +6,7 @@ import javax.inject.{Inject, Singleton}
 
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, BodyParsers, Controller}
+import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json.{JsObject, JsString}
@@ -19,8 +19,9 @@ import scala.async.Async._
 //noinspection TypeAnnotation
 class UserController @Inject()(configuration: Configuration,
                                referenceProvider: ReferenceProvider,
-                               wSClient: WSClient)
-                              (implicit executionContext: ExecutionContext) extends Controller {
+                               wSClient: WSClient,
+                               components: ControllerComponents)
+                              (implicit executionContext: ExecutionContext) extends AbstractController(components)  {
 
   val authDir = Paths.get(configuration.underlying.getString("af.user.keys.path")).toAbsolutePath
   if (!Files.exists(authDir)) {
@@ -55,7 +56,7 @@ class UserController @Inject()(configuration: Configuration,
 
   val googleUri = "https://www.googleapis.com/oauth2/v3/tokeninfo"
 
-  def authTokenPost() = Action.async(BodyParsers.parse.form(UserController.userForm)) { req =>
+  def authTokenPost() = Action(parse.form(UserController.userForm)).async { req =>
     getByToken(req.body.idToken)
   }
 

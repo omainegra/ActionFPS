@@ -10,7 +10,7 @@ import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 import providers.ReferenceProvider
 import providers.full.FullProvider
 
@@ -20,10 +20,11 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: ReferenceProvider,
                                   ladderController: LadderController,
-                                  fullProvider: FullProvider)
+                                  fullProvider: FullProvider,
+                                  components: ControllerComponents)
                                  (implicit configuration: Configuration,
                                   executionContext: ExecutionContext,
-                                  wSClient: WSClient) extends Controller {
+                                  wSClient: WSClient) extends AbstractController(components)  {
 
   import common._
 

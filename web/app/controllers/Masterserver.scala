@@ -4,7 +4,7 @@ import javax.inject._
 
 import com.actionfps.reference.ServerRecord
 import play.api.Configuration
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 import providers.ReferenceProvider
 
 import scala.async.Async._
@@ -15,9 +15,10 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class Masterserver @Inject()(configuration: Configuration,
-                             referenceProvider: ReferenceProvider)
+                             referenceProvider: ReferenceProvider,
+                             components: ControllerComponents)
                             (implicit executionContext: ExecutionContext)
-  extends Controller {
+  extends AbstractController(components) {
 
   def ms: Action[AnyContent] = Action.async {
     async {

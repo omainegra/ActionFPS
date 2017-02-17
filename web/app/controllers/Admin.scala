@@ -5,20 +5,22 @@ package controllers
   */
 
 import javax.inject._
-import com.actionfps.accumulation.GameAxisAccumulator$
+
 import play.api.Configuration
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{AbstractController, ControllerComponents}
 import providers.ReferenceProvider
 import providers.full.FullProvider
 
 @Singleton
 class Admin @Inject()(fullProvider: FullProvider,
                       referenceProvider: ReferenceProvider,
-                      configuration: Configuration)
-  extends Controller {
+                      configuration: Configuration,
+                      components: ControllerComponents)
+  extends AbstractController(components) {
 
   /**
     * Reloads reference data and forces [[FullProvider]] to reevaluate usernames and clans for all games.
+    *
     * @return
     */
   def reloadReference = Action { request =>

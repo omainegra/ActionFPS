@@ -3,9 +3,9 @@ package controllers
 import java.time.{Instant, ZonedDateTime}
 import javax.inject.Inject
 
-import com.actionfps.accumulation.user.{FullProfile, User}
 import com.actionfps.accumulation.Clan
 import com.actionfps.accumulation.user.Nickname.CurrentNickname
+import com.actionfps.accumulation.user.{FullProfile, User}
 import com.actionfps.api.{Game, GameAchievement, GamePlayer, GameTeam}
 import com.actionfps.clans.CompleteClanwar
 import com.actionfps.clans.Conclusion.Namer
@@ -14,8 +14,7 @@ import com.actionfps.ladder.parser.UserStatistics
 import com.actionfps.pinger._
 import com.actionfps.reference.Maps
 import lib.{Clanner, WebTemplateRender}
-import play.api.mvc.Action
-import play.api.mvc.Results._
+import play.api.mvc.{AbstractController, ControllerComponents}
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import play.api.routing.sird._
@@ -29,8 +28,9 @@ import scala.concurrent.ExecutionContext
   * This is for development use to iterate quickly without having to load in the real data.
   */
 class Dev @Inject()(webTemplateRender: WebTemplateRender,
-                    newsService: NewsService)
-                   (implicit executionContext: ExecutionContext) extends SimpleRouter {
+                    newsService: NewsService,
+                    components: ControllerComponents)
+                   (implicit executionContext: ExecutionContext) extends AbstractController(components) with SimpleRouter {
 
   private implicit class RichHtml(html: Html) {
     def transform(f: String => String): Html = {
