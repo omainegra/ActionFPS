@@ -1,4 +1,3 @@
-
 import Dependencies._
 
 name := "actionfps"
@@ -7,18 +6,26 @@ javaOptions in ThisBuild += "-Duser.timezone=UTC"
 javaOptions in run in ThisBuild += "-Duser.timezone=UTC"
 scalaVersion in ThisBuild := "2.11.8"
 scalacOptions in ThisBuild := Seq(
-  "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
-  "-language:existentials", "-language:implicitConversions",
-  "-language:reflectiveCalls", "-target:jvm-1.8"
+  "-unchecked",
+  "-deprecation",
+  "-encoding",
+  "utf8",
+  "-feature",
+  "-language:existentials",
+  "-language:implicitConversions",
+  "-language:reflectiveCalls",
+  "-target:jvm-1.8"
 )
 
 resolvers in ThisBuild += Resolver.mavenLocal
 resolvers in ThisBuild += Resolver.bintrayRepo("scalawilliam", "maven")
 resolvers in ThisBuild += Resolver.bintrayRepo("actionfps", "maven")
 
-updateOptions in ThisBuild := (updateOptions in ThisBuild).value.withCachedResolution(true)
+updateOptions in ThisBuild := (updateOptions in ThisBuild).value
+  .withCachedResolution(true)
 
-incOptions in ThisBuild := (incOptions in ThisBuild).value.withNameHashing(true)
+incOptions in ThisBuild := (incOptions in ThisBuild).value
+  .withNameHashing(true)
 
 cancelable in Global := true
 
@@ -40,8 +47,7 @@ lazy val root =
   Project(
     id = "actionfps",
     base = file(".")
-  )
-    .aggregate(
+  ).aggregate(
       pureAchievements,
       web,
       referenceReader,
@@ -52,18 +58,19 @@ lazy val root =
       pureStats,
       jsonFormats,
       challonge
-    ).dependsOn(
-    pureAchievements,
-    web,
-    referenceReader,
-    ladderParser,
-    interParser,
-    accumulation,
-    pureClanwar,
-    pureStats,
-    jsonFormats,
-    challonge
-  )
+    )
+    .dependsOn(
+      pureAchievements,
+      web,
+      referenceReader,
+      ladderParser,
+      interParser,
+      accumulation,
+      pureClanwar,
+      pureStats,
+      jsonFormats,
+      challonge
+    )
 
 lazy val web = project
   .enablePlugins(PlayScala)
@@ -77,9 +84,9 @@ lazy val web = project
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
-    publishArtifact in(Compile, packageDoc) := false,
+    publishArtifact in (Compile, packageDoc) := false,
     publishArtifact in packageDoc := false,
-    sources in(Compile, doc) := Seq.empty,
+    sources in (Compile, doc) := Seq.empty,
     scalaSource in IntegrationTest := baseDirectory.value / "it",
     fork in run := true,
     libraryDependencies ++= Seq(
@@ -115,36 +122,43 @@ lazy val web = project
       git.gitHeadCommit,
       gitCommitDescription
     ),
-    mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map { f =>
-      f -> s"resources/${f.getName}"
+    mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map {
+      f =>
+        f -> s"resources/${f.getName}"
     },
     gitCommitDescription := {
-      com.typesafe.sbt.SbtGit.GitKeys.gitReader.value.withGit { interface =>
-        for {
-          sha <- git.gitHeadCommit.value
-          interface <- Option(interface).collect { case i: com.typesafe.sbt.git.JGit => i }
-          ref <- Option(interface.repo.resolve(sha))
-          message <- {
-            val walk = new RevWalk(interface.repo)
-            try Option(walk.parseCommit(ref.toObjectId)).flatMap(commit => Option(commit.getFullMessage))
-            finally walk.dispose()
-          }
-        } yield message
+      com.typesafe.sbt.SbtGit.GitKeys.gitReader.value.withGit {
+        interface =>
+          for {
+            sha <- git.gitHeadCommit.value
+            interface <- Option(interface).collect {
+              case i: com.typesafe.sbt.git.JGit => i
+            }
+            ref <- Option(interface.repo.resolve(sha))
+            message <- {
+              val walk = new RevWalk(interface.repo)
+              try Option(walk.parseCommit(ref.toObjectId)).flatMap(commit =>
+                Option(commit.getFullMessage))
+              finally walk.dispose()
+            }
+          } yield message
       }
-    }.map { str => Base64.getEncoder.encodeToString(str.getBytes("UTF-8")) },
+    }.map { str =>
+      Base64.getEncoder.encodeToString(str.getBytes("UTF-8"))
+    },
     version := "5.0",
     buildInfoPackage := "af",
     buildInfoOptions += BuildInfoOption.ToJson
   )
 
-lazy val gitCommitDescription = SettingKey[Option[String]]("gitCommitDescription", "Base64-encoded!")
+lazy val gitCommitDescription =
+  SettingKey[Option[String]]("gitCommitDescription", "Base64-encoded!")
 
 lazy val pureAchievements =
   Project(
     id = "pure-achievements",
     base = file("pure-achievements")
-  )
-    .settings(
+  ).settings(
       libraryDependencies += gameParser
     )
 
@@ -152,8 +166,7 @@ lazy val interParser =
   Project(
     id = "inter-parser",
     base = file("inter-parser")
-  )
-    .settings(
+  ).settings(
       libraryDependencies += scalatest % Test
     )
 
@@ -166,7 +179,6 @@ lazy val referenceReader =
     libraryDependencies += kantanCsv,
     libraryDependencies += scalatest % Test
   )
-
 
 lazy val accumulation = project
   .dependsOn(pureAchievements)
@@ -181,8 +193,7 @@ lazy val pureClanwar =
   Project(
     id = "pure-clanwar",
     base = file("pure-clanwar")
-  )
-    .settings(
+  ).settings(
       libraryDependencies += pureGame
     )
 
@@ -190,8 +201,7 @@ lazy val ladderParser =
   Project(
     id = "ladder-parser",
     base = file("ladder-parser")
-  )
-    .settings(
+  ).settings(
       libraryDependencies += scalatest % "test",
       libraryDependencies += gameParser
     )
@@ -200,8 +210,7 @@ lazy val pureStats =
   Project(
     id = "pure-stats",
     base = file("pure-stats")
-  )
-    .dependsOn(pureClanwar)
+  ).dependsOn(pureClanwar)
     .settings(
       libraryDependencies += scalatest % Test
     )
@@ -210,8 +219,7 @@ lazy val jsonFormats =
   Project(
     id = "json-formats",
     base = file("json-formats")
-  )
-    .dependsOn(accumulation)
+  ).dependsOn(accumulation)
     .settings(
       libraryDependencies += json,
       libraryDependencies += jsonQuote,
@@ -223,8 +231,7 @@ lazy val sampleLog = taskKey[File]("Sample Log")
 lazy val challonge = Project(
   id = "challonge",
   base = file("challonge")
-)
-  .dependsOn(pureClanwar)
+).dependsOn(pureClanwar)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
