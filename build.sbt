@@ -2,15 +2,19 @@
 import Dependencies._
 
 name := "actionfps"
-
-scalaVersion in ThisBuild := "2.11.8"
-
-
-resolvers in ThisBuild += Resolver.bintrayRepo("scalawilliam", "maven")
-
-resolvers in ThisBuild += Resolver.bintrayRepo("actionfps", "maven")
-
 organization in ThisBuild := "com.actionfps"
+javaOptions in ThisBuild += "-Duser.timezone=UTC"
+javaOptions in run in ThisBuild += "-Duser.timezone=UTC"
+scalaVersion in ThisBuild := "2.11.8"
+scalacOptions in ThisBuild := Seq(
+  "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
+  "-language:existentials", "-language:implicitConversions",
+  "-language:reflectiveCalls", "-target:jvm-1.8"
+)
+
+resolvers in ThisBuild += Resolver.mavenLocal
+resolvers in ThisBuild += Resolver.bintrayRepo("scalawilliam", "maven")
+resolvers in ThisBuild += Resolver.bintrayRepo("actionfps", "maven")
 
 updateOptions in ThisBuild := (updateOptions in ThisBuild).value.withCachedResolution(true)
 
@@ -70,10 +74,12 @@ lazy val web = project
   .dependsOn(challonge)
   .dependsOn(ladderParser)
   .enablePlugins(BuildInfoPlugin)
-  .settings(dontDocument)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
+    publishArtifact in(Compile, packageDoc) := false,
+    publishArtifact in packageDoc := false,
+    sources in(Compile, doc) := Seq.empty,
     scalaSource in IntegrationTest := baseDirectory.value / "it",
     fork in run := true,
     libraryDependencies ++= Seq(
@@ -227,9 +233,3 @@ lazy val challonge = Project(
     libraryDependencies += ws % "provided",
     libraryDependencies += akkaStreamTestkit % "it"
   )
-
-def dontDocument = Seq(
-  publishArtifact in(Compile, packageDoc) := false,
-  publishArtifact in packageDoc := false,
-  sources in(Compile, doc) := Seq.empty
-)
