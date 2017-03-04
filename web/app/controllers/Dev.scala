@@ -13,7 +13,7 @@ import com.actionfps.ladder.parser.Aggregate.RankedStat
 import com.actionfps.ladder.parser.UserStatistics
 import com.actionfps.pinger._
 import com.actionfps.reference.Maps
-import com.actionfps.reference.Registration.Email.PlainEmail
+import com.actionfps.reference.RegistrationEmail.PlainRegistrationEmail
 import lib.{Clanner, WebTemplateRender}
 import play.api.mvc.Action
 import play.api.mvc.Results._
@@ -99,7 +99,7 @@ object Dev {
     user = User(
       id = "boo",
       name = "Boo",
-      email = PlainEmail("boo@actionfps.com"),
+      email = PlainRegistrationEmail("boo@actionfps.com"),
       previousNicknames = None,
       registrationDate = ZonedDateTime.now().minusDays(5),
       nickname = CurrentNickname(

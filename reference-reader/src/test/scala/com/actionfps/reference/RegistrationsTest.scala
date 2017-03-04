@@ -3,7 +3,6 @@ package com.actionfps.reference
 import java.io.StringReader
 import java.time.LocalDateTime
 
-import com.actionfps.reference.Registration.Email.PlainEmail
 import org.scalatest.{FunSuite, Matchers}
 
 /**
@@ -17,7 +16,7 @@ class RegistrationsTest
   }
   test("it should extract with e-mails") {
     val recs = Registration.parseRecords(getSample("registrations.csv"))
-    recs.head shouldBe Registration("sanzo", "Sanzo", PlainEmail("sanzo@actionfps.com"), LocalDateTime.parse("2015-01-14T11:25"), "w00p|Sanzo")
+    recs.head shouldBe Registration("sanzo", "Sanzo", RegistrationEmail.PlainRegistrationEmail("sanzo@actionfps.com"), LocalDateTime.parse("2015-01-14T11:25"), "w00p|Sanzo")
     recs should have size 96
   }
   test("It maps one to one") {
@@ -26,11 +25,5 @@ class RegistrationsTest
     withClue(s"$csvStr") {
       Registration.parseRecords(new StringReader(csvStr)) shouldEqual recs
     }
-  }
-  test("Secure e-mail validates as expected") {
-    assert(PlainEmail("sanzo@woop.us").secured.matches("sanzo@woop.us"))
-  }
-  test("Secure e-mail does not contain the original e-mail") {
-    PlainEmail("sanzo@woop.us").secured.toString should not include ("sanzo")
   }
 }

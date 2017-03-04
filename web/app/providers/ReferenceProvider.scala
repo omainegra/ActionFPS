@@ -6,7 +6,6 @@ import javax.inject.{Inject, Singleton}
 import com.actionfps.accumulation.Clan
 import com.actionfps.accumulation.user.User
 import com.actionfps.reference._
-import com.google.common.io.CharStreams
 import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.libs.json.Json
@@ -67,7 +66,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
 
     def registrations: Future[List[Registration]] = fetch(RegistrationsKey).map { bdy =>
       val sr = new StringReader(bdy)
-      try Registration.parseRecords(sr).map(_.withSecureEmail)
+      try Registration.parseRecords(sr)
       finally sr.close()
     }
 

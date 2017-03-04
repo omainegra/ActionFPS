@@ -4,15 +4,18 @@ package controllers
   * Created by William on 01/01/2016.
   */
 
+import java.security.spec.X509EncodedKeySpec
+import java.security.{KeyFactory, KeyPairGenerator, PublicKey}
+import java.util.Base64
 import javax.inject._
 
 import com.actionfps.reference.Registration
 import lib.WebTemplateRender
-import play.api.Configuration
 import play.api.http.Writeable
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
 import providers.full.FullProvider
 
@@ -29,8 +32,23 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
 
   import common._
 
+  private val logger = Logger(getClass)
+
+  private implicit val publicKey: PublicKey = configuration.getString("registration.public-key") match {
+    case Some(publicKeyStr) =>
+      val bytes = Base64.getDecoder.decode(publicKeyStr)
+      val keySpec = new X509EncodedKeySpec(bytes)
+      val keyFactory = KeyFactory.getInstance("RSA")
+      keyFactory.generatePublic(keySpec)
+    case _ =>
+      logger.error("No public key found, using a random one.")
+      val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
+      keyPairGenerator.initialize(1024)
+      keyPairGenerator.generateKeyPair().getPublic
+  }
+
   private implicit val writeRegistrations: Writeable[List[Registration]] = {
-    implicitly[Writeable[String]].map(Registration.writeCsv)
+    implicitly[Writeable[String]].map((Registration.writeCsv _).compose(Registration.secure))
   }
 
   def players: Action[AnyContent] = Action.async { implicit request =>
