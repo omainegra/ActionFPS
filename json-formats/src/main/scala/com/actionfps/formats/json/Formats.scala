@@ -15,6 +15,7 @@ import com.actionfps.clans.{ClanwarMeta, NewClanwar, TwoGamesNoWinnerClanwar, _}
 import com.actionfps.clans.Conclusion.Namer
 import com.actionfps.gameparser.enrichers._
 import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
+import com.actionfps.reference.Registration.Email
 import com.actionfps.reference.ServerRecord
 import com.actionfps.stats.Stats.PunchCard
 import com.actionfps.stats.{Clanstat, Clanstats}
@@ -48,6 +49,15 @@ trait Formats {
     )
   }
 
+
+  private implicit val writeEmail: Writes[Email] = Writes[Email](email => JsString(email.stringValue))
+  private implicit val readEmail: Reads[Email] = Reads[Email] {
+    case JsString(email) => Email.fromString(email) match {
+      case Right(e) => JsSuccess(e)
+      case Left(e) => JsError(e)
+    }
+    case _ => JsError("Could not read a string for e-mail address")
+  }
   private implicit val vf = DefaultZonedDateTimeWrites
   private implicit val pnFormat = Json.format[PreviousNickname]
   private implicit val cnFormat = Json.format[CurrentNickname]
@@ -131,9 +141,9 @@ trait Formats {
   implicit val bpwrites: OWrites[BuiltProfile] = Json.writes[BuiltProfile]
 
   implicit val sw: OWrites[ServerRecord] = {
-    OWrites[ServerRecord]{ sr =>
+    OWrites[ServerRecord] { sr =>
       Json.writes[ServerRecord].writes(sr) ++ JsObject(Map("address" -> JsString(sr.address), "url" -> JsString(sr.connectUrl),
-      "name" -> JsString(sr.name)))
+        "name" -> JsString(sr.name)))
     }
   }
 

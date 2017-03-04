@@ -7,9 +7,10 @@ package com.actionfps.accumulation.user
 import java.time.{ZoneId, ZonedDateTime}
 
 import com.actionfps.accumulation.user.Nickname.{CurrentNickname, PreviousNickname}
+import com.actionfps.reference.Registration.Email
 import com.actionfps.reference.{NicknameRecord, Registration}
 
-case class User(id: String, name: String, email: Option[String],
+case class User(id: String, name: String, email: Email,
                 registrationDate: ZonedDateTime, nickname: CurrentNickname,
                 previousNicknames: Option[List[PreviousNickname]]) {
   def nicknames: List[Nickname] = List(nickname) ++ previousNicknames.toList.flatten

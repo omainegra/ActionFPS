@@ -6,8 +6,10 @@ package controllers
 
 import javax.inject._
 
+import com.actionfps.reference.Registration
 import lib.WebTemplateRender
 import play.api.Configuration
+import play.api.http.Writeable
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, AnyContent, Controller}
@@ -27,15 +29,19 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
 
   import common._
 
+  private implicit val writeRegistrations: Writeable[List[Registration]] = {
+    implicitly[Writeable[String]].map(Registration.writeCsv)
+  }
+
   def players: Action[AnyContent] = Action.async { implicit request =>
     async {
       request.getQueryString("format") match {
         case Some("registrations-csv") =>
-          Ok(await(referenceProvider.Users(withEmails = false).filteredRegistrations)).as("text/csv")
+          Ok(await(referenceProvider.Users.registrations)).as("text/csv")
         case Some("nicknames-csv") =>
-          Ok(await(referenceProvider.Users(withEmails = false).rawNicknames)).as("text/csv")
+          Ok(await(referenceProvider.Users.rawNicknames)).as("text/csv")
         case Some("json") =>
-          Ok(Json.toJson(await(referenceProvider.Users(withEmails = false).users)))
+          Ok(Json.toJson(await(referenceProvider.Users.users)))
         case _ =>
           val players = await(referenceProvider.users)
           Ok(renderTemplate(title = Some("ActionFPS Players"), supportsJson = true)(views.html.players(players)))
@@ -106,7 +112,7 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
 
   def playerByEmail(email: String): Action[AnyContent] = Action.async {
     async {
-      await(referenceProvider.Users(withEmails = true).users).find(_.email.contains(email)) match {
+      await(referenceProvider.Users.users).find(_.email.matches(email)) match {
         case Some(user) =>
           Ok(Json.toJson(user))
         case None =>

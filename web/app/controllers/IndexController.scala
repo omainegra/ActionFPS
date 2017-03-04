@@ -49,7 +49,7 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
 
   def index: Action[AnyContent] = Action.async { implicit request =>
     async {
-      implicit val playerNamer = PlayerNamer.fromMap(await(referenceProvider.Users().users).map(u => u.id -> u.nickname.nickname).toMap)
+      implicit val playerNamer = PlayerNamer.fromMap(await(referenceProvider.Users.users).map(u => u.id -> u.nickname.nickname).toMap)
       implicit val namer = await(namerF)
       implicit val clanner = await(clannerF)
       val games = await(fullProvider.getRecent(10)).map(MixedGame.fromJsonGame)

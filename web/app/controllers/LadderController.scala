@@ -38,7 +38,7 @@ class LadderController @Inject()(ladderService: LadderService,
           }
           Ok(Json.toJson(aggregate))
         case _ =>
-          implicit val playerNamer = PlayerNamer.fromMap(await(referenceProvider.Users().users).map(u => u.id -> u.name).toMap)
+          implicit val playerNamer = PlayerNamer.fromMap(await(referenceProvider.Users.users).map(u => u.id -> u.name).toMap)
           Ok(common.renderTemplate(
             title = Some("Ladder"),
             supportsJson = true)
@@ -51,7 +51,7 @@ class LadderController @Inject()(ladderService: LadderService,
 object LadderController {
 
   trait PlayerNamer {
-    def nameOf(user: String): Option[String] = ???
+    def nameOf(user: String): Option[String]
   }
 
   object PlayerNamer {
