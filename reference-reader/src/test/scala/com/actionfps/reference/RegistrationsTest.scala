@@ -27,4 +27,10 @@ class RegistrationsTest
       Registration.parseRecords(new StringReader(csvStr)) shouldEqual recs
     }
   }
+  test("Secure e-mail validates as expected") {
+    assert(PlainEmail("sanzo@woop.us").secured.matches("sanzo@woop.us"))
+  }
+  test("Secure e-mail does not contain the original e-mail") {
+    PlainEmail("sanzo@woop.us").secured.toString should not include ("sanzo")
+  }
 }

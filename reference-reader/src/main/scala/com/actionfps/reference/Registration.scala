@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import com.actionfps.reference.Registration.Email
+import com.actionfps.reference.Registration.Email.SecureEmail
 import org.apache.commons.csv.CSVFormat
 
 import scala.util.Try
@@ -12,7 +13,7 @@ import scala.util.Try
 case class Registration(id: String, name: String, email: Email, registrationDate: LocalDateTime, currentNickname: String) {
   def toCsvLine: String = List(id, name, email.stringValue, Registration.dtf.format(registrationDate), currentNickname).mkString(",")
 
-  def withSecureEmail: Registration = this
+  def withSecureEmail: Registration = copy(email = email.secured)
 }
 
 object Registration {
@@ -25,6 +26,8 @@ object Registration {
     def matches(emailString: String): Boolean
 
     def stringValue: String
+
+    def secured: SecureEmail
   }
 
   object Email {
@@ -33,12 +36,16 @@ object Registration {
       override def stringValue: String = s"$mailto$email"
 
       override def matches(emailString: String): Boolean = emailString == email
+
+      override def secured: SecureEmail = SecureEmail(email)
     }
 
     final case class SecureEmail(encrypted: String) extends Email {
       override def stringValue: String = s"$secureEmailPrefix$encrypted"
 
-      override def matches(emailString: String): Boolean = false
+      override def matches(emailString: String): Boolean = encrypted == emailString
+
+      override def secured: SecureEmail = this
     }
 
     val mailto = "mailto:"
