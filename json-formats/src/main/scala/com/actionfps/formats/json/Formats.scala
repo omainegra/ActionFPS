@@ -1,5 +1,6 @@
 package com.actionfps.formats.json
 
+import java.security.PublicKey
 import java.time.ZonedDateTime
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.util.Locale
@@ -15,7 +16,7 @@ import com.actionfps.clans.{ClanwarMeta, NewClanwar, TwoGamesNoWinnerClanwar, _}
 import com.actionfps.clans.Conclusion.Namer
 import com.actionfps.gameparser.enrichers._
 import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
-import com.actionfps.reference.ServerRecord
+import com.actionfps.reference.{RegistrationEmail, ServerRecord}
 import com.actionfps.stats.Stats.PunchCard
 import com.actionfps.stats.{Clanstat, Clanstats}
 import play.api.libs.json.{JsArray, _}
@@ -48,20 +49,20 @@ trait Formats {
     )
   }
 
+
+  private implicit val writeEmail: Writes[RegistrationEmail] = Writes[RegistrationEmail](email => JsString(email.stringValue))
+  private implicit val readEmail: Reads[RegistrationEmail] = Reads[RegistrationEmail] {
+    case JsString(email) => RegistrationEmail.fromString(email) match {
+      case Right(e) => JsSuccess(e)
+      case Left(e) => JsError(e)
+    }
+    case _ => JsError("Could not read a string for e-mail address")
+  }
   private implicit val vf = DefaultZonedDateTimeWrites
   private implicit val pnFormat = Json.format[PreviousNickname]
   private implicit val cnFormat = Json.format[CurrentNickname]
-  implicit val userFormat: OFormat[User] = Json.format[User]
-
-  object WithoutEmailFormat {
-
-    import play.api.libs.json._
-    import play.api.libs.json.Reads._
-    import play.api.libs.functional.syntax._
-
-    implicit val noEmailUserWrite: OWrites[User] = Json.writes[User].transform((jv: JsObject) => jv.validate((__ \ 'email).json.prune).get)
-  }
-
+  implicit def userWrite(implicit publicKey: PublicKey): Writes[User] = Writes[User](u => Json.writes[User].writes(u.copy(email = u.email.secured)))
+  implicit val userRead: Reads[User] = Json.reads[User]
 
   implicit def clanwarWrites(implicit namer: Namer): Writes[Clanwar] = {
     implicit val ccww = {
@@ -128,12 +129,12 @@ trait Formats {
   implicit val writeStats: OWrites[PlayersStats] = Json.writes[PlayersStats]
   private implicit val fmts = Json.format[PlayerStatistics]
 
-  implicit val bpwrites: OWrites[BuiltProfile] = Json.writes[BuiltProfile]
+  implicit def bpwrites(implicit publicKey: PublicKey): Writes[BuiltProfile] = Json.writes[BuiltProfile]
 
   implicit val sw: OWrites[ServerRecord] = {
-    OWrites[ServerRecord]{ sr =>
+    OWrites[ServerRecord] { sr =>
       Json.writes[ServerRecord].writes(sr) ++ JsObject(Map("address" -> JsString(sr.address), "url" -> JsString(sr.connectUrl),
-      "name" -> JsString(sr.name)))
+        "name" -> JsString(sr.name)))
     }
   }
 

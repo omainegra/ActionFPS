@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    <ShortName>ActionFPS</ShortName>
+    <Description>Use Google to search ActionFPS</Description>
+    <Tags>actionfps assaultcube actioncube fps quake quakelive counterstrike cs</Tags>
+    <AdultContent>false</AdultContent>
+
+    <Url type="text/html"
+         template="http://www.google.com/search?q=site:actionfps.com {searchTerms}"/>
+</OpenSearchDescription>

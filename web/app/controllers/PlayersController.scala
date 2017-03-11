@@ -4,13 +4,18 @@ package controllers
   * Created by William on 01/01/2016.
   */
 
+import java.security.spec.X509EncodedKeySpec
+import java.security.{KeyFactory, KeyPairGenerator, PublicKey}
+import java.util.Base64
 import javax.inject._
 
+import com.actionfps.reference.Registration
 import lib.WebTemplateRender
-import play.api.Configuration
+import play.api.http.Writeable
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.ws.WSClient
-import play.api.mvc._
+import play.api.mvc.{Action, AnyContent, _}
+import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
 import providers.full.FullProvider
 
@@ -24,19 +29,38 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
                                   components: ControllerComponents)
                                  (implicit configuration: Configuration,
                                   executionContext: ExecutionContext,
-                                  wSClient: WSClient) extends AbstractController(components)  {
+                                  wSClient: WSClient) extends AbstractController(components) {
 
   import common._
+
+  private val logger = Logger(getClass)
+
+  private implicit val publicKey: PublicKey = configuration.getOptional[String]("registration.public-key") match {
+    case Some(publicKeyStr) =>
+      val bytes = Base64.getDecoder.decode(publicKeyStr)
+      val keySpec = new X509EncodedKeySpec(bytes)
+      val keyFactory = KeyFactory.getInstance("RSA")
+      keyFactory.generatePublic(keySpec)
+    case _ =>
+      logger.error("No public key found, using a random one.")
+      val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
+      keyPairGenerator.initialize(1024)
+      keyPairGenerator.generateKeyPair().getPublic
+  }
+
+  private implicit val writeRegistrations: Writeable[List[Registration]] = {
+    implicitly[Writeable[String]].map((Registration.writeCsv _).compose(Registration.secure))
+  }
 
   def players: Action[AnyContent] = Action.async { implicit request =>
     async {
       request.getQueryString("format") match {
         case Some("registrations-csv") =>
-          Ok(await(referenceProvider.Users(withEmails = false).filteredRegistrations)).as("text/csv")
+          Ok(await(referenceProvider.Users.registrations)).as("text/csv")
         case Some("nicknames-csv") =>
-          Ok(await(referenceProvider.Users(withEmails = false).rawNicknames)).as("text/csv")
+          Ok(await(referenceProvider.Users.rawNicknames)).as("text/csv")
         case Some("json") =>
-          Ok(Json.toJson(await(referenceProvider.Users(withEmails = false).users)))
+          Ok(Json.toJson(await(referenceProvider.Users.users)))
         case _ =>
           val players = await(referenceProvider.users)
           Ok(renderTemplate(title = Some("ActionFPS Players"), supportsJson = true)(views.html.players(players)))
@@ -107,7 +131,7 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
 
   def playerByEmail(email: String): Action[AnyContent] = Action.async {
     async {
-      await(referenceProvider.Users(withEmails = true).users).find(_.email.contains(email)) match {
+      await(referenceProvider.Users.users).find(_.email.matches(email)) match {
         case Some(user) =>
           Ok(Json.toJson(user))
         case None =>

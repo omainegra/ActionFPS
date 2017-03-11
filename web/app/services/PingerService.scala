@@ -77,7 +77,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
   }, { be =>
     if (!cgsStatus.get().contains(be.now.server) || !cgsStatus.get().get(be.now.server).exists(statusSimilar(be, _))) {
       cgsStatus.send(_.updated(be.now.server, be))
-      referenceProvider.Users().users.foreach { lu =>
+      referenceProvider.Users.users.foreach { lu =>
         val b = be.withUsers(lu.map(u => u.nickname.nickname -> u.id).toMap.get)
 
         val cgse =

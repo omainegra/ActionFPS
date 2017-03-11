@@ -22,6 +22,7 @@ object Butcher {
       for {
         "ctf" <- List(game.mode)
         firstTeam <- game.teams
+        if firstTeam.players.size > 1
         if firstTeam.players.contains(player)
         secondTeam <- game.teams; if secondTeam != firstTeam
         if player.frags >= 80

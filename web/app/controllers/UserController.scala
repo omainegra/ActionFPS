@@ -66,7 +66,7 @@ class UserController @Inject()(configuration: Configuration,
       assert((response.json \ "aud").as[String].startsWith("566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9"))
       (response.json \ "email").asOpt[String] match {
         case Some(email) =>
-          await(referenceProvider.Users(withEmails = true).users).find(_.email.contains(email)) match {
+          await(referenceProvider.Users.users).find(_.email.matches(email)) match {
             case Some(theUser) =>
               Ok(JsObject(Map("user" -> JsString(theUser.id), "privKey" -> JsString(ForUser(theUser.id).getOrUpdate()))))
             case None =>

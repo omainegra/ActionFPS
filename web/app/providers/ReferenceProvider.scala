@@ -6,7 +6,6 @@ import javax.inject.{Inject, Singleton}
 import com.actionfps.accumulation.Clan
 import com.actionfps.accumulation.user.User
 import com.actionfps.reference._
-import com.google.common.io.CharStreams
 import play.api.Configuration
 import play.api.cache.AsyncCacheApi
 import play.api.libs.json.Json
@@ -63,19 +62,9 @@ class ReferenceProvider @Inject()(configuration: Configuration,
     }
   }
 
-  case class Users(withEmails: Boolean = false) {
+  object Users {
 
-    def filteredRegistrations: Future[String] = fetch(RegistrationsKey).map(
-      bdy => Registration.filterRegistrationsEmail(new StringReader(bdy))
-    )
-
-    protected def rawRegistrations: Future[String] = fetch(RegistrationsKey).map(
-      bdy => CharStreams.toString(new StringReader(bdy))
-    )
-
-    def postEmailRegistrations: Future[String] = if (withEmails) rawRegistrations else filteredRegistrations
-
-    def registrations: Future[List[Registration]] = postEmailRegistrations.map { bdy =>
+    def registrations: Future[List[Registration]] = fetch(RegistrationsKey).map { bdy =>
       val sr = new StringReader(bdy)
       try Registration.parseRecords(sr)
       finally sr.close()
@@ -99,7 +88,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
 
   def clans: Future[List[Clan]] = Clans.clans
 
-  def users: Future[List[User]] = Users(withEmails = false).users
+  def users: Future[List[User]] = Users.users
 
   private implicit val serverRecordRead = Json.reads[ServerRecord]
 

@@ -14,15 +14,16 @@ class RegistrationsTest
   test("it should work") {
     Registration.parseRecords(getSample("registrations.csv")) should have size 96
   }
-  test("it should filter e-mails") {
-    val result = Registration.filterRegistrationsEmail(getSample("registrations.csv"))
-    val recs = Registration.parseRecords(new StringReader(result))
-    every(recs.map(_.email)) shouldBe empty
-    recs should have size 96
-  }
   test("it should extract with e-mails") {
     val recs = Registration.parseRecords(getSample("registrations.csv"))
-    recs.head shouldBe Registration("sanzo", "Sanzo", Some("sanzo@actionfps.com"), LocalDateTime.parse("2015-01-14T11:25"), "w00p|Sanzo")
+    recs.head shouldBe Registration("sanzo", "Sanzo", RegistrationEmail.PlainRegistrationEmail("sanzo@actionfps.com"), LocalDateTime.parse("2015-01-14T11:25"), "w00p|Sanzo")
     recs should have size 96
+  }
+  test("It maps one to one") {
+    val recs = Registration.parseRecords(getSample("registrations.csv"))
+    val csvStr = Registration.writeCsv(recs)
+    withClue(s"$csvStr") {
+      Registration.parseRecords(new StringReader(csvStr)) shouldEqual recs
+    }
   }
 }
