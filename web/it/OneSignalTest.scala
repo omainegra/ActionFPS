@@ -4,7 +4,8 @@ import akka.actor.ActorSystem
 import com.actionfps.accumulation.ValidServers
 import com.actionfps.inter.{InterOut, UserMessage}
 import org.scalatest.DoNotDiscover
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
@@ -18,7 +19,7 @@ import scala.concurrent.ExecutionContext
 @DoNotDiscover
 class OneSignalTest
   extends PlaySpec
-  with OneServerPerSuite {
+  with GuiceOneServerPerSuite {
     override implicit lazy val app: Application = {
       new GuiceApplicationBuilder()
         .build()

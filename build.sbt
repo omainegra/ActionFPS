@@ -103,8 +103,6 @@ lazy val web = project
       s"-Dgeolitecity.dat=${geoLiteCity.value}"
     ),
     PlayKeys.playRunHooks += HazelcastRunHook(),
-    // todo fix timeout problem
-    // PlayKeys.devSettings += "play.server.akka.requestTimeout" -> null,
     scriptClasspath := Seq("*", "../conf/"),
     buildInfoKeys := Seq[BuildInfoKey](
       name,

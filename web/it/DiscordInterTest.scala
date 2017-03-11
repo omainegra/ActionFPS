@@ -4,16 +4,16 @@ import akka.actor.ActorSystem
 import com.actionfps.accumulation.ValidServers
 import com.actionfps.inter.{InterOut, UserMessage}
 import org.scalatest.DoNotDiscover
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.routing.Router
 import services.DiscordInters
 
-import concurrent._
-import concurrent.duration._
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, _}
+import scala.concurrent.duration._
 
 /**
   * Created by william on 28/1/17.
@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext
 @DoNotDiscover
 class DiscordInterTest
   extends PlaySpec
-    with OneServerPerSuite {
+    with GuiceOneServerPerSuite {
   override implicit lazy val app: Application = {
     new GuiceApplicationBuilder()
       .router(Router.empty)

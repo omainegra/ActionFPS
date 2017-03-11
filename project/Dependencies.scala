@@ -13,9 +13,9 @@ object Dependencies {
   val playIteratees: ModuleID = "com.typesafe.play" %% "play-iteratees" % "2.6.1"
   val playIterateesStreams: ModuleID = "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1"
 
-  val scalatestPlus: ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0-M2"
+  val scalatestPlus: ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0-M1"
   val alpakkaFile: ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.6"
-  val seleniumJava: ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "3.2.0"
+  val seleniumJava: ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "3.3.1"
   val seleniumHtmlUnit: ModuleID = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0"
 
   val geoipApi: ModuleID = "com.maxmind.geoip" % "geoip-api" % "1.3.1"
@@ -35,6 +35,6 @@ object Dependencies {
 
   val raptureJsonPlay: ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M8" exclude ("com.typesafe.play", "play-json")
 
-  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.0-M3"
+  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.0-M5"
 
 }
