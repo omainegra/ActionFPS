@@ -1,3 +1,4 @@
+sudo: required
 language: scala
 # https://github.com/nativelibs4java/scalaxy-streams/commit/01ffbadeece7e2db8b21373fcdc25298845869d4
 sudo: true
@@ -8,7 +9,13 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
     - geoip-resources
+services:
+  - docker
+before_install:
+  - docker pull carlad/sinatra
+  - hseeberger/scala-sbt
 script:
-  - make travis
+#  - make travis
+  - docker run -v ${HOME}.m2:/root/.m2 -v ${HOME}/.ivy2:/root/.ivy2 -v ${PWD}:/af -it -w=/af hseeberger/scala-sbt sbt test it:test
 jdk:
   - oraclejdk8
