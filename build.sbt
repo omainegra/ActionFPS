@@ -101,7 +101,7 @@ lazy val web = project
       async,
       akkaStreamTestkit % "it",
       scalatestPlus % "it,test",
-      scalatestOld % "it,test",
+      scalatest % "it,test",
       seleniumHtmlUnit % "it",
       seleniumJava % "it",
       cache

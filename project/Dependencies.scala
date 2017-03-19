@@ -3,16 +3,15 @@ import sbt._
 object Dependencies {
 
   val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.1"
-  val scalatestOld: ModuleID = "org.scalatest" %% "scalatest" % "2.2.6"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
   val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.4"
-  val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.15"
+  val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.18"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.2"
   val hazelcastClient: ModuleID = "com.hazelcast" % "hazelcast-client" % "3.6.5"
-  val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.2"
-  val httpClientCache: ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.2"
-  val scalatestPlus: ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1"
-  val alpakkaFile: ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.5"
+  val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.3"
+  val httpClientCache: ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.3"
+  val scalatestPlus: ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0"
+  val alpakkaFile: ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.6"
   val seleniumJava: ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "2.53.1"
   val seleniumHtmlUnit: ModuleID = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0"
 
@@ -23,7 +22,7 @@ object Dependencies {
   val akkaslf: ModuleID = akka("slf4j")
   val akkaTestkit: ModuleID = akka("testkit")
 
-  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.16"
+  private def akka(stuff: String) = "com.typesafe.akka" %% s"akka-$stuff" % "2.4.17"
 
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 

@@ -13,7 +13,7 @@ import scala.util.Try
   */
 package object reference {
 
-  implicit val ldtDecoder = CellDecoder(str => DecodeResult(parseLocalDateTime(str)))
+  implicit val ldtDecoder: CellDecoder[LocalDateTime] = CellDecoder.from(str => DecodeResult(parseLocalDateTime(str)))
 
   val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
   val dtf2: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
