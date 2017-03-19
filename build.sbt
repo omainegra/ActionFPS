@@ -39,10 +39,6 @@ fork in Test in ThisBuild := true
 
 git.remoteRepo in ThisBuild := "git@github.com:ScalaWilliam/ActionFPS.git"
 
-import java.util.Base64
-import com.hazelcast.core.{HazelcastInstance, Hazelcast}
-import org.eclipse.jgit.revwalk.RevWalk
-
 lazy val root =
   Project(
     id = "actionfps",
