@@ -80,7 +80,7 @@ lazy val web = project
   .dependsOn(jsonFormats)
   .dependsOn(challonge)
   .dependsOn(ladderParser)
-  .enablePlugins(BuildInfoPlugin)
+  .enablePlugins(WebBuildInfo)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
@@ -110,49 +110,17 @@ lazy val web = project
       seleniumJava % "it",
       cache
     ),
-    javaOptions in IntegrationTest ++= Seq(
-      s"-Dgeolitecity.dat=${geoLiteCity.value}"
-    ),
+    javaOptions in IntegrationTest += s"-Dgeolitecity.dat=${geoLiteCity.value}",
     PlayKeys.playRunHooks += HazelcastRunHook(),
     scriptClasspath := Seq("*", "../conf/"),
-    buildInfoKeys := Seq[BuildInfoKey](
-      name,
-      version,
-      buildInfoBuildNumber,
-      git.gitHeadCommit,
-      gitCommitDescription
-    ),
     mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map {
       f =>
         f -> s"resources/${f.getName}"
-    },
-    gitCommitDescription := {
-      com.typesafe.sbt.SbtGit.GitKeys.gitReader.value.withGit {
-        interface =>
-          for {
-            sha <- git.gitHeadCommit.value
-            interface <- Option(interface).collect {
-              case i: com.typesafe.sbt.git.JGit => i
-            }
-            ref <- Option(interface.repo.resolve(sha))
-            message <- {
-              val walk = new RevWalk(interface.repo)
-              try Option(walk.parseCommit(ref.toObjectId)).flatMap(commit =>
-                Option(commit.getFullMessage))
-              finally walk.dispose()
-            }
-          } yield message
-      }
-    }.map { str =>
-      Base64.getEncoder.encodeToString(str.getBytes("UTF-8"))
     },
     version := "5.0",
     buildInfoPackage := "af",
     buildInfoOptions += BuildInfoOption.ToJson
   )
-
-lazy val gitCommitDescription =
-  SettingKey[Option[String]]("gitCommitDescription", "Base64-encoded!")
 
 lazy val pureAchievements =
   Project(
