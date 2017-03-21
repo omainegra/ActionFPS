@@ -1,6 +1,7 @@
 package controllers
 
 import java.nio.file.{Files, Path, Paths}
+import java.time.LocalDateTime
 import java.util.Base64
 import javax.inject.{Inject, Singleton}
 
@@ -11,6 +12,7 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json.{JsObject, JsString}
 import providers.ReferenceProvider
+import services.LoginService
 
 import scala.concurrent.ExecutionContext
 import scala.async.Async._
@@ -19,6 +21,7 @@ import scala.async.Async._
 //noinspection TypeAnnotation
 class UserController @Inject()(configuration: Configuration,
                                referenceProvider: ReferenceProvider,
+                               loginService: LoginService,
                                wSClient: WSClient)
                               (implicit executionContext: ExecutionContext) extends Controller {
 
@@ -85,6 +88,27 @@ class UserController @Inject()(configuration: Configuration,
   def redirectPlay() = Action {
     SeeOther("/play/")
   }
+
+  def register() = Action.async(BodyParsers.parse.form(UserController.registrationForm)) { req =>
+    async {
+      val reg = loginService.register_user(
+        id = req.body.id,
+        name = req.body.name,
+        nickname = req.body.nickname,
+        email = await(loginService.getEmailFromToken(req.body.token)),
+        registrationDate = LocalDateTime.now()
+      )
+      await(reg) match {
+        case None =>
+          Option(req.body.redirect).filter(_.nonEmpty) match {
+            case Some(redirect) => SeeOther(redirect)
+            case None => SeeOther(s"/player/?id=${req.body.id}")
+          }
+        case Some(errors) =>
+          Unauthorized(s"Could not register you because\n: ${errors.mkString("\n")}")
+      }
+    }
+  }
 }
 
 object UserController {
@@ -97,5 +121,20 @@ object UserController {
     )(IdToken.apply)(IdToken.unapply)
   )
 
+  case class RegistrationForm(nickname: String,
+                              name: String,
+                              id: String,
+                              token: String,
+                              redirect: String)
+
+  val registrationForm = Form(
+    mapping(
+      "nickname" -> text,
+      "name" -> text,
+      "id" -> text,
+      "token" -> text,
+      "redirect" -> text
+    )(RegistrationForm.apply)(RegistrationForm.unapply)
+  )
 
 }

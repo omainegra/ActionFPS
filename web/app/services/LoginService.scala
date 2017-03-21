@@ -5,9 +5,11 @@ import java.time.{LocalDateTime, ZoneId}
 import javax.inject._
 
 import com.actionfps.accumulation.user.User
+import controllers.Admin
 import play.api.Configuration
 import play.api.libs.json.JsObject
 import play.api.libs.ws.WSClient
+import providers.ReferenceProvider
 import rapture.json._
 import rapture.json.jsonBackends.play._
 
@@ -18,30 +20,39 @@ import scala.concurrent.{ExecutionContext, Future}
   * Created by me on 21/03/2017.
   */
 @Singleton
-class LoginService(spreadsheetId: String)(implicit executionContext: ExecutionContext, wsClient: WSClient) {
+class LoginService(spreadsheetId: String, apiKey: String)(implicit executionContext: ExecutionContext, wsClient: WSClient,
+                                                          referenceProvider: ReferenceProvider, admin: Admin) {
 
-  @Inject() def this(configuration: Configuration)(implicit executionContext: ExecutionContext, wsClient: WSClient) =
-    this(configuration.underlying.getString("spreadsheet-id"))
+  @Inject() def this(configuration: Configuration)(implicit executionContext: ExecutionContext, wsClient: WSClient,
+                                                   referenceProvider: ReferenceProvider, admin: Admin) =
+    this(configuration.underlying.getString("spreadsheet-id"), configuration.underlying.getString("sheets-api-key"))
 
   val SheetNicknames = "Nicknames"
   val SheetRegistrations = "Registrations"
 
-  def register_user(id: String, name: String, nickname: String, email: String, registrationDate: String): Option[List[String]] = {
-    val errors = LoginService.verifyRegistration(???)(nickname, id, name, email)
-    errors match {
-      case None =>
-        val url = s"https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Registrations:append"
-        val postBody: JsObject = json"""{"values": [[
-          ${id},${name},${email},${DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now().atZone(ZoneId.of("UTC")))}
+  def register_user(id: String, name: String, nickname: String, email: String, registrationDate: LocalDateTime): Future[Option[List[String]]] = {
+    import scala.async.Async._
+    async {
+      val errors = {
+        LoginService
+          .verifyRegistration(await(referenceProvider.users))(nickname, id, name, email)
+      }
+      errors match {
+        case None =>
+          val url = s"https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Registrations:append"
+          val postBody: JsObject = json"""{"values": [[
+          ${id},${name},${email},${DateTimeFormatter.ISO_DATE_TIME.format(registrationDate.atZone(ZoneId.of("UTC")))}
           ]]}""".as[JsObject]
-        val url2 = s"https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Nicknames:append"
-        val postBody2: JsObject = json"""{"values": [[
-          ${DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now().atZone(ZoneId.of("UTC")))},${id},${nickname}
+          val url2 = s"https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Nicknames:append"
+          val postBody2: JsObject = json"""{"values": [[
+          ${DateTimeFormatter.ISO_DATE_TIME.format(registrationDate.atZone(ZoneId.of("UTC")))},${id},${nickname}
           ]]}""".as[JsObject]
-        wsClient.url(url).post(postBody)
-        wsClient.url(url2).post(postBody2)
-        None
-      case other => other
+          await(wsClient.url(url).withQueryString("key" -> apiKey).post(postBody))
+          await(wsClient.url(url2).withQueryString("key" -> apiKey).post(postBody2))
+          admin.refresh()
+          None
+        case other => other
+      }
     }
   }
 
