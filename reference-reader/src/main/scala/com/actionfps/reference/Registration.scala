@@ -10,8 +10,8 @@ import org.apache.commons.csv.CSVFormat
 
 import scala.util.Try
 
-case class Registration(id: String, name: String, email: RegistrationEmail, registrationDate: LocalDateTime, currentNickname: String) {
-  def toCsvLine: String = List(id, name, email.stringValue, Registration.dtf.format(registrationDate), currentNickname).mkString(",")
+case class Registration(id: String, name: String, email: RegistrationEmail, registrationDate: LocalDateTime) {
+  def toCsvLine: String = List(id, name, email.stringValue, Registration.dtf.format(registrationDate)).mkString(",")
 
   def secured(implicit publicKey: PublicKey): Registration = email match {
     case p: PlainRegistrationEmail => copy(email = p.secured)
@@ -43,7 +43,6 @@ object Registration {
     CSVFormat.EXCEL.withHeader().parse(input).asScala.flatMap { rec =>
       for {
         id <- Option(rec.get(idColumn)).filter(_.nonEmpty)
-        currentNickname <- Option(rec.get(currentNicknameColumn)).filter(_.nonEmpty)
         name <- Option(rec.get(nameColumn)).filter(_.nonEmpty)
         email <- Option(rec.get(emailColumn)).filter(_.nonEmpty).map(RegistrationEmail.fromString).flatMap(_.right.toOption)
         registrationDate <- Try(LocalDateTime.parse(rec.get(registrationDateColumn), dtf))
@@ -52,8 +51,7 @@ object Registration {
         id = id,
         name = name,
         email = email,
-        registrationDate = registrationDate,
-        currentNickname = currentNickname
+        registrationDate = registrationDate
       )
     }.toList
   }

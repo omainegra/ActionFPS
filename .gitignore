@@ -70,3 +70,4 @@ cache.tmp
 serverlog_*
 geoip-resources
 test.db
+/users/
