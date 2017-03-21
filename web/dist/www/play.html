@@ -201,7 +201,7 @@ $ ./ActionFPS/install.sh</code></pre>
         var root = document.querySelector("#questions");
         root.setAttribute("data-stage", "wait-google");
 
-        var rootUrl = "https://script.google.com/macros/s/AKfycbw2na0_P4atptBWe_AXn2TJECge8POwV-3ai5QGJ2hd25TffWtY/exec";
+        var rootUrl = "/player/by-email/";
         function onSignIn(googleUser) {
             var profile = googleUser.getAuthResponse();
             $("#token").val(profile.id_token);
