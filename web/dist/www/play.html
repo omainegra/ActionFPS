@@ -87,6 +87,7 @@
     </section>
 
     <style scoped>
+        .af { display:none }
         #download-game[data-platform] .platform-id {
             display: none
         }
@@ -110,6 +111,9 @@
 
     <section id="signed-in">
         <div id="download-game">
+            <h2>Download &amp; install AssaultCube</h2>
+            <p><a href="http://assault.cubers.net/download.html">Click here</a></p>
+            <div class="af">
             <h2>Download &amp; install ActionFPS</h2>
             <p class="platform" id="download-game-windows"><a href="/download-direct/game/?os=windows"
                                                               class="pure-button pure-button-primary">Download Windows
@@ -160,14 +164,17 @@ $ ./ActionFPS/install.sh</code></pre>
                 }
             </script>
         </div>
+        </div>
 
         <section id="key-part">
             <section id="key-loaded">
+                <div class="af">
                 <h2>Play now</h2>
                 <p><a class="button-error pure-button" id="connect-link">Play now (with authentication)</a></p>
                 <p>This will load your user account credentials into ActionFPS so you can play on the official
                     servers.</p>
                 <p><a href="/servers/" class="button-warning pure-button">Server list</a></p>
+                </div>
             </section>
             <section id="key-waiting">
                 <h2>We're loading your Play button...</h2>
