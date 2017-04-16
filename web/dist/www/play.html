@@ -87,7 +87,6 @@
     </section>
 
     <style scoped>
-        .af { display:none }
         #download-game[data-platform] .platform-id {
             display: none
         }
@@ -112,7 +111,7 @@
     <section id="signed-in">
         <div id="download-game">
             <h2>Download &amp; install AssaultCube</h2>
-            <p><a href="http://assault.cubers.net/download.html">Click here</a></p>
+            <p><a href="http://assault.cubers.net/download.html" class="pure-button pure-button-primary">Click here</a></p>
             <div class="af">
             <h2>Download &amp; install ActionFPS</h2>
             <p class="platform" id="download-game-windows"><a href="/download-direct/game/?os=windows"
@@ -130,13 +129,12 @@ $ ./ActionFPS/install.sh</code></pre>
             </div>
             <p class="platform" id="download-game-mac"><a href="/download-direct/game/?os=mac"
                                                           class="pure-button pure-button-primary">Download Mac OS X .dmg
-                (55MB)</a><br/>
-                Please note Mac is not well tested and the release <a
-                        href="https://github.com/ActionFPS/ActionFPS-Game/issues/101">does not work with macOS
-                    Sierra</a> and your help in fixing that would be awesome!</p>
+                (55MB)</a>
+            </p>
 
             <p id="release-info">
-                GitHub Release: <a id="release-link"></a>, <time id="release-date" is="relative-time"></time>. <span id="num-dl"></span> downloads.
+                GitHub Release: <a id="release-link"></a>, <time id="release-date" is="relative-time"></time>. <span id="num-dl"></span> downloads.<br>
+                Problems? <a href="https://github.com/ActionFPS/ActionFPS-Game/issues/98">Post here</a>.
             </p>
 
             <script type="text/javascript">
@@ -169,7 +167,7 @@ $ ./ActionFPS/install.sh</code></pre>
         <section id="key-part">
             <section id="key-loaded">
                 <div class="af">
-                <h2>Play now</h2>
+                <h2>Play ActionFPS now</h2>
                 <p><a class="button-error pure-button" id="connect-link">Play now (with authentication)</a></p>
                 <p>This will load your user account credentials into ActionFPS so you can play on the official
                     servers.</p>
