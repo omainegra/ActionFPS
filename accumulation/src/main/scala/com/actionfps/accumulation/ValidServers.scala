@@ -11,7 +11,8 @@ import com.actionfps.gameparser.enrichers.JsonGame
   * List of valid servers for log parsing. This is an append-only list of present and past servers.
   * Previously was encoding it in YAML but the parsing felt a bit pointless as this would be the
   * one and only code path to consume the data anyway.
-  * There is no other consumer for this data than the accumulator.
+  *
+  * There is no other consumer for this data than the accumulator and internal processors.
   */
 object ValidServers {
 
