@@ -2,9 +2,9 @@
 
 > [ActionFPS website](https://actionfps.com/)
 
-_See [ActionFPS Portal Development Guide](https://docs.actionfps.com/Portal-Development-Guide.html)_
-
 ## Quickstart
+
+_More detail: [ActionFPS Portal Development Guide](https://docs.actionfps.com/portal-development-guide.html)_
 
 1. Install <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">Oracle JDK 8</a> or <a href="http://openjdk.java.net/install/">OpenJDK 8</a>.
 2. Install <a href="www.scala-sbt.org">SBT</a> (<a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Mac.html">Mac</a>,
