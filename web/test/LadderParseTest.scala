@@ -32,5 +32,5 @@ class LadderParseTest extends FreeSpec with Matchers {
 }
 
 object LadderParseTest {
-  val sampleMessage = """2016-07-02T21:58:09 [92.21.240.78] egg gibbed nescio"""
+  val sampleMessage = """2016-07-02T21:58:09 [92.21.240.78:egg] egg gibbed nescio"""
 }

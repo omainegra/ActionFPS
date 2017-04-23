@@ -85,7 +85,7 @@ object LadderService {
   case class TimedUserMessageExtract(nickToUser: String => Option[String]) {
     def unapply(input: String): Option[TimedUserMessage] = {
       val localTimeSample = "2016-07-02T22:09:14"
-      val regex = s"""\\[([\\d\\.]+)\\] ([^ ]+) (.*)""".r
+      val regex = s"""\\[([^\\]]+)\\] ([^ ]+) (.*)""".r
       val firstSpace = input.indexOf(' ')
       if (firstSpace < 10) None else {
         val (time, rest) = input.splitAt(firstSpace)
