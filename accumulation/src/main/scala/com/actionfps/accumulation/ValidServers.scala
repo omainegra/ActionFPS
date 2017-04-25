@@ -159,6 +159,12 @@ object ValidServers {
       address = "califa.actionfps.com:1999"
     ),
     ValidServer(
+      logId = "califa.actionfps.com califa AssaultCube[local#1999]",
+      name = "califa 1999",
+      timezone = "UTC",
+      address = "califa.actionfps.com:1999"
+    ),
+    ValidServer(
       logId = "nordfinsh.com bonza AssaultCube[local#1999]",
       name = "bonza 1999",
       timezone = "UTC",
@@ -177,7 +183,7 @@ object ValidServers {
       address = "aura.woop.ac:7654"
     ),
     ValidServer(
-      logId = "45.34.167.87 califa ActionFPS[local#7654]",
+      logId = "califa.actionfps.com califa ActionFPS[local#7654]",
       name = "califa 7654",
       timezone = "UTC",
       address = "califa.actionfps.com:7654"
