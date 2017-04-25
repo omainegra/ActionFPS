@@ -175,6 +175,12 @@ object ValidServers {
       name = "aura 7654",
       timezone = "UTC",
       address = "aura.woop.ac:7654"
+    ),
+    ValidServer(
+      logId = "45.34.167.87 califa ActionFPS[local#7654]",
+      name = "califa 7654",
+      timezone = "UTC",
+      address = "califa.actionfps.com:7654"
     )
   )
 
