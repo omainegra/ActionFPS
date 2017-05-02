@@ -46,6 +46,7 @@ lazy val root =
   ).aggregate(
       pureAchievements,
       web,
+      logServer,
       referenceReader,
       interParser,
       accumulation,
@@ -58,6 +59,7 @@ lazy val root =
     .dependsOn(
       pureAchievements,
       web,
+      logServer,
       referenceReader,
       ladderParser,
       interParser,
@@ -68,6 +70,15 @@ lazy val root =
       challonge
     )
 
+lazy val logServer = project
+  .in(file("log-server"))
+  .enablePlugins(PlayScala)
+  .settings(
+    libraryDependencies += alpakkaFile,
+    libraryDependencies += gameParser,
+    libraryDependencies += scalatest % "test"
+  )
+
 lazy val web = project
   .enablePlugins(PlayScala)
   .dependsOn(accumulation)
@@ -76,6 +87,7 @@ lazy val web = project
   .dependsOn(jsonFormats)
   .dependsOn(challonge)
   .dependsOn(ladderParser)
+  .dependsOn(logServer)
   .enablePlugins(WebBuildInfo)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
@@ -123,16 +135,16 @@ lazy val pureAchievements =
     id = "pure-achievements",
     base = file("pure-achievements")
   ).settings(
-      libraryDependencies += gameParser
-    )
+    libraryDependencies += gameParser
+  )
 
 lazy val interParser =
   Project(
     id = "inter-parser",
     base = file("inter-parser")
   ).settings(
-      libraryDependencies += scalatest % Test
-    )
+    libraryDependencies += scalatest % Test
+  )
 
 lazy val referenceReader =
   Project(
@@ -158,17 +170,17 @@ lazy val pureClanwar =
     id = "pure-clanwar",
     base = file("pure-clanwar")
   ).settings(
-      libraryDependencies += pureGame
-    )
+    libraryDependencies += pureGame
+  )
 
 lazy val ladderParser =
   Project(
     id = "ladder-parser",
     base = file("ladder-parser")
   ).settings(
-      libraryDependencies += scalatest % "test",
-      libraryDependencies += gameParser
-    )
+    libraryDependencies += scalatest % "test",
+    libraryDependencies += gameParser
+  )
 
 lazy val pureStats =
   Project(

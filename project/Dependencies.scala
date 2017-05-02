@@ -11,7 +11,7 @@ object Dependencies {
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.3"
   val httpClientCache: ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.3"
   val scalatestPlus: ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0"
-  val alpakkaFile: ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.6"
+  val alpakkaFile: ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.7"
   val seleniumJava: ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "2.53.1"
   val seleniumHtmlUnit: ModuleID = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0"
 

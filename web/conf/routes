@@ -34,3 +34,6 @@ GET        /installed/               @controllers.UserController.redirectPlay
 GET        /uninstalled/               @controllers.UserController.redirectPlay
 
 GET         /download-direct/game/          @controllers.DownloadsController.game
+
+GET        /logs.tsv        @controllers.RawLogController.historical(from: String, to: String)
+GET        /logs           @controllers.RawLogController.stream
