@@ -34,4 +34,7 @@ object Dependencies {
 
   val raptureJsonPlay: ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M8"
 
+  val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.12.1"
+  val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.12.1"
+
 }

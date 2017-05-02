@@ -76,7 +76,10 @@ lazy val logServer = project
   .settings(
     libraryDependencies += alpakkaFile,
     libraryDependencies += gameParser,
-    libraryDependencies += scalatest % "test"
+    libraryDependencies += jwtPlayJson,
+    libraryDependencies += jwtPlay,
+    libraryDependencies += scalatest % "test",
+    initialCommands in console := "import controllers.LogController._"
   )
 
 lazy val web = project
