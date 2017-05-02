@@ -21,12 +21,13 @@ class LogController(sourceFile: Path) extends Controller {
 
   type MessageType = (ZonedDateTime, String, String)
   def stream = Action { request =>
+    val startTime = ZonedDateTime.now()
     val messageFilter: Flow[MessageType, MessageType, NotUsed] =
       request.headers.get(LastEventIdHeader) match {
         case Some(lastId) =>
           Flow[MessageType].dropWhile(
             _._1.isBefore(ZonedDateTime.parse(lastId)))
-        case None => Flow[MessageType]
+        case None => Flow[MessageType].dropWhile(_._1.isBefore(startTime))
       }
     val messagesStream = FileTailSource
       .lines(
