@@ -4,10 +4,9 @@ import java.nio.file.Path
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-import akka.NotUsed
 import akka.actor.Cancellable
 import akka.stream.alpakka.file.scaladsl.FileTailSource
-import akka.stream.scaladsl.{FileIO, Flow, Source}
+import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
 import com.actionfps.gameparser.mserver.ExtractMessage
 import controllers.LogController._
@@ -20,15 +19,13 @@ import scala.concurrent.duration._
 class LogController(sourceFile: Path) extends Controller {
 
   type MessageType = (ZonedDateTime, String, String)
+
   def stream = Action { request =>
-    val startTime = ZonedDateTime.now()
-    val messageFilter: Flow[MessageType, MessageType, NotUsed] =
-      request.headers.get(LastEventIdHeader) match {
-        case Some(lastId) =>
-          Flow[MessageType].dropWhile(
-            _._1.isBefore(ZonedDateTime.parse(lastId)))
-        case None => Flow[MessageType].dropWhile(_._1.isBefore(startTime))
-      }
+    val now = ZonedDateTime.now()
+    val startTime = request.headers
+      .get(LastEventIdHeader)
+      .map(ZonedDateTime.parse)
+      .getOrElse(now)
     val messagesStream = FileTailSource
       .lines(
         path = sourceFile,
@@ -38,7 +35,7 @@ class LogController(sourceFile: Path) extends Controller {
       .collect[MessageType] {
         case ExtractMessage(zdt, server, message) => (zdt, server, message)
       }
-      .via(messageFilter)
+      .dropWhile(_._1.isBefore(startTime))
       .map { case (z, s, m) => (z, s, LogController.filterOutIp(m)) }
       .filterNot {
         case (a, b, c) => LogController.ignorePrivateConversation(c)
