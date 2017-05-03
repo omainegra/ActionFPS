@@ -51,8 +51,9 @@ class LogController(sourceFile: Path) extends Controller {
         case (zdt, server, message) =>
           Event(
             id = Some(DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)),
-            data = message,
-            name = Some(server)
+            data = s"${DateTimeFormatter.ISO_INSTANT
+              .format(zdt.toInstant)}\t${server}\t${message}\n",
+            name = None
           )
       }
       .merge(keepAliveEventSource)
@@ -160,10 +161,10 @@ object LogController {
   }
 
   /** To issue, do:
-    * $ sbt logServer/console
-    * ...
-    * scala> issueJwt(key = "LOLOL", logAccess = LogAccess(Set("ip")), expireSeconds = 200)
-    * ey.ab.cd
-    */
+  * $ sbt logServer/console
+  * ...
+  * scala> issueJwt(key = "LOLOL", logAccess = LogAccess(Set("ip")), expireSeconds = 200)
+  * ey.ab.cd
+  */
 
 }
