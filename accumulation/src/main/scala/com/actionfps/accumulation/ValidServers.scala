@@ -17,9 +17,10 @@ import com.actionfps.gameparser.enrichers.JsonGame
 object ValidServers {
 
   private implicit def strToTz(string: String): ZoneId = ZoneId.of(string)
-  private implicit def strToOstr(string: String): Option[String] = Option(string)
+  private implicit def strToOstr(string: String): Option[String] =
+    Option(string)
 
-  val validServers = List(
+  val validServers: List[ValidServer] = List(
     ValidServer(
       logId = "104.219.54.14 tyrwoopac AssaultCube[local#1999]",
       name = "tyr 1999",
@@ -75,7 +76,8 @@ object ValidServers {
       address = "aura.woop.ac:3999"
     ),
     ValidServer(
-      logId = "62-210-131-155.rev.poneytelecom.eu sd-55104 AssaultCube[local#3999]",
+      logId =
+        "62-210-131-155.rev.poneytelecom.eu sd-55104 AssaultCube[local#3999]",
       name = "aura 3999",
       timezone = "Europe/Paris",
       address = "aura.woop.ac:3999"
@@ -93,19 +95,22 @@ object ValidServers {
       address = "aura.woop.ac:8999"
     ),
     ValidServer(
-      logId = "62-210-131-155.rev.poneytelecom.eu sd-55104 AssaultCube[local#1999]",
+      logId =
+        "62-210-131-155.rev.poneytelecom.eu sd-55104 AssaultCube[local#1999]",
       name = "aura 1999",
       timezone = "Europe/Paris",
       address = "aura.woop.ac:1999"
     ),
     ValidServer(
-      logId = "62-210-131-155.rev.poneytelecom.eu sd-55104 AssaultCube[local#2999]",
+      logId =
+        "62-210-131-155.rev.poneytelecom.eu sd-55104 AssaultCube[local#2999]",
       name = "aura 2999",
       timezone = "Europe/Paris",
       address = "aura.woop.ac:2999"
     ),
     ValidServer(
-      logId = "62-210-131-155.rev.poneytelecom.eu sd-55104 AssaultCube[local#4999]",
+      logId =
+        "62-210-131-155.rev.poneytelecom.eu sd-55104 AssaultCube[local#4999]",
       name = "aura 4999",
       timezone = "Europe/Paris",
       address = "aura.woop.ac:4999"
@@ -177,7 +182,8 @@ object ValidServers {
       address = "legal.actionfps.com:1999"
     ),
     ValidServer(
-      logId = "62-210-131-155.rev.poneytelecom.eu sd-55104 ActionFPS[local#7654]",
+      logId =
+        "62-210-131-155.rev.poneytelecom.eu sd-55104 ActionFPS[local#7654]",
       name = "aura 7654",
       timezone = "UTC",
       address = "aura.woop.ac:7654"
@@ -188,13 +194,27 @@ object ValidServers {
       timezone = "UTC",
       address = "califa.actionfps.com:7654"
     )
-  )
+  ) ++ {
+    for {
+      port <- List(1999, 2999, 3999, 4999, 7654)
+      host <- List("aura", "woop", "sd-55104")
+    } yield
+      ValidServer(
+        logId =
+          s"62-210-131-155.rev.poneytelecom.eu ${host} AssaultCube[local#${port}]",
+        name = s"aura ${port}",
+        timezone = "Europe/Paris",
+        address = s"aura.woop.ac:${port}"
+      )
+  }
 
-  implicit val fromResource = ValidServers(validServers.map(v => v.logId -> v).toMap)
+  implicit val fromResource = ValidServers(
+    validServers.map(v => v.logId -> v).toMap)
 
   object Validator {
 
-    implicit class validator(jsonGame: JsonGame)(implicit validServers: ValidServers) {
+    implicit class validator(jsonGame: JsonGame)(
+        implicit validServers: ValidServers) {
       def validateServer: Boolean = {
         val server = jsonGame.server
         validServers.items.exists(item => item._1 == server && item._2.isValid)
@@ -203,12 +223,15 @@ object ValidServers {
 
   }
 
-  case class ValidServer(logId: String, name: String, timezone: ZoneId, address: Option[String] = None, invalid: Option[Boolean] = None) {
+  case class ValidServer(logId: String,
+                         name: String,
+                         timezone: ZoneId,
+                         address: Option[String] = None,
+                         invalid: Option[Boolean] = None) {
     def isValid: Boolean = !invalid.contains(true)
   }
 
 }
-
 
 case class ValidServers(items: Map[String, ValidServer]) {
 
@@ -217,9 +240,8 @@ case class ValidServers(items: Map[String, ValidServer]) {
   }
 
   object AddressFromLog {
-    def unapply(string: String): Option[String] = items.get(string).flatMap(_.address)
+    def unapply(string: String): Option[String] =
+      items.get(string).flatMap(_.address)
   }
 
 }
-
-
