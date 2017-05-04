@@ -70,7 +70,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
       finally sr.close()
     }
 
-    def rawNicknames: Future[String] = fetch(NicknamesKey)
+    private def rawNicknames: Future[String] = fetch(NicknamesKey)
 
     def nicknames: Future[List[NicknameRecord]] = rawNicknames.map { bdy =>
       val sr = new StringReader(bdy)

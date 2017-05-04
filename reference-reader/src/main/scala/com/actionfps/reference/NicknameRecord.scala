@@ -12,7 +12,7 @@ case class NicknameRecord(from: LocalDateTime, id: String, nickname: String)
 object NicknameRecord {
   def parseRecords(input: Reader): List[NicknameRecord] = {
     import collection.JavaConverters._
-    CSVFormat.EXCEL.parse(input).asScala.flatMap { rec =>
+    CSVFormat.EXCEL.withDelimiter('\t').parse(input).asScala.flatMap { rec =>
       for {
         from <- Try(parseLocalDateTime(rec.get(0))).toOption
         id <- Option(rec.get(1)).filter(_.nonEmpty)

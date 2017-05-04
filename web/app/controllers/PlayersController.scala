@@ -56,8 +56,6 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
       request.getQueryString("format") match {
         case Some("registrations-csv") =>
           Ok(await(referenceProvider.Users.registrations)).as("text/csv")
-        case Some("nicknames-csv") =>
-          Ok(await(referenceProvider.Users.rawNicknames)).as("text/csv")
         case Some("json") =>
           Ok(Json.toJson(await(referenceProvider.Users.users)))
         case _ =>
