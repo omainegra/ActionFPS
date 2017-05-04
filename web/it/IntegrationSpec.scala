@@ -81,11 +81,11 @@ class IntegrationSpec
     }
     "Provide a master server" in {
       go to s"$root/retrieve.do?abc"
-      pageSource must include("1337")
+      pageSource must include("7654")
     }
     "Provide a master server /ms/" in {
       go to s"$root/ms/"
-      pageSource must include("1337")
+      pageSource must include("7654")
     }
   }
 
