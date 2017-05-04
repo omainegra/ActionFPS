@@ -5,7 +5,7 @@ name := "actionfps"
 organization in ThisBuild := "com.actionfps"
 javaOptions in ThisBuild += "-Duser.timezone=UTC"
 javaOptions in run in ThisBuild += "-Duser.timezone=UTC"
-scalaVersion in ThisBuild := "2.12.1"
+scalaVersion in ThisBuild := "2.12.2"
 scalacOptions in ThisBuild := Seq(
   "-unchecked",
   "-deprecation",
@@ -111,7 +111,7 @@ lazy val web = project
       playIterateesStreams,
       seleniumHtmlUnit % "it",
       seleniumJava % "it",
-      cache
+      ehcache
     ),
     javaOptions in IntegrationTest ++= Seq(
       s"-Dgeolitecity.dat=${geoLiteCity.value}"
