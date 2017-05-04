@@ -40,10 +40,6 @@ fork in Test in ThisBuild := true
 
 git.remoteRepo in ThisBuild := "git@github.com:ScalaWilliam/ActionFPS.git"
 
-import java.util.Base64
-import com.hazelcast.core.{HazelcastInstance, Hazelcast}
-import org.eclipse.jgit.revwalk.RevWalk
-
 lazy val root =
   Project(
     id = "actionfps",
@@ -51,6 +47,7 @@ lazy val root =
   ).aggregate(
       pureAchievements,
       web,
+      logServer,
       referenceReader,
       interParser,
       accumulation,
@@ -63,6 +60,7 @@ lazy val root =
     .dependsOn(
       pureAchievements,
       web,
+      logServer,
       referenceReader,
       ladderParser,
       interParser,
@@ -73,6 +71,18 @@ lazy val root =
       challonge
     )
 
+lazy val logServer = project
+  .in(file("log-server"))
+  .enablePlugins(PlayScala)
+  .settings(
+    libraryDependencies += alpakkaFile,
+    libraryDependencies += gameParser,
+    libraryDependencies += jwtPlayJson,
+    libraryDependencies += jwtPlay,
+    libraryDependencies += scalatest % "test",
+    initialCommands in console := "import controllers.LogController._"
+  )
+
 lazy val web = project
   .enablePlugins(PlayScala)
   .dependsOn(accumulation)
@@ -81,7 +91,8 @@ lazy val web = project
   .dependsOn(jsonFormats)
   .dependsOn(challonge)
   .dependsOn(ladderParser)
-  .enablePlugins(BuildInfoPlugin)
+  .dependsOn(logServer)
+  .enablePlugins(WebBuildInfo)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
@@ -113,65 +124,33 @@ lazy val web = project
       seleniumJava % "it",
       ehcache
     ),
-    javaOptions in IntegrationTest ++= Seq(
-      s"-Dgeolitecity.dat=${geoLiteCity.value}"
-    ),
+    javaOptions in IntegrationTest += s"-Dgeolitecity.dat=${geoLiteCity.value}",
     PlayKeys.playRunHooks += HazelcastRunHook(),
     scriptClasspath := Seq("*", "../conf/"),
-    buildInfoKeys := Seq[BuildInfoKey](
-      name,
-      version,
-      buildInfoBuildNumber,
-      git.gitHeadCommit,
-      gitCommitDescription
-    ),
     mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map {
       f =>
         f -> s"resources/${f.getName}"
-    },
-    gitCommitDescription := {
-      com.typesafe.sbt.SbtGit.GitKeys.gitReader.value.withGit {
-        interface =>
-          for {
-            sha <- git.gitHeadCommit.value
-            interface <- Option(interface).collect {
-              case i: com.typesafe.sbt.git.JGit => i
-            }
-            ref <- Option(interface.repo.resolve(sha))
-            message <- {
-              val walk = new RevWalk(interface.repo)
-              try Option(walk.parseCommit(ref.toObjectId)).flatMap(commit =>
-                Option(commit.getFullMessage))
-              finally walk.dispose()
-            }
-          } yield message
-      }
-    }.map { str =>
-      Base64.getEncoder.encodeToString(str.getBytes("UTF-8"))
     },
     version := "5.0",
     buildInfoPackage := "af",
     buildInfoOptions += BuildInfoOption.ToJson
   )
 
-lazy val gitCommitDescription =
-  SettingKey[Option[String]]("gitCommitDescription", "Base64-encoded!")
-
 lazy val pureAchievements =
   Project(
     id = "pure-achievements",
     base = file("pure-achievements")
   ).settings(
-      libraryDependencies += gameParser
-    )
+    libraryDependencies += gameParser
+  )
 
 lazy val interParser =
   Project(
     id = "inter-parser",
     base = file("inter-parser")
   ).settings(
-      libraryDependencies += scalatest % Test
-    )
+    libraryDependencies += scalatest % Test
+  )
 
 lazy val referenceReader =
   Project(
@@ -197,17 +176,17 @@ lazy val pureClanwar =
     id = "pure-clanwar",
     base = file("pure-clanwar")
   ).settings(
-      libraryDependencies += pureGame
-    )
+    libraryDependencies += pureGame
+  )
 
 lazy val ladderParser =
   Project(
     id = "ladder-parser",
     base = file("ladder-parser")
   ).settings(
-      libraryDependencies += scalatest % "test",
-      libraryDependencies += gameParser
-    )
+    libraryDependencies += scalatest % "test",
+    libraryDependencies += gameParser
+  )
 
 lazy val pureStats =
   Project(

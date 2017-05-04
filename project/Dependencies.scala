@@ -37,4 +37,7 @@ object Dependencies {
 
   val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.0-M7"
 
+  val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.12.1"
+  val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.12.1"
+
 }

@@ -110,6 +110,9 @@
 
     <section id="signed-in">
         <div id="download-game">
+            <h2>Download &amp; install AssaultCube</h2>
+            <p><a href="http://assault.cubers.net/download.html" class="pure-button pure-button-primary">Click here</a></p>
+            <div class="af">
             <h2>Download &amp; install ActionFPS</h2>
             <p class="platform" id="download-game-windows"><a href="/download-direct/game/?os=windows"
                                                               class="pure-button pure-button-primary">Download Windows
@@ -124,15 +127,17 @@ $ sudo apt-get install libsdl1.2debian libsdl-image1.2 zlib1g libogg0 libvorbis0
 $ ./ActionFPS/install.sh</code></pre>
 
             </div>
-            <p class="platform" id="download-game-mac"><a href="/download-direct/game/?os=mac"
+            <p class="platform" id="download-game-mac"><a href="/download-direct/game/?os=mac" style="display:none"
                                                           class="pure-button pure-button-primary">Download Mac OS X .dmg
-                (55MB)</a><br/>
-                Please note Mac is not well tested and the release <a
-                        href="https://github.com/ActionFPS/ActionFPS-Game/issues/101">does not work with macOS
-                    Sierra</a> and your help in fixing that would be awesome!</p>
+                (55MB)</a>
+                Sorry, automated Mac builds are not available, you may need to <a href="https://github.com/ActionFPS/ActionFPS-Game#mac">build one yourself</a>.
+            </p>
 
             <p id="release-info">
-                GitHub Release: <a id="release-link"></a>, <time id="release-date" is="relative-time"></time>. <span id="num-dl"></span> downloads.
+                GitHub Release: <a id="release-link"></a>, <time id="release-date" is="relative-time"></time>. <span id="num-dl"></span> downloads.</p>
+
+                <p>
+                Problems? <a href="https://github.com/ActionFPS/ActionFPS-Game/issues/98">Post here</a>.
             </p>
 
             <script type="text/javascript">
@@ -160,14 +165,18 @@ $ ./ActionFPS/install.sh</code></pre>
                 }
             </script>
         </div>
+        </div>
 
         <section id="key-part">
             <section id="key-loaded">
-                <h2>Play now</h2>
+                <div class="af">
+                <h2>Play ActionFPS now</h2>
                 <p><a class="button-error pure-button" id="connect-link">Play now (with authentication)</a></p>
                 <p>This will load your user account credentials into ActionFPS so you can play on the official
                     servers.</p>
-                <p><a href="/servers/" class="button-warning pure-button">Server list</a></p>
+
+                </div>
+                                <p><a href="/servers/" class="button-warning pure-button">Server list</a></p>
             </section>
             <section id="key-waiting">
                 <h2>We're loading your Play button...</h2>
