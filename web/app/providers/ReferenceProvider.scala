@@ -43,7 +43,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
   }
 
   object Clans {
-    def csv: Future[String] = fetch(ClansKey)
+    private def csv: Future[String] = fetch(ClansKey)
 
     def clans: Future[List[Clan]] = csv.map { bdy =>
       val sr = new StringReader(bdy)
@@ -53,7 +53,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
   }
 
   object Servers {
-    def raw: Future[String] = fetch(ServersKey)
+    private def raw: Future[String] = fetch(ServersKey)
 
     def servers: Future[List[ServerRecord]] = raw.map { bdy =>
       val sr = new StringReader(bdy)
