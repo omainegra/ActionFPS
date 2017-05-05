@@ -9,7 +9,7 @@ cache:
     - $HOME/.sbt/boot/
     - geoip-resources
 before_script:
-  - chmod +x /usr/local/bin/sbt
+  - sudo chmod +x /usr/local/bin/sbt
 script:
   - sbt test it:test
 jdk:
