@@ -8,7 +8,7 @@ import org.scalatest.{FunSuite, Matchers, OptionValues}
 class NicknamesTest extends FunSuite with Matchers with OptionValues {
 
   test("It should parse both") {
-    val r = NicknameRecord.parseRecords(getSample("nicknames.csv"))
+    val r = NicknameRecord.parseRecords(getSample("nicknames.tsv"))
     r should have size 139
   }
 
