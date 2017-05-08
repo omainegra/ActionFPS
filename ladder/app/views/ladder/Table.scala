@@ -1,8 +1,7 @@
 package views.ladder
 
+import java.nio.file.Path
 import com.actionfps.ladder.parser.Aggregate
-import controllers.LadderController.PlayerNamer
-import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import play.twirl.api.Html
 
@@ -11,9 +10,18 @@ import play.twirl.api.Html
   */
 object Table {
 
-  private def ladderTableHtmlPath = WebTemplateRender.wwwLocation.resolve("ladder_table.html")
 
-  def render(aggregate: com.actionfps.ladder.parser.Aggregate)(showTime: Boolean = false)(implicit playerNamer: PlayerNamer): Html = {
+  trait PlayerNamer {
+    def nameOf(user: String): Option[String]
+  }
+
+  object PlayerNamer {
+    def fromMap(map: Map[String, String]): PlayerNamer = new PlayerNamer {
+      override def nameOf(user: String): Option[String] = map.get(user)
+    }
+  }
+
+  def render(ladderTableHtmlPath: Path, aggregate: com.actionfps.ladder.parser.Aggregate)(showTime: Boolean = false)(implicit playerNamer: PlayerNamer): Html = {
     val doc = Jsoup.parse(ladderTableHtmlPath.toFile, "UTF-8")
     val tr = doc.select("tbody > tr")
     aggregate.ranked.map { case Aggregate.RankedStat(id, rankM1, us) =>

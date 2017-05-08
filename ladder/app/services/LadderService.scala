@@ -3,72 +3,60 @@ package services
 /**
   * Created by me on 09/05/2016.
   */
+
 import java.time.{LocalDateTime, ZoneOffset, ZonedDateTime}
-import javax.inject._
 
 import akka.NotUsed
-import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import akka.util.ByteString
 import com.actionfps.ladder.parser._
 import play.api.Configuration
-import play.api.inject.ApplicationLifecycle
-import play.api.mvc.Controller
-import providers.ReferenceProvider
+import services.LadderService.NickToUser
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class LadderService(commands: List[List[String]])
+class LadderService(commands: List[List[String]], usersMap: () => Future[NickToUser])
                    (implicit executionContext: ExecutionContext,
-                    applicationLifecycle: ApplicationLifecycle,
-                    referenceProvider: ReferenceProvider,
-                    actorSystem: ActorSystem) extends Controller {
-
-  @Inject() def this(configuration: Configuration)
-                    (implicit executionContext: ExecutionContext,
-                     applicationLifecycle: ApplicationLifecycle,
-                     referenceProvider: ReferenceProvider,
-                     actorSystem: ActorSystem) = {
-    this(LadderService.getSourceCommands(configuration, "af.ladder.sources"))
-  }
+                    actorMaterializer: ActorMaterializer) {
 
   private val agg = Agent(KeyedAggregate.empty[String])
 
-  implicit val actorMat = ActorMaterializer()
-
   def aggregate: Aggregate = agg.get().total
 
-  private val usersMap = {
-    referenceProvider.users.map {
-      users =>
-        users.map(user => user.nickname.nickname -> user.id).toMap.get _
+  def run(): Unit = {
+    // TODO flatten it so it reports errors better.
+    commands.foreach { command =>
+      StreamConverters.fromInputStream(() => {
+        new java.lang.ProcessBuilder(command: _*)
+          .start()
+          .getInputStream
+      })
+        .via(Framing.delimiter(ByteString.fromString("\n", "UTF-8"), 2096, allowTruncation = false))
+        .map(_.decodeString("UTF-8"))
+        .via(LadderService.individualServerFlow(usersMap))
+        .alsoTo(Sink.foreach { g => agg.send(_.includeAggregate(s"$command")(g)) })
+        .runWith(Sink.ignore)
     }
-  }
-
-  // TODO flatten it so it reports errors better.
-  commands.foreach { command =>
-    StreamConverters.fromInputStream(() => {
-      new java.lang.ProcessBuilder(command: _*)
-        .start()
-        .getInputStream
-    })
-      .via(Framing.delimiter(ByteString.fromString("\n", "UTF-8"), 2096, allowTruncation = false))
-      .map(_.decodeString("UTF-8"))
-      .via(LadderService.individualServerFlow(() => usersMap))
-      .alsoTo(Sink.foreach { g => agg.send(_.includeAggregate(s"$command")(g)) })
-      .to(Sink.ignore)
-      .run()
   }
 
 }
 
 object LadderService {
 
-  def individualServerFlow(nickToUser: () => Future[String => Option[String]])
+  trait NickToUser {
+    def userOfNickname(nickname: String): Option[String]
+  }
+
+  object NickToUser {
+    def empty: NickToUser = new NickToUser {
+      override def userOfNickname(nickname: String): Option[String] = None
+    }
+  }
+
+  def individualServerFlow(nickToUser: () => Future[NickToUser])
                           (implicit executionContext: ExecutionContext): Flow[String, Aggregate, NotUsed] = {
     Flow[String]
       .scanAsync(Aggregate.empty) {
@@ -82,7 +70,7 @@ object LadderService {
       }
   }
 
-  case class TimedUserMessageExtract(nickToUser: String => Option[String]) {
+  case class TimedUserMessageExtract(nickToUser: NickToUser) {
     def unapply(input: String): Option[TimedUserMessage] = {
       val localTimeSample = "2016-07-02T22:09:14"
       val regex = s"""\\[([^\\]]+)\\] ([^ ]+) (.*)""".r
@@ -98,7 +86,7 @@ object LadderService {
         }
         msg match {
           case regex(ip, nickname, mesg) =>
-            nickToUser(nickname) match {
+            nickToUser.userOfNickname(nickname) match {
               case Some(user) =>
                 Some(TimedUserMessage(instant, user, mesg))
               case _ => None

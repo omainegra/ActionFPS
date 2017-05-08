@@ -36,7 +36,11 @@ class ReferenceProvider @Inject()(configuration: Configuration,
     cacheApi.get[String](key) match {
       case Some(value) => value
       case None =>
-        val value = await(wSClient.url(configuration.underlying.getString(s"af.reference.${key}")).get().filter(_.status == 200).map(_.body))
+        val url = configuration.underlying.getString(s"af.reference.${key}")
+        val value = await(wSClient.url(url).get()) match {
+          case r if r.status == 200 => r.body
+          case other => throw new RuntimeException(s"Received unexpected response ${other.status} for ${url}")
+        }
         cacheApi.set(key, value, Duration.apply("1h"))
         value
     }

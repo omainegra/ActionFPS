@@ -44,24 +44,24 @@ lazy val root =
     id = "actionfps",
     base = file(".")
   ).aggregate(
-      pureAchievements,
-      web,
-      logServer,
-      referenceReader,
-      interParser,
-      accumulation,
-      ladderParser,
-      pureClanwar,
-      pureStats,
-      jsonFormats,
-      challonge
-    )
+    pureAchievements,
+    web,
+    logServer,
+    referenceReader,
+    interParser,
+    accumulation,
+    ladderParser,
+    ladder,
+    pureClanwar,
+    pureStats,
+    jsonFormats,
+    challonge
+  )
     .dependsOn(
       pureAchievements,
       web,
       logServer,
       referenceReader,
-      ladderParser,
       interParser,
       accumulation,
       pureClanwar,
@@ -89,15 +89,15 @@ lazy val web = project
   .dependsOn(pureStats)
   .dependsOn(jsonFormats)
   .dependsOn(challonge)
-  .dependsOn(ladderParser)
+  .dependsOn(ladder)
   .dependsOn(logServer)
   .enablePlugins(WebBuildInfo)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
-    publishArtifact in (Compile, packageDoc) := false,
+    publishArtifact in(Compile, packageDoc) := false,
     publishArtifact in packageDoc := false,
-    sources in (Compile, doc) := Seq.empty,
+    sources in(Compile, doc) := Seq.empty,
     scalaSource in IntegrationTest := baseDirectory.value / "it",
     fork in run := true,
     libraryDependencies ++= Seq(
@@ -179,11 +179,27 @@ lazy val pureClanwar =
 lazy val ladderParser =
   Project(
     id = "ladder-parser",
-    base = file("ladder-parser")
+    base = file("ladder/ladder-parser")
   ).settings(
     libraryDependencies += scalatest % "test",
     libraryDependencies += gameParser
   )
+
+lazy val ladder =
+  Project(
+    id = "ladder",
+    base = file("ladder")
+  )
+    .enablePlugins(PlayScala)
+    .dependsOn(ladderParser)
+    .settings(
+      libraryDependencies += alpakkaFile,
+      libraryDependencies += scalatest % "test",
+      libraryDependencies += gameParser,
+      libraryDependencies += async,
+      libraryDependencies += akkaAgent,
+      libraryDependencies += jsoup
+    )
 
 lazy val pureStats =
   Project(

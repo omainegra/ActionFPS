@@ -4,7 +4,8 @@
 
 @import com.actionfps.players.PlayersStats
 @import com.actionfps.stats.Clanstats
-@import controllers.LadderController.PlayerNamer
+@import views.ladder.Table.PlayerNamer
+@import lib.WebTemplateRender
 @(games: List[MixedGame], events: List[Map[String, String]],
         latestClanwars: List[com.actionfps.clans.ClanwarMeta],
         bulletin: Option[services.NewsService.NewsItems],
@@ -35,7 +36,7 @@
     </ol>
 </div>
 
-@views.ladder.Table.render(ladder)(showTime = false)
+@views.ladder.Table.render(WebTemplateRender.wwwLocation.resolve("ladder_table.html"), ladder)(showTime = false)
 @views.PlayerRanks.render(playersStats)
 @views.ClanRankings.render(clanStats)
 
