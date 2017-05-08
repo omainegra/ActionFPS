@@ -1,4 +1,4 @@
-package com.actionfps.reference
+package com.actionfps.accumulation
 
 import java.util.Properties
 

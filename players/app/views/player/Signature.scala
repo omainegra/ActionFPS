@@ -2,7 +2,7 @@ package views.player
 
 import java.nio.file.{Files, Path}
 
-import com.actionfps.reference.Maps
+import com.actionfps.accumulation.Maps
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser
 import play.api.mvc._

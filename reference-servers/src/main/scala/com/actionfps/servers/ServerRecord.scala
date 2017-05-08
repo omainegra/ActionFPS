@@ -1,4 +1,4 @@
-package com.actionfps.reference
+package com.actionfps.servers
 
 import java.io.Reader
 import java.net.URI

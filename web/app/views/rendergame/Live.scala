@@ -1,6 +1,6 @@
 package views.rendergame
 
-import com.actionfps.reference.ServerRecord
+import com.actionfps.servers.ServerRecord
 import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import play.twirl.api.Html

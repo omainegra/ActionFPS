@@ -1,7 +1,7 @@
-package com.actionfps.reference
+package com.actionfps.accumulation
 
+import org.scalatest.Matchers._
 import org.scalatest._
-import Matchers._
 
 /**
   * Created by me on 18/01/2017.

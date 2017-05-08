@@ -1,7 +1,7 @@
 package views.rendergame
 
+import com.actionfps.accumulation.Maps
 import com.actionfps.gameparser.enrichers.{JsonGame, JsonGamePlayer}
-import com.actionfps.reference.Maps
 
 case class NowServer(server: String)
 

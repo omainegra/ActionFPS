@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import com.actionfps.reference.ServerRecord
+import com.actionfps.servers.ServerRecord
 import play.api.Configuration
 import play.api.mvc.{Action, AnyContent, Controller}
 import providers.ReferenceProvider

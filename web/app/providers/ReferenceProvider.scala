@@ -4,7 +4,6 @@ import java.io.StringReader
 import javax.inject.{Inject, Singleton}
 
 import com.actionfps.accumulation.Clan
-import com.actionfps.reference._
 import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.libs.json.Json
@@ -14,6 +13,7 @@ import scala.async.Async._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import com.actionfps.formats.json.Formats._
+import com.actionfps.servers.ServerRecord
 import com.actionfps.user.{NicknameRecord, Registration, User}
 
 /**

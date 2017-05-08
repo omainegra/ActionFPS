@@ -3,7 +3,7 @@ package controllers
 import java.time.{Instant, ZonedDateTime}
 import javax.inject.Inject
 
-import com.actionfps.accumulation.Clan
+import com.actionfps.accumulation.{Clan, Maps}
 import com.actionfps.accumulation.user.FullProfile
 import com.actionfps.user.Nickname.CurrentNickname
 import com.actionfps.api.{Game, GameAchievement, GamePlayer, GameTeam}
@@ -11,7 +11,6 @@ import com.actionfps.clans.{ClanNamer, CompleteClanwar}
 import com.actionfps.ladder.parser.Aggregate.RankedStat
 import com.actionfps.ladder.parser.UserStatistics
 import com.actionfps.pinger._
-import com.actionfps.reference.Maps
 import com.actionfps.user.RegistrationEmail.PlainRegistrationEmail
 import com.actionfps.user.User
 import lib.{Clanner, WebTemplateRender}

@@ -12,8 +12,8 @@ import akka.actor.{ActorSystem, Kill}
 import akka.agent.Agent
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
+import com.actionfps.accumulation.Maps
 import com.actionfps.pinger._
-import com.actionfps.reference.Maps
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
