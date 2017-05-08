@@ -15,6 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import com.actionfps.formats.json.Formats._
 import com.actionfps.servers.ServerRecord
 import com.actionfps.user.{NicknameRecord, Registration, User}
+import controllers.ProvidesServers
 
 /**
   * Created by William on 01/01/2016.
@@ -25,7 +26,8 @@ import com.actionfps.user.{NicknameRecord, Registration, User}
 class ReferenceProvider @Inject()(configuration: Configuration,
                                   cacheApi: CacheApi)
                                  (implicit wSClient: WSClient,
-                                  executionContext: ExecutionContext) {
+                                  executionContext: ExecutionContext)
+extends ProvidesServers {
 
   import ReferenceProvider._
 

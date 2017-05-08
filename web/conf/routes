@@ -16,16 +16,16 @@ GET         /player/by-email/               @controllers.PlayersController.playe
 GET         /player/signature.svg           @controllers.PlayersController.playerSig(id: String)
 GET         /playerranks/                   @controllers.PlayersController.rankings
 GET         /hof/                           @controllers.PlayersController.hof
-GET         /servers/                       @controllers.MiscController.servers
-GET         /ms/                            @controllers.Masterserver.ms
-GET         /retrieve.do                    @controllers.Masterserver.ms
+GET         /servers/                       @controllers.ServersController.servers
+GET         /ms/                            @controllers.MasterServerController.ms
+GET         /retrieve.do                    @controllers.MasterServerController.ms
 GET         /server-updates/                @controllers.EventStreamController.serverUpdates
 GET         /recent-games/                  @controllers.GamesController.recentGames
 GET         /new-games/                     @controllers.EventStreamController.newGames
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
 GET         /ladder/                        @controllers.LadderController.ladder
 GET         /event-stream/                  @controllers.EventStreamController.eventStream
-GET         /version/                       @controllers.MiscController.version
+GET         /version/                       @controllers.VersionController.version
 GET         /user/auth-token/               @controllers.UserController.authTokenGet
 POST        /user/auth-token/               @controllers.UserController.authTokenPost
 GET        /register-play/               @controllers.UserController.redirectPlay

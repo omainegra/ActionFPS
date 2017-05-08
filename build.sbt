@@ -53,7 +53,7 @@ lazy val root =
     jsonFormats,
     clans,
     players,
-    referenceServers
+    servers
   )
 
 lazy val logServer = project
@@ -78,6 +78,7 @@ lazy val web = project
   .dependsOn(clansChallonge)
   .dependsOn(ladder)
   .dependsOn(logServer)
+  .dependsOn(servers)
   .enablePlugins(WebBuildInfo)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
@@ -302,9 +303,20 @@ lazy val playerAchievements =
 lazy val referenceServers =
   Project(
     id = "reference-servers",
-    base = file("reference-servers")
+    base = file("servers/reference-servers")
   ).settings(
     libraryDependencies += scalatest % Test,
     libraryDependencies += commonsCsv,
     libraryDependencies += kantanCsv
   )
+
+lazy val servers =
+  Project(
+    id = "servers",
+    base = file("servers")
+  ).enablePlugins(PlayScala)
+    .dependsOn(referenceServers)
+    .aggregate(referenceServers)
+    .settings(
+      libraryDependencies += async
+    )
