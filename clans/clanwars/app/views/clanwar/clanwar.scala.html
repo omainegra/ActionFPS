@@ -1,0 +1,13 @@
+@import views.clanwar.Clanwar
+@import com.actionfps.api.Game
+@import java.nio.file.Path
+@import views.clanwar.Clanwar.ClanIdToClan
+@(clanwarHtmlPath: Path, clanwarMeta: com.actionfps.clans.ClanwarMeta, showPlayers: Boolean, showGames: Boolean, renderGame: Game => Html)(implicit clanner: ClanIdToClan)
+<div id="game">
+    @Clanwar.render(clanwarHtmlPath, clanwarMeta, showPlayers)
+    @if(showGames) {
+        @clanwarMeta.games.map { game =>
+            @renderGame(game)
+        }
+    }
+</div>

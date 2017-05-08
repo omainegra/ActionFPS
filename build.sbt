@@ -51,10 +51,9 @@ lazy val root =
       inters,
       accumulation,
       ladder,
-      pureClanwar,
       pureStats,
       jsonFormats,
-      challonge
+      clans
     )
     .dependsOn(
       pureAchievements,
@@ -63,10 +62,7 @@ lazy val root =
       referenceReader,
       interParser,
       accumulation,
-      pureClanwar,
-      pureStats,
-      jsonFormats,
-      challonge
+      jsonFormats
     )
 
 lazy val logServer = project
@@ -86,8 +82,9 @@ lazy val web = project
   .dependsOn(accumulation)
   .dependsOn(inters)
   .dependsOn(pureStats)
+  .dependsOn(clanwars)
   .dependsOn(jsonFormats)
-  .dependsOn(challonge)
+  .dependsOn(clansChallonge)
   .dependsOn(ladder)
   .dependsOn(logServer)
   .enablePlugins(WebBuildInfo)
@@ -182,17 +179,12 @@ lazy val accumulation = project
   .dependsOn(pureAchievements)
   .dependsOn(referenceReader)
   .dependsOn(pureStats)
+  .dependsOn(clanStats)
+  .dependsOn(pureClanwar)
+  .dependsOn(clan)
   .settings(
     libraryDependencies += geoipApi,
     libraryDependencies += scalatest % Test
-  )
-
-lazy val pureClanwar =
-  Project(
-    id = "pure-clanwar",
-    base = file("pure-clanwar")
-  ).settings(
-    libraryDependencies += pureGame
   )
 
 lazy val ladderParser =
@@ -224,10 +216,10 @@ lazy val pureStats =
   Project(
     id = "pure-stats",
     base = file("pure-stats")
-  ).dependsOn(pureClanwar)
-    .settings(
-      libraryDependencies += scalatest % Test
-    )
+  ).settings(
+    libraryDependencies += scalatest % Test,
+    libraryDependencies += pureGame
+  )
 
 lazy val jsonFormats =
   Project(
@@ -242,9 +234,53 @@ lazy val jsonFormats =
 
 lazy val sampleLog = taskKey[File]("Sample Log")
 
-lazy val challonge = Project(
-  id = "challonge",
-  base = file("challonge")
+lazy val clans =
+  Project(
+    id = "clans",
+    base = file("clans")
+  ).aggregate(clan)
+    .aggregate(pureClanwar)
+    .aggregate(clanStats)
+    .aggregate(clanwars)
+    .aggregate(clansChallonge)
+
+lazy val clan =
+  Project(
+    id = "clans-clan",
+    base = file("clans/clan")
+  )
+
+lazy val clanwars =
+  Project(
+    id = "clanwars",
+    base = file("clans/clanwars")
+  ).dependsOn(pureClanwar)
+    .enablePlugins(PlayScala)
+    .settings(
+      libraryDependencies += jsoup
+    )
+
+lazy val pureClanwar =
+  Project(
+    id = "pure-clanwar",
+    base = file("clans/clanwars/pure-clanwar")
+  ).dependsOn(clan)
+    .settings(
+      libraryDependencies += pureGame
+    )
+
+lazy val clanStats =
+  Project(
+    id = "clan-stats",
+    base = file("clans/clan-stats")
+  ).dependsOn(pureClanwar)
+    .settings(
+      libraryDependencies += scalatest % Test
+    )
+
+lazy val clansChallonge = Project(
+  id = "clans-challonge",
+  base = file("clans/challonge")
 ).dependsOn(pureClanwar)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)

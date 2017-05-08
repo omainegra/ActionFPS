@@ -13,7 +13,6 @@ import com.actionfps.achievements.{AchievementsRepresentation, CompletedAchievem
 import com.actionfps.achievements.immutable.{Achievement, CaptureMapCompletion, CaptureMaster, PlayerStatistics}
 import com.actionfps.api.GameAchievement
 import com.actionfps.clans.{ClanwarMeta, NewClanwar, TwoGamesNoWinnerClanwar, _}
-import com.actionfps.clans.Conclusion.Namer
 import com.actionfps.gameparser.enrichers._
 import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
 import com.actionfps.reference.{RegistrationEmail, ServerRecord}
@@ -64,7 +63,7 @@ trait Formats {
   implicit def userWrite(implicit publicKey: PublicKey): Writes[User] = Writes[User](u => Json.writes[User].writes(u.copy(email = u.email.secured)))
   implicit val userRead: Reads[User] = Json.reads[User]
 
-  implicit def clanwarWrites(implicit namer: Namer): Writes[Clanwar] = {
+  implicit def clanwarWrites(implicit namer: ClanNamer): Writes[Clanwar] = {
     implicit val ccww = {
       implicit val cpww = Json.format[ClanwarPlayer]
       implicit val ctww = Json.format[ClanwarTeam]
@@ -81,12 +80,12 @@ trait Formats {
     }
   }
 
-  implicit def writeClanwars(implicit namer: Namer): Writes[Clanstats] = {
+  implicit def writeClanwars(implicit namer: ClanNamer): Writes[Clanstats] = {
     implicit val clanstatWrites = Json.writes[Clanstat]
     Writes[Clanstats](cs => Json.writes[Clanstats].writes(cs.named))
   }
 
-  implicit def writeClanstat(implicit namer: Namer): Writes[Clanstat] = {
+  implicit def writeClanstat(implicit namer: ClanNamer): Writes[Clanstat] = {
     Writes[Clanstat](cs => Json.writes[Clanstat].writes(cs.named))
   }
 

@@ -2,8 +2,6 @@ package com.actionfps.accumulation
 
 import java.net.URI
 
-import com.actionfps.accumulation.user.ClanTagNicknameMatcher
-
 /**
   * Created by William on 26/12/2015.
   * The only difference between this and  the Referene clan is the tags.
