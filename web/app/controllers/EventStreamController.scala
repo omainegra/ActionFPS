@@ -44,18 +44,11 @@ class EventStreamController @Inject()(pingerService: PingerService,
           pingerService
             .liveGamesWithRetainedSource
             .merge(NewGamesProvider.newGamesSource)
-            .merge(IntersService.intersSource)
             .merge(await(clanwarsSource))
             .merge(KeepAliveEvents.source)
         }
       )
     }
-  }
-
-  def inters = Action {
-    Ok.chunked(
-      content = IntersService.intersSource.merge(KeepAliveEvents.source)
-    ).as("text/event-stream")
   }
 
   def serverUpdates = Action {

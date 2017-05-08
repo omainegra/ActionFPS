@@ -1,15 +1,17 @@
+package af.inters
+
 import java.time.Instant
 
+import af.inters.IntersFlow.NicknameToUser
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.Matchers._
 import org.scalatest._
-import services.IntersService
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by me on 18/01/2017.
@@ -25,12 +27,17 @@ class IntersServiceSpec extends FreeSpec with BeforeAndAfterAll {
 
   "IntersService event flow" - {
     "produces 1 output event only" in {
-      val flow = IntersService
+      val flow = IntersFlow
         .lineToEventFlow(
-          usersProvider = () => Future.successful(IntersServiceSpec.nicknameToUser.get),
+          usersProvider = () =>
+            Future.successful(new NicknameToUser {
+              override def userOf(nickname: String): Option[String] =
+                IntersServiceSpec.nicknameToUser.get(nickname)
+            }),
           instant = () => Instant.now()
         )
-      val source = Source(IntersServiceSpec.syslogEvents).via(flow).runWith(Sink.seq)
+      val source =
+        Source(IntersServiceSpec.syslogEvents).via(flow).runWith(Sink.seq)
       val gotIos = Await.result(source, 5.seconds)
       gotIos should have size 1
     }
@@ -51,6 +58,7 @@ object IntersServiceSpec {
 
   val nicknameToUser: Map[String, String] = Map("w00p|Boo" -> "boo")
 
-  val syslogEvents: List[String] = List(oldSyslogEvent, currentSyslogEvent, currentSyslogEvent)
+  val syslogEvents: List[String] =
+    List(oldSyslogEvent, currentSyslogEvent, currentSyslogEvent)
 
 }

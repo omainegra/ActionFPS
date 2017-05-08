@@ -23,7 +23,6 @@ GET         /server-updates/                @controllers.EventStreamController.s
 GET         /recent-games/                  @controllers.GamesController.recentGames
 GET         /new-games/                     @controllers.EventStreamController.newGames
 POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
-GET         /inters/                        @controllers.EventStreamController.inters
 GET         /ladder/                        @controllers.LadderController.ladder
 GET         /event-stream/                  @controllers.EventStreamController.eventStream
 GET         /version/                       @controllers.MiscController.version
