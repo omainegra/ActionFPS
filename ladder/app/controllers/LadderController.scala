@@ -13,7 +13,6 @@ import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller}
-import providers.ReferenceProvider
 import services.LadderService
 import services.LadderService.NickToUser
 import views.ladder.Table.PlayerNamer
@@ -23,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class LadderController @Inject()(configuration: Configuration,
-                                 referenceProvider: ReferenceProvider,
+                                 providesUsers: ProvidesUsers,
                                  common: WebTemplateRender)(
     implicit executionContext: ExecutionContext,
     actorSystem: ActorSystem)
@@ -31,7 +30,7 @@ class LadderController @Inject()(configuration: Configuration,
   private implicit val actorMaterializer = ActorMaterializer()
 
   private def nickToUser: Future[NickToUser] =
-    referenceProvider.users.map(users =>
+    providesUsers.users.map(users =>
       new NickToUser {
         override def userOfNickname(nickname: String): Option[String] = {
           users.find(_.nickname.nickname == nickname).map(_.id)
@@ -61,8 +60,8 @@ class LadderController @Inject()(configuration: Configuration,
           }
           Ok(Json.toJson(aggregate))
         case _ =>
-          implicit val playerNamer = PlayerNamer.fromMap(await(
-            referenceProvider.Users.users).map(u => u.id -> u.name).toMap)
+          implicit val playerNamer = PlayerNamer.fromMap(
+            await(providesUsers.users).map(u => u.id -> u.name).toMap)
           Ok(
             common.renderTemplate(title = Some("Ladder"), supportsJson = true)(
               views.ladder.Table.render(

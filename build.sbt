@@ -178,6 +178,8 @@ lazy val ladder =
   ).enablePlugins(PlayScala)
     .dependsOn(ladderParser)
     .aggregate(ladderParser)
+    .dependsOn(playerUser)
+    .dependsOn(webTemplate)
     .settings(
       libraryDependencies ++= Seq(
         alpakkaFile,

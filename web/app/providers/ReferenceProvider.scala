@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import com.actionfps.formats.json.Formats._
 import com.actionfps.servers.ServerRecord
 import com.actionfps.user.{NicknameRecord, Registration, User}
-import controllers.ProvidesServers
+import controllers.{ProvidesServers, ProvidesUsers}
 
 /**
   * Created by William on 01/01/2016.
@@ -24,15 +24,17 @@ import controllers.ProvidesServers
   */
 @Singleton
 class ReferenceProvider @Inject()(configuration: Configuration,
-                                  cacheApi: CacheApi)
-                                 (implicit wSClient: WSClient,
-                                  executionContext: ExecutionContext)
-extends ProvidesServers {
+                                  cacheApi: CacheApi)(
+    implicit wSClient: WSClient,
+    executionContext: ExecutionContext)
+    extends ProvidesServers
+    with ProvidesUsers {
 
   import ReferenceProvider._
 
   def unCache(): Unit = {
-    List(ClansKey, ServersKey, RegistrationsKey, NicknamesKey).foreach(cacheApi.remove)
+    List(ClansKey, ServersKey, RegistrationsKey, NicknamesKey).foreach(
+      cacheApi.remove)
   }
 
   private def fetch(key: String) = async {
@@ -42,7 +44,9 @@ extends ProvidesServers {
         val url = configuration.underlying.getString(s"af.reference.${key}")
         val value = await(wSClient.url(url).get()) match {
           case r if r.status == 200 => r.body
-          case other => throw new RuntimeException(s"Received unexpected response ${other.status} for ${url}")
+          case other =>
+            throw new RuntimeException(
+              s"Received unexpected response ${other.status} for ${url}")
         }
         cacheApi.set(key, value, Duration.apply("1h"))
         value
@@ -53,7 +57,7 @@ extends ProvidesServers {
     private def csv: Future[String] = fetch(ClansKey)
 
     def clans: Future[List[Clan]] = csv.map { bdy =>
-      Json.parse(bdy).validate[List[Clan]].map(_.filter(_.valid)).getOrElse{
+      Json.parse(bdy).validate[List[Clan]].map(_.filter(_.valid)).getOrElse {
         throw new RuntimeException(s"Failed to parse JSON from body: ${bdy}")
       }
     }
@@ -63,7 +67,7 @@ extends ProvidesServers {
     private def raw: Future[String] = fetch(ServersKey)
 
     def servers: Future[List[ServerRecord]] = raw.map { bdy =>
-      Json.parse(bdy).validate[List[ServerRecord]].getOrElse{
+      Json.parse(bdy).validate[List[ServerRecord]].getOrElse {
         throw new RuntimeException(s"Failed to parse JSON from body: ${bdy}")
       }
     }
@@ -71,11 +75,12 @@ extends ProvidesServers {
 
   object Users {
 
-    def registrations: Future[List[Registration]] = fetch(RegistrationsKey).map { bdy =>
-      val sr = new StringReader(bdy)
-      try Registration.parseRecords(sr)
-      finally sr.close()
-    }
+    def registrations: Future[List[Registration]] =
+      fetch(RegistrationsKey).map { bdy =>
+        val sr = new StringReader(bdy)
+        try Registration.parseRecords(sr)
+        finally sr.close()
+      }
 
     private def rawNicknames: Future[String] = fetch(NicknamesKey)
 
@@ -88,7 +93,9 @@ extends ProvidesServers {
     def users: Future[List[User]] = async {
       val regs = await(registrations)
       val nicks = await(nicknames)
-      regs.flatMap { reg => User.fromRegistration(reg, nicks) }
+      regs.flatMap { reg =>
+        User.fromRegistration(reg, nicks)
+      }
     }
 
   }

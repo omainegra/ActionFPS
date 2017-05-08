@@ -5,11 +5,12 @@ package modules
   */
 
 import com.google.inject.AbstractModule
-import controllers.ProvidesServers
+import controllers.{ProvidesServers, ProvidesUsers}
 import providers.ReferenceProvider
 
-class ServerProviderModule extends AbstractModule {
+class ReferenceProviderModule extends AbstractModule {
   def configure(): Unit = {
     bind(classOf[ProvidesServers]).to(classOf[ReferenceProvider])
+    bind(classOf[ProvidesUsers]).to(classOf[ReferenceProvider])
   }
 }
