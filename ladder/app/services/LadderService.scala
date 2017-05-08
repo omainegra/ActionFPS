@@ -110,13 +110,9 @@ object LadderService {
     import collection.JavaConverters._
 
     configuration
-      .getConfigList(path)
-      .map { items =>
-        items.asScala.map { source =>
-          source.underlying.getStringList("command").asScala.toList
-        }.toList
-      }
-      .toList
-      .flatten
+      .underlying.getConfigList(path)
+      .asScala.map { source =>
+         source.getStringList("command").asScala.toList
+    }.toList
   }
 }

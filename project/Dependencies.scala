@@ -14,7 +14,7 @@ object Dependencies {
   val playIterateesStreams: ModuleID = "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1"
 
   val scalatestPlus: ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0-M3"
-  val alpakkaFile: ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.7"
+  val alpakkaFile: ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.8"
   val seleniumJava: ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "3.4.0"
   val seleniumHtmlUnit: ModuleID = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0"
 

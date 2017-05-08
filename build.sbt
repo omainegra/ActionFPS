@@ -158,9 +158,8 @@ lazy val inters =
       libraryDependencies += scalatest % Test,
       libraryDependencies += scalatest % "it",
       libraryDependencies += raptureJsonPlay,
-      libraryDependencies += json,
-      libraryDependencies += ws,
-      libraryDependencies += jsonQuote
+      libraryDependencies += playJson,
+      libraryDependencies += ws
     )
 
 lazy val interParser =

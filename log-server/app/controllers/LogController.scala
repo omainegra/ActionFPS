@@ -20,7 +20,8 @@ import pdi.jwt.JwtSession._
 
 import scala.concurrent.duration._
 
-class LogController(sourceFile: Path) extends Controller {
+class LogController(sourceFile: Path, components: ControllerComponents)
+    extends AbstractController(components) {
 
   def stream = Action { request =>
     if (!request.jwtSession.isEmpty()) {

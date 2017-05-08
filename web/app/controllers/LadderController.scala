@@ -12,7 +12,7 @@ import com.actionfps.ladder.parser._
 import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 import providers.ReferenceProvider
 import services.LadderService
 import services.LadderService.NickToUser
@@ -24,10 +24,11 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class LadderController @Inject()(configuration: Configuration,
                                  referenceProvider: ReferenceProvider,
-                                 common: WebTemplateRender)(
+                                 common: WebTemplateRender,
+                                 components: ControllerComponents)(
     implicit executionContext: ExecutionContext,
     actorSystem: ActorSystem)
-    extends Controller {
+    extends AbstractController(components) {
   private implicit val actorMaterializer = ActorMaterializer()
 
   private def nickToUser: Future[NickToUser] =
