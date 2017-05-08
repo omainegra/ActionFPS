@@ -14,7 +14,7 @@ import scala.async.Async._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import com.actionfps.formats.json.Formats._
-import com.actionfps.user.User
+import com.actionfps.user.{NicknameRecord, Registration, User}
 
 /**
   * Created by William on 01/01/2016.

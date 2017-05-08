@@ -12,7 +12,7 @@ import com.actionfps.ladder.parser.Aggregate.RankedStat
 import com.actionfps.ladder.parser.UserStatistics
 import com.actionfps.pinger._
 import com.actionfps.reference.Maps
-import com.actionfps.reference.RegistrationEmail.PlainRegistrationEmail
+import com.actionfps.user.RegistrationEmail.PlainRegistrationEmail
 import com.actionfps.user.User
 import lib.{Clanner, WebTemplateRender}
 import play.api.mvc.Action

@@ -295,7 +295,11 @@ lazy val playerStats =
 lazy val playerUser = Project(
   id = "player-user",
   base = file("players/player-user")
-).dependsOn(referenceReader)
+).settings(
+    libraryDependencies += scalatest % Test,
+    libraryDependencies += commonsCsv,
+    libraryDependencies += kantanCsv
+  )
 
 lazy val playerAchievements =
   Project(

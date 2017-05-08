@@ -1,18 +1,18 @@
-package com.actionfps.reference
+package com.actionfps.user
 
 import java.security.KeyPairGenerator
 
-import com.actionfps.reference.RegistrationEmail.{PlainRegistrationEmail, SecureRegistrationEmail}
-import org.scalatest.{FunSuite, Matchers}
-import org.scalatest.EitherValues._
+import com.actionfps.user.RegistrationEmail.{
+  PlainRegistrationEmail,
+  SecureRegistrationEmail
+}
+import org.scalatest._
+import EitherValues._
 
 /**
   * Created by William on 05/12/2015.
   */
-class RegistrationEmailTest
-  extends FunSuite
-    with Matchers {
-
+class RegistrationEmailTest extends FunSuite with Matchers {
 
   private lazy val keyPair = {
     val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
@@ -38,11 +38,15 @@ class RegistrationEmailTest
     RegistrationEmail
       .fromString(sampleEmail.secured.stringValue)
       .right
-      .value.asInstanceOf[SecureRegistrationEmail].decrypt shouldEqual sampleEmail.secured.decrypt
+      .value
+      .asInstanceOf[SecureRegistrationEmail]
+      .decrypt shouldEqual sampleEmail.secured.decrypt
   }
   test("Normal e-mail reparses") {
-    RegistrationEmail.fromString(sampleEmail.stringValue)
-      .right.value shouldEqual sampleEmail
+    RegistrationEmail
+      .fromString(sampleEmail.stringValue)
+      .right
+      .value shouldEqual sampleEmail
   }
 
 }

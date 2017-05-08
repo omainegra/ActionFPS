@@ -9,7 +9,7 @@ import java.security.{KeyFactory, KeyPairGenerator, PublicKey}
 import java.util.Base64
 import javax.inject._
 
-import com.actionfps.reference.Registration
+import com.actionfps.user.Registration
 import lib.WebTemplateRender
 import play.api.http.Writeable
 import play.api.libs.json.{JsObject, JsString, Json}
@@ -82,7 +82,7 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
         Ok(Json.toJson(ranks))
       else
         Ok(renderTemplate(title = Some("Player Rankings"), supportsJson = true)(views.PlayerRanks.render(
-          WebTemplateRender.wwwLocation,
+          WebTemplateRender.wwwLocation.resolve(views.PlayerRanks.PlayerRanksFilename),
           ranks)))
     }
   }
@@ -99,7 +99,7 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
                 title = Some(s"${player.user.nickname.nickname} (${player.user.id})"),
                 supportsJson = true
               ) {
-                views.player.Player.render(WebTemplateRender.wwwLocation ,player, ladderController.aggregate.ranked.find(_.user == id))
+                views.player.Player.render(WebTemplateRender.wwwLocation.resolve(views.player.Player.PlayerFile) ,player, ladderController.aggregate.ranked.find(_.user == id))
               }
             }
           }

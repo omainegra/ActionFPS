@@ -15,10 +15,10 @@ import com.actionfps.api.GameAchievement
 import com.actionfps.clans.{ClanwarMeta, NewClanwar, TwoGamesNoWinnerClanwar, _}
 import com.actionfps.gameparser.enrichers._
 import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
-import com.actionfps.reference.{RegistrationEmail, ServerRecord}
+import com.actionfps.reference.ServerRecord
 import com.actionfps.stats.Stats.PunchCard
 import com.actionfps.stats.{Clanstat, Clanstats}
-import com.actionfps.user.User
+import com.actionfps.user.{RegistrationEmail, User}
 import play.api.libs.json.{JsArray, _}
 
 import scala.collection.immutable.ListMap

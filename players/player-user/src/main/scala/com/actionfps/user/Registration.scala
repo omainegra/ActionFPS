@@ -1,11 +1,11 @@
-package com.actionfps.reference
+package com.actionfps.user
 
 import java.io.Reader
 import java.security.PublicKey
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import com.actionfps.reference.RegistrationEmail.PlainRegistrationEmail
+import com.actionfps.user.RegistrationEmail.PlainRegistrationEmail
 import org.apache.commons.csv.CSVFormat
 
 import scala.util.Try

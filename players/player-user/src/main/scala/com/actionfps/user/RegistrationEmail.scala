@@ -1,10 +1,10 @@
-package com.actionfps.reference
+package com.actionfps.user
 
 import java.security.{MessageDigest, PrivateKey, PublicKey}
 import javax.crypto.Cipher
 import javax.xml.bind.DatatypeConverter
 
-import com.actionfps.reference.RegistrationEmail.SecureRegistrationEmail
+import com.actionfps.user.RegistrationEmail.SecureRegistrationEmail
 
 /**
   * Created by me on 04/03/2017.

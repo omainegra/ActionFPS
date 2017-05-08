@@ -14,7 +14,7 @@ object PlayerRanks {
   val PlayerRanksFilename = "player_ranks.html"
 
   def render(wwwRoot: Path, playersStats: PlayersStats): Html = {
-    val htmlB = Jsoup.parse(wwwRoot.resolve(PlayerRanksFilename).toFile, "UTF-8")
+    val htmlB = Jsoup.parse(wwwRoot.toFile, "UTF-8")
 
     val trs = htmlB.select("tbody > tr")
     playersStats.onlyRanked.players.values.toList.sortBy(_.rank).map { player =>
