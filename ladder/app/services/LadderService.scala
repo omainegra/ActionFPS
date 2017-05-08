@@ -3,7 +3,6 @@ package services
 /**
   * Created by me on 09/05/2016.
   */
-
 import java.time.{LocalDateTime, ZoneOffset, ZonedDateTime}
 
 import akka.NotUsed
@@ -12,15 +11,16 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import akka.util.ByteString
 import com.actionfps.ladder.parser._
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import services.LadderService.NickToUser
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
 
-class LadderService(commands: List[List[String]], usersMap: () => Future[NickToUser])
-                   (implicit executionContext: ExecutionContext,
-                    actorMaterializer: ActorMaterializer) {
+class LadderService(commands: List[List[String]],
+                    usersMap: () => Future[NickToUser])(
+    implicit executionContext: ExecutionContext,
+    actorMaterializer: ActorMaterializer) {
 
   private val agg = Agent(KeyedAggregate.empty[String])
 
@@ -29,15 +29,21 @@ class LadderService(commands: List[List[String]], usersMap: () => Future[NickToU
   def run(): Unit = {
     // TODO flatten it so it reports errors better.
     commands.foreach { command =>
-      StreamConverters.fromInputStream(() => {
-        new java.lang.ProcessBuilder(command: _*)
-          .start()
-          .getInputStream
-      })
-        .via(Framing.delimiter(ByteString.fromString("\n", "UTF-8"), 2096, allowTruncation = false))
+      StreamConverters
+        .fromInputStream(() => {
+          new java.lang.ProcessBuilder(command: _*)
+            .start()
+            .getInputStream
+        })
+        .via(Framing.delimiter(ByteString.fromString("\n", "UTF-8"),
+                               2096,
+                               allowTruncation = false))
         .map(_.decodeString("UTF-8"))
         .via(LadderService.individualServerFlow(usersMap))
         .runForeach(g => agg.send(_.includeAggregate(s"$command")(g)))
+        .onFailure { case f =>
+          Logger.error(s"Failed to process command: ${command} due to: $f", f)
+        }
     }
   }
 
@@ -55,8 +61,9 @@ object LadderService {
     }
   }
 
-  def individualServerFlow(nickToUser: () => Future[NickToUser])
-                          (implicit executionContext: ExecutionContext): Flow[String, Aggregate, NotUsed] = {
+  def individualServerFlow(nickToUser: () => Future[NickToUser])(
+      implicit executionContext: ExecutionContext)
+    : Flow[String, Aggregate, NotUsed] = {
     Flow[String]
       .scanAsync(Aggregate.empty) {
         case (aggregate, message) =>
@@ -74,7 +81,8 @@ object LadderService {
       val localTimeSample = "2016-07-02T22:09:14"
       val regex = s"""\\[([^\\]]+)\\] ([^ ]+) (.*)""".r
       val firstSpace = input.indexOf(' ')
-      if (firstSpace < 10) None else {
+      if (firstSpace < 10) None
+      else {
         val (time, rest) = input.splitAt(firstSpace)
         val msg = rest.drop(1)
         val instant = {
@@ -96,16 +104,19 @@ object LadderService {
     }
   }
 
-  def getSourceCommands(configuration: Configuration, path: String): List[List[String]] = {
+  def getSourceCommands(configuration: Configuration,
+                        path: String): List[List[String]] = {
 
     import collection.JavaConverters._
 
-    configuration.getConfigList(path).map {
-      items =>
-        items.asScala.map {
-          source =>
-            source.underlying.getStringList("command").asScala.toList
+    configuration
+      .getConfigList(path)
+      .map { items =>
+        items.asScala.map { source =>
+          source.underlying.getStringList("command").asScala.toList
         }.toList
-    }.toList.flatten
+      }
+      .toList
+      .flatten
   }
 }
