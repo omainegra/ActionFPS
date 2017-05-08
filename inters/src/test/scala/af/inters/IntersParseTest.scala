@@ -1,5 +1,7 @@
+package af.inters
+
+import af.inters.IntersFlow.NicknameToUser
 import org.scalatest.{FreeSpec, Matchers}
-import services.IntersService
 
 /**
   * Created by me on 18/01/2017.
@@ -7,18 +9,21 @@ import services.IntersService
 class IntersParseTest extends FreeSpec with Matchers {
   "A UserMessage" - {
     "is produced from a syslog line" in {
-      IntersService
-        .UserMessageFromLine(Map("w00p|Boo" -> "boo").get)
+      IntersFlow
+        .UserMessageFromLine(new NicknameToUser {
+          override def userOf(nickname: String): Option[String] =
+            if (nickname == "w00p|Boo") Some("boo") else None
+        })
         .unapply(IntersParseTest.syslogEvent) shouldBe defined
     }
     "is not produced when user doesn't map" in {
-      IntersService
-        .UserMessageFromLine(Function.const(None))
+      IntersFlow
+        .UserMessageFromLine(NicknameToUser.empty)
         .unapply(IntersParseTest.syslogEvent) shouldBe empty
     }
     "is not produced for empty input" in {
-      IntersService
-        .UserMessageFromLine(Function.const(None))
+      IntersFlow
+        .UserMessageFromLine(NicknameToUser.empty)
         .unapply("") shouldBe empty
     }
   }

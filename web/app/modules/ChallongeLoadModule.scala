@@ -7,7 +7,7 @@ package modules
 import com.google.inject.AbstractModule
 import services.{ChallongeService, IntersService}
 
-class EagerLoadModule extends AbstractModule {
+class ChallongeLoadModule extends AbstractModule {
   def configure(): Unit = {
     bind(classOf[ChallongeService]).asEagerSingleton()
     bind(classOf[IntersService]).asEagerSingleton()
