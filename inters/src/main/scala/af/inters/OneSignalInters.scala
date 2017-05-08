@@ -2,8 +2,8 @@ package af.inters
 
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink}
-import com.actionfps.accumulation.ValidServers
 import com.actionfps.inter.InterOut
+import com.actionfps.servers.ValidServers
 import play.api.libs.json.JsObject
 import play.api.libs.ws.{WSClient, WSResponse}
 

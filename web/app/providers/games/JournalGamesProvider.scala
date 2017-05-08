@@ -4,7 +4,7 @@ package providers.games
   * Created by William on 01/01/2016.
   */
 
-import com.actionfps.accumulation.ValidServers.Validator._
+import com.actionfps.accumulation.ServerValidator._
 import com.actionfps.api.Game
 import com.actionfps.gameparser.GameScanner
 import com.actionfps.gameparser.enrichers._

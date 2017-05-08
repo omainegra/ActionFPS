@@ -1,9 +1,8 @@
-package com.actionfps.accumulation
+package com.actionfps.servers
 
 import java.time.ZoneId
 
-import com.actionfps.accumulation.ValidServers.ValidServer
-import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.servers.ValidServers.ValidServer
 
 /**
   * Created by William on 26/12/2015.
@@ -211,17 +210,6 @@ object ValidServers {
   implicit val fromResource = ValidServers(
     validServers.map(v => v.logId -> v).toMap)
 
-  object Validator {
-
-    implicit class validator(jsonGame: JsonGame)(
-        implicit validServers: ValidServers) {
-      def validateServer: Boolean = {
-        val server = jsonGame.server
-        validServers.items.exists(item => item._1 == server && item._2.isValid)
-      }
-    }
-
-  }
 
   case class ValidServer(logId: String,
                          name: String,

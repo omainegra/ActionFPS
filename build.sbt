@@ -47,13 +47,13 @@ lazy val root =
     playerAchievements,
     web,
     logServer,
-    referenceReader,
     inters,
     accumulation,
     ladder,
     jsonFormats,
     clans,
-    players
+    players,
+    referenceServers
   )
 
 lazy val logServer = project
@@ -148,19 +148,9 @@ lazy val interParser =
     libraryDependencies += scalatest % Test
   )
 
-lazy val referenceReader =
-  Project(
-    id = "reference-reader",
-    base = file("reference-reader")
-  ).settings(
-    libraryDependencies += commonsCsv,
-    libraryDependencies += kantanCsv,
-    libraryDependencies += scalatest % Test
-  )
-
 lazy val accumulation = project
   .dependsOn(playerAchievements)
-  .dependsOn(referenceReader)
+  .dependsOn(referenceServers)
   .dependsOn(playerStats)
   .dependsOn(playerUser)
   .dependsOn(clanStats)
@@ -272,7 +262,6 @@ lazy val players = Project(
 ).enablePlugins(PlayScala)
   .dependsOn(ladder)
   .dependsOn(jsonFormats)
-  .dependsOn(referenceReader)
   .dependsOn(playerUser)
   .dependsOn(playerStats)
   .aggregate(playerStats)
@@ -296,10 +285,10 @@ lazy val playerUser = Project(
   id = "player-user",
   base = file("players/player-user")
 ).settings(
-    libraryDependencies += scalatest % Test,
-    libraryDependencies += commonsCsv,
-    libraryDependencies += kantanCsv
-  )
+  libraryDependencies += scalatest % Test,
+  libraryDependencies += commonsCsv,
+  libraryDependencies += kantanCsv
+)
 
 lazy val playerAchievements =
   Project(
@@ -309,3 +298,13 @@ lazy val playerAchievements =
     .settings(
       libraryDependencies += gameParser
     )
+
+lazy val referenceServers =
+  Project(
+    id = "reference-servers",
+    base = file("reference-servers")
+  ).settings(
+    libraryDependencies += scalatest % Test,
+    libraryDependencies += commonsCsv,
+    libraryDependencies += kantanCsv
+  )

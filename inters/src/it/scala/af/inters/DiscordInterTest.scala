@@ -4,8 +4,8 @@ import java.time.Instant
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.actionfps.accumulation.ValidServers
 import com.actionfps.inter.{InterOut, UserMessage}
+import com.actionfps.servers.ValidServers
 import org.scalatest.{DoNotDiscover, WordSpec}
 import play.api.libs.ws.ahc.AhcWSClient
 

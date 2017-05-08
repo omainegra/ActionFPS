@@ -7,7 +7,7 @@ import akka.agent.Agent
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import com.actionfps.accumulation.ValidServers.Validator._
+import com.actionfps.accumulation.ServerValidator._
 import com.actionfps.gameparser.GameScanner
 import com.actionfps.formats.json.Formats._
 import com.actionfps.gameparser.enrichers.{JsonGame, _}
