@@ -44,26 +44,17 @@ lazy val root =
     id = "actionfps",
     base = file(".")
   ).aggregate(
-      pureAchievements,
-      web,
-      logServer,
-      referenceReader,
-      inters,
-      accumulation,
-      ladder,
-      pureStats,
-      jsonFormats,
-      clans
-    )
-    .dependsOn(
-      pureAchievements,
-      web,
-      logServer,
-      referenceReader,
-      interParser,
-      accumulation,
-      jsonFormats
-    )
+    pureAchievements,
+    web,
+    logServer,
+    referenceReader,
+    inters,
+    accumulation,
+    ladder,
+    pureStats,
+    jsonFormats,
+    clans
+  )
 
 lazy val logServer = project
   .in(file("log-server"))
