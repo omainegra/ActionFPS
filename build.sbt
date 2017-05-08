@@ -49,9 +49,9 @@ lazy val root =
       web,
       logServer,
       referenceReader,
-      interParser,
+      inters,
       accumulation,
-      ladderParser,
+      ladder,
       pureClanwar,
       pureStats,
       jsonFormats,
@@ -62,7 +62,6 @@ lazy val root =
       web,
       logServer,
       referenceReader,
-      ladderParser,
       interParser,
       accumulation,
       pureClanwar,
@@ -86,11 +85,11 @@ lazy val logServer = project
 lazy val web = project
   .enablePlugins(PlayScala)
   .dependsOn(accumulation)
-  .dependsOn(interParser)
+  .dependsOn(inters)
   .dependsOn(pureStats)
   .dependsOn(jsonFormats)
   .dependsOn(challonge)
-  .dependsOn(ladderParser)
+  .dependsOn(ladder)
   .dependsOn(logServer)
   .enablePlugins(WebBuildInfo)
   .configs(IntegrationTest)
@@ -103,7 +102,6 @@ lazy val web = project
     fork in run := true,
     libraryDependencies ++= Seq(
       akkaActor,
-      raptureJsonPlay,
       akkaAgent,
       akkaslf,
       jsoup,
@@ -144,10 +142,31 @@ lazy val pureAchievements =
     libraryDependencies += gameParser
   )
 
+lazy val inters =
+  Project(
+    id = "inters",
+    base = file("inters")
+  ).dependsOn(interParser)
+    .dependsOn(accumulation)
+    .configs(IntegrationTest)
+    .settings(Defaults.itSettings: _*)
+    .aggregate(interParser)
+    .settings(
+      libraryDependencies += gameParser,
+      libraryDependencies += async,
+      libraryDependencies += alpakkaFile,
+      libraryDependencies += scalatest % Test,
+      libraryDependencies += scalatest % "it",
+      libraryDependencies += raptureJsonPlay,
+      libraryDependencies += json,
+      libraryDependencies += ws,
+      libraryDependencies += jsonQuote
+    )
+
 lazy val interParser =
   Project(
     id = "inter-parser",
-    base = file("inter-parser")
+    base = file("inters/inter-parser")
   ).settings(
     libraryDependencies += scalatest % Test
   )
@@ -182,11 +201,27 @@ lazy val pureClanwar =
 lazy val ladderParser =
   Project(
     id = "ladder-parser",
-    base = file("ladder-parser")
+    base = file("ladder/ladder-parser")
   ).settings(
     libraryDependencies += scalatest % "test",
     libraryDependencies += gameParser
   )
+
+lazy val ladder =
+  Project(
+    id = "ladder",
+    base = file("ladder")
+  ).enablePlugins(PlayScala)
+    .dependsOn(ladderParser)
+    .aggregate(ladderParser)
+    .settings(
+      libraryDependencies += alpakkaFile,
+      libraryDependencies += scalatest % "test",
+      libraryDependencies += gameParser,
+      libraryDependencies += async,
+      libraryDependencies += akkaAgent,
+      libraryDependencies += jsoup
+    )
 
 lazy val pureStats =
   Project(

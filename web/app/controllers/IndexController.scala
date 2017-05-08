@@ -4,7 +4,6 @@ import java.time.Instant
 import javax.inject._
 
 import com.actionfps.clans.Conclusion.Namer
-import controllers.LadderController.PlayerNamer
 import lib.{Clanner, WebTemplateRender}
 import play.api.Logger
 import play.api.mvc._
@@ -12,6 +11,7 @@ import providers.ReferenceProvider
 import providers.full.FullProvider
 import providers.games.NewGamesProvider
 import services.NewsService
+import views.ladder.Table.PlayerNamer
 import views.rendergame.MixedGame
 
 import scala.async.Async._

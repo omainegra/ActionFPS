@@ -124,18 +124,11 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
 
   def clans: Action[AnyContent] = Action.async { implicit request =>
     async {
-      request.getQueryString("format") match {
-        case Some("csv") =>
-          Ok(await(referenceProvider.Clans.csv)).as("text/csv")
-        case Some("json") =>
-          Ok(Json.toJson(await(referenceProvider.Clans.clans)))
-        case _ =>
-          val clans = await(referenceProvider.clans)
-          Ok(webTemplateRender.renderTemplate(
-            title = Some("ActionFPS Clans"),
-            supportsJson = true
-          )(views.html.clans(clans)))
-      }
+      val clans = await(referenceProvider.clans)
+      Ok(webTemplateRender.renderTemplate(
+        title = Some("ActionFPS Clans"),
+        supportsJson = true
+      )(views.html.clans(clans)))
     }
   }
 

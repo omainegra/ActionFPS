@@ -14,6 +14,7 @@ import play.api.libs.ws.WSClient
 import scala.async.Async._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
+import com.actionfps.formats.json.Formats._
 
 /**
   * Created by William on 01/01/2016.
@@ -36,24 +37,28 @@ class ReferenceProvider @Inject()(configuration: Configuration,
     await(cacheApi.get[String](key)) match {
       case Some(value) => value
       case None =>
-        val value = await(wSClient.url(configuration.underlying.getString(s"af.reference.${key}")).get().filter(_.status == 200).map(_.body))
+        val url = configuration.underlying.getString(s"af.reference.${key}")
+        val value = await(wSClient.url(url).get()) match {
+          case r if r.status == 200 => r.body
+          case other => throw new RuntimeException(s"Received unexpected response ${other.status} for ${url}")
+        }
         await(cacheApi.set(key, value, Duration.apply("1h")))
         value
     }
   }
 
   object Clans {
-    def csv: Future[String] = fetch(ClansKey)
+    private def csv: Future[String] = fetch(ClansKey)
 
     def clans: Future[List[Clan]] = csv.map { bdy =>
-      val sr = new StringReader(bdy)
-      try ClanRecord.parseRecords(sr).map(Clan.fromClanRecord)
-      finally sr.close()
+      Json.parse(bdy).validate[List[Clan]].map(_.filter(_.valid)).getOrElse{
+        throw new RuntimeException(s"Failed to parse JSON from body: ${bdy}")
+      }
     }
   }
 
   object Servers {
-    def raw: Future[String] = fetch(ServersKey)
+    private def raw: Future[String] = fetch(ServersKey)
 
     def servers: Future[List[ServerRecord]] = raw.map { bdy =>
       val sr = new StringReader(bdy)
@@ -70,7 +75,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
       finally sr.close()
     }
 
-    def rawNicknames: Future[String] = fetch(NicknamesKey)
+    private def rawNicknames: Future[String] = fetch(NicknamesKey)
 
     def nicknames: Future[List[NicknameRecord]] = rawNicknames.map { bdy =>
       val sr = new StringReader(bdy)

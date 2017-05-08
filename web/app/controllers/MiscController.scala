@@ -28,8 +28,6 @@ class MiscController @Inject()(common: WebTemplateRender, referenceProvider: Ref
   def servers: Action[AnyContent] = Action.async { implicit request =>
     async {
       request.getQueryString("format") match {
-        case Some("csv") =>
-          Ok(await(referenceProvider.Servers.raw)).as("text/csv")
         case Some("json") =>
           Ok(Json.toJson(await(referenceProvider.Servers.servers)))
         case _ =>

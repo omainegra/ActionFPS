@@ -4,6 +4,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.Matchers._
 import org.scalatest._
 import services.LadderService
+import services.LadderService.NickToUser
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -24,8 +25,13 @@ class LadderServiceSpec extends FreeSpec with BeforeAndAfterAll {
   "LadderController event flow" - {
     "produces the right aggregate" in {
       val flow = LadderService
-        .individualServerFlow(() => Future.successful(LadderServiceSpec.nicknameToUser.get))
-      val source = Source(LadderServiceSpec.sampleEvents).via(flow).runWith(Sink.last)
+        .individualServerFlow(() =>
+          Future.successful(new NickToUser {
+            override def userOfNickname(nickname: String): Option[String] =
+              LadderServiceSpec.nicknameToUser.get(nickname)
+          }))
+      val source =
+        Source(LadderServiceSpec.sampleEvents).via(flow).runWith(Sink.last)
       val lastAggregate = Await.result(source, 5.seconds)
       lastAggregate.users should have size 2
       lastAggregate.users("shadow").gibs shouldEqual 2
@@ -43,6 +49,7 @@ object LadderServiceSpec {
     "2016-07-02T22:13:49 [79.208.75.37] blip gibbed somebody"
   )
 
-  val nicknameToUser: Map[String, String] = Map("~sHaDoW~" -> "shadow", "ForaDilma" -> "dilma")
+  val nicknameToUser: Map[String, String] =
+    Map("~sHaDoW~" -> "shadow", "ForaDilma" -> "dilma")
 
 }

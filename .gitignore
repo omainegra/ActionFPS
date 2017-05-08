@@ -1,4 +1,4 @@
-users/
+/users/
 *.dmo
 *.raw
 *.log-bin.gz
