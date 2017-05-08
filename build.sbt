@@ -304,10 +304,6 @@ lazy val referenceServers =
   Project(
     id = "reference-servers",
     base = file("servers/reference-servers")
-  ).settings(
-    libraryDependencies += scalatest % Test,
-    libraryDependencies += commonsCsv,
-    libraryDependencies += kantanCsv
   )
 
 lazy val servers =

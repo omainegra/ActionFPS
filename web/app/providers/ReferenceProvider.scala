@@ -63,9 +63,9 @@ extends ProvidesServers {
     private def raw: Future[String] = fetch(ServersKey)
 
     def servers: Future[List[ServerRecord]] = raw.map { bdy =>
-      val sr = new StringReader(bdy)
-      try ServerRecord.parseRecords(sr)
-      finally sr.close()
+      Json.parse(bdy).validate[List[ServerRecord]].getOrElse{
+        throw new RuntimeException(s"Failed to parse JSON from body: ${bdy}")
+      }
     }
   }
 

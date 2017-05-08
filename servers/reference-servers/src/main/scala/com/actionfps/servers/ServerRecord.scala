@@ -1,12 +1,5 @@
 package com.actionfps.servers
 
-import java.io.Reader
-import java.net.URI
-
-import org.apache.commons.csv.CSVFormat
-
-import scala.util.Try
-
 /**
   * Created by William on 05/12/2015.
   */
@@ -27,19 +20,4 @@ case class ServerRecord(region: String, hostname: String, port: Int, kind: Strin
 
   def protocol: String = if (kind == "ActionFPS") "actionfps" else "assaultcube"
 
-}
-
-object ServerRecord {
-
-  import kantan.csv.ops._
-  import kantan.csv.generic._
-
-  def parseRecords(input: Reader): List[ServerRecord] = {
-    input
-      .asCsvReader[ServerRecord](sep = ',', header = false)
-      .toList
-      .flatMap(_.toList)
-      .filter(_.hostname.nonEmpty)
-      .filter(_.kind.nonEmpty)
-  }
 }
