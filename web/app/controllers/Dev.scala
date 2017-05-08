@@ -165,7 +165,7 @@ object Dev {
   )
   implicit val namer = Namer(Map("newbie" -> "w00p|Newbie").get)
   val woopCln = Clan(id = "woop", name = "w00p", fullName = "Woop Clan",
-    tag = None, tags = None, website = None, teamspeak = None,
+    tags = Nil, website = None, teamspeak = None,
     logo = "https://cloud.githubusercontent.com/assets/2464813/12814066/25c656a4-cb34-11e5-87a7-dbff30d759c6.png")
 
   implicit val clanner = Clanner(

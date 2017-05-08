@@ -1,7 +1,8 @@
 package com.actionfps.accumulation
 
+import java.net.URI
+
 import com.actionfps.accumulation.user.ClanTagNicknameMatcher
-import com.actionfps.reference.ClanRecord
 
 /**
   * Created by William on 26/12/2015.
@@ -9,26 +10,39 @@ import com.actionfps.reference.ClanRecord
   *
   * Might consider for removal and just use the Reference one.
   */
-case class Clan(id: String, name: String, fullName: String,
-                tag: Option[String], tags: Option[List[String]], website: Option[String],
+case class Clan(id: String,
+                name: String,
+                fullName: String,
+                tags: List[String],
+                website: Option[String],
                 teamspeak: Option[String],
                 logo: String) {
-  def nicknameInClan(nickname: String): Boolean = {
-    (tag.toList ++ tags.toList.flatten).exists(ClanTagNicknameMatcher.apply(_)(nickname))
-  }
-}
 
-object Clan {
-  def fromClanRecord(clanRecord: ClanRecord): Clan = {
-    Clan(
-      id = clanRecord.id,
-      name = clanRecord.shortName,
-      fullName = clanRecord.longName,
-      tag = if (clanRecord.tag2.nonEmpty) None else Option(clanRecord.tag),
-      tags = if (clanRecord.tag2.isEmpty) None else Option(List(clanRecord.tag) ++ clanRecord.tag2),
-      website = clanRecord.website.map(_.toString),
-      logo = clanRecord.logo.toString,
-      teamspeak = clanRecord.teamspeak.map(_.toString)
-    )
+  def nicknameInClan(nickname: String): Boolean = {
+    tags.exists(ClanTagNicknameMatcher.apply(_)(nickname))
+  }
+
+  def valid: Boolean = {
+    try {
+      val websiteValid = website.map(w => new URI(w)) match {
+        case None => true
+        case Some(uri) => true
+      }
+      val teamspeakValid = teamspeak.map(w => new URI(w)) match {
+        case Some(uri) if uri.getScheme == "ts3server" => true
+        case Some(_) => false
+        case _ => true
+      }
+      val imageValid = {
+        val u = new URI(logo)
+        val extensionOk = u.getPath.endsWith(".png") || u.getPath.endsWith(
+          ".svg") || u.getHost.contains("github")
+        val schemeOk = u.getScheme == "https"
+        extensionOk || schemeOk
+      }
+      imageValid && websiteValid && teamspeakValid
+    } catch {
+      case _: Throwable => false
+    }
   }
 }

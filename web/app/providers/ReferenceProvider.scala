@@ -14,6 +14,7 @@ import play.api.libs.ws.WSClient
 import scala.async.Async._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
+import com.actionfps.formats.json.Formats._
 
 /**
   * Created by William on 01/01/2016.
@@ -50,9 +51,9 @@ class ReferenceProvider @Inject()(configuration: Configuration,
     private def csv: Future[String] = fetch(ClansKey)
 
     def clans: Future[List[Clan]] = csv.map { bdy =>
-      val sr = new StringReader(bdy)
-      try ClanRecord.parseRecords(sr).map(Clan.fromClanRecord)
-      finally sr.close()
+      Json.parse(bdy).validate[List[Clan]].map(_.filter(_.valid)).getOrElse{
+        throw new RuntimeException(s"Failed to parse JSON from body: ${bdy}")
+      }
     }
   }
 
