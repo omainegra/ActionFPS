@@ -11,19 +11,19 @@ import play.api.mvc.{Action, AnyContent, RequestHeader}
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import play.api.routing.sird._
-import providers.full.FullProvider
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
+import com.actionfps.formats.json.Formats._
 /**
   * Provide a batch list of all games in different formats.
   */
 @Singleton
-class AllGames @Inject()(fullProvider: FullProvider)
+class AllGames @Inject()(providesGames: ProvidesGames)
                         (implicit executionContext: ExecutionContext) extends SimpleRouter {
 
-  import fullProvider.allGames
+  import providesGames._
 
   override def routes: Routes = {
     case GET(p"/") | GET(p"/games.tsv") => allTsv

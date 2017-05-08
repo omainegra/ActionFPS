@@ -15,7 +15,12 @@ import scala.concurrent.{ExecutionContext, Future}
 import com.actionfps.formats.json.Formats._
 import com.actionfps.servers.ServerRecord
 import com.actionfps.user.{NicknameRecord, Registration, User}
-import controllers.{ProvidesServers, ProvidesUsers}
+import controllers.{
+  ProvidesClanNames,
+  ProvidesServers,
+  ProvidesUsers,
+  ProvidesUsersList
+}
 import lib.ClansProvider
 
 /**
@@ -29,7 +34,10 @@ class ReferenceProvider @Inject()(configuration: Configuration,
     implicit wSClient: WSClient,
     executionContext: ExecutionContext)
     extends ProvidesServers
-    with ProvidesUsers with ClansProvider {
+    with ProvidesUsers
+    with ClansProvider
+    with ProvidesClanNames
+    with ProvidesUsersList {
 
   import ReferenceProvider._
 
@@ -109,6 +117,8 @@ class ReferenceProvider @Inject()(configuration: Configuration,
 
   def servers: Future[List[ServerRecord]] = Servers.servers
 
+  override def clanNames: Future[Map[String, String]] =
+    clans.map(_.map(c => c.id -> c.name).toMap)
 }
 
 object ReferenceProvider {

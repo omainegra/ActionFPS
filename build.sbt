@@ -376,6 +376,7 @@ lazy val downloads =
       libraryDependencies ++= Seq(
         fluentHc,
         httpClientCache,
+        alpakkaFile,
         json
       ),
       scalaSource in IntegrationTest := baseDirectory.value / "it",

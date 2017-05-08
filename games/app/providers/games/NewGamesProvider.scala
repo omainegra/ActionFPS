@@ -1,5 +1,4 @@
-package providers
-package games
+package providers.games
 
 import akka.actor.ActorSystem
 import akka.stream.OverflowStrategy

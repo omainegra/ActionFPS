@@ -85,9 +85,7 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
 
 }
 
-case class NewRichGameDetected(jsonGame: JsonGame)
 
-case class NewRawGameDetected(jsonGame: JsonGame)
 
 case class FullIteratorDetector(original: GameAxisAccumulator, updated: GameAxisAccumulator) {
 
