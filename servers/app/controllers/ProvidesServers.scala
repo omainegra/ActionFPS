@@ -1,7 +1,6 @@
 package controllers
 
 import com.actionfps.servers.ServerRecord
-
 import scala.concurrent.Future
 
 /**

@@ -17,14 +17,13 @@ class ServersController @Inject()(templateRender: WebTemplateRender,
     implicit executionContext: ExecutionContext)
     extends Controller {
 
-  import templateRender._
-
   def servers: Action[AnyContent] = Action.async { implicit request =>
     async {
       val got = await(providesServers.servers)
       Ok(
-        renderTemplate(title = Some("ActionFPS Servers"),
-                       supportsJson = false)(views.html.servers(got)))
+        templateRender.renderTemplate(
+          title = Some("ActionFPS Servers"),
+          supportsJson = false)(views.html.servers(got)))
     }
   }
 

@@ -70,15 +70,15 @@ lazy val logServer = project
 
 lazy val web = project
   .enablePlugins(PlayScala)
-  .dependsOn(accumulation)
   .dependsOn(inters)
   .dependsOn(clanwars)
   .dependsOn(players)
-  .dependsOn(jsonFormats)
   .dependsOn(clansChallonge)
   .dependsOn(ladder)
   .dependsOn(logServer)
   .dependsOn(servers)
+  .dependsOn(webTemplate)
+  .aggregate(webTemplate)
   .enablePlugins(WebBuildInfo)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
@@ -90,14 +90,12 @@ lazy val web = project
     fork in run := true,
     libraryDependencies ++= Seq(
       akkaActor,
-      akkaAgent,
       akkaslf,
       jsoup,
       hazelcastClient,
       fluentHc,
       httpClientCache,
       serverPinger,
-      alpakkaFile,
       filters,
       ws,
       async,
@@ -130,15 +128,17 @@ lazy val inters =
     .settings(Defaults.itSettings: _*)
     .aggregate(interParser)
     .settings(
-      libraryDependencies += gameParser,
-      libraryDependencies += async,
-      libraryDependencies += alpakkaFile,
-      libraryDependencies += scalatest % Test,
-      libraryDependencies += scalatest % "it",
-      libraryDependencies += raptureJsonPlay,
-      libraryDependencies += json,
-      libraryDependencies += ws,
-      libraryDependencies += jsonQuote
+      libraryDependencies ++= Seq(
+        gameParser,
+        async,
+        alpakkaFile,
+        scalatest % Test,
+        scalatest % "it",
+        raptureJsonPlay,
+        json,
+        ws,
+        jsonQuote
+      )
     )
 
 lazy val interParser =
@@ -179,12 +179,14 @@ lazy val ladder =
     .dependsOn(ladderParser)
     .aggregate(ladderParser)
     .settings(
-      libraryDependencies += alpakkaFile,
-      libraryDependencies += scalatest % "test",
-      libraryDependencies += gameParser,
-      libraryDependencies += async,
-      libraryDependencies += akkaAgent,
-      libraryDependencies += jsoup
+      libraryDependencies ++= Seq(
+        alpakkaFile,
+        scalatest % "test",
+        gameParser,
+        async,
+        akkaAgent,
+        jsoup
+      )
     )
 
 lazy val jsonFormats =
@@ -251,10 +253,12 @@ lazy val clansChallonge = Project(
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
-    libraryDependencies += scalatest % "it,test",
-    libraryDependencies += async,
-    libraryDependencies += ws % "provided",
-    libraryDependencies += akkaStreamTestkit % "it"
+    libraryDependencies ++= Seq(
+      scalatest % "it,test",
+      async,
+      ws % "provided",
+      akkaStreamTestkit % "it"
+    )
   )
 
 lazy val players = Project(
@@ -313,6 +317,18 @@ lazy val servers =
   ).enablePlugins(PlayScala)
     .dependsOn(referenceServers)
     .aggregate(referenceServers)
+    .dependsOn(webTemplate)
     .settings(
       libraryDependencies += async
+    )
+
+lazy val webTemplate =
+  Project(
+    id = "web-template",
+    base = file("web/web-template")
+  ).enablePlugins(PlayScala)
+    .dependsOn(jsonFormats)
+    .settings(
+      libraryDependencies += async,
+      libraryDependencies += jsoup
     )
