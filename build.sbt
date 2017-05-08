@@ -52,6 +52,7 @@ lazy val root =
     ladder,
     jsonFormats,
     clans,
+    games,
     players,
     servers
   )
@@ -71,12 +72,12 @@ lazy val logServer = project
 lazy val web = project
   .enablePlugins(PlayScala)
   .dependsOn(inters)
-  .dependsOn(clanwars)
   .dependsOn(players)
-  .dependsOn(clansChallonge)
   .dependsOn(ladder)
+  .dependsOn(games)
   .dependsOn(logServer)
   .dependsOn(servers)
+  .dependsOn(clans)
   .dependsOn(webTemplate)
   .aggregate(webTemplate)
   .enablePlugins(WebBuildInfo)
@@ -213,6 +214,17 @@ lazy val clans =
     .aggregate(clanStats)
     .aggregate(clanwars)
     .aggregate(clansChallonge)
+    .dependsOn(clanStats)
+    .dependsOn(clanwars)
+    .dependsOn(webTemplate)
+    .dependsOn(games)
+    .dependsOn(clansChallonge)
+    .enablePlugins(PlayScala)
+    .dependsOn(jsonFormats)
+    .settings(
+      libraryDependencies += async,
+      libraryDependencies += jsoup
+    )
 
 lazy val clan =
   Project(
@@ -331,6 +343,22 @@ lazy val webTemplate =
   ).enablePlugins(PlayScala)
     .dependsOn(jsonFormats)
     .settings(
-      libraryDependencies += async,
-      libraryDependencies += jsoup
+      libraryDependencies ++= Seq(
+        async,
+        jsoup
+      )
+    )
+
+lazy val games =
+  Project(
+    id = "games",
+    base = file("games")
+  ).enablePlugins(PlayScala)
+    .dependsOn(accumulation)
+    .dependsOn(webTemplate)
+    .settings(
+      libraryDependencies ++= Seq(
+        jsoup,
+        async
+      )
     )

@@ -4,7 +4,7 @@ import com.actionfps.api.GameTeam
 import com.actionfps.gameparser.enrichers.JsonGamePlayer
 import lib.WebTemplateRender
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
+import org.jsoup.nodes.{Document, Element}
 import play.twirl.api.Html
 
 /**
@@ -44,7 +44,7 @@ object Render {
   }
 
   def renderMixedGame(mixedGame: MixedGame): Html = {
-    val doc = Jsoup.parse(renderGameHtmlPath, "UTF-8")
+    val doc: Document = Jsoup.parse(renderGameHtmlPath, "UTF-8")
     fillHeader(doc.select("header").first(), mixedGame)
     doc.select("article").addClass(mixedGame.className).attr("style", mixedGame.bgStyle)
 

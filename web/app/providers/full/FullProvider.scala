@@ -11,11 +11,12 @@ import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
 import com.actionfps.stats.Clanstats
 import com.google.inject.ImplementedBy
+import lib.ClanDataProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[FullProviderImpl])
-abstract class FullProvider()(implicit executionContext: ExecutionContext) {
+abstract class FullProvider()(implicit executionContext: ExecutionContext) extends ClanDataProvider {
 
   protected[providers] def fullStuff: Future[Agent[GameAxisAccumulator]]
 

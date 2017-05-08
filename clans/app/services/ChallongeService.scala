@@ -5,9 +5,10 @@ import javax.inject.{Inject, Singleton}
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
 import akka.stream.{ActorMaterializer, OverflowStrategy}
+import com.actionfps.clans.CompleteClanwar
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
-import providers.full.NewClanwarCompleted
+import services.ChallongeService.NewClanwarCompleted
 import tl.{ChallongeClient, WinFlow}
 
 import scala.concurrent.ExecutionContext
@@ -28,4 +29,8 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient,
     .to(Sink.foreach(item => Logger.info(s"Sunk clanwar: ${item}")))
     .run()
 
+}
+
+object ChallongeService {
+  case class NewClanwarCompleted(clanwarCompleted: CompleteClanwar)
 }

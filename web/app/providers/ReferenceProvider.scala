@@ -16,6 +16,7 @@ import com.actionfps.formats.json.Formats._
 import com.actionfps.servers.ServerRecord
 import com.actionfps.user.{NicknameRecord, Registration, User}
 import controllers.{ProvidesServers, ProvidesUsers}
+import lib.ClansProvider
 
 /**
   * Created by William on 01/01/2016.
@@ -28,7 +29,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
     implicit wSClient: WSClient,
     executionContext: ExecutionContext)
     extends ProvidesServers
-    with ProvidesUsers {
+    with ProvidesUsers with ClansProvider {
 
   import ReferenceProvider._
 
