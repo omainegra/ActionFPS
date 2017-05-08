@@ -1,13 +1,13 @@
 package views.player
 
+import java.nio.file.Path
 import java.time.format.DateTimeFormatter
 
 import com.actionfps.accumulation.user.FullProfile
 import com.actionfps.achievements.AchievementsRepresentation
-import com.actionfps.achievements.immutable.CaptureMapCompletion.{Achieved, Achieving}
+import com.actionfps.achievements.immutable.CaptureMapCompletion._
 import com.actionfps.achievements.immutable.CaptureMaster
 import com.actionfps.ladder.parser.Aggregate.RankedStat
-import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import play.twirl.api.Html
@@ -17,7 +17,7 @@ import play.twirl.api.Html
   */
 object Player {
 
-  private def playerHtmlPath = WebTemplateRender.wwwLocation.resolve("player.html").toFile
+  val PlayerFile = "player.html"
 
   def progress_val(percent: Int): Either[Int, Int] = {
     if (percent <= 50) Right(Math.round(90 + 3.6 * percent).toInt)
@@ -82,8 +82,8 @@ object Player {
     notStarted.remove()
   }
 
-  def render(player: FullProfile, rankedStat: Option[RankedStat]): Html = {
-    val htmlB = Jsoup.parse(playerHtmlPath, "UTF-8")
+  def render(playerHtmlPath: Path, player: FullProfile, rankedStat: Option[RankedStat]): Html = {
+    val htmlB = Jsoup.parse(playerHtmlPath.toFile, "UTF-8")
     val doc = htmlB
     doc.select("h1").first().text(player.user.nickname.nickname)
     val signatureHref = s"/player/signature.svg?id=${player.user.id}"

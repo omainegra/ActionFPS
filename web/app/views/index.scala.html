@@ -37,7 +37,7 @@
 </div>
 
 @views.ladder.Table.render(WebTemplateRender.wwwLocation.resolve("ladder_table.html"), ladder)(showTime = false)
-@views.PlayerRanks.render(playersStats)
+@views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(views.PlayerRanks.PlayerRanksFilename), playersStats)
 @views.ClanRankings.render(clanStats)
 
 <div id="latest-clanwars">

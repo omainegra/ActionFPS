@@ -7,7 +7,7 @@ import java.util.Locale
 
 import com.actionfps.accumulation.Clan
 import com.actionfps.accumulation.achievements.HallOfFame
-import com.actionfps.accumulation.user.Nickname.{CurrentNickname, PreviousNickname}
+import com.actionfps.user.Nickname.{CurrentNickname, PreviousNickname}
 import com.actionfps.accumulation.user._
 import com.actionfps.achievements.{AchievementsRepresentation, CompletedAchievement, PartialAchievement, SwitchNotAchieved}
 import com.actionfps.achievements.immutable.{Achievement, CaptureMapCompletion, CaptureMaster, PlayerStatistics}
@@ -18,6 +18,7 @@ import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
 import com.actionfps.reference.{RegistrationEmail, ServerRecord}
 import com.actionfps.stats.Stats.PunchCard
 import com.actionfps.stats.{Clanstat, Clanstats}
+import com.actionfps.user.User
 import play.api.libs.json.{JsArray, _}
 
 import scala.collection.immutable.ListMap

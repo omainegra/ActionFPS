@@ -4,8 +4,8 @@ import java.time.{Instant, ZonedDateTime}
 import javax.inject.Inject
 
 import com.actionfps.accumulation.Clan
-import com.actionfps.accumulation.user.{FullProfile, User}
-import com.actionfps.accumulation.user.Nickname.CurrentNickname
+import com.actionfps.accumulation.user.FullProfile
+import com.actionfps.user.Nickname.CurrentNickname
 import com.actionfps.api.{Game, GameAchievement, GamePlayer, GameTeam}
 import com.actionfps.clans.{ClanNamer, CompleteClanwar}
 import com.actionfps.ladder.parser.Aggregate.RankedStat
@@ -13,6 +13,7 @@ import com.actionfps.ladder.parser.UserStatistics
 import com.actionfps.pinger._
 import com.actionfps.reference.Maps
 import com.actionfps.reference.RegistrationEmail.PlainRegistrationEmail
+import com.actionfps.user.User
 import lib.{Clanner, WebTemplateRender}
 import play.api.mvc.Action
 import play.api.mvc.Results._
@@ -52,13 +53,14 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
         ladderrank = Some(2),
         gamecount = Some(4),
         map = request.getQueryString("map")
-      ).result
+      ).result(WebTemplateRender.wwwLocation.resolve(views.player.Signature.SigTemplateFilename))
     }
     case GET(p"/sig/") => Action {
       Ok(Html("""<img src="../sig.svg">"""))
     }
     case GET(p"/player/") => Action { implicit req =>
       Ok(webTemplateRender.renderTemplate(title = None, supportsJson = true)(views.player.Player.render(
+        playerHtmlPath = WebTemplateRender.wwwLocation.resolve(views.player.Player.PlayerFile),
         Dev.fullProfile,
         Some(Dev.rankedStat)
       )

@@ -1,8 +1,8 @@
-package com.actionfps.accumulation.user
+package com.actionfps.user
 
 import java.time.ZonedDateTime
 
-import com.actionfps.accumulation.user.Nickname.{CurrentNickname, PreviousNickname}
+import com.actionfps.user.Nickname.{CurrentNickname, PreviousNickname}
 
 /**
   * Created by me on 15/01/2017.

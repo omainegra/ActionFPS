@@ -81,7 +81,9 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(ranks))
       else
-        Ok(renderTemplate(title = Some("Player Rankings"), supportsJson = true)(views.PlayerRanks.render(ranks)))
+        Ok(renderTemplate(title = Some("Player Rankings"), supportsJson = true)(views.PlayerRanks.render(
+          WebTemplateRender.wwwLocation,
+          ranks)))
     }
   }
 
@@ -97,7 +99,7 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
                 title = Some(s"${player.user.nickname.nickname} (${player.user.id})"),
                 supportsJson = true
               ) {
-                views.player.Player.render(player, ladderController.aggregate.ranked.find(_.user == id))
+                views.player.Player.render(WebTemplateRender.wwwLocation ,player, ladderController.aggregate.ranked.find(_.user == id))
               }
             }
           }
@@ -119,7 +121,7 @@ class PlayersController @Inject()(common: WebTemplateRender, referenceProvider: 
             countrycode = build.location.flatMap(_.countryCode),
             ladderrank = ladderController.aggregate.ranked.find(_.user == id).map(_.rank),
             gamecount = player.achievements.map(_.playerStatistics.gamesPlayed)
-          ).result
+          ).result(WebTemplateRender.wwwLocation.resolve(views.player.Signature.SigTemplateFilename))
         case None =>
           NotFound("Player could not be found")
       }

@@ -1,8 +1,8 @@
 package com.actionfps.accumulation.achievements
 
-import com.actionfps.accumulation.user.User
 import com.actionfps.achievements.PlayerState
 import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.user.User
 
 /**
   * Created by me on 15/01/2017.

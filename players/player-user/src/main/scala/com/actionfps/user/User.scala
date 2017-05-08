@@ -1,4 +1,4 @@
-package com.actionfps.accumulation.user
+package com.actionfps.user
 
 /**
   * Created by William on 26/12/2015.
@@ -6,8 +6,8 @@ package com.actionfps.accumulation.user
 
 import java.time.{ZoneId, ZonedDateTime}
 
-import com.actionfps.accumulation.user.Nickname.{CurrentNickname, PreviousNickname}
 import com.actionfps.reference.{NicknameRecord, Registration, RegistrationEmail}
+import com.actionfps.user.Nickname.{CurrentNickname, PreviousNickname}
 
 case class User(id: String, name: String, email: RegistrationEmail,
                 registrationDate: ZonedDateTime, nickname: CurrentNickname,
@@ -34,7 +34,7 @@ object User {
               to = nextNick.from.atZone(ZoneId.of("UTC"))
             )
         }.toList
-        User(
+        com.actionfps.user.User(
           id = registration.id,
           name = registration.name,
           email = registration.email,

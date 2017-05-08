@@ -1,13 +1,12 @@
 package views.player
 
-import java.nio.file.Files
+import java.nio.file.{Files, Path}
 
 import com.actionfps.reference.Maps
-import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser
-import play.api.mvc.Result
-import play.api.mvc.Results.Ok
+import play.api.mvc._
+import play.api.mvc.Results._
 
 /**
   * Created by me on 30/12/2016.
@@ -15,9 +14,7 @@ import play.api.mvc.Results.Ok
 case class Signature(playername: String, countrycode: Option[String], interrank: Option[Int], ladderrank: Option[Int], gamecount: Option[Int],
                      map: Option[String]) {
 
-  private def sigTemplateSvgPath = WebTemplateRender.wwwLocation.resolve("sig-template.svg")
-
-  def result: Result = {
+  def result(sigTemplateSvgPath: Path): Result = {
     val tplBytes = Files.readAllBytes(sigTemplateSvgPath)
     val tplString = new String(tplBytes, "UTF-8")
     val baseUrl = "https://actionfps.com/"
@@ -43,4 +40,7 @@ case class Signature(playername: String, countrycode: Option[String], interrank:
     }
     Ok(doc.outerHtml()).as("image/svg+xml")
   }
+}
+object Signature {
+  val SigTemplateFilename = "sig-template.svg"
 }

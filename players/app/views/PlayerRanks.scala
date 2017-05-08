@@ -1,7 +1,8 @@
 package views
 
+import java.nio.file.Path
+
 import com.actionfps.players.PlayersStats
-import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import play.twirl.api.Html
 
@@ -10,10 +11,10 @@ import play.twirl.api.Html
   */
 object PlayerRanks {
 
-  private def playerRanksHtmlPath = WebTemplateRender.wwwLocation.resolve("player_ranks.html")
+  val PlayerRanksFilename = "player_ranks.html"
 
-  def render(playersStats: PlayersStats): Html = {
-    val htmlB = Jsoup.parse(playerRanksHtmlPath.toFile, "UTF-8")
+  def render(wwwRoot: Path, playersStats: PlayersStats): Html = {
+    val htmlB = Jsoup.parse(wwwRoot.resolve(PlayerRanksFilename).toFile, "UTF-8")
 
     val trs = htmlB.select("tbody > tr")
     playersStats.onlyRanked.players.values.toList.sortBy(_.rank).map { player =>

@@ -44,16 +44,16 @@ lazy val root =
     id = "actionfps",
     base = file(".")
   ).aggregate(
-    pureAchievements,
+    playerAchievements,
     web,
     logServer,
     referenceReader,
     inters,
     accumulation,
     ladder,
-    pureStats,
     jsonFormats,
-    clans
+    clans,
+    players
   )
 
 lazy val logServer = project
@@ -72,8 +72,8 @@ lazy val web = project
   .enablePlugins(PlayScala)
   .dependsOn(accumulation)
   .dependsOn(inters)
-  .dependsOn(pureStats)
   .dependsOn(clanwars)
+  .dependsOn(players)
   .dependsOn(jsonFormats)
   .dependsOn(clansChallonge)
   .dependsOn(ladder)
@@ -119,14 +119,6 @@ lazy val web = project
     buildInfoOptions += BuildInfoOption.ToJson
   )
 
-lazy val pureAchievements =
-  Project(
-    id = "pure-achievements",
-    base = file("pure-achievements")
-  ).settings(
-    libraryDependencies += gameParser
-  )
-
 lazy val inters =
   Project(
     id = "inters",
@@ -167,9 +159,10 @@ lazy val referenceReader =
   )
 
 lazy val accumulation = project
-  .dependsOn(pureAchievements)
+  .dependsOn(playerAchievements)
   .dependsOn(referenceReader)
-  .dependsOn(pureStats)
+  .dependsOn(playerStats)
+  .dependsOn(playerUser)
   .dependsOn(clanStats)
   .dependsOn(pureClanwar)
   .dependsOn(clan)
@@ -202,15 +195,6 @@ lazy val ladder =
       libraryDependencies += akkaAgent,
       libraryDependencies += jsoup
     )
-
-lazy val pureStats =
-  Project(
-    id = "pure-stats",
-    base = file("pure-stats")
-  ).settings(
-    libraryDependencies += scalatest % Test,
-    libraryDependencies += pureGame
-  )
 
 lazy val jsonFormats =
   Project(
@@ -281,3 +265,43 @@ lazy val clansChallonge = Project(
     libraryDependencies += ws % "provided",
     libraryDependencies += akkaStreamTestkit % "it"
   )
+
+lazy val players = Project(
+  id = "players",
+  base = file("players")
+).enablePlugins(PlayScala)
+  .dependsOn(ladder)
+  .dependsOn(jsonFormats)
+  .dependsOn(referenceReader)
+  .dependsOn(playerUser)
+  .dependsOn(playerStats)
+  .aggregate(playerStats)
+  .aggregate(playerAchievements)
+  .aggregate(playerUser)
+  .settings(
+    libraryDependencies += async,
+    libraryDependencies += jsoup
+  )
+
+lazy val playerStats =
+  Project(
+    id = "player-stats",
+    base = file("players/player-stats")
+  ).settings(
+    libraryDependencies += scalatest % Test,
+    libraryDependencies += pureGame
+  )
+
+lazy val playerUser = Project(
+  id = "player-user",
+  base = file("players/player-user")
+).dependsOn(referenceReader)
+
+lazy val playerAchievements =
+  Project(
+    id = "players-achievements",
+    base = file("players/player-achievements")
+  ).dependsOn(playerUser)
+    .settings(
+      libraryDependencies += gameParser
+    )
