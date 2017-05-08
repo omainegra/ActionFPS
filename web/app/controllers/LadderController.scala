@@ -19,8 +19,8 @@ import services.LadderService
 import services.LadderService.NickToUser
 import views.ladder.Table.PlayerNamer
 
-import scala.concurrent.ExecutionContext
 import scala.async.Async._
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class LadderController @Inject()(configuration: Configuration,
@@ -28,16 +28,18 @@ class LadderController @Inject()(configuration: Configuration,
                                  common: WebTemplateRender)
                                 (implicit executionContext: ExecutionContext,
                                  actorSystem: ActorSystem) extends Controller {
-
   private implicit val actorMaterializer = ActorMaterializer()
 
   private val ladderService = new LadderService(LadderService.getSourceCommands(configuration, "af.ladder.sources"),
     usersMap = () => referenceProvider.users.map(users => new NickToUser{
-      override def userOfNickname(nickname: String): Option[String] =
+      override def userOfNickname(nickname: String): Option[String] = {
         users.find(_.nickname.nickname == nickname).map(_.id)
+      }
     }))
 
-  def aggregate: Aggregate = ladderService.aggregate.displayed(Instant.now()).trimmed(Instant.now())
+  ladderService.run()
+
+  def aggregate: Aggregate = ladderService.aggregate.displayed(Instant.now()) .trimmed(Instant.now())
 
   def ladder: Action[AnyContent] = Action.async { implicit req =>
     async {
