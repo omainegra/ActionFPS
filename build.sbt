@@ -50,6 +50,7 @@ lazy val root =
     inters,
     accumulation,
     ladder,
+    downloads,
     jsonFormats,
     clans,
     games,
@@ -78,6 +79,7 @@ lazy val web = project
   .dependsOn(logServer)
   .dependsOn(servers)
   .dependsOn(clans)
+  .dependsOn(downloads)
   .dependsOn(webTemplate)
   .aggregate(webTemplate)
   .enablePlugins(WebBuildInfo)
@@ -94,8 +96,6 @@ lazy val web = project
       akkaslf,
       jsoup,
       hazelcastClient,
-      fluentHc,
-      httpClientCache,
       serverPinger,
       filters,
       ws,
@@ -362,3 +362,22 @@ lazy val games =
         async
       )
     )
+
+lazy val downloads =
+  Project(
+    id = "downloads",
+    base = file("downloads")
+  ).enablePlugins(PlayScala)
+    .dependsOn(webTemplate)
+    .settings(
+      libraryDependencies ++= Seq(
+        fluentHc,
+        httpClientCache,
+        json
+      ),
+      scalaSource in IntegrationTest := baseDirectory.value / "it",
+      libraryDependencies += scalatest % Test,
+      libraryDependencies += scalatest % "it"
+    )
+    .configs(IntegrationTest)
+    .settings(Defaults.itSettings: _*)
