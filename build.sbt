@@ -96,7 +96,6 @@ lazy val web = project
       akkaslf,
       jsoup,
       hazelcastClient,
-      serverPinger,
       filters,
       ws,
       async,
@@ -333,7 +332,11 @@ lazy val servers =
     .aggregate(referenceServers)
     .dependsOn(webTemplate)
     .settings(
-      libraryDependencies += async
+      libraryDependencies ++= Seq(
+        async,
+        akkaAgent,
+        serverPinger
+      )
     )
 
 lazy val webTemplate =

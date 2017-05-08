@@ -14,26 +14,26 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import com.actionfps.accumulation.Maps
 import com.actionfps.pinger._
+import controllers.{ProvidesServers, ProvidesUsersList}
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.libs.streams.Streams
-import providers.ReferenceProvider
 
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
-import concurrent.duration._
 
 /**
   * Pings live ActionFPS Servers using the <a href="https://github.com/ActionFPS/server-pinger">Server Pinger library</a>.
-  * Provides the result to [[controllers.LiveGamesController]]
   *
   * @todo Clean it up, it's very ugly right now.
   */
 @Singleton
 class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
-                              referenceProvider: ReferenceProvider
+                             providesServers: ProvidesServers,
+                             providesUsers: ProvidesUsersList
                              )(implicit actorSystem: ActorSystem,
                                executionContext: ExecutionContext) {
 
@@ -77,7 +77,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
   }, { be =>
     if (!cgsStatus.get().contains(be.now.server) || !cgsStatus.get().get(be.now.server).exists(statusSimilar(be, _))) {
       cgsStatus.send(_.updated(be.now.server, be))
-      referenceProvider.Users.users.foreach { lu =>
+      providesUsers.users.foreach { lu =>
         val b = be.withUsers(lu.map(u => u.nickname.nickname -> u.id).toMap.get)
 
         val cgse =
@@ -90,7 +90,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
 
         status.alter(m => m.updated(s"${cgse.id}${cgse.name}", cgse))
 
-        referenceProvider.servers.foreach { servers =>
+        providesServers.servers.foreach { servers =>
           val body =
             try {
               views.rendergame.Live.render(b, Maps.mapToImage, servers)
@@ -110,7 +110,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
   }))
 
   Source
-    .tick(0.seconds, 5.seconds, referenceProvider)
+    .tick(0.seconds, 5.seconds, providesServers)
     .mapAsync(1)(_.servers)
     .mapConcat(identity)
     .mapMaterializedValue { can => applicationLifecycle.addStopHook(() => Future.successful(can.cancel())) }
