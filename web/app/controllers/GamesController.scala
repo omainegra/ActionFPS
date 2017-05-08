@@ -2,13 +2,12 @@ package controllers
 
 import javax.inject._
 
-import com.actionfps.clans.Conclusion.Namer
+import com.actionfps.clans.ClanNamer
 import lib.WebTemplateRender
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller}
 import providers.ReferenceProvider
 import providers.full.FullProvider
-import providers.games.NewGamesProvider
 import views.rendergame.MixedGame
 
 import scala.async.Async._
@@ -22,7 +21,7 @@ class GamesController @Inject()(webTemplateRender: WebTemplateRender,
 
   private implicit def namerF = async {
     val clans = await(referenceProvider.clans)
-    Namer(id => clans.find(_.id == id).map(_.name))
+    ClanNamer(id => clans.find(_.id == id).map(_.name))
   }
 
   def recentGames: Action[AnyContent] = Action.async { implicit request =>
@@ -47,7 +46,7 @@ class GamesController @Inject()(webTemplateRender: WebTemplateRender,
             Ok(webTemplateRender.renderTemplate(
               title = Some {
                 val namer = await(namerF)
-                game.clangame.toList.flatMap(_.toList).flatMap(namer.clan) match {
+                game.clangame.toList.flatMap(_.toList).flatMap(namer.clanName) match {
                   case a :: b :: Nil => s"Clan game between ${a} and ${b}"
                   case _ =>
                     s"Game between ${game.teams.flatMap(_.players).flatMap(_.user).mkString(", ")}"

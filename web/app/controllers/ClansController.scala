@@ -8,8 +8,7 @@ import java.time.Instant
 import javax.inject._
 
 import com.actionfps.accumulation.Clan
-import com.actionfps.clans.Clanwar
-import com.actionfps.clans.Conclusion.Namer
+import com.actionfps.clans.{ClanNamer, Clanwar}
 import com.actionfps.stats.Clanstat
 import controllers.ClansController.ClanView
 import lib.{Clanner, WebTemplateRender}
@@ -19,6 +18,8 @@ import play.api.mvc.{Action, AnyContent, Controller}
 import providers.ReferenceProvider
 import providers.full.FullProvider
 import views.ClanRankings
+import views.clanwar.Clanwar.ClanIdToClan
+import views.rendergame.MixedGame
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -32,12 +33,17 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
 
   private def namerF = async {
     val clans = await(referenceProvider.clans)
-    Namer(id => clans.find(_.id == id).map(_.name))
+    ClanNamer(id => clans.find(_.id == id).map(_.name))
   }
 
   private def clannerF = async {
     val clans = await(referenceProvider.clans)
     Clanner(id => clans.find(_.id == id))
+  }
+  
+  private def clanIdToClan = async {
+    val clans = await(referenceProvider.clans)
+    ClanIdToClan(id => clans.find(_.id == id))
   }
 
   def rankings: Action[AnyContent] = Action.async { implicit request =>
@@ -87,6 +93,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
     async {
       implicit val namer = await(namerF)
       implicit val clanner = await(clannerF)
+      implicit val cidtc = await(clanIdToClan)
       await(fullProvider.clanwars).all.find(_.id == id) match {
         case Some(clanwar) =>
           if (request.getQueryString("format").contains("json"))
@@ -98,7 +105,9 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
             )(views.html.clanwar.clanwar(
               clanwarMeta = clanwar.meta.named,
               showPlayers = true,
-              showGames = true
+              showGames = true,
+              clanwarHtmlPath = WebTemplateRender.wwwLocation.resolve(views.clanwar.Clanwar.ClanwarHtmlFile),
+              renderGame = g => views.rendergame.Render.renderMixedGame(MixedGame.fromJsonGame(g))
             )))
         case None => NotFound("Clanwar could not be found")
       }
@@ -109,6 +118,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
     async {
       implicit val namer = await(namerF)
       implicit val clanner = await(clannerF)
+      implicit val cidtc = await(clanIdToClan)
       val cws = await(fullProvider.clanwars).all.toList.sortBy(_.id).reverse.take(50)
       request.getQueryString("format") match {
         case Some("json") =>
@@ -138,7 +148,7 @@ object ClansController {
   case class ClanView(clan: Clan, recentClanwars: List[Clanwar], stats: Option[Clanstat])
 
   object ClanView {
-    implicit def cww(implicit namer: Namer): Writes[ClanView] = {
+    implicit def cww(implicit namer: ClanNamer): Writes[ClanView] = {
       implicit val cstw = Json.writes[Clanstat]
       Json.writes[ClanView]
     }

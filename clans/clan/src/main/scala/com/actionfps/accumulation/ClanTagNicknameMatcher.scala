@@ -1,4 +1,4 @@
-package com.actionfps.accumulation.user
+package com.actionfps.accumulation
 
 /**
   * Created by William on 26/12/2015.

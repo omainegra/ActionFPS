@@ -3,12 +3,11 @@ package controllers
 import java.time.{Instant, ZonedDateTime}
 import javax.inject.Inject
 
-import com.actionfps.accumulation.user.{FullProfile, User}
 import com.actionfps.accumulation.Clan
+import com.actionfps.accumulation.user.{FullProfile, User}
 import com.actionfps.accumulation.user.Nickname.CurrentNickname
 import com.actionfps.api.{Game, GameAchievement, GamePlayer, GameTeam}
-import com.actionfps.clans.CompleteClanwar
-import com.actionfps.clans.Conclusion.Namer
+import com.actionfps.clans.{ClanNamer, CompleteClanwar}
 import com.actionfps.ladder.parser.Aggregate.RankedStat
 import com.actionfps.ladder.parser.UserStatistics
 import com.actionfps.pinger._
@@ -22,6 +21,7 @@ import play.api.routing.SimpleRouter
 import play.api.routing.sird._
 import play.twirl.api.Html
 import services.NewsService
+import views.clanwar.Clanwar.ClanIdToClan
 
 import scala.concurrent.ExecutionContext
 
@@ -70,7 +70,9 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
   private def clanwarTemplate = Action { implicit req =>
     implicit val namer = Dev.namer
     implicit val clanner = Dev.clanner
+    implicit val clanid = Dev.clanidToClan
     val html = views.clanwar.Clanwar.render(
+      clanwarHtmlPath = WebTemplateRender.wwwLocation.resolve(views.clanwar.Clanwar.ClanwarHtmlFile),
       clanwar = Dev.completeClanwar.meta.named,
       showPlayers = true
     )
@@ -163,7 +165,7 @@ object Dev {
     scores = Map("woop" -> 2, "bleh" -> 1),
     games = List(Dev.completedGame, Dev.completedGame)
   )
-  implicit val namer = Namer(Map("newbie" -> "w00p|Newbie").get)
+  implicit val namer = ClanNamer(Map("newbie" -> "w00p|Newbie").get)
   val woopCln = Clan(id = "woop", name = "w00p", fullName = "Woop Clan",
     tags = Nil, website = None, teamspeak = None,
     logo = "https://cloud.githubusercontent.com/assets/2464813/12814066/25c656a4-cb34-11e5-87a7-dbff30d759c6.png")
@@ -172,4 +174,6 @@ object Dev {
     Map("woop" -> woopCln,
       "bleh" -> woopCln.copy(id = "bleh", name = "BLEH", logo = "https://cloud.githubusercontent.com/assets/5359646/12004841/d10c564a-ab7b-11e5-8d41-00e673cc0096.png")).get
   )
+
+  implicit val clanidToClan = ClanIdToClan(clanner.get)
 }

@@ -3,14 +3,14 @@ package controllers
 import java.time.Instant
 import javax.inject._
 
-import com.actionfps.clans.Conclusion.Namer
+import com.actionfps.clans.ClanNamer
 import lib.{Clanner, WebTemplateRender}
 import play.api.Logger
 import play.api.mvc.{Action, AnyContent, Controller}
 import providers.ReferenceProvider
 import providers.full.FullProvider
-import providers.games.NewGamesProvider
 import services.NewsService
+import views.clanwar.Clanwar.ClanIdToClan
 import views.ladder.Table.PlayerNamer
 import views.rendergame.MixedGame
 
@@ -27,9 +27,9 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
 
   import webTemplateRender._
 
-  private def namerF: Future[Namer] = async {
+  private def namerF: Future[ClanNamer] = async {
     val clans = await(referenceProvider.clans)
-    Namer(id => clans.find(_.id == id).map(_.name))
+    ClanNamer(id => clans.find(_.id == id).map(_.name))
   }
 
   private def clannerF: Future[Clanner] = async {
@@ -52,6 +52,7 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
       implicit val playerNamer = PlayerNamer.fromMap(await(referenceProvider.Users.users).map(u => u.id -> u.nickname.nickname).toMap)
       implicit val namer = await(namerF)
       implicit val clanner = await(clannerF)
+      implicit val clanIdToClan = ClanIdToClan(clanner.get)
       val games = await(fullProvider.getRecent(10)).map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
       val latestClanwars = await(fullProvider.clanwars).complete.toList.sortBy(_.id).reverse.take(10).map(_.meta.named)

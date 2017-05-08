@@ -5,13 +5,13 @@ import javax.inject._
 import akka.actor.ActorSystem
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.Source
-import com.actionfps.clans.Conclusion.Namer
+import com.actionfps.clans.ClanNamer
 import lib.KeepAliveEvents
 import play.api.mvc.{Action, Controller}
 import providers.ReferenceProvider
 import providers.full.NewClanwarCompleted
 import providers.games.NewGamesProvider
-import services.{IntersService, PingerService}
+import services.PingerService
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,9 +22,9 @@ class EventStreamController @Inject()(pingerService: PingerService,
                                      (implicit actorSystem: ActorSystem,
                                       executionContext: ExecutionContext) extends Controller {
 
-  private def namerF: Future[Namer] = async {
+  private def namerF: Future[ClanNamer] = async {
     val clans = await(referenceProvider.clans)
-    Namer(id => clans.find(_.id == id).map(_.name))
+    ClanNamer(id => clans.find(_.id == id).map(_.name))
   }
 
   private val clanwarsSource = {

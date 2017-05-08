@@ -1,9 +1,7 @@
 package com.actionfps.stats
 
 import java.time.{Duration, Instant}
-
-import com.actionfps.clans.Conclusion.Namer
-import com.actionfps.clans.{CompleteClanwar, Conclusion}
+import com.actionfps.clans.{ClanNamer, CompleteClanwar, Conclusion}
 
 /**
   * Created by William on 02/01/2016.
@@ -73,7 +71,7 @@ case class Clanstats(clans: Map[String, Clanstat]) {
     clans = clans.filter { case (_, clan) => clan.rank.nonEmpty }
   )
 
-  def named(implicit namer: Namer): Clanstats = {
+  def named(implicit namer: ClanNamer): Clanstats = {
     copy(
       clans = clans.mapValues(_.named)
     )
@@ -159,8 +157,8 @@ case class Clanstat(id: String,
     deaths = deaths + other.deaths
   )
 
-  def named(implicit namer: Namer): Clanstat =
-    copy(name = namer.clan(id))
+  def named(implicit namer: ClanNamer): Clanstat =
+    copy(name = namer.clanName(id))
 }
 
 object Clanstat {

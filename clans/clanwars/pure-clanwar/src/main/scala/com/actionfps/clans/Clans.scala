@@ -47,22 +47,22 @@ case class Conclusion(teams: List[ClanwarTeam]) {
     }
   )
 
-  def named(implicit namer: Conclusion.Namer) = copy(
-    teams = teams.map(team => team.copy(name = namer.clan(team.clan)))
+  def named(implicit namer: ClanNamer): Conclusion = copy(
+    teams = teams.map(team => team.copy(name = namer.clanName(team.clan)))
   )
 }
 
+trait ClanNamer {
+  def clanName(clanId: String): Option[String]
+}
+
+object ClanNamer {
+  def apply(f: String => Option[String]) = new ClanNamer {
+    override def clanName(id: String): Option[String] = f(id)
+  }
+}
 object Conclusion {
 
-  trait Namer {
-    def clan(id: String): Option[String]
-  }
-
-  object Namer {
-    def apply(f: String => Option[String]) = new Namer {
-      override def clan(id: String): Option[String] = f(id)
-    }
-  }
 
   def conclude(games: List[Game]) = {
     val allTeams = for {
@@ -108,7 +108,7 @@ case class ClanwarMeta(id: String,
                        completed: Boolean,
                        teamSize: Int,
                        games: List[Game]) {
-  def named(implicit namer: Conclusion.Namer): ClanwarMeta = copy(
+  def named(implicit namer: ClanNamer): ClanwarMeta = copy(
     conclusion = conclusion.named
   )
 
