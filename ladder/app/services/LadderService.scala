@@ -37,7 +37,7 @@ class LadderService(commands: List[List[String]], usersMap: () => Future[NickToU
         .via(Framing.delimiter(ByteString.fromString("\n", "UTF-8"), 2096, allowTruncation = false))
         .map(_.decodeString("UTF-8"))
         .via(LadderService.individualServerFlow(usersMap))
-        .runForeach(g => agg.alter(_.includeAggregate(s"$command")(g)))
+        .runForeach(g => agg.send(_.includeAggregate(s"$command")(g)))
     }
   }
 
