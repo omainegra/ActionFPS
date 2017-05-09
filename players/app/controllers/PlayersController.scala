@@ -62,8 +62,9 @@ class PlayersController @Inject()(common: WebTemplateRender,
         case _ =>
           val players = await(playersProvider.users)
           Ok(
-            renderTemplate(title = Some("ActionFPS Players"),
-                           supportsJson = true)(views.html.players(players)))
+            renderTemplate(
+              title = Some("ActionFPS Players"),
+              jsonLink = Some("?format=json"))(views.html.players(players)))
       }
     }
   }
@@ -75,8 +76,8 @@ class PlayersController @Inject()(common: WebTemplateRender,
         Ok(Json.toJson(h))
       else
         Ok(
-          renderTemplate(title = Some("Hall of Fame"), supportsJson = true)(
-            views.Hof.render(h)))
+          renderTemplate(title = Some("Hall of Fame"),
+                         jsonLink = Some("?format=json"))(views.Hof.render(h)))
     }
   }
 
@@ -87,7 +88,8 @@ class PlayersController @Inject()(common: WebTemplateRender,
         Ok(Json.toJson(ranks))
       else
         Ok(
-          renderTemplate(title = Some("Player Rankings"), supportsJson = true)(
+          renderTemplate(title = Some("Player Rankings"),
+                         jsonLink = Some("?format=json"))(
             views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(
                                        views.PlayerRanks.PlayerRanksFilename),
                                      ranks)))
@@ -106,7 +108,7 @@ class PlayersController @Inject()(common: WebTemplateRender,
                 renderTemplate(
                   title = Some(
                     s"${player.user.nickname.nickname} (${player.user.id})"),
-                  supportsJson = true
+                  jsonLink = Some("?format=json")
                 ) {
                   views.player.Player.render(
                     WebTemplateRender.wwwLocation.resolve(

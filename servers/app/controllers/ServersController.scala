@@ -25,7 +25,6 @@ class ServersController @Inject()(templateRender: WebTemplateRender,
       Ok(
         templateRender.renderTemplate(
           title = Some("ActionFPS Servers"),
-          supportsJson = true,
           jsonLink = Some(configuration.underlying.getString(
             ServersController.ServersReferenceUrlConfigurationKey))
         )(views.html.servers(got)))

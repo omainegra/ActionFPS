@@ -58,7 +58,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
         Ok(
           webTemplateRender.renderTemplate(
             title = Some("Clan Rankings"),
-            supportsJson = true
+            jsonLink = Some("?format=json")
           )(ClanRankings.render(stats)))
     }
   }
@@ -87,7 +87,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
             Ok(
               webTemplateRender.renderTemplate(
                 title = Some(s"${clan.fullName}"),
-                supportsJson = true
+                jsonLink = Some("?format=json")
               )(views.html.clan(clan, ccw, st)))
         case None =>
           NotFound("Clan could not be found")
@@ -110,7 +110,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
                 webTemplateRender.renderTemplate(
                   title = Some(
                     s"${clanwar.clans.flatMap(clanner.get).map(_.fullName).mkString(" and ")} - Clanwar"),
-                  supportsJson = true
+                  jsonLink = Some("?format=json")
                 )(views.html.clanwar.clanwar(
                   clanwarMeta = clanwar.meta.named,
                   showPlayers = true,
@@ -142,7 +142,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
           Ok(
             webTemplateRender.renderTemplate(
               title = Some("Clanwars"),
-              supportsJson = true
+              jsonLink = Some("?format=json")
             )(views.html.clanwars(cws.map(_.meta.named))))
       }
     }
@@ -154,8 +154,8 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
       Ok(
         webTemplateRender.renderTemplate(
           title = Some("ActionFPS Clans"),
-          supportsJson = true,
-          jsonLink = Some(configuration.underlying.getString(ClansController.ClansReferenceKey))
+          jsonLink = Some(configuration.underlying.getString(
+            ClansController.ClansReferenceKey))
         )(views.html.clans(clans)))
     }
   }

@@ -63,7 +63,8 @@ class LadderController @Inject()(configuration: Configuration,
           implicit val playerNamer = PlayerNamer.fromMap(
             await(providesUsers.users).map(u => u.id -> u.name).toMap)
           Ok(
-            common.renderTemplate(title = Some("Ladder"), supportsJson = true)(
+            common.renderTemplate(title = Some("Ladder"),
+                                  jsonLink = Some("?format=json"))(
               views.ladder.Table.render(
                 WebTemplateRender.wwwLocation.resolve("ladder_table.html"),
                 aggregate)(showTime = true)))

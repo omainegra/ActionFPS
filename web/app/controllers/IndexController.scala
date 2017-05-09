@@ -70,7 +70,7 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
       Ok(
         renderTemplate(
           title = None,
-          supportsJson = false,
+          sourceLink = false,
           wide = true
         )(views.html.index(
           games = games,

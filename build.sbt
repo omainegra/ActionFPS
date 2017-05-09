@@ -353,6 +353,7 @@ lazy val webTemplate =
     .settings(
       libraryDependencies ++= Seq(
         async,
+        sourcecode,
         jsoup
       )
     )

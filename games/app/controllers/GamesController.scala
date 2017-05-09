@@ -27,8 +27,7 @@ class GamesController @Inject()(
           .map(MixedGame.fromJsonGame)
       Ok(
         webTemplateRender.renderTemplate(
-          title = Some("Recent ActionFPS Games"),
-          supportsJson = false
+          title = Some("Recent ActionFPS Games")
         )(
           views.html.recent_games(games)
         ))
@@ -54,7 +53,7 @@ class GamesController @Inject()(
                       s"Game between ${game.teams.flatMap(_.players).flatMap(_.user).mkString(", ")}"
                   }
                 },
-                supportsJson = true
+                jsonLink = Some("?format=json")
               )(views.html.game(game)))
         case None => NotFound("Game not found")
       }
