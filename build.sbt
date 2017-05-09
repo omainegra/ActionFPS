@@ -196,7 +196,7 @@ lazy val ladder =
 lazy val jsonFormats =
   Project(
     id = "json-formats",
-    base = file("json-formats")
+    base = file("web/json-formats")
   ).dependsOn(accumulation)
     .settings(
       libraryDependencies += json,
