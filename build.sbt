@@ -288,8 +288,11 @@ lazy val players = Project(
   .aggregate(playerAchievements)
   .aggregate(playerUser)
   .settings(
-    libraryDependencies += async,
-    libraryDependencies += jsoup
+    libraryDependencies ++= Seq(
+      async,
+      jsoup,
+      ws
+    )
   )
 
 lazy val playerStats =
