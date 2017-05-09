@@ -45,30 +45,19 @@ lazy val root =
     id = "actionfps",
     base = file(".")
   ).aggregate(
-      pureAchievements,
-      web,
-      logServer,
-      referenceReader,
-      inters,
-      accumulation,
-      ladder,
-      pureClanwar,
-      pureStats,
-      jsonFormats,
-      challonge
-    )
-    .dependsOn(
-      pureAchievements,
-      web,
-      logServer,
-      referenceReader,
-      interParser,
-      accumulation,
-      pureClanwar,
-      pureStats,
-      jsonFormats,
-      challonge
-    )
+    playerAchievements,
+    web,
+    logServer,
+    inters,
+    accumulation,
+    ladder,
+    downloads,
+    jsonFormats,
+    clans,
+    games,
+    players,
+    servers
+  )
 
 lazy val logServer = project
   .in(file("log-server"))
@@ -84,13 +73,16 @@ lazy val logServer = project
 
 lazy val web = project
   .enablePlugins(PlayScala)
-  .dependsOn(accumulation)
   .dependsOn(inters)
-  .dependsOn(pureStats)
-  .dependsOn(jsonFormats)
-  .dependsOn(challonge)
+  .dependsOn(players)
   .dependsOn(ladder)
+  .dependsOn(games)
   .dependsOn(logServer)
+  .dependsOn(servers)
+  .dependsOn(clans)
+  .dependsOn(downloads)
+  .dependsOn(webTemplate)
+  .aggregate(webTemplate)
   .enablePlugins(WebBuildInfo)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
@@ -102,14 +94,9 @@ lazy val web = project
     fork in run := true,
     libraryDependencies ++= Seq(
       akkaActor,
-      akkaAgent,
       akkaslf,
       jsoup,
       hazelcastClient,
-      fluentHc,
-      httpClientCache,
-      serverPinger,
-      alpakkaFile,
       filters,
       ws,
       async,
@@ -134,14 +121,6 @@ lazy val web = project
     buildInfoOptions += BuildInfoOption.ToJson
   )
 
-lazy val pureAchievements =
-  Project(
-    id = "pure-achievements",
-    base = file("pure-achievements")
-  ).settings(
-    libraryDependencies += gameParser
-  )
-
 lazy val inters =
   Project(
     id = "inters",
@@ -152,14 +131,16 @@ lazy val inters =
     .settings(Defaults.itSettings: _*)
     .aggregate(interParser)
     .settings(
-      libraryDependencies += gameParser,
-      libraryDependencies += async,
-      libraryDependencies += alpakkaFile,
-      libraryDependencies += scalatest % Test,
-      libraryDependencies += scalatest % "it",
-      libraryDependencies += raptureJsonPlay,
-      libraryDependencies += playJson,
-      libraryDependencies += ws
+      libraryDependencies ++= Seq(
+        gameParser,
+        async,
+        alpakkaFile,
+        scalatest % Test,
+        scalatest % "it",
+        raptureJsonPlay,
+        playJson,
+        ws
+      )
     )
 
 lazy val interParser =
@@ -170,31 +151,17 @@ lazy val interParser =
     libraryDependencies += scalatest % Test
   )
 
-lazy val referenceReader =
-  Project(
-    id = "reference-reader",
-    base = file("reference-reader")
-  ).settings(
-    libraryDependencies += commonsCsv,
-    libraryDependencies += kantanCsv,
-    libraryDependencies += scalatest % Test
-  )
-
 lazy val accumulation = project
-  .dependsOn(pureAchievements)
-  .dependsOn(referenceReader)
-  .dependsOn(pureStats)
+  .dependsOn(playerAchievements)
+  .dependsOn(referenceServers)
+  .dependsOn(playerStats)
+  .dependsOn(playerUser)
+  .dependsOn(clanStats)
+  .dependsOn(pureClanwar)
+  .dependsOn(clan)
   .settings(
     libraryDependencies += geoipApi,
     libraryDependencies += scalatest % Test
-  )
-
-lazy val pureClanwar =
-  Project(
-    id = "pure-clanwar",
-    base = file("pure-clanwar")
-  ).settings(
-    libraryDependencies += pureGame
   )
 
 lazy val ladderParser =
@@ -213,22 +180,17 @@ lazy val ladder =
   ).enablePlugins(PlayScala)
     .dependsOn(ladderParser)
     .aggregate(ladderParser)
+    .dependsOn(playerUser)
+    .dependsOn(webTemplate)
     .settings(
-      libraryDependencies += alpakkaFile,
-      libraryDependencies += scalatest % "test",
-      libraryDependencies += gameParser,
-      libraryDependencies += async,
-      libraryDependencies += akkaAgent,
-      libraryDependencies += jsoup
-    )
-
-lazy val pureStats =
-  Project(
-    id = "pure-stats",
-    base = file("pure-stats")
-  ).dependsOn(pureClanwar)
-    .settings(
-      libraryDependencies += scalatest % Test
+      libraryDependencies ++= Seq(
+        alpakkaFile,
+        scalatest % "test",
+        gameParser,
+        async,
+        akkaAgent,
+        jsoup
+      )
     )
 
 lazy val jsonFormats =
@@ -243,15 +205,184 @@ lazy val jsonFormats =
 
 lazy val sampleLog = taskKey[File]("Sample Log")
 
-lazy val challonge = Project(
-  id = "challonge",
-  base = file("challonge")
+lazy val clans =
+  Project(
+    id = "clans",
+    base = file("clans")
+  ).aggregate(clan)
+    .aggregate(pureClanwar)
+    .aggregate(clanStats)
+    .aggregate(clanwars)
+    .aggregate(clansChallonge)
+    .dependsOn(clanStats)
+    .dependsOn(clanwars)
+    .dependsOn(webTemplate)
+    .dependsOn(games)
+    .dependsOn(clansChallonge)
+    .enablePlugins(PlayScala)
+    .dependsOn(jsonFormats)
+    .settings(
+      libraryDependencies += async,
+      libraryDependencies += jsoup
+    )
+
+lazy val clan =
+  Project(
+    id = "clans-clan",
+    base = file("clans/clan")
+  )
+
+lazy val clanwars =
+  Project(
+    id = "clanwars",
+    base = file("clans/clanwars")
+  ).dependsOn(pureClanwar)
+    .enablePlugins(PlayScala)
+    .settings(
+      libraryDependencies += jsoup
+    )
+
+lazy val pureClanwar =
+  Project(
+    id = "pure-clanwar",
+    base = file("clans/clanwars/pure-clanwar")
+  ).dependsOn(clan)
+    .settings(
+      libraryDependencies += pureGame
+    )
+
+lazy val clanStats =
+  Project(
+    id = "clan-stats",
+    base = file("clans/clan-stats")
+  ).dependsOn(pureClanwar)
+    .settings(
+      libraryDependencies += scalatest % Test
+    )
+
+lazy val clansChallonge = Project(
+  id = "clans-challonge",
+  base = file("clans/challonge")
 ).dependsOn(pureClanwar)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
-    libraryDependencies += scalatest % "it,test",
-    libraryDependencies += async,
-    libraryDependencies += ws % "provided",
-    libraryDependencies += akkaStreamTestkit % "it"
+    libraryDependencies ++= Seq(
+      scalatest % "it,test",
+      async,
+      ws % "provided",
+      akkaStreamTestkit % "it"
+    )
   )
+
+lazy val players = Project(
+  id = "players",
+  base = file("players")
+).enablePlugins(PlayScala)
+  .dependsOn(ladder)
+  .dependsOn(jsonFormats)
+  .dependsOn(playerUser)
+  .dependsOn(playerStats)
+  .aggregate(playerStats)
+  .aggregate(playerAchievements)
+  .aggregate(playerUser)
+  .settings(
+    libraryDependencies += async,
+    libraryDependencies += jsoup
+  )
+
+lazy val playerStats =
+  Project(
+    id = "player-stats",
+    base = file("players/player-stats")
+  ).settings(
+    libraryDependencies += scalatest % Test,
+    libraryDependencies += pureGame
+  )
+
+lazy val playerUser = Project(
+  id = "player-user",
+  base = file("players/player-user")
+).settings(
+  libraryDependencies += scalatest % Test,
+  libraryDependencies += commonsCsv,
+  libraryDependencies += kantanCsv
+)
+
+lazy val playerAchievements =
+  Project(
+    id = "players-achievements",
+    base = file("players/player-achievements")
+  ).dependsOn(playerUser)
+    .settings(
+      libraryDependencies += gameParser
+    )
+
+lazy val referenceServers =
+  Project(
+    id = "reference-servers",
+    base = file("servers/reference-servers")
+  )
+
+lazy val servers =
+  Project(
+    id = "servers",
+    base = file("servers")
+  ).enablePlugins(PlayScala)
+    .dependsOn(referenceServers)
+    .aggregate(referenceServers)
+    .dependsOn(webTemplate)
+    .settings(
+      libraryDependencies ++= Seq(
+        async,
+        akkaAgent,
+        serverPinger
+      )
+    )
+
+lazy val webTemplate =
+  Project(
+    id = "web-template",
+    base = file("web/web-template")
+  ).enablePlugins(PlayScala)
+    .dependsOn(jsonFormats)
+    .settings(
+      libraryDependencies ++= Seq(
+        async,
+        jsoup
+      )
+    )
+
+lazy val games =
+  Project(
+    id = "games",
+    base = file("games")
+  ).enablePlugins(PlayScala)
+    .dependsOn(accumulation)
+    .dependsOn(webTemplate)
+    .settings(
+      libraryDependencies ++= Seq(
+        jsoup,
+        async
+      )
+    )
+
+lazy val downloads =
+  Project(
+    id = "downloads",
+    base = file("downloads")
+  ).enablePlugins(PlayScala)
+    .dependsOn(webTemplate)
+    .settings(
+      libraryDependencies ++= Seq(
+        fluentHc,
+        httpClientCache,
+        alpakkaFile,
+        json
+      ),
+      scalaSource in IntegrationTest := baseDirectory.value / "it",
+      libraryDependencies += scalatest % Test,
+      libraryDependencies += scalatest % "it"
+    )
+    .configs(IntegrationTest)
+    .settings(Defaults.itSettings: _*)

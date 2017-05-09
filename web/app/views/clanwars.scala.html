@@ -1,5 +1,0 @@
-@import lib.Clanner
-@(clanwars: List[com.actionfps.clans.ClanwarMeta])(implicit clanner: Clanner)
-@clanwars.map { clanwar =>
-    @views.html.clanwar.clanwar(clanwar, showPlayers = false, showGames = false)
-}

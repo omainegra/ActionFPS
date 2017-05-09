@@ -6,9 +6,9 @@ import java.time.Instant
 import akka.NotUsed
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.stream.scaladsl.{Flow, Source}
-import com.actionfps.accumulation.ValidServers
 import com.actionfps.gameparser.mserver.ExtractMessage
 import com.actionfps.inter.{InterOut, IntersIterator, UserMessage}
+import com.actionfps.servers.ValidServers
 
 import scala.async.Async._
 import scala.concurrent.duration._

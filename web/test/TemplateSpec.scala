@@ -1,5 +1,5 @@
+import com.actionfps.accumulation.Maps
 import com.actionfps.pinger.CurrentGameStatus
-import com.actionfps.reference.Maps
 import controllers.Dev
 import org.scalatest.{FunSuite, Matchers}
 

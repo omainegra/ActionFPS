@@ -4,12 +4,13 @@ import java.time.YearMonth
 
 import com.actionfps.accumulation.achievements.{AchievementsIterator, HallOfFame}
 import com.actionfps.accumulation.enrich.EnrichGames
-import com.actionfps.accumulation.user.{FullProfile, User}
+import com.actionfps.accumulation.user.FullProfile
 import com.actionfps.api.GameAchievement
 import com.actionfps.clans.{Clanwars, CompleteClanwar}
 import com.actionfps.gameparser.enrichers._
 import com.actionfps.players.PlayersStats
 import com.actionfps.stats.Clanstats
+import com.actionfps.user.User
 
 
 /**

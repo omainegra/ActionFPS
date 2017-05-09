@@ -4,8 +4,6 @@ import java.io.StringReader
 import javax.inject.{Inject, Singleton}
 
 import com.actionfps.accumulation.Clan
-import com.actionfps.accumulation.user.User
-import com.actionfps.reference._
 import play.api.Configuration
 import play.api.cache.AsyncCacheApi
 import play.api.libs.json.Json
@@ -15,6 +13,15 @@ import scala.async.Async._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import com.actionfps.formats.json.Formats._
+import com.actionfps.servers.ServerRecord
+import com.actionfps.user.{NicknameRecord, Registration, User}
+import controllers.{
+  ProvidesClanNames,
+  ProvidesServers,
+  ProvidesUsers,
+  ProvidesUsersList
+}
+import lib.ClansProvider
 
 /**
   * Created by William on 01/01/2016.
@@ -23,14 +30,20 @@ import com.actionfps.formats.json.Formats._
   */
 @Singleton
 class ReferenceProvider @Inject()(configuration: Configuration,
-                                  cacheApi: AsyncCacheApi)
-                                 (implicit wSClient: WSClient,
-                                  executionContext: ExecutionContext) {
+                                  cacheApi: AsyncCacheApi)(
+    implicit wSClient: WSClient,
+    executionContext: ExecutionContext)
+    extends ProvidesServers
+    with ProvidesUsers
+    with ClansProvider
+    with ProvidesClanNames
+    with ProvidesUsersList {
 
   import ReferenceProvider._
 
   def unCache(): Unit = {
-    List(ClansKey, ServersKey, RegistrationsKey, NicknamesKey).foreach(cacheApi.remove)
+    List(ClansKey, ServersKey, RegistrationsKey, NicknamesKey).foreach(
+      cacheApi.remove)
   }
 
   private def fetch(key: String) = async {
@@ -40,7 +53,9 @@ class ReferenceProvider @Inject()(configuration: Configuration,
         val url = configuration.underlying.getString(s"af.reference.${key}")
         val value = await(wSClient.url(url).get()) match {
           case r if r.status == 200 => r.body
-          case other => throw new RuntimeException(s"Received unexpected response ${other.status} for ${url}")
+          case other =>
+            throw new RuntimeException(
+              s"Received unexpected response ${other.status} for ${url}")
         }
         await(cacheApi.set(key, value, Duration.apply("1h")))
         value
@@ -51,7 +66,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
     private def csv: Future[String] = fetch(ClansKey)
 
     def clans: Future[List[Clan]] = csv.map { bdy =>
-      Json.parse(bdy).validate[List[Clan]].map(_.filter(_.valid)).getOrElse{
+      Json.parse(bdy).validate[List[Clan]].map(_.filter(_.valid)).getOrElse {
         throw new RuntimeException(s"Failed to parse JSON from body: ${bdy}")
       }
     }
@@ -61,19 +76,20 @@ class ReferenceProvider @Inject()(configuration: Configuration,
     private def raw: Future[String] = fetch(ServersKey)
 
     def servers: Future[List[ServerRecord]] = raw.map { bdy =>
-      val sr = new StringReader(bdy)
-      try ServerRecord.parseRecords(sr)
-      finally sr.close()
+      Json.parse(bdy).validate[List[ServerRecord]].getOrElse {
+        throw new RuntimeException(s"Failed to parse JSON from body: ${bdy}")
+      }
     }
   }
 
   object Users {
 
-    def registrations: Future[List[Registration]] = fetch(RegistrationsKey).map { bdy =>
-      val sr = new StringReader(bdy)
-      try Registration.parseRecords(sr)
-      finally sr.close()
-    }
+    def registrations: Future[List[Registration]] =
+      fetch(RegistrationsKey).map { bdy =>
+        val sr = new StringReader(bdy)
+        try Registration.parseRecords(sr)
+        finally sr.close()
+      }
 
     private def rawNicknames: Future[String] = fetch(NicknamesKey)
 
@@ -86,7 +102,9 @@ class ReferenceProvider @Inject()(configuration: Configuration,
     def users: Future[List[User]] = async {
       val regs = await(registrations)
       val nicks = await(nicknames)
-      regs.flatMap { reg => User.fromRegistration(reg, nicks) }
+      regs.flatMap { reg =>
+        User.fromRegistration(reg, nicks)
+      }
     }
 
   }
@@ -99,6 +117,8 @@ class ReferenceProvider @Inject()(configuration: Configuration,
 
   def servers: Future[List[ServerRecord]] = Servers.servers
 
+  override def clanNames: Future[Map[String, String]] =
+    clans.map(_.map(c => c.id -> c.name).toMap)
 }
 
 object ReferenceProvider {

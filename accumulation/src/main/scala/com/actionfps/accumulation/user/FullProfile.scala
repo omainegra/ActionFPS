@@ -4,6 +4,7 @@ import com.actionfps.accumulation.mostCommon
 import com.actionfps.achievements.PlayerState
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.{PlayerGameCounts, PlayerStat}
+import com.actionfps.user.User
 
 /**
   * Created by me on 15/01/2017.

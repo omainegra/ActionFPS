@@ -7,18 +7,18 @@ import java.util.Locale
 
 import com.actionfps.accumulation.Clan
 import com.actionfps.accumulation.achievements.HallOfFame
-import com.actionfps.accumulation.user.Nickname.{CurrentNickname, PreviousNickname}
+import com.actionfps.user.Nickname.{CurrentNickname, PreviousNickname}
 import com.actionfps.accumulation.user._
 import com.actionfps.achievements.{AchievementsRepresentation, CompletedAchievement, PartialAchievement, SwitchNotAchieved}
 import com.actionfps.achievements.immutable.{Achievement, CaptureMapCompletion, CaptureMaster, PlayerStatistics}
 import com.actionfps.api.GameAchievement
 import com.actionfps.clans.{ClanwarMeta, NewClanwar, TwoGamesNoWinnerClanwar, _}
-import com.actionfps.clans.Conclusion.Namer
 import com.actionfps.gameparser.enrichers._
 import com.actionfps.players.{PlayerGameCounts, PlayerStat, PlayersStats}
-import com.actionfps.reference.{RegistrationEmail, ServerRecord}
+import com.actionfps.servers.ServerRecord
 import com.actionfps.stats.Stats.PunchCard
 import com.actionfps.stats.{Clanstat, Clanstats}
+import com.actionfps.user.{RegistrationEmail, User}
 import play.api.libs.json.{JsArray, _}
 
 import scala.collection.immutable.ListMap
@@ -64,7 +64,7 @@ trait Formats {
   implicit def userWrite(implicit publicKey: PublicKey): Writes[User] = Writes[User](u => Json.writes[User].writes(u.copy(email = u.email.secured)))
   implicit val userRead: Reads[User] = Json.reads[User]
 
-  implicit def clanwarWrites(implicit namer: Namer): Writes[Clanwar] = {
+  implicit def clanwarWrites(implicit namer: ClanNamer): Writes[Clanwar] = {
     implicit val ccww = {
       implicit val cpww = Json.format[ClanwarPlayer]
       implicit val ctww = Json.format[ClanwarTeam]
@@ -81,12 +81,12 @@ trait Formats {
     }
   }
 
-  implicit def writeClanwars(implicit namer: Namer): Writes[Clanstats] = {
+  implicit def writeClanwars(implicit namer: ClanNamer): Writes[Clanstats] = {
     implicit val clanstatWrites = Json.writes[Clanstat]
     Writes[Clanstats](cs => Json.writes[Clanstats].writes(cs.named))
   }
 
-  implicit def writeClanstat(implicit namer: Namer): Writes[Clanstat] = {
+  implicit def writeClanstat(implicit namer: ClanNamer): Writes[Clanstat] = {
     Writes[Clanstat](cs => Json.writes[Clanstat].writes(cs.named))
   }
 

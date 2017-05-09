@@ -1,0 +1,11 @@
+@import lib.Clanner
+@import lib.WebTemplateRender
+@import views.rendergame.MixedGame
+@import com.actionfps.clans.ClanNamer
+@import views.clanwar.Clanwar.ClanIdToClan
+@(clanwars: List[com.actionfps.clans.ClanwarMeta])(implicit clanner: Clanner, clanNamer: ClanNamer, clanIdToClan: ClanIdToClan)
+@clanwars.map { clanwar =>
+    @views.html.clanwar.clanwar(clanwarMeta = clanwar.named, showPlayers = false, showGames = false,
+    clanwarHtmlPath = WebTemplateRender.wwwLocation.resolve(views.clanwar.Clanwar.ClanwarHtmlFile),
+    renderGame = g => views.rendergame.Render.renderMixedGame(MixedGame.fromJsonGame(g)))
+}

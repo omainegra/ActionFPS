@@ -1,8 +1,8 @@
 package com.actionfps.accumulation.enrich
 
 import com.actionfps.accumulation.Clan
-import com.actionfps.accumulation.user.User
 import com.actionfps.gameparser.enrichers.JsonGame
+import com.actionfps.user.User
 
 /**
   * Created by me on 15/01/2017.

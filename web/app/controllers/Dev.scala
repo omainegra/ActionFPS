@@ -3,17 +3,16 @@ package controllers
 import java.time.{Instant, ZonedDateTime}
 import javax.inject.Inject
 
-import com.actionfps.accumulation.Clan
-import com.actionfps.accumulation.user.Nickname.CurrentNickname
-import com.actionfps.accumulation.user.{FullProfile, User}
+import com.actionfps.accumulation.{Clan, Maps}
+import com.actionfps.accumulation.user.FullProfile
+import com.actionfps.user.Nickname.CurrentNickname
 import com.actionfps.api.{Game, GameAchievement, GamePlayer, GameTeam}
-import com.actionfps.clans.CompleteClanwar
-import com.actionfps.clans.Conclusion.Namer
+import com.actionfps.clans.{ClanNamer, CompleteClanwar}
 import com.actionfps.ladder.parser.Aggregate.RankedStat
 import com.actionfps.ladder.parser.UserStatistics
 import com.actionfps.pinger._
-import com.actionfps.reference.Maps
-import com.actionfps.reference.RegistrationEmail.PlainRegistrationEmail
+import com.actionfps.user.RegistrationEmail.PlainRegistrationEmail
+import com.actionfps.user.User
 import lib.{Clanner, WebTemplateRender}
 import play.api.mvc.{AbstractController, ControllerComponents}
 import play.api.routing.Router.Routes
@@ -21,6 +20,7 @@ import play.api.routing.SimpleRouter
 import play.api.routing.sird._
 import play.twirl.api.Html
 import services.NewsService
+import views.clanwar.Clanwar.ClanIdToClan
 
 import scala.concurrent.ExecutionContext
 
@@ -45,20 +45,21 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
     }
     case GET(p"/live-template/") => liveTemplate
     case GET(p"/clanwars/") => clanwarTemplate
-    case GET(p"/sig.svg") => Action { request =>
+    case GET(p"/sig.svg") => Action.apply { request =>
       views.player.Signature(interrank = Some(1),
         playername = "w00p|Drakas",
         countrycode = Some("GB"),
         ladderrank = Some(2),
         gamecount = Some(4),
         map = request.getQueryString("map")
-      ).result
+      ).result(WebTemplateRender.wwwLocation.resolve(views.player.Signature.SigTemplateFilename))
     }
     case GET(p"/sig/") => Action {
       Ok(Html("""<img src="../sig.svg">"""))
     }
-    case GET(p"/player/") => Action { implicit req =>
+    case GET(p"/player/") => Action.apply { implicit req =>
       Ok(webTemplateRender.renderTemplate(title = None, supportsJson = true)(views.player.Player.render(
+        playerHtmlPath = WebTemplateRender.wwwLocation.resolve(views.player.Player.PlayerFile),
         Dev.fullProfile,
         Some(Dev.rankedStat)
       )
@@ -67,10 +68,12 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
     }
   }
 
-  private def clanwarTemplate = Action { implicit req =>
+  private def clanwarTemplate = Action.apply { implicit req =>
     implicit val namer = Dev.namer
     implicit val clanner = Dev.clanner
+    implicit val clanid = Dev.clanidToClan
     val html = views.clanwar.Clanwar.render(
+      clanwarHtmlPath = WebTemplateRender.wwwLocation.resolve(views.clanwar.Clanwar.ClanwarHtmlFile),
       clanwar = Dev.completeClanwar.meta.named,
       showPlayers = true
     )
@@ -78,7 +81,7 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
     Ok(webTemplateRender.renderTemplate(title = None, supportsJson = false)(fh))
   }
 
-  private def liveTemplate = Action { implicit req =>
+  private def liveTemplate = Action.apply { implicit req =>
     val html = views.rendergame.Live.render(mapMapping = Maps.mapToImage, game = Dev.game, servers = Nil)
     val fh = Html(html.body + "<hr/>")
     Ok(webTemplateRender.renderTemplate(title = None, supportsJson = false)(fh))
@@ -163,7 +166,7 @@ object Dev {
     scores = Map("woop" -> 2, "bleh" -> 1),
     games = List(Dev.completedGame, Dev.completedGame)
   )
-  implicit val namer = Namer(Map("newbie" -> "w00p|Newbie").get)
+  implicit val namer = ClanNamer(Map("newbie" -> "w00p|Newbie").get)
   val woopCln = Clan(id = "woop", name = "w00p", fullName = "Woop Clan",
     tags = Nil, website = None, teamspeak = None,
     logo = "https://cloud.githubusercontent.com/assets/2464813/12814066/25c656a4-cb34-11e5-87a7-dbff30d759c6.png")
@@ -172,4 +175,6 @@ object Dev {
     Map("woop" -> woopCln,
       "bleh" -> woopCln.copy(id = "bleh", name = "BLEH", logo = "https://cloud.githubusercontent.com/assets/5359646/12004841/d10c564a-ab7b-11e5-8d41-00e673cc0096.png")).get
   )
+
+  implicit val clanidToClan = ClanIdToClan(clanner.get)
 }

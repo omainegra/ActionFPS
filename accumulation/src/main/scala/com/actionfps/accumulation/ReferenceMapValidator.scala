@@ -1,7 +1,6 @@
 package com.actionfps.accumulation
 
 import com.actionfps.gameparser.enrichers.MapValidator
-import com.actionfps.reference.Maps
 
 /**
   * Created by me on 18/01/2017.

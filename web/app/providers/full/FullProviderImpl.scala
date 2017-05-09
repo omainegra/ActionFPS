@@ -11,10 +11,9 @@ import com.actionfps.clans.CompleteClanwar
 import com.actionfps.gameparser.enrichers.JsonGame
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
-import play.api.libs.EventSource.Event
-import play.api.libs.json.{Json, Writes}
 import providers.ReferenceProvider
 import providers.games.GamesProvider
+import services.ChallongeService.NewClanwarCompleted
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
@@ -86,19 +85,7 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
 
 }
 
-case class NewRichGameDetected(jsonGame: JsonGame)
 
-case class NewRawGameDetected(jsonGame: JsonGame)
-
-case class NewClanwarCompleted(clanwarCompleted: CompleteClanwar) {
-  def toEvent(implicit writes: Writes[CompleteClanwar]): Event = {
-    Event(
-      data = Json.toJson(clanwarCompleted).toString,
-      name = Some("clanwar"),
-      id = Some(clanwarCompleted.id)
-    )
-  }
-}
 
 case class FullIteratorDetector(original: GameAxisAccumulator, updated: GameAxisAccumulator) {
 

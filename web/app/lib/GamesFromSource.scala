@@ -1,9 +1,8 @@
 package lib
 
-import com.actionfps.accumulation.ValidServers.Validator._
 import com.actionfps.api.Game
 import com.actionfps.gameparser.enrichers.{IpLookup, _}
-import play.api.Logger
+import com.actionfps.accumulation.ServerValidator._
 import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
 
 import scala.io.Source

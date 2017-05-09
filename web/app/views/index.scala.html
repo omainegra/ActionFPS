@@ -1,11 +1,11 @@
 @import views.rendergame.MixedGame
 @import lib.Clanner
-@import java.time.format.DateTimeFormatter
 
 @import com.actionfps.players.PlayersStats
 @import com.actionfps.stats.Clanstats
 @import views.ladder.Table.PlayerNamer
 @import lib.WebTemplateRender
+@import views.clanwar.Clanwar.ClanIdToClan
 @(games: List[MixedGame], events: List[Map[String, String]],
         latestClanwars: List[com.actionfps.clans.ClanwarMeta],
         bulletin: Option[services.NewsService.NewsItems],
@@ -13,7 +13,7 @@
     playersStats: PlayersStats,
     clanStats: Clanstats
 
-)(implicit clanner: Clanner, playerNamer: PlayerNamer)
+)(implicit clanner: Clanner, playerNamer: PlayerNamer, clanIdToClan: ClanIdToClan)
 <div class="bordered" id="bulletins">
 @bulletin.map { h =>
     <div class="bulletin">
@@ -37,12 +37,12 @@
 </div>
 
 @views.ladder.Table.render(WebTemplateRender.wwwLocation.resolve("ladder_table.html"), ladder)(showTime = false)
-@views.PlayerRanks.render(playersStats)
+@views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(views.PlayerRanks.PlayerRanksFilename), playersStats)
 @views.ClanRankings.render(clanStats)
 
 <div id="latest-clanwars">
 @latestClanwars.map { clanwar =>
-    @views.clanwar.Clanwar.render(clanwar, showPlayers = false)
+    @views.clanwar.Clanwar.render(clanwarHtmlPath = WebTemplateRender.wwwLocation.resolve(views.clanwar.Clanwar.ClanwarHtmlFile), clanwar, showPlayers = false)
 }
 </div>
 <div id="games">
