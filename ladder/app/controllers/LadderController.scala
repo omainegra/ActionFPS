@@ -13,6 +13,7 @@ import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller}
+import play.twirl.api.Html
 import services.LadderService
 import services.LadderService.NickToUser
 import views.ladder.Table.PlayerNamer
@@ -65,9 +66,12 @@ class LadderController @Inject()(configuration: Configuration,
           Ok(
             common.renderTemplate(title = Some("Ladder"),
                                   jsonLink = Some("?format=json"))(
-              views.ladder.Table.render(
-                WebTemplateRender.wwwLocation.resolve("ladder_table.html"),
-                aggregate)(showTime = true)))
+              views.html.ladder
+                .big_table(
+                  views.ladder.Table.render(
+                    WebTemplateRender.wwwLocation.resolve("ladder_table.html"),
+                    aggregate)(showTime = true))
+            ))
       }
     }
   }

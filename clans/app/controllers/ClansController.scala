@@ -59,7 +59,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
           webTemplateRender.renderTemplate(
             title = Some("Clan Rankings"),
             jsonLink = Some("?format=json")
-          )(ClanRankings.render(stats)))
+          )(views.html.clan_ranks_wrap(ClanRankings.render(stats))))
     }
   }
 
@@ -111,7 +111,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
                   title = Some(
                     s"${clanwar.clans.flatMap(clanner.get).map(_.fullName).mkString(" and ")} - Clanwar"),
                   jsonLink = Some("?format=json")
-                )(views.html.clanwar.clanwar(
+                )(views.html.clanwar.contained(views.html.clanwar.clanwar(
                   clanwarMeta = clanwar.meta.named,
                   showPlayers = true,
                   showGames = true,
@@ -120,7 +120,7 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
                   renderGame = g =>
                     views.rendergame.Render
                       .renderMixedGame(MixedGame.fromJsonGame(g))
-                )))
+                ))))
           case None => NotFound("Clanwar could not be found")
         }
       }
@@ -143,7 +143,8 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
             webTemplateRender.renderTemplate(
               title = Some("Clanwars"),
               jsonLink = Some("?format=json")
-            )(views.html.clanwars(cws.map(_.meta.named))))
+            )(views.html.clanwar
+              .contained(views.html.clanwars(cws.map(_.meta.named)))))
       }
     }
   }
