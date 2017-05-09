@@ -24,11 +24,10 @@ START_TIME=$(grep -v '^$' ${TARGET_FILE} | tail -n 1 | cut -f 1 -d $'\t')
 # lines for that time when resuming
 START_TIME_REPETITIONS=$(tail -n 100 ${TARGET_FILE} | grep -F ${START_TIME} | wc -l)
 START_TIME=${START_TIME:=2014-12-01T01:01:01Z}
-END_TIME=2099-04-10T11:02:03Z
 
 echo Resume from time: ${START_TIME} >> /dev/stderr;
 
-DOWNLOAD_URL="https://actionfps.com/logs.tsv?from=${START_TIME}&to=${END_TIME}"
+DOWNLOAD_URL="https://actionfps.com/logs.tsv?from=${START_TIME}"
 
 curl --fail ${CURL_OPTS} ${DOWNLOAD_URL} | \
     tail -n +$[ START_TIME_REPETITIONS + 1 ] | \
