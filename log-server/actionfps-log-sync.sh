@@ -7,6 +7,8 @@ usage() {
     echo CURL_OPTS environment variable is available.
     echo If file does not exist, try to create it.
 }
+
+# Silent curl
 CURL_OPTS="-s"
 set -e
 [ -z "$1" ] && { usage; exit 1; }
