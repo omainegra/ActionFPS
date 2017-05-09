@@ -123,11 +123,13 @@ lazy val inters =
     id = "inters",
     base = file("inters")
   ).dependsOn(interParser)
+    .enablePlugins(PlayScala)
     .dependsOn(accumulation)
     .configs(IntegrationTest)
     .settings(Defaults.itSettings: _*)
     .aggregate(interParser)
     .settings(
+      scalaSource in IntegrationTest := baseDirectory.value / "it",
       libraryDependencies ++= Seq(
         gameParser,
         async,
