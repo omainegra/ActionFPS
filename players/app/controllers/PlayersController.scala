@@ -90,9 +90,9 @@ class PlayersController @Inject()(common: WebTemplateRender,
         Ok(
           renderTemplate(title = Some("Player Rankings"),
                          jsonLink = Some("?format=json"))(
-            views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(
+            views.html.player.gh_link(views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(
                                        views.PlayerRanks.PlayerRanksFilename),
-                                     ranks)))
+                                     ranks))))
     }
   }
 
