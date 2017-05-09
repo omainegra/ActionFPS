@@ -315,7 +315,7 @@ lazy val playerUser = Project(
 
 lazy val playerAchievements =
   Project(
-    id = "players-achievements",
+    id = "player-achievements",
     base = file("players/player-achievements")
   ).dependsOn(playerUser)
     .settings(

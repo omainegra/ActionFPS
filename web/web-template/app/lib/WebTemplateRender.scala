@@ -3,7 +3,6 @@ package lib
 /**
   * Created by William on 01/01/2016.
   */
-
 import java.nio.file.{Files, Path, Paths}
 import javax.inject._
 
@@ -30,14 +29,18 @@ class WebTemplateRender @Inject()() {
     */
   def renderTemplate(title: Option[String],
                      supportsJson: Boolean,
-                     wide: Boolean = false)
-                    (html: Html)
-                    (implicit requestHeader: RequestHeader): Html = {
-    val templateHtmlPath = WebTemplateRender.wwwLocation.resolve("template.html")
+                     jsonLink: Option[String] = None,
+                     wide: Boolean = false)(html: Html)(
+      implicit requestHeader: RequestHeader): Html = {
+    val templateHtmlPath =
+      WebTemplateRender.wwwLocation.resolve("template.html")
     val js = Jsoup.parse(templateHtmlPath.toFile, "UTF-8")
     title.foreach(js.title)
     if (supportsJson) {
       js.select("#content").attr("data-has-json", "has-json")
+      jsonLink.foreach { link =>
+        js.select("#content").attr("data-json-link", link)
+      }
     }
     if (wide) {
       js.body.addClass("wide")
@@ -47,7 +50,9 @@ class WebTemplateRender @Inject()() {
     js.select(s"#reg-menu-play").first().text("Play!")
 
     PartialFunction.condOpt(
-      requestHeader.cookies.get("af_id").map(_.value) -> requestHeader.cookies.get("af_name").map(_.value)
+      requestHeader.cookies
+        .get("af_id")
+        .map(_.value) -> requestHeader.cookies.get("af_name").map(_.value)
     ) {
       case (Some(id), Some(name)) =>
         js.select("#log-in").first().text(name)
@@ -64,7 +69,9 @@ class WebTemplateRender @Inject()() {
 
   def renderStatic(path: Path, wide: Boolean = false) = Action { implicit r =>
     Ok(renderTemplate(title = None, supportsJson = false, wide = wide) {
-      Html(new String(Files.readAllBytes(WebTemplateRender.wwwLocation.resolve(path))))
+      Html(
+        new String(
+          Files.readAllBytes(WebTemplateRender.wwwLocation.resolve(path))))
     })
   }
 

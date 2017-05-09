@@ -118,7 +118,8 @@
         var text = document.createTextNode("View JSON");
         a.appendChild(text);
         var char = location.search.startsWith("?") ? "&" : "?";
-        a.setAttribute("href", location.search + char + "format=json");
+        var jsonLink = contentWithJson.getAttribute("data-json-link")||(location.search + char + "format=json");
+        a.setAttribute("href", jsonLink);
         contentWithJson.appendChild(p);
     }
 </script>
