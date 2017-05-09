@@ -16,14 +16,16 @@ import views.rendergame.MixedGame
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
+import IndexController._
 
 @Singleton
 class IndexController @Inject()(webTemplateRender: WebTemplateRender,
                                 newsService: NewsService,
                                 referenceProvider: ReferenceProvider,
                                 fullProvider: FullProvider,
-                                ladderController: LadderController)
-                               (implicit executionContext: ExecutionContext) extends Controller {
+                                ladderController: LadderController)(
+    implicit executionContext: ExecutionContext)
+    extends Controller {
 
   import webTemplateRender._
 
@@ -37,46 +39,58 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
     Clanner(id => clans.find(_.id == id))
   }
 
-  def recentGames: Action[AnyContent] = Action.async { implicit request =>
-    async {
-      implicit val namer = await(namerF)
-      val games = await(fullProvider.getRecent(100)).map(MixedGame.fromJsonGame)
-      Ok(renderTemplate(title = Some("Recent Games"), supportsJson = false)(
-        views.html.recent_games(games)
-      ))
-    }
-  }
-
   def index: Action[AnyContent] = Action.async { implicit request =>
     async {
-      implicit val playerNamer = PlayerNamer.fromMap(await(referenceProvider.Users.users).map(u => u.id -> u.nickname.nickname).toMap)
+      implicit val playerNamer = PlayerNamer.fromMap(
+        await(referenceProvider.Users.users)
+          .map(u => u.id -> u.nickname.nickname)
+          .toMap)
       implicit val namer = await(namerF)
       implicit val clanner = await(clannerF)
       implicit val clanIdToClan = ClanIdToClan(clanner.get)
-      val games = await(fullProvider.getRecent(10)).map(MixedGame.fromJsonGame)
+      val games = await(fullProvider.getRecent(NumberOfRecentGames))
+        .map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
-      val latestClanwars = await(fullProvider.clanwars).complete.toList.sortBy(_.id).reverse.take(10).map(_.meta.named)
-      val headingO = await(newsService.latestItemFuture().map(Option.apply).recover { case e =>
-        Logger.error(s"Heading: ${e}", e)
-        None
-      })
+      val latestClanwars = await(fullProvider.clanwars).complete.toList
+        .sortBy(_.id)
+        .reverse
+        .take(NumberOfLatestClanwars)
+        .map(_.meta.named)
+      val headingO =
+        await(newsService.latestItemFuture().map(Option.apply).recover {
+          case e =>
+            Logger.error(s"Heading: ${e}", e)
+            None
+        })
 
-      val cstats = await(fullProvider.clanstats).shiftedElo(Instant.now()).onlyRanked.named
-      Ok(renderTemplate(
-        title = None,
-        supportsJson = false,
-        wide = true
-      )(
-        views.html.index(
+      val cstats = await(fullProvider.clanstats)
+        .shiftedElo(Instant.now())
+        .onlyRanked
+        .named
+      Ok(
+        renderTemplate(
+          title = None,
+          supportsJson = false,
+          wide = true
+        )(views.html.index(
           games = games,
           events = events,
           latestClanwars = latestClanwars,
           bulletin = headingO,
-          ladder = ladderController.aggregate.top(10),
-          playersStats = await(fullProvider.playerRanks).onlyRanked.top(10),
-          clanStats = cstats.top(10)
+          ladder = ladderController.aggregate.top(NumberOfLadderPlayers),
+          playersStats = await(fullProvider.playerRanks).onlyRanked
+            .top(NumberOfPlayerRanks),
+          clanStats = cstats.top(NumberOfClanRanks)
         )))
     }
   }
 
+}
+
+object IndexController {
+  val NumberOfRecentGames = 10
+  val NumberOfLatestClanwars = 10
+  val NumberOfLadderPlayers = 10
+  val NumberOfPlayerRanks = 10
+  val NumberOfClanRanks = 10
 }
