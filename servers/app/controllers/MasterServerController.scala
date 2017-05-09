@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext
   * Created by William on 31/12/2015.
   */
 @Singleton
-class Masterserver @Inject()(configuration: Configuration,
+class MasterServerController @Inject()(configuration: Configuration,
                              providesServers: ProvidesServers,
                              components: ControllerComponents)
                             (implicit executionContext: ExecutionContext)

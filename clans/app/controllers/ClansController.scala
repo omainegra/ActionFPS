@@ -15,8 +15,6 @@ import lib.{ClanDataProvider, Clanner, ClansProvider, WebTemplateRender}
 import play.api.Configuration
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
-import providers.ReferenceProvider
-import providers.full.FullProvider
 import views.ClanRankings
 import views.clanwar.Clanwar.ClanIdToClan
 import views.rendergame.MixedGame

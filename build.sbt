@@ -103,8 +103,6 @@ lazy val web = project
       akkaStreamTestkit % "it",
       scalatestPlus % "it,test",
       scalatest % "it,test",
-      playIteratees,
-      playIterateesStreams,
       seleniumHtmlUnit % "it",
       seleniumJava % "it",
       ehcache
@@ -334,6 +332,8 @@ lazy val servers =
     .dependsOn(webTemplate)
     .settings(
       libraryDependencies ++= Seq(
+        playIteratees,
+        playIterateesStreams,
         async,
         akkaAgent,
         serverPinger
@@ -378,7 +378,7 @@ lazy val downloads =
         fluentHc,
         httpClientCache,
         alpakkaFile,
-        json
+        playJson
       ),
       scalaSource in IntegrationTest := baseDirectory.value / "it",
       libraryDependencies += scalatest % Test,

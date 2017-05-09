@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import lib.WebTemplateRender
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -13,9 +13,10 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class ServersController @Inject()(templateRender: WebTemplateRender,
-                                  providesServers: ProvidesServers)(
+                                  providesServers: ProvidesServers,
+                                  components: ControllerComponents)(
     implicit executionContext: ExecutionContext)
-    extends Controller {
+    extends AbstractController(components) {
 
   def servers: Action[AnyContent] = Action.async { implicit request =>
     async {

@@ -21,8 +21,6 @@ import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.iteratee.streams.IterateeStreams
 import play.api.libs.json.{JsObject, JsString, Json}
-import providers.ReferenceProvider
-import play.api.libs.streams.Streams
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}

@@ -4,7 +4,7 @@ import java.util.Base64
 import javax.inject._
 
 import play.api.libs.json.{JsObject, JsString, Json}
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{AbstractController, ControllerComponents}
 
 import scala.concurrent.ExecutionContext
 
@@ -12,9 +12,9 @@ import scala.concurrent.ExecutionContext
   * Created by William on 01/01/2016.
   */
 @Singleton
-class VersionController @Inject()()(
+class VersionController @Inject()(controllerComponents: ControllerComponents)(
     implicit executionContext: ExecutionContext)
-    extends Controller {
+    extends AbstractController(controllerComponents) {
 
   def version = Action {
     val parsedJson = Json.parse(af.BuildInfo.toJson).asInstanceOf[JsObject]
