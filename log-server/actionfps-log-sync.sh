@@ -33,4 +33,4 @@ curl --fail ${CURL_OPTS} ${DOWNLOAD_URL} | \
     tail -n +$[ START_TIME_REPETITIONS + 1 ] | \
     grep -v -F ${START_TIME} | \
     tee -a ${TARGET_FILE} | \
-    awk '{ c++ } ; END{ print c " lines added" >> "/dev/stderr"; }'
+    awk 'BEGIN { c = 0; }; { c++ }; END { print c " lines added" >> "/dev/stderr"; }'
