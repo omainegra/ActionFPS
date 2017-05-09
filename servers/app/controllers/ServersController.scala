@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 
 import lib.WebTemplateRender
+import play.api.Configuration
 import play.api.mvc.{Action, AnyContent, Controller}
 
 import scala.async.Async._
@@ -13,6 +14,7 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class ServersController @Inject()(templateRender: WebTemplateRender,
+                                  configuration: Configuration,
                                   providesServers: ProvidesServers)(
     implicit executionContext: ExecutionContext)
     extends Controller {
@@ -23,8 +25,14 @@ class ServersController @Inject()(templateRender: WebTemplateRender,
       Ok(
         templateRender.renderTemplate(
           title = Some("ActionFPS Servers"),
-          supportsJson = false)(views.html.servers(got)))
+          supportsJson = true,
+          jsonLink = Some(configuration.underlying.getString(
+            ServersController.ServersReferenceUrlConfigurationKey))
+        )(views.html.servers(got)))
     }
   }
 
+}
+object ServersController {
+  val ServersReferenceUrlConfigurationKey = "af.reference.servers"
 }
