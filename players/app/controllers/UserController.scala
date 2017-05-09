@@ -4,21 +4,21 @@ import java.nio.file.{Files, Path, Paths}
 import java.util.Base64
 import javax.inject.{Inject, Singleton}
 
-import play.api.{Configuration, Logger}
+import play.api.data.Forms._
+import play.api.data._
+import play.api.libs.json.{JsObject, JsString}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, BodyParsers, Controller}
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.json.{JsObject, JsString}
-import providers.ReferenceProvider
+import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
 import scala.async.Async._
+import scala.concurrent.ExecutionContext
+import com.actionfps.formats.json.Formats._
 
 @Singleton
 //noinspection TypeAnnotation
 class UserController @Inject()(configuration: Configuration,
-                               referenceProvider: ReferenceProvider,
+                               playersProvider: PlayersProvider,
                                wSClient: WSClient)
                               (implicit executionContext: ExecutionContext) extends Controller {
 
@@ -65,7 +65,7 @@ class UserController @Inject()(configuration: Configuration,
       assert((response.json \ "aud").as[String].startsWith("566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9"))
       (response.json \ "email").asOpt[String] match {
         case Some(email) =>
-          await(referenceProvider.Users.users).find(_.email.matches(email)) match {
+          await(playersProvider.users).find(_.email.matches(email)) match {
             case Some(theUser) =>
               Ok(JsObject(Map("user" -> JsString(theUser.id), "privKey" -> JsString(ForUser(theUser.id).getOrUpdate()))))
             case None =>
