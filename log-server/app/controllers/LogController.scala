@@ -53,7 +53,7 @@ class LogController(sourceFile: Path) extends Controller {
             id = Some(DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)),
             data = s"${DateTimeFormatter.ISO_INSTANT
               .format(zdt.toInstant)}\t${server}\t${message}\n",
-            name = None
+            name = Some("log")
           )
       }
       .merge(keepAliveEventSource)
