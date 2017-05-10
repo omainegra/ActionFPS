@@ -756,6 +756,10 @@ input {
 #bottom-links {
   order:8;
 }
+
+.top10 {
+  order:6;
+}
 .day-cell-tooltip {
   margin-top:20em;
   margin-left:10em;
@@ -839,4 +843,8 @@ input {
 
 #server-status:not(.active) {
   display:none;
+}
+
+.top10, .top10 th, .top10 td {
+  text-align:left;
 }
