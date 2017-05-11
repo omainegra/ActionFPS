@@ -6,6 +6,7 @@ import play.api.http.HttpFilters
 import play.filters.cors.CORSFilter
 import play.filters.gzip.GzipFilter
 
-class FiltersAF @Inject()(gzipFilter: GzipFilter, cORSFilter: CORSFilter) extends HttpFilters {
+class FiltersAF @Inject()(gzipFilter: GzipFilter, cORSFilter: CORSFilter)
+    extends HttpFilters {
   def filters = Seq(cORSFilter, gzipFilter)
 }

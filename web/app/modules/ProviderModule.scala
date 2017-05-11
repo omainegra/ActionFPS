@@ -4,7 +4,14 @@ package modules
   * Created by William on 01/01/2016.
   */
 import com.google.inject.AbstractModule
-import controllers.{PlayersProvider, ProvidesClanNames, ProvidesGames, ProvidesServers, ProvidesUsers, ProvidesUsersList}
+import controllers.{
+  PlayersProvider,
+  ProvidesClanNames,
+  ProvidesGames,
+  ProvidesServers,
+  ProvidesUsers,
+  ProvidesUsersList
+}
 import lib.{ClanDataProvider, ClansProvider}
 import providers.ReferenceProvider
 import providers.full.{FullProvider, PlayersProviderImpl}
