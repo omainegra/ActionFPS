@@ -2,6 +2,8 @@ package com.actionfps
 package gameparser
 package mserver
 
+import java.time.format.DateTimeFormatter
+
 import org.scalatest.{FunSuite, Matchers}
 
 /**
@@ -11,11 +13,20 @@ class ServerStatusParserTest
   extends FunSuite
     with Matchers {
 
+
   test("server Status parser works") {
     val message = """Status at 22-05-2015 15:14:59: 4 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"""
     val ServerStatus(ldt, clients) = message
     ldt.toString shouldBe "2015-05-22T15:14:59"
     clients shouldBe 4
+  }
+
+  test("Extract message for tabular works") {
+    val fullMessage = "2015-05-22T13:17:24.097Z\t62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#1999]\tStatus at 22-05-2015 15:14:59: 45 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"
+    val ExtractMessage(d, s, p) = fullMessage
+    DateTimeFormatter.ISO_INSTANT.format(d) shouldEqual "2015-05-22T13:17:24Z"
+    s shouldEqual "62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#1999]"
+    p shouldEqual "Status at 22-05-2015 15:14:59: 45 remote clients, 4.1 send, 2.1 rec (K/sec); Ping: #23|1022|34; CSL: #24|1934|72 (bytes)"
   }
 
   test("Shift is good") {

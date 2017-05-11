@@ -24,7 +24,11 @@ object ParseSyslogMessage {
 
     def unapply(input: String): Option[(String, String, String)] = {
       var proc = input
-      if (!input.startsWith("Date: ")) return None
+      if (!input.startsWith("Date: ")) {
+        val logParts = input.split("\t", -1)
+        if ( logParts.size < 3 ) return None
+        return Some((logParts(0), logParts(1), logParts(2)))
+      }
       proc = input.substring(6)
       val serverIndex = proc.indexOf(", Server: ")
       if (serverIndex <= 0) return None
