@@ -10,9 +10,9 @@ import akka.agent.Agent
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import akka.util.ByteString
+import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
 import com.actionfps.ladder.parser._
 import play.api.{Configuration, Logger}
-import services.LadderService.NickToUser
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,8 +41,10 @@ class LadderService(commands: List[List[String]],
         .map(_.decodeString("UTF-8"))
         .via(LadderService.individualServerFlow(usersMap))
         .runForeach(g => agg.send(_.includeAggregate(s"$command")(g)))
-        .onFailure { case f =>
-          Logger.error(s"Failed to process command: ${command} due to: $f", f)
+        .onFailure {
+          case f =>
+            Logger.error(s"Failed to process command: ${command} due to: $f",
+                         f)
         }
     }
   }
@@ -50,16 +52,6 @@ class LadderService(commands: List[List[String]],
 }
 
 object LadderService {
-
-  trait NickToUser {
-    def userOfNickname(nickname: String): Option[String]
-  }
-
-  object NickToUser {
-    def empty: NickToUser = new NickToUser {
-      override def userOfNickname(nickname: String): Option[String] = None
-    }
-  }
 
   def individualServerFlow(nickToUser: () => Future[NickToUser])(
       implicit executionContext: ExecutionContext)
@@ -76,33 +68,6 @@ object LadderService {
       }
   }
 
-  case class TimedUserMessageExtract(nickToUser: NickToUser) {
-    def unapply(input: String): Option[TimedUserMessage] = {
-      val localTimeSample = "2016-07-02T22:09:14"
-      val regex = s"""\\[([^\\]]+)\\] ([^ ]+) (.*)""".r
-      val firstSpace = input.indexOf(' ')
-      if (firstSpace < 10) None
-      else {
-        val (time, rest) = input.splitAt(firstSpace)
-        val msg = rest.drop(1)
-        val instant = {
-          if (time.length == localTimeSample.length)
-            LocalDateTime.parse(time).toInstant(ZoneOffset.UTC)
-          else
-            ZonedDateTime.parse(time).toInstant
-        }
-        msg match {
-          case regex(ip, nickname, mesg) =>
-            nickToUser.userOfNickname(nickname) match {
-              case Some(user) =>
-                Some(TimedUserMessage(instant, user, mesg))
-              case _ => None
-            }
-          case _ => None
-        }
-      }
-    }
-  }
 
   def getSourceCommands(configuration: Configuration,
                         path: String): List[List[String]] = {
