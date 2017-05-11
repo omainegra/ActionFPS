@@ -24,18 +24,19 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
     val tsvExtract =
       TsvExtract(com.actionfps.ladder.parser.validServers, nick2User)
     val result = {
-      val source = scala.io.Source
-        .fromFile(path.toFile)
-      try {
-        source
-          .getLines()
-          .foldLeft(KeyedAggregate.empty[String]) {
-            case (ka, tsvExtract(serverKey, tum)) =>
-              ka.includeLine(serverKey)(tum)
-            case (ka, _) => ka
-          }
-      } finally source.close()
-//      KeyedAggregate.empty[String]
+//      val source = scala.io.Source
+//        .fromFile(path.toFile)
+      // commented to speed up load - load incrementally instead of a proper future.
+//      try {
+//        source
+//          .getLines()
+//          .foldLeft(KeyedAggregate.empty[String]) {
+//            case (ka, tsvExtract(serverKey, tum)) =>
+//              ka.includeLine(serverKey)(tum)
+//            case (ka, _) => ka
+//          }
+//      } finally source.close()
+      KeyedAggregate.empty[String]
     }
     Agent(result)
   }
@@ -51,7 +52,8 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
           .apply(
             path = path,
             maxChunkSize = 2048,
-            startingPosition = fileSize,
+            startingPosition = 0,
+//            startingPosition = fileSize,
             pollingInterval = 1.second
           )
           .via(
@@ -59,7 +61,7 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
                                                    2048,
                                                    allowTruncation = false))
           .map(_.decodeString("UTF-8"))
-          .drop(1) // we might be mid-line
+//          .drop(1) // we might be mid-line
           .mapConcat { line =>
             val tsvExtract =
               TsvExtract(com.actionfps.ladder.parser.validServers, nick2user)
