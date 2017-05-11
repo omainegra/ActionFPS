@@ -15,7 +15,7 @@ import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller}
-import services.{RemoteLadderService, TsvLadderService}
+import services.TsvLadderService
 import views.ladder.Table.PlayerNamer
 
 import scala.async.Async._
@@ -37,16 +37,10 @@ class LadderController @Inject()(configuration: Configuration,
     })
 
   private val ladderService = new TsvLadderService(
-    Paths.get(scala.util.Properties.userHome, "actionfps.tsv"),
-    () => nickToUser) /*new RemoteLadderService(
-    RemoteLadderService.getSourceCommands(configuration, "af.ladder.sources"),
-    usersMap = {
-      val f = nickToUser
-      () =>
-        f
-    })*/
+    Paths.get(configuration.underlying.getString("journal.large")),
+    () => nickToUser)
 
-//  ladderService.run()
+  ladderService.run()
 
   def aggregate: Future[Aggregate] =
     ladderService.aggregate.map(

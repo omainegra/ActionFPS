@@ -9,4 +9,5 @@ import scala.concurrent.Future
   */
 trait LadderService {
   def aggregate: Future[Aggregate]
+  def run(): Unit
 }

@@ -45,6 +45,7 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
         await(referenceProvider.Users.users)
           .map(u => u.id -> u.nickname.nickname)
           .toMap)
+      val ladderAggregateF = ladderController.aggregate
       implicit val namer = await(namerF)
       implicit val clanner = await(clannerF)
       implicit val clanIdToClan = ClanIdToClan(clanner.get)
@@ -77,7 +78,7 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
           events = events,
           latestClanwars = latestClanwars,
           bulletin = headingO,
-          ladder = await(ladderController.aggregate).top(NumberOfLadderPlayers),
+          ladder = await(ladderAggregateF).top(NumberOfLadderPlayers),
           playersStats = await(fullProvider.playerRanks).onlyRanked
             .top(NumberOfPlayerRanks),
           clanStats = cstats.top(NumberOfClanRanks)

@@ -87,4 +87,16 @@ class ParseSpec extends FreeSpec {
     info(s"${result}")
 
   }
+  "Lien parses" in {
+    val line = "2017-05-11T14:12:00Z\t62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#10000]\t[103.252.202.88] w00p|Drakas scored with the flag for CLA, new score 8"
+
+
+    val tsvExtract = TsvExtract(
+      servers = validServers,
+      nickToUser = NickToUser(Map("w00p|Drakas" -> "drakas").get)
+    )
+
+    info(s"${tsvExtract.unapply(line)}")
+
+  }
 }

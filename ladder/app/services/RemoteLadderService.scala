@@ -18,7 +18,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class RemoteLadderService(commands: List[List[String]],
                           usersMap: () => Future[NickToUser])(
     implicit executionContext: ExecutionContext,
-    actorMaterializer: ActorMaterializer) {
+    actorMaterializer: ActorMaterializer)
+    extends LadderService {
 
   private val agg = Agent(KeyedAggregate.empty[String])
 
@@ -65,7 +66,6 @@ object RemoteLadderService {
           }
       }
   }
-
 
   def getSourceCommands(configuration: Configuration,
                         path: String): List[List[String]] = {
