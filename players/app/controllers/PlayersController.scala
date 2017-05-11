@@ -114,7 +114,7 @@ class PlayersController @Inject()(common: WebTemplateRender,
                     WebTemplateRender.wwwLocation.resolve(
                       views.player.Player.PlayerFile),
                     player,
-                    ladderController.aggregate.ranked.find(_.user == id))
+                    await(ladderController.aggregate).ranked.find(_.user == id))
                 }
               }
             }
@@ -135,7 +135,7 @@ class PlayersController @Inject()(common: WebTemplateRender,
               map = build.favouriteMap,
               playername = build.user.nickname.nickname,
               countrycode = build.location.flatMap(_.countryCode),
-              ladderrank = ladderController.aggregate.ranked
+              ladderrank = await(ladderController.aggregate).ranked
                 .find(_.user == id)
                 .map(_.rank),
               gamecount =
