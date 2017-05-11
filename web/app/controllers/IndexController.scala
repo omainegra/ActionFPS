@@ -77,7 +77,7 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
           events = events,
           latestClanwars = latestClanwars,
           bulletin = headingO,
-          ladder = ladderController.aggregate.top(NumberOfLadderPlayers),
+          ladder = await(ladderController.aggregate).top(NumberOfLadderPlayers),
           playersStats = await(fullProvider.playerRanks).onlyRanked
             .top(NumberOfPlayerRanks),
           clanStats = cstats.top(NumberOfClanRanks)

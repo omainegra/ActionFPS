@@ -59,7 +59,7 @@ class ParseSpec extends FreeSpec {
     }
 
     val tsvExtract = TsvExtract(
-      servers = servers,
+      servers = validServers,
       nickToUser = NickToUser(u2n.get)
     )
     val keyedAggregate = KeyedAggregate
