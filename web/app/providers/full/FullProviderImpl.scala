@@ -29,9 +29,10 @@ import scala.util.{Failure, Success}
 @Singleton
 class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
                                  gamesProvider: GamesProvider,
-                                 applicationLifecycle: ApplicationLifecycle)
-                                (implicit executionContext: ExecutionContext,
-                                 actorSystem: ActorSystem) extends FullProvider() {
+                                 applicationLifecycle: ApplicationLifecycle)(
+    implicit executionContext: ExecutionContext,
+    actorSystem: ActorSystem)
+    extends FullProvider() {
 
   private val logger = Logger(getClass)
 
@@ -45,49 +46,56 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
     await(await(fullStuff).alter(_.updateReference(users, clans)))
   }
 
-  override protected[providers] val fullStuff: Future[Agent[GameAxisAccumulator]] = async {
+  override protected[providers] val fullStuff
+    : Future[Agent[GameAxisAccumulator]] = async {
     val users = await(referenceProvider.users)
     val clans = await(referenceProvider.clans)
     val allGames = await(gamesProvider.games)
 
-    val initial = GameAxisAccumulator
-      .empty
+    val initial = GameAxisAccumulator.empty
       .copy(
         users = users.map(u => u.id -> u).toMap,
         clans = clans.map(c => c.id -> c).toMap
       )
 
-    val newIterator = initial.includeGames(allGames.valuesIterator.toList.sortBy(_.id))
+    val newIterator =
+      initial.includeGames(allGames.valuesIterator.toList.sortBy(_.id))
 
     Agent(newIterator)
   }
 
   Source
     .actorRef[NewRawGameDetected](10, OverflowStrategy.dropHead)
-    .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[NewRawGameDetected]))
+    .mapMaterializedValue(
+      actorSystem.eventStream.subscribe(_, classOf[NewRawGameDetected]))
     .map(_.jsonGame)
     .mapAsync(1) { game =>
       async {
         val originalIteratorAgent = await(fullStuff)
         val originalIterator = originalIteratorAgent.get()
-        val newIterator = await(originalIteratorAgent.alter(_.includeGames(List(game))))
+        val newIterator =
+          await(originalIteratorAgent.alter(_.includeGames(List(game))))
         FullIteratorDetector(originalIterator, newIterator)
       }
     }
     .runForeach { fid =>
-      fid.detectGame.map(NewRichGameDetected).foreach(actorSystem.eventStream.publish)
-      fid.detectClanwar.map(NewClanwarCompleted).foreach(actorSystem.eventStream.publish)
+      fid.detectGame
+        .map(NewRichGameDetected)
+        .foreach(actorSystem.eventStream.publish)
+      fid.detectClanwar
+        .map(NewClanwarCompleted)
+        .foreach(actorSystem.eventStream.publish)
     }
     .onComplete {
       case Success(_) => logger.info("Stopped.")
-      case Failure(reason) => logger.error(s"Flow failed due to ${reason}", reason)
+      case Failure(reason) =>
+        logger.error(s"Flow failed due to ${reason}", reason)
     }
 
 }
 
-
-
-case class FullIteratorDetector(original: GameAxisAccumulator, updated: GameAxisAccumulator) {
+case class FullIteratorDetector(original: GameAxisAccumulator,
+                                updated: GameAxisAccumulator) {
 
   def detectClanwar: List[CompleteClanwar] = {
     (updated.clanwars.complete -- original.clanwars.complete).toList

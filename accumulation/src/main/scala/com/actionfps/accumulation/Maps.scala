@@ -5,7 +5,6 @@ import java.util.Properties
 /**
   * Created by me on 04/02/2016.
   */
-
 object Maps {
 
   private def getMap: Map[String, String] = {

@@ -24,16 +24,20 @@ import scala.util.{Failure, Success, Try}
   * So it's only slow on very first load.
   */
 @Singleton
-class HazelcastCachedProvider @Inject()(fullProviderR: FullProviderImpl,
-                                        applicationLifecycle: ApplicationLifecycle)
-                                       (implicit executionContext: ExecutionContext) extends FullProvider() {
+class HazelcastCachedProvider @Inject()(
+    fullProviderR: FullProviderImpl,
+    applicationLifecycle: ApplicationLifecycle)(
+    implicit executionContext: ExecutionContext)
+    extends FullProvider() {
   private val hz = HazelcastClient.newHazelcastClient()
   private val theMap = hz.getMap[String, GameAxisAccumulator]("stuff")
   private val keyName: String = "fullIterator"
   private val logger = Logger(getClass)
 
-  override protected[providers] val fullStuff: Future[Agent[GameAxisAccumulator]] = async {
+  override protected[providers] val fullStuff
+    : Future[Agent[GameAxisAccumulator]] = async {
     if (theMap.containsKey(keyName)) {
+
       /** In case class has changed **/
       Try(theMap.get(keyName)) match {
         case Success(good) => Agent(good)

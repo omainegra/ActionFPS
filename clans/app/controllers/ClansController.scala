@@ -3,7 +3,6 @@ package controllers
 /**
   * Created by William on 01/01/2016.
   */
-
 import java.time.Instant
 import javax.inject._
 
@@ -49,14 +48,18 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
   def rankings: Action[AnyContent] = Action.async { implicit request =>
     async {
       implicit val namer = await(namerF)
-      val stats = await(clanDataProvider.clanstats).shiftedElo(Instant.now()).onlyRanked.named
+      val stats = await(clanDataProvider.clanstats)
+        .shiftedElo(Instant.now())
+        .onlyRanked
+        .named
       if (request.getQueryString("format").contains("json"))
         Ok(Json.toJson(stats))
       else
-        Ok(webTemplateRender.renderTemplate(
-          title = Some("Clan Rankings"),
-          supportsJson = true
-        )(ClanRankings.render(stats)))
+        Ok(
+          webTemplateRender.renderTemplate(
+            title = Some("Clan Rankings"),
+            jsonLink = Some("?format=json")
+          )(views.html.clan_ranks_wrap(ClanRankings.render(stats))))
     }
   }
 
@@ -64,54 +67,63 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
     async {
       implicit val namer = await(namerF)
 
-      val ccw = await(clanDataProvider.clanwars)
-        .all
+      val ccw = await(clanDataProvider.clanwars).all
         .filter(_.clans.contains(id))
         .toList
         .sortBy(_.id)
         .reverse
         .take(15)
 
-      val st = await(clanDataProvider.clanstats).shiftedElo(Instant.now()).clans.get(id)
+      val st = await(clanDataProvider.clanstats)
+        .shiftedElo(Instant.now())
+        .clans
+        .get(id)
 
       await(clansProvider.clans).find(_.id == id) match {
         case Some(clan) =>
           if (request.getQueryString("format").contains("json")) {
             Ok(Json.toJson(ClanView(clan, ccw, st)))
           } else
-            Ok(webTemplateRender.renderTemplate(
-              title = Some(s"${clan.fullName}"),
-              supportsJson = true
-            )(views.html.clan(clan, ccw, st)))
+            Ok(
+              webTemplateRender.renderTemplate(
+                title = Some(s"${clan.fullName}"),
+                jsonLink = Some("?format=json")
+              )(views.html.clan(clan, ccw, st)))
         case None =>
           NotFound("Clan could not be found")
       }
     }
   }
 
-  def clanwar(id: String): Action[AnyContent] = Action.async { implicit request =>
-    async {
-      implicit val namer = await(namerF)
-      implicit val clanner = await(clannerF)
-      implicit val cidtc = await(clanIdToClan)
-      await(clanDataProvider.clanwars).all.find(_.id == id) match {
-        case Some(clanwar) =>
-          if (request.getQueryString("format").contains("json"))
-            Ok(Json.toJson(clanwar))
-          else
-            Ok(webTemplateRender.renderTemplate(
-              title = Some(s"${clanwar.clans.flatMap(clanner.get).map(_.fullName).mkString(" and ")} - Clanwar"),
-              supportsJson = true
-            )(views.html.clanwar.clanwar(
-              clanwarMeta = clanwar.meta.named,
-              showPlayers = true,
-              showGames = true,
-              clanwarHtmlPath = WebTemplateRender.wwwLocation.resolve(views.clanwar.Clanwar.ClanwarHtmlFile),
-              renderGame = g => views.rendergame.Render.renderMixedGame(MixedGame.fromJsonGame(g))
-            )))
-        case None => NotFound("Clanwar could not be found")
+  def clanwar(id: String): Action[AnyContent] = Action.async {
+    implicit request =>
+      async {
+        implicit val namer = await(namerF)
+        implicit val clanner = await(clannerF)
+        implicit val cidtc = await(clanIdToClan)
+        await(clanDataProvider.clanwars).all.find(_.id == id) match {
+          case Some(clanwar) =>
+            if (request.getQueryString("format").contains("json"))
+              Ok(Json.toJson(clanwar))
+            else
+              Ok(
+                webTemplateRender.renderTemplate(
+                  title = Some(
+                    s"${clanwar.clans.flatMap(clanner.get).map(_.fullName).mkString(" and ")} - Clanwar"),
+                  jsonLink = Some("?format=json")
+                )(views.html.clanwar.contained(views.html.clanwar.clanwar(
+                  clanwarMeta = clanwar.meta.named,
+                  showPlayers = true,
+                  showGames = true,
+                  clanwarHtmlPath = WebTemplateRender.wwwLocation.resolve(
+                    views.clanwar.Clanwar.ClanwarHtmlFile),
+                  renderGame = g =>
+                    views.rendergame.Render
+                      .renderMixedGame(MixedGame.fromJsonGame(g))
+                ))))
+          case None => NotFound("Clanwar could not be found")
+        }
       }
-    }
   }
 
   def clanwars: Action[AnyContent] = Action.async { implicit request =>
@@ -119,14 +131,20 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
       implicit val namer = await(namerF)
       implicit val clanner = await(clannerF)
       implicit val cidtc = await(clanIdToClan)
-      val cws = await(clanDataProvider.clanwars).all.toList.sortBy(_.id).reverse.take(50)
+      val cws = await(clanDataProvider.clanwars).all.toList
+        .sortBy(_.id)
+        .reverse
+        .take(50)
       request.getQueryString("format") match {
         case Some("json") =>
           Ok(Json.toJson(cws))
-        case _ => Ok(webTemplateRender.renderTemplate(
-          title = Some("Clanwars"),
-          supportsJson = true
-        )(views.html.clanwars(cws.map(_.meta.named))))
+        case _ =>
+          Ok(
+            webTemplateRender.renderTemplate(
+              title = Some("Clanwars"),
+              jsonLink = Some("?format=json")
+            )(views.html.clanwar
+              .contained(views.html.clanwars(cws.map(_.meta.named)))))
       }
     }
   }
@@ -134,10 +152,12 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
   def clans: Action[AnyContent] = Action.async { implicit request =>
     async {
       val clans = await(clansProvider.clans)
-      Ok(webTemplateRender.renderTemplate(
-        title = Some("ActionFPS Clans"),
-        supportsJson = true
-      )(views.html.clans(clans)))
+      Ok(
+        webTemplateRender.renderTemplate(
+          title = Some("ActionFPS Clans"),
+          jsonLink = Some(configuration.underlying.getString(
+            ClansController.ClansReferenceKey))
+        )(views.html.clans(clans)))
     }
   }
 
@@ -145,7 +165,11 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
 
 object ClansController {
 
-  case class ClanView(clan: Clan, recentClanwars: List[Clanwar], stats: Option[Clanstat])
+  val ClansReferenceKey = "af.reference.clans"
+
+  case class ClanView(clan: Clan,
+                      recentClanwars: List[Clanwar],
+                      stats: Option[Clanstat])
 
   object ClanView {
     implicit def cww(implicit namer: ClanNamer): Writes[ClanView] = {

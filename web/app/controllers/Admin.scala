@@ -3,7 +3,6 @@ package controllers
 /**
   * Created by William on 05/12/2015.
   */
-
 import javax.inject._
 
 import play.api.Configuration
@@ -15,8 +14,7 @@ import providers.full.FullProvider
 class Admin @Inject()(fullProvider: FullProvider,
                       referenceProvider: ReferenceProvider,
                       configuration: Configuration,
-                      components: ControllerComponents)
-  extends AbstractController(components) {
+  components: ControllerComponents)extends AbstractController(components) {
 
   /**
     * Reloads reference data and forces [[FullProvider]] to reevaluate usernames and clans for all games.
@@ -24,7 +22,8 @@ class Admin @Inject()(fullProvider: FullProvider,
     * @return
     */
   def reloadReference = Action { request =>
-    val apiKeyO = request.getQueryString("api-key").orElse(request.headers.get("api-key"))
+    val apiKeyO =
+      request.getQueryString("api-key").orElse(request.headers.get("api-key"))
     val apiKeyCO = configuration.get[String]("af.admin-api-key")
     if (apiKeyO == apiKeyCO) {
       referenceProvider.unCache()

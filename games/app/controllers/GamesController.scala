@@ -21,13 +21,15 @@ class GamesController @Inject()(webTemplateRender: WebTemplateRender,
 
   def recentGames: Action[AnyContent] = Action.async { implicit request =>
     async {
-      val games = await(providesGames.getRecent(100)).map(MixedGame.fromJsonGame)
-      Ok(webTemplateRender.renderTemplate(
-        title = Some("Recent ActionFPS Games"),
-        supportsJson = false
-      )(
-        views.html.recent_games(games)
-      ))
+      val games =
+        await(providesGames.getRecent(GamesController.NumberOfRecentGames))
+          .map(MixedGame.fromJsonGame)
+      Ok(
+        webTemplateRender.renderTemplate(
+          title = Some("Recent ActionFPS Games")
+        )(
+          views.html.recent_games(games)
+        ))
     }
   }
 
@@ -38,20 +40,27 @@ class GamesController @Inject()(webTemplateRender: WebTemplateRender,
           if (request.getQueryString("format").contains("json"))
             Ok(Json.toJson(game))
           else
-            Ok(webTemplateRender.renderTemplate(
-              title = Some {
-                val clanNames = await(providesClanNames.clanNames)
-                game.clangame.toList.flatMap(_.toList).flatMap(clanNames.get) match {
-                  case a :: b :: Nil => s"Clan game between ${a} and ${b}"
-                  case _ =>
-                    s"Game between ${game.teams.flatMap(_.players).flatMap(_.user).mkString(", ")}"
-                }
-              },
-              supportsJson = true
-            )(views.html.game(game)))
+            Ok(
+              webTemplateRender.renderTemplate(
+                title = Some {
+                  val clanNames = await(providesClanNames.clanNames)
+                  game.clangame.toList
+                    .flatMap(_.toList)
+                    .flatMap(clanNames.get) match {
+                    case a :: b :: Nil => s"Clan game between ${a} and ${b}"
+                    case _ =>
+                      s"Game between ${game.teams.flatMap(_.players).flatMap(_.user).mkString(", ")}"
+                  }
+                },
+                jsonLink = Some("?format=json")
+              )(views.html.game(game)))
         case None => NotFound("Game not found")
       }
     }
   }
 
+}
+
+object GamesController {
+  val NumberOfRecentGames = 100
 }

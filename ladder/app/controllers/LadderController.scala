@@ -3,18 +3,19 @@ package controllers
 /**
   * Created by me on 09/05/2016.
   */
+import java.nio.file.Paths
 import java.time.Instant
 import javax.inject._
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
 import com.actionfps.ladder.parser._
 import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc._
-import services.LadderService
-import services.LadderService.NickToUser
+import services.TsvLadderService
 import views.ladder.Table.PlayerNamer
 
 import scala.async.Async._
@@ -32,24 +33,19 @@ class LadderController @Inject()(configuration: Configuration,
 
   private def nickToUser: Future[NickToUser] =
     providesUsers.users.map(users =>
-      new NickToUser {
-        override def userOfNickname(nickname: String): Option[String] = {
-          users.find(_.nickname.nickname == nickname).map(_.id)
-        }
+      NickToUser { nickname =>
+        users.find(_.nickname.nickname == nickname).map(_.id)
     })
 
-  private val ladderService = new LadderService(
-    LadderService.getSourceCommands(configuration, "af.ladder.sources"),
-    usersMap = {
-      val f = nickToUser
-      () =>
-        f
-    })
+  private val ladderService = new TsvLadderService(
+    Paths.get(configuration.underlying.getString("journal.large")),
+    () => nickToUser)
 
   ladderService.run()
 
-  def aggregate: Aggregate =
-    ladderService.aggregate.displayed(Instant.now()).trimmed(Instant.now())
+  def aggregate: Future[Aggregate] =
+    ladderService.aggregate.map(
+      _.displayed(Instant.now()).trimmed(Instant.now()))
 
   def ladder: Action[AnyContent] = Action.async { implicit req =>
     async {
@@ -59,15 +55,19 @@ class LadderController @Inject()(configuration: Configuration,
             implicit val usWriter = Json.writes[UserStatistics]
             Json.writes[Aggregate]
           }
-          Ok(Json.toJson(aggregate))
+          Ok(Json.toJson(await(aggregate)))
         case _ =>
           implicit val playerNamer = PlayerNamer.fromMap(
             await(providesUsers.users).map(u => u.id -> u.name).toMap)
           Ok(
-            common.renderTemplate(title = Some("Ladder"), supportsJson = true)(
-              views.ladder.Table.render(
-                WebTemplateRender.wwwLocation.resolve("ladder_table.html"),
-                aggregate)(showTime = true)))
+            common.renderTemplate(title = Some("Ladder"),
+                                  jsonLink = Some("?format=json"))(
+              views.html.ladder
+                .big_table(
+                  views.ladder.Table.render(
+                    WebTemplateRender.wwwLocation.resolve("ladder_table.html"),
+                    await(aggregate))(showTime = true))
+            ))
       }
     }
   }

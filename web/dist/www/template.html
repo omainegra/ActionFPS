@@ -109,18 +109,14 @@
     }
     ga('send', 'pageview');
 
-    var contentWithJson = document.querySelector("#content[data-has-json='has-json']");
-    if (contentWithJson) {
-        var p = document.createElement("p");
-        p.setAttribute("id", "view-json");
-        var a = document.createElement("a");
-        p.appendChild(a);
-        var text = document.createTextNode("View JSON");
-        a.appendChild(text);
-        var char = location.search.startsWith("?") ? "&" : "?";
-        a.setAttribute("href", location.search + char + "format=json");
-        contentWithJson.appendChild(p);
-    }
+    [].forEach.call(document.querySelectorAll("#bottom-links a"), function(a) {
+        if ( a.getAttribute("href") === "?format=json" ) {
+            var char = location.search.startsWith("?") ? "&" : "?";
+            var jsonLink = location.search + char + "format=json";
+            a.setAttribute("href", jsonLink);
+        }
+    });
+
 </script>
 <script src="/assets/push/push.js"></script>
 </body>

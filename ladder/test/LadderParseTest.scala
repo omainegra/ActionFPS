@@ -1,7 +1,7 @@
+import com.actionfps.ladder.parser.TimedUserMessageExtract
+import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
 import org.scalatest.OptionValues._
 import org.scalatest.{FreeSpec, Matchers}
-import services.LadderService
-import services.LadderService.NickToUser
 
 /**
   * Created by me on 18/01/2017.
@@ -9,8 +9,7 @@ import services.LadderService.NickToUser
 class LadderParseTest extends FreeSpec with Matchers {
   "TimedUserMessage" - {
     "is extracted" in {
-      val tme = LadderService
-        .TimedUserMessageExtract(new NickToUser {
+      val tme = TimedUserMessageExtract(new NickToUser {
           override def userOfNickname(nickname: String): Option[String] =
             if (nickname == "egg") Some("egghead") else None
         })
@@ -23,13 +22,11 @@ class LadderParseTest extends FreeSpec with Matchers {
       assert(tme.message == "gibbed nescio")
     }
     "is not extracted when user doesn't match" in {
-      LadderService
-        .TimedUserMessageExtract(NickToUser.empty)
+      TimedUserMessageExtract(NickToUser.empty)
         .unapply(LadderParseTest.sampleMessage) shouldBe empty
     }
     "is not extracted for an empty input" in {
-      LadderService
-        .TimedUserMessageExtract(NickToUser.empty)
+      TimedUserMessageExtract(NickToUser.empty)
         .unapply("") shouldBe empty
     }
   }

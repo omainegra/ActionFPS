@@ -36,6 +36,8 @@
     </ol>
 </div>
 
+
+@views.Top10.render(clanStats, playersStats, ladder)
 @views.ladder.Table.render(WebTemplateRender.wwwLocation.resolve("ladder_table.html"), ladder)(showTime = false)
 @views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(views.PlayerRanks.PlayerRanksFilename), playersStats)
 @views.ClanRankings.render(clanStats)

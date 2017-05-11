@@ -3,6 +3,7 @@ import sbt._
 object Dependencies {
 
   val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.3"
+  val sourcecode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.1.3"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
   val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.4"
   val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.18"
@@ -30,8 +31,8 @@ object Dependencies {
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 
   val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.5.2"
-  val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.8.0"
-  val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.8.0"
+  val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.9.0"
+  val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.9.0"
 
   val raptureJsonPlay: ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M9" exclude ("com.typesafe.play", "play-json")
 

@@ -620,16 +620,18 @@ img.clan-logo {
   margin-top:-1.3em;
 }
 
-#view-json {
+#bottom-links {
   text-align: center;
   font-size: 0.8em;
 }
 
-#view-json a {
+#bottom-links a {
   display: inline-block;
   background: #333;
   padding: 0.5em 1em;
   border-radius: 0.5em;
+  margin-left:0.25em;
+  margin-right:0.25em;
 }
 
 .of-clanwar {
@@ -751,6 +753,13 @@ input {
 #clan-ranks {
   order:7;
 }
+#bottom-links {
+  order:8;
+}
+
+.top10 {
+  order:6;
+}
 .day-cell-tooltip {
   margin-top:20em;
   margin-left:10em;
@@ -834,4 +843,8 @@ input {
 
 #server-status:not(.active) {
   display:none;
+}
+
+.top10, .top10 th, .top10 td {
+  text-align:left;
 }

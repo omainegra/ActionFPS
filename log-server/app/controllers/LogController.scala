@@ -54,14 +54,14 @@ class LogController(sourceFile: Path, components: ControllerComponents)
             id = Some(DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)),
             data = s"${DateTimeFormatter.ISO_INSTANT
               .format(zdt.toInstant)}\t${server}\t${message}\n",
-            name = None
+            name = Some("log")
           )
       }
       .merge(keepAliveEventSource)
     Ok.chunked(eventsStream).as(ContentTypes.EVENT_STREAM)
   }
 
-  def historical(from: String, to: String) = Action { request =>
+  def historical(from: String, to: Option[String]) = Action { request =>
     if (!request.jwtSession.isEmpty()) {
       require(request.jwtSession.claim.isValid(IssuerName))
     }
@@ -76,12 +76,15 @@ class LogController(sourceFile: Path, components: ControllerComponents)
         .delimiter(ByteString.fromString("\n"), 8096, allowTruncation = false))
       .map(_.decodeString("UTF-8"))
 
+    val fromTime = ZonedDateTime.parse(from)
+    val toTime = to.map(ZonedDateTime.parse).getOrElse(ZonedDateTime.now())
+
     val dataSource = fileSource
       .collect[MessageType] {
         case ExtractMessage(zdt, server, message) => (zdt, server, message)
       }
-      .dropWhile(_._1.isBefore(ZonedDateTime.parse(from)))
-      .takeWhile(_._1.isBefore(ZonedDateTime.parse(to)))
+      .dropWhile(_._1.isBefore(fromTime))
+      .takeWhile(_._1.isBefore(toTime))
       .via(logAccess.filterFlow)
       .map {
         case (zdt, server, message) =>

@@ -3,7 +3,6 @@ package lib
 /**
   * Created by William on 01/01/2016.
   */
-
 import java.nio.file.{Files, Path, Paths}
 import javax.inject._
 
@@ -21,24 +20,24 @@ class WebTemplateRender @Inject()() {
 
   /**
     * @param title Set the title tag content to this.
-    * @param supportsJson Indicate whether there's JSON support at this page.
-    *                     Client-side will append a link button to view the JSON at '?format=json'.
+    * @param jsonLink Indicate whether there's JSON support at this page.
     * @param wide whether to render a wide layout. Adds "wide" class to the body.
     * @param html HTML to put inside '#content' element.
     * @param requestHeader implicit request header. Used to extract cookie information.
     * @return rendered HTML.
     */
   def renderTemplate(title: Option[String],
-                     supportsJson: Boolean,
-                     wide: Boolean = false)
-                    (html: Html)
-                    (implicit requestHeader: RequestHeader): Html = {
-    val templateHtmlPath = WebTemplateRender.wwwLocation.resolve("template.html")
+                     jsonLink: Option[String] = None,
+                     sourceLink: Boolean = true,
+                     wide: Boolean = false)(html: Html)(
+      implicit requestHeader: RequestHeader,
+      file: sourcecode.File,
+      line: sourcecode.Line
+  ): Html = {
+    val templateHtmlPath =
+      WebTemplateRender.wwwLocation.resolve("template.html")
     val js = Jsoup.parse(templateHtmlPath.toFile, "UTF-8")
     title.foreach(js.title)
-    if (supportsJson) {
-      js.select("#content").attr("data-has-json", "has-json")
-    }
     if (wide) {
       js.body.addClass("wide")
     }
@@ -47,7 +46,9 @@ class WebTemplateRender @Inject()() {
     js.select(s"#reg-menu-play").first().text("Play!")
 
     PartialFunction.condOpt(
-      requestHeader.cookies.get("af_id").map(_.value) -> requestHeader.cookies.get("af_name").map(_.value)
+      requestHeader.cookies
+        .get("af_id")
+        .map(_.value) -> requestHeader.cookies.get("af_name").map(_.value)
     ) {
       case (Some(id), Some(name)) =>
         js.select("#log-in").first().text(name)
@@ -58,13 +59,45 @@ class WebTemplateRender @Inject()() {
         js.select("#reg-menu-play").parents().first().remove()
     }
     js.select("#content").html(html.body)
+    val prefix = "https://github.com/ScalaWilliam/ActionFPS/blob/master"
+    val bottomLinksElement = {
+      val el = js.select("nav#bottom-links")
+      if (el.isEmpty) {
+        val nel = js.createElement("nav").attr("id", "bottom-links")
+        js.select("#content").first().appendChild(nel)
+        nel
+      } else el.first()
+    }
+
+    if ( sourceLink ) {
+      val lineExtra =
+        Some(line.value).filter(_ > 0).map(l => s"#L${l}").getOrElse("")
+      bottomLinksElement
+        .appendElement("a")
+        .attr(
+          "href",
+          s"${prefix}${file.value.drop(WebTemplateRender.removePrefixLength)}${lineExtra}")
+        .text("View source (GitHub)")
+    }
+
+    jsonLink.foreach { l =>
+      bottomLinksElement.appendElement("a").attr("href", l).text("View JSON")
+    }
+
+    if ( bottomLinksElement.children().isEmpty ) {
+      bottomLinksElement.remove()
+    }
 
     Html(js.toString)
   }
 
-  def renderStatic(path: Path, wide: Boolean = false)(implicit requestHeader: RequestHeader): Result = {
-    Ok(renderTemplate(title = None, supportsJson = false, wide = wide) {
-      Html(new String(Files.readAllBytes(WebTemplateRender.wwwLocation.resolve(path))))
+  def renderStatic(path: Path, wide: Boolean = false)(
+      implicit file: sourcecode.File) = Action { implicit r =>
+    implicit val line: sourcecode.Line = sourcecode.Line(0)
+    Ok(renderTemplate(title = None, wide = wide) {
+      Html(
+        new String(
+          Files.readAllBytes(WebTemplateRender.wwwLocation.resolve(path))))
     })
   }
 
@@ -79,4 +112,17 @@ object WebTemplateRender {
         throw new IllegalArgumentException(s"Could not find 'www'.")
       }
   }
+
+  private val myFile = implicitly[sourcecode.File].value
+
+  val root: String = myFile
+    .split("/", -1)
+    .reverse
+    .dropWhile(_ != "web")
+    .drop(1)
+    .reverse
+    .mkString("/")
+
+  val removePrefixLength: Int = root.length
+
 }

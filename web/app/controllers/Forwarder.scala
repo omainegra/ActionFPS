@@ -38,12 +38,14 @@ class Forwarder @Inject()(environment: Environment,
 
   def getAsset(path: String): Action[AnyContent] = {
     resources.find(_.endsWith(path)) match {
-      case Some(v) => Action {
-        Ok.sendFile(v.toFile)
-      }
-      case None => Action {
-        NotFound("Not found")
-      }
+      case Some(v) =>
+        Action {
+          Ok.sendFile(v.toFile)
+        }
+      case None =>
+        Action {
+          NotFound("Not found")
+        }
     }
   }
 

@@ -11,7 +11,7 @@ import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
 import com.actionfps.stats.Clanstats
 import com.google.inject.ImplementedBy
-import controllers.ProvidesGames
+import controllers.{PlayersProvider, ProvidesGames}
 import lib.ClanDataProvider
 
 import scala.concurrent.{ExecutionContext, Future}

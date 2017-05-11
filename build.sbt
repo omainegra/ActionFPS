@@ -124,11 +124,13 @@ lazy val inters =
     id = "inters",
     base = file("inters")
   ).dependsOn(interParser)
+    .enablePlugins(PlayScala)
     .dependsOn(accumulation)
     .configs(IntegrationTest)
     .settings(Defaults.itSettings: _*)
     .aggregate(interParser)
     .settings(
+      scalaSource in IntegrationTest := baseDirectory.value / "it",
       libraryDependencies ++= Seq(
         gameParser,
         async,
@@ -194,7 +196,7 @@ lazy val ladder =
 lazy val jsonFormats =
   Project(
     id = "json-formats",
-    base = file("json-formats")
+    base = file("web/json-formats")
   ).dependsOn(accumulation)
     .settings(
       libraryDependencies += playJson,
@@ -285,8 +287,11 @@ lazy val players = Project(
   .aggregate(playerAchievements)
   .aggregate(playerUser)
   .settings(
-    libraryDependencies += async,
-    libraryDependencies += jsoup
+    libraryDependencies ++= Seq(
+      async,
+      jsoup,
+      ws
+    )
   )
 
 lazy val playerStats =
@@ -309,7 +314,7 @@ lazy val playerUser = Project(
 
 lazy val playerAchievements =
   Project(
-    id = "players-achievements",
+    id = "player-achievements",
     base = file("players/player-achievements")
   ).dependsOn(playerUser)
     .settings(
@@ -349,6 +354,7 @@ lazy val webTemplate =
     .settings(
       libraryDependencies ++= Seq(
         async,
+        sourcecode,
         jsoup
       )
     )
