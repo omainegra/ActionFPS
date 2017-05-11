@@ -8,14 +8,13 @@ import javax.inject._
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
 import com.actionfps.ladder.parser._
 import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller}
-import play.twirl.api.Html
 import services.LadderService
-import services.LadderService.NickToUser
 import views.ladder.Table.PlayerNamer
 
 import scala.async.Async._
@@ -32,10 +31,8 @@ class LadderController @Inject()(configuration: Configuration,
 
   private def nickToUser: Future[NickToUser] =
     providesUsers.users.map(users =>
-      new NickToUser {
-        override def userOfNickname(nickname: String): Option[String] = {
-          users.find(_.nickname.nickname == nickname).map(_.id)
-        }
+      NickToUser { nickname =>
+        users.find(_.nickname.nickname == nickname).map(_.id)
     })
 
   private val ladderService = new LadderService(
