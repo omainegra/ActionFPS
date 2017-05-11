@@ -11,9 +11,12 @@ import play.api.mvc.ControllerComponents
   * Created by me on 02/05/2017.
   */
 @Singleton
-class RawLogController(logFile: Path, components: ControllerComponents) extends LogController(logFile, components) {
-  @Inject() def this(configuration: Configuration, components: ControllerComponents) = this(
-    ForJournal.ForConfig(configuration.underlying).lastLogPathO.get,
-    components
-  )
+class RawLogController(logFile: Path, components: ControllerComponents)
+    extends LogController(logFile, components) {
+  @Inject()
+  def this(configuration: Configuration, components: ControllerComponents) =
+    this(
+      ForJournal.ForConfig(configuration.underlying).lastLogPathO.get,
+      components
+    )
 }

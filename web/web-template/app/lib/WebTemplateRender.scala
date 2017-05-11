@@ -8,7 +8,7 @@ import javax.inject._
 
 import org.jsoup.Jsoup
 import play.api.mvc.Results._
-import play.api.mvc.{Action, RequestHeader, Result}
+import play.api.mvc._
 import play.twirl.api.Html
 
 /**
@@ -16,7 +16,8 @@ import play.twirl.api.Html
   *
   * Here we use the DOM Templating technique of manipulating the HTML tree.
   */
-class WebTemplateRender @Inject()() {
+class WebTemplateRender @Inject()(controllerComponents: ControllerComponents)
+    extends AbstractController(controllerComponents) {
 
   /**
     * @param title Set the title tag content to this.
@@ -69,7 +70,7 @@ class WebTemplateRender @Inject()() {
       } else el.first()
     }
 
-    if ( sourceLink ) {
+    if (sourceLink) {
       val lineExtra =
         Some(line.value).filter(_ > 0).map(l => s"#L${l}").getOrElse("")
       bottomLinksElement
@@ -84,7 +85,7 @@ class WebTemplateRender @Inject()() {
       bottomLinksElement.appendElement("a").attr("href", l).text("View JSON")
     }
 
-    if ( bottomLinksElement.children().isEmpty ) {
+    if (bottomLinksElement.children().isEmpty) {
       bottomLinksElement.remove()
     }
 

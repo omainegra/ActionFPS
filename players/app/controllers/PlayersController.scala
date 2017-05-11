@@ -12,7 +12,7 @@ import com.actionfps.user.Registration
 import lib.WebTemplateRender
 import play.api.http.Writeable
 import play.api.libs.json.{JsObject, JsString, Json}
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 import play.api.{Configuration, Logger}
 
 import scala.async.Async._
@@ -23,18 +23,19 @@ import play.api.libs.ws.WSClient
 @Singleton
 class PlayersController @Inject()(common: WebTemplateRender,
                                   playersProvider: PlayersProvider,
-                                  ladderController: LadderController)(
+                                  ladderController: LadderController,
+                                  controllerComponents: ControllerComponents)(
     implicit configuration: Configuration,
     executionContext: ExecutionContext,
     wSClient: WSClient)
-    extends Controller {
+    extends AbstractController(controllerComponents) {
 
-  import common._
+  import common.renderTemplate
 
   private val logger = Logger(getClass)
 
   private implicit val publicKey: PublicKey =
-    configuration.getString("registration.public-key") match {
+    configuration.getOptional[String]("registration.public-key") match {
       case Some(publicKeyStr) =>
         val bytes = Base64.getDecoder.decode(publicKeyStr)
         val keySpec = new X509EncodedKeySpec(bytes)
@@ -88,9 +89,10 @@ class PlayersController @Inject()(common: WebTemplateRender,
         Ok(Json.toJson(ranks))
       else
         Ok(
-          renderTemplate(title = Some("Player Rankings"),
-                         jsonLink = Some("?format=json"))(
-            views.html.player.gh_link(views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(
+          renderTemplate(
+            title = Some("Player Rankings"),
+            jsonLink = Some("?format=json"))(views.html.player.gh_link(
+            views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(
                                        views.PlayerRanks.PlayerRanksFilename),
                                      ranks))))
     }
@@ -114,7 +116,8 @@ class PlayersController @Inject()(common: WebTemplateRender,
                     WebTemplateRender.wwwLocation.resolve(
                       views.player.Player.PlayerFile),
                     player,
-                    await(ladderController.aggregate).ranked.find(_.user == id))
+                    await(ladderController.aggregate).ranked
+                      .find(_.user == id))
                 }
               }
             }

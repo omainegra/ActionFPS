@@ -30,8 +30,10 @@ import scala.concurrent.ExecutionContext
   */
 class Dev @Inject()(webTemplateRender: WebTemplateRender,
                     newsService: NewsService,
-                    components: ControllerComponents)
-                   (implicit executionContext: ExecutionContext) extends AbstractController(components) withSimpleRouter {
+                    components: ControllerComponents)(
+    implicit executionContext: ExecutionContext)
+    extends AbstractController(components)
+    with SimpleRouter {
 
   private implicit class RichHtml(html: Html) {
     def transform(f: String => String): Html = {
