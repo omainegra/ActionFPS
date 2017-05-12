@@ -40,12 +40,6 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
 
   private implicit val actorMaterializer = ActorMaterializer()
 
-  override def reloadReference(): Future[GameAxisAccumulator] = async {
-    val users = await(referenceProvider.users).map(u => u.id -> u).toMap
-    val clans = await(referenceProvider.clans).map(c => c.id -> c).toMap
-    await(await(fullStuff).alter(_.updateReference(users, clans)))
-  }
-
   override protected[providers] val fullStuff
     : Future[Agent[GameAxisAccumulator]] = async {
     val users = await(referenceProvider.users)
