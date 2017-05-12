@@ -1,13 +1,11 @@
 package lib
 
-import java.net.URI
 import java.nio.file._
 
 import com.actionfps.api.Game
 import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
 import com.actionfps.servers.ValidServers
 import com.typesafe.config.Config
-import org.apache.http.client.utils.URIBuilder
 import play.api.Logger
 import play.api.libs.json.{Format, Json}
 
