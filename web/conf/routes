@@ -37,6 +37,3 @@ GET         /download-direct/game/          @controllers.DownloadsController.gam
 GET         /logs.tsv                       @controllers.RawLogController.historical(from: String, to: Option[String])
 GET         /logs                           @controllers.RawLogController.stream
 GET         /logs/stream/                   @controllers.RawLogController.stream
-
-GET         /logs/large.tsv                 @controllers.LargeJournalController.historical(from: String, to: Option[String])
-GET         /logs/large/stream/             @controllers.LargeJournalController.stream

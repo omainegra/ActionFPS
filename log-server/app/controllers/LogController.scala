@@ -132,6 +132,8 @@ object LogController {
   case class LogAccess(levels: Set[String]) {
     def showIps: Boolean = levels.contains("ip")
 
+    def readOld: Boolean = levels.contains("old")
+
     def filterFlow: Flow[MessageType, MessageType, NotUsed] = {
       Flow[MessageType]
         .map {
