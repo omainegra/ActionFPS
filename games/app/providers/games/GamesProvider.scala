@@ -1,6 +1,7 @@
 package providers.games
 
 import java.nio.file.{Files, Path, Paths, StandardOpenOption}
+import java.time.Clock
 import javax.inject.{Inject, Singleton}
 
 import akka.NotUsed
@@ -32,13 +33,21 @@ class GamesProvider(gameJournalPath: Path)(
 
   private val gamesActorFuture: Future[Agent[Map[String, JsonGame]]] = Future {
     blocking {
+      val startTime = Clock.systemUTC().instant()
 
-      Agent {
+      val agent = Agent {
         GamesFromSource
           .loadUnfiltered(scala.io.Source.fromFile(gameJournalPath.toFile))
           .map(game => game.id -> game)
           .toMap
       }
+      val endTime = Clock.systemUTC().instant()
+      val deltaTime =
+        java.time.Duration.between(startTime, endTime)
+
+      Logger.info(s"It took ${deltaTime} to load games from journal.")
+
+      agent
     }
   }
 

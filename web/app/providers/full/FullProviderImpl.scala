@@ -1,6 +1,7 @@
 package providers.full
 
 import java.nio.file.Paths
+import java.time.Clock
 import javax.inject.{Inject, Singleton}
 
 import akka.NotUsed
@@ -60,8 +61,15 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
         clans = clans.map(c => c.id -> c).toMap
       )
 
+    val startTime = Clock.systemUTC().instant()
+
     val newIterator =
       initial.includeGames(allGames.valuesIterator.toList.sortBy(_.id))
+
+    val endTime = Clock.systemUTC().instant()
+
+    Logger.info(
+      s"It took ${java.time.Duration.between(startTime, endTime)} to compute accumulator data.")
 
     Agent(newIterator)
   }
