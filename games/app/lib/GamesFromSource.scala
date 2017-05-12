@@ -14,6 +14,7 @@ import scala.io.Source
   *
   */
 object GamesFromSource {
+
   /**
     * Load a list of [[Game]] from [[scala.io.Source]]
     * Will rethrow any exceptions and also filter out games.
@@ -32,26 +33,36 @@ object GamesFromSource {
       .toList
   }
 
-  def loadUnfiltered(source: => Source)(implicit reads: Reads[Game]): List[Game] = {
+  def loadUnfiltered(source: => Source)(
+      implicit reads: Reads[Game]): List[Game] = {
     val src = source
-    try src.getLines().zipWithIndex.filter(_._1.nonEmpty).map { case (line, lineno) =>
-      line.split("\t").toList match {
-        case id :: _ :: _ :: jsonText :: Nil =>
-          Json.fromJson[Game](Json.parse(jsonText)) match {
-            case JsSuccess(good, _) => good
-            case e: JsError =>
-              throw new RuntimeException(s"Failed to parse JSON in line ${lineno} due to ${e}: $jsonText")
+    try src
+      .getLines()
+      .zipWithIndex
+      .filter(_._1.nonEmpty)
+      .map {
+        case (line, lineno) =>
+          line.split("\t").toList match {
+            case id :: _ :: _ :: jsonText :: Nil =>
+              Json.fromJson[Game](Json.parse(jsonText)) match {
+                case JsSuccess(good, _) => good
+                case e: JsError =>
+                  throw new RuntimeException(
+                    s"Failed to parse JSON in line ${lineno} due to ${e}: $jsonText")
+              }
+            case id :: jsonText :: Nil =>
+              Json.fromJson[Game](Json.parse(jsonText)) match {
+                case JsSuccess(good, _) => good
+                case e: JsError =>
+                  throw new RuntimeException(
+                    s"Failed to parse JSON in line ${lineno} due to ${e}: $jsonText")
+              }
+            case _ =>
+              throw new RuntimeException(
+                s"Failed to parse in line ${lineno}: $line")
           }
-        case id :: jsonText :: Nil =>
-          Json.fromJson[Game](Json.parse(jsonText)) match {
-            case JsSuccess(good, _) => good
-            case e: JsError =>
-              throw new RuntimeException(s"Failed to parse JSON in line ${lineno} due to ${e}: $jsonText")
-          }
-        case _ =>
-          throw new RuntimeException(s"Failed to parse in line ${lineno}: $line")
       }
-    }.toList
+      .toList
     finally src.close
   }
 

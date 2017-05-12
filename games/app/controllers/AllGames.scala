@@ -16,12 +16,14 @@ import scala.async.Async._
 import scala.concurrent.ExecutionContext
 
 import com.actionfps.formats.json.Formats._
+
 /**
   * Provide a batch list of all games in different formats.
   */
 @Singleton
-class AllGames @Inject()(providesGames: ProvidesGames)
-                        (implicit executionContext: ExecutionContext) extends SimpleRouter {
+class AllGames @Inject()(providesGames: ProvidesGames)(
+    implicit executionContext: ExecutionContext)
+    extends SimpleRouter {
 
   import providesGames._
 
@@ -42,9 +44,9 @@ class AllGames @Inject()(providesGames: ProvidesGames)
   private def allTsv: Action[AnyContent] = Action.async { implicit req =>
     async {
       Ok.chunked(
-        Source(await(allGames).filter(gameFilter))
-          .map(game => s"${game.id}\t${Json.toJson(game)}\n")
-      )
+          Source(await(allGames).filter(gameFilter))
+            .map(game => s"${game.id}\t${Json.toJson(game)}\n")
+        )
         .as("text/tab-separated-values")
         .withHeaders("Content-Disposition" -> "attachment; filename=games.tsv")
     }
@@ -53,7 +55,8 @@ class AllGames @Inject()(providesGames: ProvidesGames)
   private def allCsv: Action[AnyContent] = Action.async { implicit req =>
     async {
       Ok.chunked(Source(await(allGames).filter(gameFilter))
-        .map(game => CSVFormat.DEFAULT.format(game.id, Json.toJson(game)) + "\n"))
+          .map(game =>
+            CSVFormat.DEFAULT.format(game.id, Json.toJson(game)) + "\n"))
         .as("text/csv")
     }
   }
@@ -61,7 +64,7 @@ class AllGames @Inject()(providesGames: ProvidesGames)
   private def allNdJson: Action[AnyContent] = Action.async { implicit req =>
     async {
       Ok.chunked(Source(await(allGames).filter(gameFilter))
-        .map(game => Json.toJson(game).toString() + "\n"))
+          .map(game => Json.toJson(game).toString() + "\n"))
         .as("text/plain")
     }
   }
@@ -71,7 +74,8 @@ class AllGames @Inject()(providesGames: ProvidesGames)
       val source = await(allGames).filter(gameFilter) match {
         case head :: rest =>
           Source(List("[\n", Json.toJson(head).toString))
-            .concat(Source(rest).map(game => ",\n  " + Json.toJson(game).toString()))
+            .concat(Source(rest).map(game =>
+              ",\n  " + Json.toJson(game).toString()))
             .concat(Source(List("\n]")))
         case Nil => Source(List("[]"))
       }

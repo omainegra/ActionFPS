@@ -3,7 +3,6 @@ package providers.games
 /**
   * Created by William on 01/01/2016.
   */
-
 import com.actionfps.accumulation.ServerValidator._
 import com.actionfps.api.Game
 import com.actionfps.gameparser.GameScanner
@@ -20,7 +19,11 @@ object JournalGamesProvider {
     */
   def fromSource(source: => Source): List[Game] = {
     val src = source
-    try src.getLines().scanLeft(GameScanner.initial)(GameScanner.scan).collect(GameScanner.collect).toList
+    try src
+      .getLines()
+      .scanLeft(GameScanner.initial)(GameScanner.scan)
+      .collect(GameScanner.collect)
+      .toList
     finally src.close()
   }
 
@@ -36,4 +39,3 @@ object JournalGamesProvider {
   }
 
 }
-
