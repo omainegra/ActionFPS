@@ -12,6 +12,11 @@ Make sure to install:
 - <a href="www.scala-sbt.org">SBT</a>: (<a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Mac.html">Mac</a>,
                                                         <a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Windows.html">Windows</a>,
                                                         <a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Linux.html">Linux</a>).
+#### Get the reference data
+```
+$ make reference-data
+```
+
 ### Development
 
 ```
