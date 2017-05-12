@@ -379,7 +379,9 @@ lazy val games =
     .settings(
       libraryDependencies ++= Seq(
         jsoup,
-        async
+        akkaAgent,
+        async,
+        alpakkaFile
       )
     )
 

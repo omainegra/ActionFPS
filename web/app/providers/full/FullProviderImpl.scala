@@ -4,6 +4,7 @@ import javax.inject.{Inject, Singleton}
 
 import akka.actor.ActorSystem
 import akka.agent.Agent
+import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import com.actionfps.accumulation.GameAxisAccumulator
@@ -58,27 +59,32 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
     Agent(newIterator)
   }
 
-  Source
-    .actorRef[NewRawGameDetected](10, OverflowStrategy.dropHead)
-    .mapMaterializedValue(
-      actorSystem.eventStream.subscribe(_, classOf[NewRawGameDetected]))
-    .map(_.jsonGame)
+  FileTailSource
+    .lines(
+      path = ???,
+      maxLineSize = ???,
+      pollingInterval = ???,
+      lf = "\n"
+    )
+    .via(gamesProvider.journalLinesToGames)
     .mapAsync(1) { game =>
       async {
         val originalIteratorAgent = await(fullStuff)
         val originalIterator = originalIteratorAgent.get()
         val newIterator =
           await(originalIteratorAgent.alter(_.includeGames(List(game))))
-        FullIteratorDetector(originalIterator, newIterator)
+        await(gamesProvider.sinkGame(game))
+        game -> FullIteratorDetector(originalIterator, newIterator)
       }
     }
-    .runForeach { fid =>
-      fid.detectGame
-        .map(NewRichGameDetected)
-        .foreach(actorSystem.eventStream.publish)
-      fid.detectClanwar
-        .map(NewClanwarCompleted)
-        .foreach(actorSystem.eventStream.publish)
+    .runForeach {
+      case (game, fid) =>
+        fid.detectGame
+          .map(NewRichGameDetected)
+          .foreach(actorSystem.eventStream.publish)
+        fid.detectClanwar
+          .map(NewClanwarCompleted)
+          .foreach(actorSystem.eventStream.publish)
     }
     .onComplete {
       case Success(_) => logger.info("Stopped.")
