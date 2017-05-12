@@ -44,8 +44,9 @@ object ClanRankings {
               .attr("href", s"/clanwar/?id=${clanwarId}")
               .select("time")
               .attr("datetime", clanwarId)
+              .first()
+              .text(s"${clanwarId}")
         }
-        <td class="clan-last-clanwar"><a href=""><time is="relative-time" datetime="2016-02-03">2016-02-03</time></a></td>
         target
       }
       .foreach(tbodyTr.first().parent().appendChild)
