@@ -37,7 +37,9 @@ class LadderController @Inject()(configuration: Configuration,
     })
 
   private val ladderService = new TsvLadderService(
-    Paths.get(configuration.underlying.getString("journal.large")),
+    Paths
+      .get(configuration.underlying.getString("journal.large"))
+      .toAbsolutePath,
     () => nickToUser)
 
   ladderService.run()

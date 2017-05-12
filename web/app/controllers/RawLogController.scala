@@ -12,6 +12,6 @@ import play.api.Configuration
 @Singleton
 class RawLogController(logFile: Path) extends LogController(logFile: Path) {
   @Inject() def this(configuration: Configuration) = this(
-    ForJournal.ForConfig(configuration.underlying).lastLogPathO.get
+    ForJournal.ForConfig(configuration.underlying).logJournalPath
   )
 }

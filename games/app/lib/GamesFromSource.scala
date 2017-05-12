@@ -33,7 +33,7 @@ object GamesFromSource {
       .toList
   }
 
-  def loadUnfiltered(source: => Source)(
+  private def loadUnfiltered(source: => Source)(
       implicit reads: Reads[Game]): List[Game] = {
     val src = source
     try src

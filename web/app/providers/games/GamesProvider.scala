@@ -1,5 +1,6 @@
 package providers.games
 
+import java.time.Instant
 import javax.inject.{Inject, Singleton}
 
 import akka.actor.ActorSystem
@@ -31,13 +32,12 @@ final class GamesProvider @Inject()(configuration: Configuration)(
   private implicit val logger = Logger(getClass)
   private implicit val actorMaterializer = ActorMaterializer()
   private val forConfig = ForConfig(configuration.underlying)
-  private val forJournal = ForJournal(forConfig.journalPath)
+  private val forJournal = ForJournal(forConfig.gamesJournalPath)
+
+  Logger.info(s"Log Journal: ${forConfig.logJournalPath}")
+  Logger.info(s"Game Journal: ${forConfig.gamesJournalPath}")
   private val gamesActorFuture: Future[Agent[Map[String, JsonGame]]] = Future {
     blocking {
-      forJournal.exist()
-      forJournal
-        .ForSources(forConfig.urlSources, forConfig.logPaths)
-        .synchronize()
       Agent {
         forJournal
           .load()
@@ -54,36 +54,37 @@ final class GamesProvider @Inject()(configuration: Configuration)(
       agtm.get().values.toList.sortBy(_.id).lastOption
   }
 
-  forConfig.lastLogPathO.foreach { lastLogPath =>
-    lastGameFO.foreach { lastGameO =>
-      FileTailSource
-        .lines(lastLogPath,
-               maxLineSize = 4096,
-               pollingInterval = 1.second,
-               lf = "\n")
-        .scan(GameScanner.initial)(GameScanner.scan)
-        .collect(GameScanner.collect)
-        .filter(ForJournal.afterLastGameFilter(lastGameO))
-        .filter(_.validate.isRight)
-        .filter(_.validateServer)
-        .map(_.withGeo)
-        .map(_.flattenPlayers)
-        .alsoTo(Sink.foreach { game =>
-          logger.info(s"Found tailed game ID ${game.id}")
-        })
-        .alsoTo(Sink.foreach { game =>
-          actorSystem.eventStream.publish(NewRawGameDetected(game))
-        })
-        .runWith(Sink.ignore)
-    }
+  lastGameFO.foreach { lastGameO =>
+    // TODO consider reading from a later offset
+    FileTailSource
+      .lines(forConfig.logJournalPath,
+             maxLineSize = GamesProvider.MaxLineSize,
+             pollingInterval = GamesProvider.DefaultPollingInterval,
+             lf = "\n")
+      .filter(_ > lastGameO.map(_.id).map(Instant.parse).map(_.minusSeconds(GamesProvider.SafeLookBackSeconds)).map(_.toString).getOrElse(""))
+      .scan(GameScanner.initial)(GameScanner.scan)
+      .collect(GameScanner.collect)
+      .filter(ForJournal.afterLastGameFilter(lastGameO))
+      .filter(_.validate.isRight)
+      .filter(_.validateServer)
+      .map(_.withGeo)
+      .map(_.flattenPlayers)
+      .alsoTo(Sink.foreach { game =>
+        logger.info(s"Found tailed game ID ${game.id}")
+      })
+      .alsoTo(Sink.foreach { game =>
+        actorSystem.eventStream.publish(NewRawGameDetected(game))
+      })
+      .runWith(Sink.ignore)
   }
 
   Source
-    .actorRef[NewRichGameDetected](10, OverflowStrategy.dropHead)
+    .actorRef[NewRichGameDetected](GamesProvider.NewRichGameBufferSize,
+                                   OverflowStrategy.dropHead)
     .mapMaterializedValue(
       actorSystem.eventStream.subscribe(_, classOf[NewRichGameDetected]))
     .map(_.jsonGame)
-    .mapAsync(1) { game =>
+    .mapAsync(GamesProvider.RichGameUpdatesAsyncLevel) { game =>
       async {
         val agent = await(gamesActorFuture)
         await(agent.alter(_.updated(game.id, game)))
@@ -98,5 +99,22 @@ final class GamesProvider @Inject()(configuration: Configuration)(
       case Failure(reason) =>
         logger.error(s"Flow failed due to ${reason}", reason)
     }
+
+}
+
+object GamesProvider {
+
+  val NewRichGameBufferSize = 10
+
+  val RichGameUpdatesAsyncLevel = 1
+
+  val DefaultPollingInterval: FiniteDuration = 1.second
+
+  val MaxLineSize = 4096
+
+  /**
+    * Since each game is up to 15 minutes, a 20 minute leeway is enough.
+     */
+  val SafeLookBackSeconds: Int = 60 * 20
 
 }
