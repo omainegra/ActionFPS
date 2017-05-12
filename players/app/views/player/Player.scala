@@ -39,7 +39,7 @@ object Player {
       val cl = achieved.clone()
       cl.select("h3").first().text(ca.title)
       cl.select("p").first().text(ca.description)
-      cl.select("a").attr("href", s"/game/?id=${ca.at}").select("time").attr("datetime", ca.at).first().text(ca.at)
+      cl.select("a").attr("href", s"/game/?id=${ca.at}").select("relative-time").attr("datetime", ca.at).first().text(ca.at)
       ca.captureMaster.foreach { cm =>
         val cmtgt = captureMaster.clone()
         fillCaptureMaster(cmtgt, cm)
@@ -148,7 +148,7 @@ object Player {
       val target = rgili.first().clone()
       target.select("a").attr("href", s"/game/?id=${game.id}")
       target.select(".mode-map").first().text(s"${game.mode} @ ${game.map}")
-      target.select("time").attr("datetime", DateTimeFormatter.ISO_INSTANT.format(game.endTime))
+      target.select("relative-time").attr("datetime", DateTimeFormatter.ISO_INSTANT.format(game.endTime))
         .first().text(DateTimeFormatter.ISO_INSTANT.format(game.endTime))
       if (game.server.contains("aura")) {
         val demoLink = s"http://woop.ac:81/find-demo.php?time=${game.id}&map=${game.map}"

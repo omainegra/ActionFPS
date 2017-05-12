@@ -34,7 +34,7 @@ object Table {
       target.select(".gibs").first().text(s"${us.gibs}")
       target.select(".time-played").first().text(us.timePlayedText)
 
-      target.select(".last-seen time").attr("datetime", us.lastSeenText).first().text(us.lastSeenText)
+      target.select(".last-seen relative-time").attr("datetime", us.lastSeenText).first().text(us.lastSeenText)
       target
     }.foreach(doc.select("tbody").first().appendChild)
 
