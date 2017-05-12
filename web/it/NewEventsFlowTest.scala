@@ -5,6 +5,7 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import org.scalatestplus.play.{HtmlUnitFactory, OneBrowserPerTest, PlaySpec}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
+import providers.full.FullProviderImpl
 import providers.games.GamesProvider
 
 import scala.concurrent.Await
@@ -35,9 +36,10 @@ class NewEventsFlowTest
       .build()
   }
 
-  "Full flow" must {
-    "produce 8 games" in {
+  "Some new logs must" must {
+    "produce 8 new games" in {
       // load initially
+      val fullProvider = app.injector.instanceOf[FullProviderImpl]
       val gamesProvider = app.injector.instanceOf[GamesProvider]
       assume(Await.result(gamesProvider.games, 1.minute).isEmpty)
       import scala.sys.process._

@@ -1,7 +1,7 @@
 package providers.games
 
-import java.nio.file.{Files, Path, StandardOpenOption}
-import javax.inject.Singleton
+import java.nio.file.{Files, Path, Paths, StandardOpenOption}
+import javax.inject.{Inject, Singleton}
 
 import akka.NotUsed
 import akka.agent.Agent
@@ -10,21 +10,29 @@ import com.actionfps.api.Game
 import com.actionfps.gameparser.GameScanner
 import com.actionfps.gameparser.enrichers.JsonGame
 import lib.GamesFromSource
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.libs.json.Json
+import com.actionfps.formats.json.Formats._
 
 import scala.async.Async._
 import scala.concurrent._
 import scala.concurrent.duration._
 
 @Singleton
-abstract class GamesProvider(gameJournalPath: Path)(
+class GamesProvider(gameJournalPath: Path)(
     implicit executionContext: ExecutionContext) {
+
+  @Inject
+  def this(configuration: Configuration)(
+      implicit executionContext: ExecutionContext) = this(
+    Paths.get(configuration.underlying.getString("journal.games"))
+  )
 
   Logger.info(s"Using game Journal: ${gameJournalPath}")
 
   private val gamesActorFuture: Future[Agent[Map[String, JsonGame]]] = Future {
     blocking {
+
       Agent {
         GamesFromSource
           .loadUnfiltered(scala.io.Source.fromFile(gameJournalPath.toFile))
@@ -34,7 +42,11 @@ abstract class GamesProvider(gameJournalPath: Path)(
     }
   }
 
-  val games: Future[Map[String, JsonGame]] = gamesActorFuture.map(_.get())
+  val lastGame: Future[Option[JsonGame]] = gamesActorFuture.map { agtm =>
+    agtm.get().values.toList.sortBy(_.id).lastOption
+  }
+
+  def games: Future[Map[String, JsonGame]] = gamesActorFuture.map(_.get())
 
   private def addGameToJournal(game: Game): Unit = {
     Files.write(gameJournalPath,
@@ -47,10 +59,12 @@ abstract class GamesProvider(gameJournalPath: Path)(
     */
   def sinkGame(jsonGame: JsonGame): Future[JsonGame] = {
     async {
-      await(gamesActorFuture).alter { games =>
-        // here we force the writer to be single threaded, just in case.
-        addGameToJournal(jsonGame)
-        games.updated(jsonGame.id, jsonGame)
+      await {
+        await(gamesActorFuture).alter { games =>
+          // here we force the writer to be single threaded, just in case.
+          addGameToJournal(jsonGame)
+          games.updated(jsonGame.id, jsonGame)
+        }
       }
       jsonGame
     }
