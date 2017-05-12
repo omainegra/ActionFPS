@@ -2,10 +2,10 @@ package af
 
 import java.io.RandomAccessFile
 import java.nio.file.Files
-import java.time.{Instant, ZonedDateTime}
+import java.time.ZonedDateTime
 
-import org.scalatest.{FunSuite, WordSpec}
 import org.scalatest.Matchers._
+import org.scalatest.WordSpec
 
 /**
   * Created by william on 12/5/17.
@@ -33,30 +33,21 @@ class FileOffsetFinderTest extends WordSpec {
   def readit[T](f: RandomAccessFile => T): T = {
     val file = new RandomAccessFile(tempFile.toFile, "r")
     try f(file)
-    finally file.close
+    finally file.close()
   }
 
   "it reads first offset" in readit { raf =>
-    Search.SearchIn("2014-02-02", raf).search() shouldBe 0
+    FileOffsetFinder("2014-02-02")(raf) shouldBe 0
   }
 
-  text.split('\n').take(2).foreach { str =>
+  text.split('\n').foreach { str =>
     val targetString = str.substring(0, 10)
     val expectedPosition = text.indexOf(targetString)
     s"it finds ${targetString}" in readit { raf =>
-      Search
-        .SearchIn(targetString, raf)
-        .search()
-        .toInt shouldBe expectedPosition
+      FileOffsetFinder(targetString)(raf).toInt shouldBe expectedPosition
     }
   }
 
 }
 
-object Search {
-
-  case class SearchIn(target: String, randomAccessFile: RandomAccessFile) {
-    def search(): Long = 0
-  }
-
-}
+object FileOffsetFinderTest {}

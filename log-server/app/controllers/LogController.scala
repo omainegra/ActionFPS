@@ -1,27 +1,30 @@
 package controllers
 
+import java.io.FileInputStream
 import java.nio.file.Path
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.{ZoneId, ZonedDateTime}
 
+import af.FileOffsetFinder
 import akka.NotUsed
 import akka.actor.Cancellable
 import akka.stream.alpakka.file.scaladsl.FileTailSource
-import akka.stream.scaladsl.{FileIO, Flow, Source}
+import akka.stream.scaladsl.{Flow, Source, StreamConverters}
 import akka.util.ByteString
 import com.actionfps.gameparser.mserver.ExtractMessage
 import controllers.LogController._
+import pdi.jwt.JwtSession._
+import pdi.jwt._
+import play.api.Logger
 import play.api.http.ContentTypes
 import play.api.libs.EventSource.Event
 import play.api.libs.json.{Json, OFormat}
 import play.api.mvc._
-import pdi.jwt._
-import pdi.jwt.JwtSession._
 
 import scala.concurrent.duration._
 
-class LogController(sourceFile: Path) extends Controller {
-
+abstract class LogController(sourceFile: Path) extends Controller {
+  Logger.info(s"Log controller for ${sourceFile}")
   def stream = Action { request =>
     if (!request.jwtSession.isEmpty()) {
       require(request.jwtSession.claim.isValid(IssuerName))
@@ -34,30 +37,55 @@ class LogController(sourceFile: Path) extends Controller {
       .get(LastEventIdHeader)
       .map(ZonedDateTime.parse)
       .getOrElse(now)
-    val messagesStream = FileTailSource
-      .lines(
-        path = sourceFile,
-        maxLineSize = 8096,
-        pollingInterval = 1.second
-      )
-      .collect[MessageType] {
-        case ExtractMessage(zdt, server, message) => (zdt, server, message)
-      }
-      .dropWhile(_._1.isBefore(startTime))
+      .toInstant
 
-    val eventsStream = messagesStream
-      .via(logAccess.filterFlow)
-      .map[Event] {
-        case (zdt, server, message) =>
-          Event(
-            id = Some(DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)),
-            data = s"${DateTimeFormatter.ISO_INSTANT
-              .format(zdt.toInstant)}\t${server}\t${message}\n",
-            name = Some("log")
-          )
-      }
-      .merge(keepAliveEventSource)
-    Ok.chunked(eventsStream).as(ContentTypes.EVENT_STREAM)
+    val outsideOfRange = {
+      startTime
+        .atZone(ZoneId.systemDefault())
+        .isBefore(
+          ZonedDateTime
+            .now()
+            .minus(LogController.OldLogsPeriod))
+    }
+
+    if (!logAccess.readOld && outsideOfRange)
+      Unauthorized(
+        s"We only allow ${LogController.OldLogsPeriod} period of access without keys.\n")
+    else {
+      val fileOffset =
+        FileOffsetFinder(startTime.toString).apply(sourceFile)
+      val messagesStream = FileTailSource
+        .apply(
+          path = sourceFile,
+          maxChunkSize = 8096,
+          pollingInterval = 1.second,
+          startingPosition = fileOffset
+        )
+        .via(
+          akka.stream.scaladsl.Framing
+            .delimiter(ByteString.fromString("\n"),
+                       8096,
+                       allowTruncation = false))
+        .map(_.decodeString("UTF-8"))
+        .collect[MessageType] {
+          case ExtractMessage(zdt, server, message) => (zdt, server, message)
+        }
+        .dropWhile(_._1.toInstant.isBefore(startTime))
+
+      val eventsStream = messagesStream
+        .via(logAccess.filterFlow)
+        .map[Event] {
+          case (zdt, server, message) =>
+            Event(
+              id = Some(DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)),
+              data = s"${DateTimeFormatter.ISO_INSTANT
+                .format(zdt.toInstant)}\t${server}\t${message}\n",
+              name = Some("log")
+            )
+        }
+        .merge(keepAliveEventSource)
+      Ok.chunked(eventsStream).as(ContentTypes.EVENT_STREAM)
+    }
   }
 
   def historical(from: String, to: Option[String]) = Action { request =>
@@ -67,34 +95,57 @@ class LogController(sourceFile: Path) extends Controller {
     val logAccess: LogAccess = request.jwtSession.claimData
       .asOpt[LogAccess]
       .getOrElse(LogAccess.default)
-    val fileSource = FileIO
-      .fromPath(
-        f = sourceFile
-      )
-      .via(akka.stream.scaladsl.Framing
-        .delimiter(ByteString.fromString("\n"), 8096, allowTruncation = false))
-      .map(_.decodeString("UTF-8"))
 
     val fromTime = ZonedDateTime.parse(from)
-    val toTime = to.map(ZonedDateTime.parse).getOrElse(ZonedDateTime.now())
+    val outsideOfRange = {
+      fromTime
+        .isBefore(
+          ZonedDateTime
+            .now()
+            .minus(LogController.OldLogsPeriod))
+    }
 
-    val dataSource = fileSource
-      .collect[MessageType] {
-        case ExtractMessage(zdt, server, message) => (zdt, server, message)
-      }
-      .dropWhile(_._1.isBefore(fromTime))
-      .takeWhile(_._1.isBefore(toTime))
-      .via(logAccess.filterFlow)
-      .map {
-        case (zdt, server, message) =>
-          s"${DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)}\t${server}\t${message}\n"
-      }
-    Ok.chunked(dataSource).as(LogController.TsvMimeType)
+    if (!logAccess.readOld && outsideOfRange)
+      Unauthorized(
+        s"We only allow ${LogController.OldLogsPeriod} period of access without keys.\n")
+    else {
+      val fileOffset =
+        FileOffsetFinder(fromTime.toInstant.toString).apply(sourceFile)
+      val fileSource = StreamConverters
+        .fromInputStream(() => {
+          val fis = new FileInputStream(sourceFile.toFile)
+          fis.skip(fileOffset)
+          fis
+        })
+        .via(
+          akka.stream.scaladsl.Framing
+            .delimiter(ByteString.fromString("\n"),
+                       8096,
+                       allowTruncation = false))
+        .map(_.decodeString("UTF-8"))
+
+      val toTime = to.map(ZonedDateTime.parse).getOrElse(ZonedDateTime.now())
+
+      val dataSource = fileSource
+        .collect[MessageType] {
+          case ExtractMessage(zdt, server, message) => (zdt, server, message)
+        }
+        .dropWhile(_._1.isBefore(fromTime))
+        .takeWhile(_._1.isBefore(toTime))
+        .via(logAccess.filterFlow)
+        .map {
+          case (zdt, server, message) =>
+            s"${DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)}\t${server}\t${message}\n"
+        }
+      Ok.chunked(dataSource).as(LogController.TsvMimeType)
+    }
   }
 
 }
 
 object LogController {
+
+  val OldLogsPeriod: java.time.Period = java.time.Period.ofMonths(3)
 
   val IssuerName = "af"
 
@@ -153,7 +204,7 @@ object LogController {
   def issueJwt(key: String,
                logAccess: LogAccess,
                expireSeconds: Long): String = {
-    import pdi.jwt.{JwtJson, JwtAlgorithm}
+    import pdi.jwt.{JwtAlgorithm, JwtJson}
     import play.api.libs.json.Json
     val algo = JwtAlgorithm.HS256
     JwtJson.encode(
