@@ -61,6 +61,8 @@ lazy val root =
 lazy val logServer = project
   .in(file("log-server"))
   .enablePlugins(PlayScala)
+  .aggregate(fileOffsetFinder)
+  .dependsOn(fileOffsetFinder)
   .settings(
     libraryDependencies += alpakkaFile,
     libraryDependencies += gameParser,
@@ -68,6 +70,13 @@ lazy val logServer = project
     libraryDependencies += jwtPlay,
     libraryDependencies += scalatest % "test",
     initialCommands in console := "import controllers.LogController._"
+  )
+
+lazy val fileOffsetFinder = project
+  .in(file("log-server/file-offset-finder"))
+  .settings(
+    libraryDependencies += scalatest % "test",
+    libraryDependencies += scalacheck % "test"
   )
 
 lazy val web = project
@@ -116,7 +125,6 @@ lazy val web = project
       if (inMemoryCache.value) Some("full.provider" -> "hazelcast-cached")
       else None
     }.toSeq,
-
     PlayKeys.devSettings += "journal.large" -> "journals/journal.tsv",
     PlayKeys.devSettings += "journal.games" -> "journals/games.tsv",
     scriptClasspath := Seq("*", "../conf/"),

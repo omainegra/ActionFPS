@@ -1,0 +1,5 @@
+package af
+
+object FileOffsetFinder {
+
+}
