@@ -7,6 +7,10 @@ import play.api.Configuration
 
 /**
   * Created by me on 02/05/2017.
+  *
+  * This is a separate controller for the newly built large journal file.
+  * [[RawLogController]] will be replace with this when performance of reading the log
+  * is increased significantly.
   */
 @Singleton
 class LargeJournalController(logFile: Path)
