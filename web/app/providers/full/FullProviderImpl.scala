@@ -1,15 +1,18 @@
 package providers.full
 
 import java.nio.file.Paths
-import java.time.Clock
+import java.time.format.DateTimeFormatter
+import java.time.{Clock, ZonedDateTime}
 import javax.inject.{Inject, Singleton}
 
+import af.FileOffsetFinder
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.util.ByteString
 import com.actionfps.accumulation.GameAxisAccumulator
 import com.actionfps.clans.CompleteClanwar
 import com.actionfps.gameparser.enrichers.{IpLookup, JsonGame, MapValidator}
@@ -78,11 +81,25 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
   import com.actionfps.gameparser.enrichers.Implicits._
 
   def readNewGames(lastGameO: Option[JsonGame]): Source[JsonGame, NotUsed] = {
+    val fileOffset = lastGameO
+      .map { game =>
+        FileOffsetFinder(
+          DateTimeFormatter.ISO_INSTANT.format(
+            ZonedDateTime.parse(game.id).minusHours(1).toInstant))
+          .apply(logSource)
+      }
+      .getOrElse(0L)
+
     FileTailSource
-      .lines(logSource,
-             maxLineSize = 4096,
-             pollingInterval = 1.second,
-             lf = "\n")
+      .apply(
+        path = logSource,
+        maxChunkSize = 8096,
+        pollingInterval = 1.second,
+        startingPosition = fileOffset
+      )
+      .via(akka.stream.scaladsl.Framing
+        .delimiter(ByteString.fromString("\n"), 8096, allowTruncation = false))
+      .map(_.decodeString("UTF-8"))
       .via(gamesProvider.journalLinesToGames)
       .filter(ForJournal.afterLastGameFilter(lastGameO))
       .filter(_.validate.isRight)
