@@ -135,10 +135,10 @@ td {
   padding: 0.2em;
   vertical-align: baseline;
 }
-th a,
-td a,
-th span,
-td span {
+table.players th a,
+table.players td a,
+table.players th span,
+table.players td span {
   white-space: pre;
 }
 .team-header {
