@@ -48,7 +48,7 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
 
   private implicit val actorMaterializer = ActorMaterializer()
 
-  override protected[providers] val fullStuff
+  override protected[providers] val accumulatorFutureAgent
     : Future[Agent[GameAxisAccumulator]] = async {
     val users = await(referenceProvider.users)
     val clans = await(referenceProvider.clans)
@@ -87,7 +87,7 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
     Flow[JsonGame]
       .mapAsync(1) { game =>
         async {
-          val originalIteratorAgent = await(fullStuff)
+          val originalIteratorAgent = await(accumulatorFutureAgent)
           val originalIterator = originalIteratorAgent.get()
           val newIterator =
             await(originalIteratorAgent.alter(_.includeGames(List(game))))
@@ -105,6 +105,7 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
 
   gamesProvider.lastGame.foreach { lastGame =>
     logger.info(s"Full provider initialized. Log source ${logSource}")
+    logger.info(s"Will read from game ${lastGame.map(_.id)}")
     readNewGames(lastGame)
       .via(commitGames)
       .runWith(Sink.ignore)
