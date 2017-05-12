@@ -20,9 +20,8 @@ class GamesProviderDeciderModule extends Module {
                         configuration: Configuration): List[Binding[_]] = {
     val bindings = mutable.Buffer.empty[Binding[_]]
     bindings += bind[IpLookup].toInstance(GeoIpLookup)
-    val useCached = environment.mode == Mode.Dev && !configuration
-      .getString("full.provider")
-      .contains("normal")
+    val useCached =
+      configuration.getString("full.provider").contains("hazelcast-cached")
     logger.info(s"Use cached? ${useCached}")
     if (useCached) {
       bindings += bind[FullProvider].to[HazelcastCachedProvider]

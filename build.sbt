@@ -106,8 +106,16 @@ lazy val web = project
       seleniumJava % "it",
       cache
     ),
+    // Disabled by default, so that it behaves more like PROD.
+    inMemoryCache := false,
     javaOptions in IntegrationTest += s"-Dgeolitecity.dat=${geoLiteCity.value}",
-    PlayKeys.playRunHooks += HazelcastRunHook(),
+    PlayKeys.playRunHooks ++= {
+      if (inMemoryCache.value) Some(HazelcastRunHook()) else None
+    }.toSeq,
+    PlayKeys.devSettings ++= {
+      if (inMemoryCache.value) Some("full.provider" -> "hazelcast-cached")
+      else None
+    }.toSeq,
     scriptClasspath := Seq("*", "../conf/"),
     mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map {
       f =>
@@ -117,6 +125,9 @@ lazy val web = project
     buildInfoPackage := "af",
     buildInfoOptions += BuildInfoOption.ToJson
   )
+
+lazy val inMemoryCache = SettingKey[Boolean](
+  "Use an in-memory Hazelcast cache for increased iteration performance.")
 
 lazy val inters =
   Project(
