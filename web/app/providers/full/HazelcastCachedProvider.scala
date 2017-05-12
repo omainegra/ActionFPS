@@ -24,9 +24,7 @@ import scala.util.{Failure, Success, Try}
   * So it's only slow on very first load.
   */
 @Singleton
-class HazelcastCachedProvider @Inject()(
-    fullProviderR: FullProviderImpl,
-    applicationLifecycle: ApplicationLifecycle)(
+class HazelcastCachedProvider @Inject()(fullProviderR: FullProviderImpl)(
     implicit executionContext: ExecutionContext)
     extends FullProvider() {
   private val hz = HazelcastClient.newHazelcastClient()
@@ -53,7 +51,4 @@ class HazelcastCachedProvider @Inject()(
       result
     }
   }
-
-  applicationLifecycle.addStopHook(() => Future.successful(hz.shutdown()))
-
 }
