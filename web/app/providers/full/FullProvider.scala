@@ -62,6 +62,4 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext)
     fullStuff.map(_.get()).map(_.getProfileFor(id))
   }
 
-  def reloadReference(): Future[GameAxisAccumulator]
-
 }

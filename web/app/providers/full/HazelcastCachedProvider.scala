@@ -56,8 +56,4 @@ class HazelcastCachedProvider @Inject()(
 
   applicationLifecycle.addStopHook(() => Future.successful(hz.shutdown()))
 
-  override def reloadReference(): Future[GameAxisAccumulator] = async {
-    val ref = await(fullProviderR.reloadReference())
-    await(await(fullStuff).alter(ref))
-  }
 }
