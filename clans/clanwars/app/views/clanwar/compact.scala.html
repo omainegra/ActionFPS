@@ -17,9 +17,9 @@
     vs <a href="/clan/?id=@enemy.clan">@enemy.name</a> -
     }
 <a href="/clanwar/?id=@clanwar.id">
-    <time is="local-time" datetime="@clanwar.meta.endTime" weekday="short" year="numeric" month="short" day="numeric">
+    <local-time datetime="@clanwar.meta.endTime" weekday="short" year="numeric" month="short" day="numeric">
     @clanwar.meta.endTime
-    </time>,
+    </local-time>,
     @clanwar.meta.teamSize
     vs
     @clanwar.meta.teamSize
