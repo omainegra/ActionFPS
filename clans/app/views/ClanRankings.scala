@@ -42,7 +42,7 @@ object ClanRankings {
             clc
               .select("a")
               .attr("href", s"/clanwar/?id=${clanwarId}")
-              .select("time")
+              .select("relative-time")
               .attr("datetime", clanwarId)
               .first()
               .text(s"${clanwarId}")
