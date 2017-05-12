@@ -18,9 +18,9 @@ object Render {
     mixedGame.url.foreach(url => target.select("a").first().attr("href", url))
     target.select(".heading").first().text(mixedGame.heading)
     if (mixedGame.now.isEmpty) {
-      target.select("time").attr("datetime", mixedGame.game.endTime.toString).first().text(mixedGame.game.endTime.toString)
+      target.select("relative-time").attr("datetime", mixedGame.game.endTime.toString).first().text(mixedGame.game.endTime.toString)
     } else {
-      target.select("time").remove()
+      target.select("relative-time").remove()
     }
     mixedGame.demoLink match {
       case None => target.select(".demo-link").remove()
@@ -85,7 +85,7 @@ object Render {
       case None => doc.select(".of-clanwar").remove()
       case Some(clanwar) =>
         doc.select(".of-clanwar a").attr("href", s"/clanwar/?id=$clanwar")
-        doc.select(".of-clanwar time").attr("datetime", clanwar).first().text(clanwar)
+        doc.select(".of-clanwar relative-time").attr("datetime", clanwar).first().text(clanwar)
     }
     import scala.collection.JavaConverters._
     mixedGame.game.achievements match {
