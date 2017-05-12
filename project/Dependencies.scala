@@ -3,6 +3,7 @@ import sbt._
 object Dependencies {
 
   val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.1"
+  val scalacheck: ModuleID = "org.scalacheck" %% "scalacheck" % "1.13.5"
   val sourcecode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.1.3"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
   val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.4"

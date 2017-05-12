@@ -7,8 +7,8 @@ import com.actionfps.accumulation.ReferenceMapValidator
 import com.actionfps.accumulation.user.GeoIpLookup
 import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
 import play.api.inject._
-import play.api.{Configuration, Environment, Logger, Mode}
-import providers.full.{HazelcastCachedProvider, FullProvider}
+import play.api.{Configuration, Environment, Logger}
+import providers.full.{FullProvider, HazelcastCachedProvider}
 
 import scala.collection.mutable
 

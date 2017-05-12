@@ -11,6 +11,6 @@ cache:
 before_script:
   - sudo chmod +x /usr/local/bin/sbt
 script:
-  - sbt test it:test
+  - make travis
 jdk:
   - oraclejdk8
