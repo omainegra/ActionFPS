@@ -9,6 +9,7 @@ import java.time.Instant
 
 import scala.annotation.tailrec
 
+
 /**
   * Created by william on 13/5/17.
   */
@@ -29,6 +30,8 @@ object TsvExtractEfficient {
     ch.position(0)
     bb.position(0)
     var lineStartPos = ch.position()
+
+    val SEARCH_BAD = -1
 
     @tailrec
     def searchFor(from: Int, char: Char): Option[Int] = {
