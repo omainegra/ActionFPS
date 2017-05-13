@@ -22,7 +22,7 @@ case class PlayerGameCounts(games: List[Instant],
       cur match {
         case h :: r if h.isAfter(instant) =>
           go(r, cnt + 1)
-        case _ => 0
+        case _ => cnt
       }
     }
     go(games, cnt = 0)
