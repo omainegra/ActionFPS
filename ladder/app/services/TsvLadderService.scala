@@ -7,7 +7,12 @@ import akka.agent.Agent
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.util.ByteString
-import com.actionfps.ladder.parser.{Aggregate, NickToUser, TsvExtract}
+import com.actionfps.ladder.parser.{
+  Aggregate,
+  NickToUser,
+  TsvExtract,
+  TsvExtractEfficient
+}
 import play.api.Logger
 
 import scala.async.Async._
@@ -21,15 +26,19 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
     actorMaterializer: ActorMaterializer)
     extends LadderService {
   private val agent: Future[Agent[Aggregate]] = async {
-    Logger.info(s"Loading ladder from ${path}")
+    Logger.info(s"Loading ladder from ${path}...")
     val clock = Clock.systemUTC()
     val start = clock.instant()
     val nickToUser = await(usersMap())
     val resultAgent = Agent {
-      val source = scala.io.Source
-        .fromFile(path.toFile)
-      try TsvExtract.buildAggregate(source, nickToUser)
-      finally source.close()
+      TsvExtractEfficient.buildAggregateEfficient(
+        path,
+        nickToUser,
+        servers = com.actionfps.ladder.parser.validServers)
+//      val source = scala.io.Source
+//        .fromFile(path.toFile)
+//      try TsvExtract.buildAggregate(source, nickToUser)
+//      finally source.close()
     }
     val end = clock.instant()
     Logger.info(s"Took ${Duration.between(start, end)} to load ladder.")

@@ -9,7 +9,6 @@ import java.time.Instant
 
 import scala.annotation.tailrec
 
-
 /**
   * Created by william on 13/5/17.
   */
@@ -26,11 +25,11 @@ object TsvExtractEfficient {
     val serversListBytes = serversList.map(_.getBytes("UTF-8"))
     var start = Aggregate.empty
     val ch: SeekableByteChannel = Files.newByteChannel(path)
-    val bb = ByteBuffer.allocateDirect(1000)
+//    val BufferSize = 1024
+    val BufferSize = 1024 * 8
+    val bb = ByteBuffer.allocateDirect(BufferSize)
     ch.position(0)
     bb.position(0)
-    var lineStartPos = ch.position()
-
     val SEARCH_BAD = -1
 
     @tailrec
@@ -43,58 +42,71 @@ object TsvExtractEfficient {
 //    val sc = ServerChecker(servers.toList)
 
     try {
-      while (ch.position() < ch.size()) {
-        bb.position(0)
-        ch.read(bb)
-        bb.position(0)
+      var allDone = false
+      while (ch.position() < ch.size() && !allDone) {
+        val readBytes = ch.read(bb)
         // navigate to second tab, and by this point we'll know a server name too
-        val instantEnd = sampleInstant.length
-        var offset = instantEnd + 1
+        var lineStart = 0
 
-        searchFor(instantEnd, '\n') match {
-          case None =>
-            println(instantEnd)
-            ???
-          case Some(lineEnd) =>
-            for {
-              serverEnd <- searchFor(instantEnd + 1, '\t')
-              ipStart <- searchFor(serverEnd + 1, '[')
-              nickStart <- searchFor(ipStart, ' ')
-              nickEnd <- searchFor(nickStart + 1, ' ')
-              nickAction <- searchFor(nickEnd + 1, ' ')
-              nickname = {
-                val strbuf = new StringBuffer(16)
-                var n = nickStart + 1
-                while (n < nickEnd) {
-                  strbuf.append(bb.get(n).toChar)
-                  n += 1
-                }
-                strbuf.toString
-              }
-              if nickToUser.nicknameExists(nickname)
-              fullLine = {
-                val charArray = Array.fill(lineEnd)(0.toChar)
-                var n = 0
-                while (n < lineEnd) {
-                  charArray(n) = bb.get(n).toChar
-                  n = n + 1
-                }
-                new String(charArray)
-              }
-            } {
-              t.unapplyHint(line = fullLine,
-                             nickname = nickname,
-                             instantEnd = instantEnd,
-                             serverEnd = serverEnd,
-                             payloadStart = ipStart)
-                .foreach {
-                  case (_, tmu) =>
-                    start = start.includeLine(tmu)
-                }
+        var bufferDone = false
+        while (!bufferDone) {
+          val instantEnd = lineStart + sampleInstant.length
 
-            }
-            ch.position(lineStartPos + lineEnd + 1)
-            lineStartPos = ch.position()
+          searchFor(instantEnd, '\n') match {
+            case None =>
+              bufferDone = true
+              // forget the last line, I suppose?
+              if ( readBytes < BufferSize ) {
+                allDone = true
+                bufferDone = true
+              } else {
+                val newPosition = ch.position() - bb.limit() + lineStart
+                ch.position(newPosition)
+                bb.rewind()
+              }
+            case Some(lineEnd) =>
+              val lineLength = lineEnd - lineStart
+              for {
+                serverEnd <- searchFor(instantEnd + 1, '\t')
+                ipStart <- searchFor(serverEnd + 1, '[')
+                nickStart <- searchFor(ipStart, ' ').map(_ + 1)
+                nickEnd <- searchFor(nickStart + 1, ' ')
+                nickAction <- searchFor(nickEnd + 1, ' ')
+                nickname = {
+                  val strbuf = new StringBuffer(16)
+                  var n = 0
+                  while (n < (nickEnd - nickStart)) {
+                    strbuf.append(bb.get(nickStart + n).toChar)
+                    n += 1
+                  }
+                  strbuf.toString
+                }
+                if nickToUser.nicknameExists(nickname)
+                fullLine = {
+                  val charArray = Array.fill(lineLength)(0.toChar)
+                  var n = 0
+                  while (n < lineLength) {
+                    charArray(n) = bb.get(lineStart + n).toChar
+                    n = n + 1
+                  }
+                  new String(charArray)
+                }
+              } {
+//                println(s"FL = '${fullLine}'")
+                t.unapply(line = fullLine)
+//                t.unapplyHint(line = fullLine,
+//                               nickname = nickname,
+//                               instantEnd = instantEnd - lineStart,
+//                               serverEnd = serverEnd - lineStart,
+//                               payloadStart = ipStart - lineStart)
+                  .foreach {
+                    case (_, tmu) =>
+                      start = start.includeLine(tmu)
+                  }
+
+              }
+              lineStart = lineEnd + 1
+          }
         }
 
       }

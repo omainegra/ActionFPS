@@ -29,7 +29,7 @@ class EfficientAggregateTest extends FreeSpec {
         "2014-12-13T18:36:17Z\twoop.ac:1999\t[0.0.0.0] w00p|Drakas headshot [PSY]quico\n"
 
     val tempFile = Files.createTempFile("test", "tsv")
-    Files.write(tempFile, inputMessage.getBytes())
+    Files.write(tempFile, (inputMessage * 200).getBytes())
 
     val aggregate = TsvExtractEfficient.buildAggregateEfficient(
       servers = Set("woop.ac:1999"),
@@ -38,8 +38,8 @@ class EfficientAggregateTest extends FreeSpec {
     val user = aggregate.users("lexus")
     user.flags shouldEqual 0
     user.frags shouldEqual 0
-    user.gibs shouldEqual 1
-    user.points shouldEqual 3
+    user.gibs shouldEqual 200
+    user.points shouldEqual 600
     user.timePlayed shouldEqual 0
   }
 }
