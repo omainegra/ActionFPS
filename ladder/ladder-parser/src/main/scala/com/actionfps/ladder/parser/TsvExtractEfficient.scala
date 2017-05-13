@@ -7,6 +7,8 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.Instant
 
+import scala.annotation.tailrec
+
 /**
   * Created by william on 13/5/17.
   */
@@ -26,6 +28,14 @@ object TsvExtractEfficient {
     ch.position(0)
     bb.position(0)
     var lineStartPos = ch.position()
+
+    @tailrec
+    def searchFor(from: Int, char: Char): Option[Int] = {
+      if (bb.limit() <= from) None
+      else if (bb.get(from) == char.toInt) Some(from)
+      else searchFor(from + 1, char)
+    }
+
     try {
       while (ch.position() < ch.size()) {
         bb.position(0)
@@ -34,55 +44,52 @@ object TsvExtractEfficient {
         // navigate to second tab, and by this point we'll know a server name too
         val instantEnd = sampleInstant.length
         var offset = instantEnd + 1
-        while (bb.get(offset).toInt != '\t'.toInt) {
-          offset = offset + 1
-        }
-        val serverEnd = offset
 
-        var lineMatches = false
+        searchFor(instantEnd, '\n') match {
+          case None =>
+            println(instantEnd)
+            ???
+          case Some(lineEnd) =>
+            for {
+              serverEnd <- searchFor(instantEnd + 1, '\t')
+              ipStart <- searchFor(serverEnd + 1, '[')
+              nickStart <- searchFor(ipStart, ' ')
+              nickEnd <- searchFor(nickStart + 1, ' ')
+              nickAction <- searchFor(nickEnd + 1, ' ')
+              nickname = {
+                val strbuf = new StringBuffer()
+                Iterator
+                  .from(nickStart + 1)
+                  .take(nickEnd - nickStart - 1)
+                  .foreach { n =>
+                    strbuf.append(bb.get(n).toChar)
+                  }
+                strbuf.toString
+              }
+              if nickToUser.nicknameExists(nickname)
+              fullLine = {
+                val strbuf = new StringBuffer()
 
-        val payloadStart = offset + 1
+                Iterator.from(0).take(lineEnd).foreach { n =>
+                  strbuf.append(bb.get(n).toChar)
+                }
+                strbuf.toString
+              }
+            } {
+              t.unapplyHint(line = fullLine,
+                             instantEnd = instantEnd,
+                             serverEnd = serverEnd,
+                             payloadStart = ipStart)
+                .foreach {
+                  case (_, tmu) =>
+                    start = start.includeLine(tmu)
+                }
 
-        if (bb.get(offset + 1) == '[') {
-          lineMatches = true
-          offset = offset + 1
-
-          while (bb.get(offset).toInt != '\n'.toInt) {
-            offset = offset + 1
-          }
-
-          val lineEnd = offset
-
-          val fullLine = {
-            val strbuf = new StringBuffer()
-
-            Iterator.from(0).take(lineEnd).foreach { n =>
-              strbuf.append(bb.get(n).toChar)
             }
-            strbuf.toString
-          }
-          t.unapplyHint(line = fullLine,
-                        instantEnd = instantEnd,
-                         serverEnd = serverEnd,
-                         payloadStart = payloadStart)
-            .foreach {
-              case (_, tmu) =>
-                start = start.includeLine(tmu)
-            }
-
-          ch.position(lineStartPos + lineEnd + 1)
-          lineStartPos = ch.position()
-        } else {
-
-          while (bb.get(offset).toInt != '\n'.toInt) {
-            offset = offset + 1
-          }
-
-          val lineEnd = offset
-
-          ch.position(lineStartPos + offset + 1)
-          lineStartPos = ch.position()
+            ch.position(lineStartPos + lineEnd + 1)
+            lineStartPos = ch.position()
         }
+
       }
     } finally ch.close()
     start
