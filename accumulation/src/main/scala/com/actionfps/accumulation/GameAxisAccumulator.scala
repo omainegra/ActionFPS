@@ -88,7 +88,7 @@ case class GameAxisAccumulator(
   private def includeGame(jsonGame: JsonGame): GameAxisAccumulator = {
     import enricher.withUsersClass
     var richGame = jsonGame.withoutHosts.withUsers.withClans
-    val (updatedAchievements, whatsChanged) =
+    val (updatedAchievements, whatsChanged, newAchievements) =
       achievementsIterator.includeGame(users)(richGame)
 
     val newHof = updatedAchievements
@@ -101,20 +101,17 @@ case class GameAxisAccumulator(
           }
       }
 
-    PartialFunction.condOpt(
-      updatedAchievements.events
-        .dropRight(achievementsIterator.events.length)) {
-      case set if set.nonEmpty =>
-        richGame = richGame.copy(
-          achievements = Option {
-            richGame.achievements.toList.flatten ++ set.map(
-              map =>
-                GameAchievement(
-                  user = map.userId,
-                  text = map.eventText
-              ))
-          }.map(_.distinct).filter(_.nonEmpty)
-        )
+    if (newAchievements.nonEmpty) {
+      richGame = richGame.copy(
+        achievements = Option {
+          richGame.achievements.toList.flatten ++ newAchievements.map(
+            map =>
+              GameAchievement(
+                user = map.userId,
+                text = map.eventText
+            ))
+        }.map(_.distinct).filter(_.nonEmpty)
+      )
     }
     val ncw = clanwars.includeFlowing(richGame)
     var newClanwarCompleted: Option[CompleteClanwar] = None

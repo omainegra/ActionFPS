@@ -36,25 +36,26 @@ case class AchievementsIterator(userToState: Map[String, PlayerState],
   /**
     * New state & also what's changed
     */
-  def includeGame(users: Map[String, User])(
-      jsonGame: JsonGame): (AchievementsIterator, Map[String, PlayerState]) = {
-    val oEvents = scala.collection.mutable.Buffer.empty[GameUserEvent]
+  def includeGame(users: Map[String, User])(jsonGame: JsonGame)
+    : (AchievementsIterator, Map[String, PlayerState], List[GameUserEvent]) = {
+    val newUsersEvents = scala.collection.mutable.Buffer.empty[GameUserEvent]
     val updates = scala.collection.mutable.Map.empty[String, PlayerState]
     for {
       team <- jsonGame.teams
       player <- team.players
       user <- player.user.flatMap(users.get)
-      (newPs, newEvents) <- userToState
+      (newPs, newUserEvents) <- userToState
         .getOrElse(user.id, PlayerState.empty)
         .includeGame(jsonGame, team, player)(p => p.user.isDefined)
     } {
-      oEvents ++= newEvents.map(gameEvent =>
+      newUsersEvents ++= newUserEvents.map(gameEvent =>
         GameUserEvent.fromGameEvent(gameEvent, user))
       updates += (user.id -> newPs)
     }
 
     (copy(userToState = userToState ++ updates,
-          events = oEvents.toList ++ events),
-     updates.toMap)
+          events = newUsersEvents.toList ++ events),
+     updates.toMap,
+     newUsersEvents.toList)
   }
 }
