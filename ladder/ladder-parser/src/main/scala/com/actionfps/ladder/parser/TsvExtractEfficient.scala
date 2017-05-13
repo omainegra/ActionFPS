@@ -17,7 +17,7 @@ object TsvExtractEfficient {
                               servers: Set[String]): Aggregate = {
     val t: TsvExtract = TsvExtract(servers, nickToUser)
     import java.nio.charset.Charset
-    val chr = Charset.forName("UTF-8")
+    val chr = Charset.forName("ISO-8859-1")
     val serversList = servers.toList
     val serversListBytes = serversList.map(_.getBytes("UTF-8"))
     var start = Aggregate.empty
@@ -54,10 +54,17 @@ object TsvExtractEfficient {
           val lineEnd = offset
 
           val fullLine = {
-            bb.position(0)
-            val charbuf = chr.decode(bb)
-            charbuf.limit(lineEnd)
-            val strbuf = new StringBuffer(charbuf)
+            val strbuf = new StringBuffer()
+
+            Iterator.from(0).take(lineEnd).foreach { n =>
+              strbuf.append(bb.get(n).toChar)
+            }
+//            bb.position(0)
+//            println(new StringBuffer(bb.asCharBuffer()))
+//            new String()
+//            val charbuf = chr.decode(bb)
+//            charbuf.limit(lineEnd)
+//            val strbuf = new StringBuffer(charbuf)
             strbuf.toString
           }
           t.unapply(fullLine).foreach {
