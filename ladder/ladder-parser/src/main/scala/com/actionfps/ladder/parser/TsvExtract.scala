@@ -9,7 +9,7 @@ case class TsvExtract(servers: Set[String], nickToUser: NickToUser) {
   private val regex = s"""\\[([^\\]]+)\\] ([^ ]+) (.*)""".r
   private val serversList = servers.toList
   def unapply(line: String): Option[(String, TimedUserMessage)] = {
-    if (serversList.exists(server => line.contains(server))) {
+//    if (servers.exists(server => line.contains(server))) {
       val splittedLine = line.split('\t')
       if (splittedLine.length >= 3) {
         val server = splittedLine(1)
@@ -29,7 +29,7 @@ case class TsvExtract(servers: Set[String], nickToUser: NickToUser) {
           } else None
         } else None
       } else None
-    } else None
+//    } else None
   }
 }
 
