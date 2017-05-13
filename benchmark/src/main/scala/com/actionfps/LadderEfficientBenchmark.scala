@@ -1,6 +1,8 @@
 package com.actionfps
 
-import com.actionfps.ladder.parser.{NickToUser, TsvExtract}
+import java.nio.file.Paths
+
+import com.actionfps.ladder.parser.{NickToUser, TsvExtractEfficient}
 import controllers.LadderController
 import org.openjdk.jmh.annotations.{Benchmark, Scope, Setup, State}
 
@@ -8,7 +10,7 @@ import org.openjdk.jmh.annotations.{Benchmark, Scope, Setup, State}
   * Created by william on 13/5/17.
   */
 @State(Scope.Benchmark)
-class LadderBenchmark {
+class LadderEfficientBenchmark {
 
   var nickToUser: NickToUser = _
   @Setup()
@@ -19,8 +21,8 @@ class LadderBenchmark {
 
   @Benchmark
   def benchAccumulator(): Unit = {
-    TsvExtract.buildAggregate(
-      scala.io.Source.fromFile("../journals/journal.tsv"),
+    TsvExtractEfficient.buildAggregateEfficient(
+      Paths.get("../journals/journal.tsv"),
       nickToUser)
   }
 

@@ -28,7 +28,7 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
     val resultAgent = Agent {
       val source = scala.io.Source
         .fromFile(path.toFile)
-      try TsvLadderService.buildAggregate(source, nickToUser)
+      try TsvExtract.buildAggregate(source, nickToUser)
       finally source.close()
     }
     val end = clock.instant()
@@ -66,21 +66,5 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
           }
       }
     }
-  }
-}
-
-object TsvLadderService {
-  def buildAggregate(source: scala.io.Source,
-                     nickToUser: NickToUser): Aggregate = {
-
-    val tsvExtract =
-      TsvExtract(com.actionfps.ladder.parser.validServers, nickToUser)
-    source
-      .getLines()
-      .foldLeft(Aggregate.empty) {
-        case (ka, tsvExtract(_, tum)) =>
-          ka.includeLine(tum)
-        case (ka, _) => ka
-      }
   }
 }

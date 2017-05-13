@@ -34,6 +34,21 @@ case class TsvExtract(servers: Set[String], nickToUser: NickToUser) {
 }
 
 object TsvExtract {
+
+  def buildAggregate(source: scala.io.Source,
+                     nickToUser: NickToUser): Aggregate = {
+
+    val tsvExtract =
+      TsvExtract(com.actionfps.ladder.parser.validServers, nickToUser)
+    source
+      .getLines()
+      .foldLeft(Aggregate.empty) {
+        case (ka, tsvExtract(_, tum)) =>
+          ka.includeLine(tum)
+        case (ka, _) => ka
+      }
+  }
+
   def empty =
     TsvExtract(servers = Set.empty,
                nickToUser = NickToUser(Function.const(None)))
