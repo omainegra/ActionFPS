@@ -59,18 +59,16 @@ object TsvExtractEfficient {
             Iterator.from(0).take(lineEnd).foreach { n =>
               strbuf.append(bb.get(n).toChar)
             }
-//            bb.position(0)
-//            println(new StringBuffer(bb.asCharBuffer()))
-//            new String()
-//            val charbuf = chr.decode(bb)
-//            charbuf.limit(lineEnd)
-//            val strbuf = new StringBuffer(charbuf)
             strbuf.toString
           }
-          t.unapply(fullLine).foreach {
-            case (_, tmu) =>
-              start = start.includeLine(tmu)
-          }
+          t.unapplyHint(line = fullLine,
+                        instantEnd = instantEnd,
+                         serverEnd = serverEnd,
+                         payloadStart = payloadStart)
+            .foreach {
+              case (_, tmu) =>
+                start = start.includeLine(tmu)
+            }
 
           ch.position(lineStartPos + lineEnd + 1)
           lineStartPos = ch.position()
