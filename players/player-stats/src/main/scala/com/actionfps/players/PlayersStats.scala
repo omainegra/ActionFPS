@@ -119,10 +119,13 @@ case class PlayersStats(players: Map[String, PlayerStat],
 
     private def updatedElos: PlayersStats = {
       val ea = eloAdditions
-      pss.copy(players = players.map {
-        case (id, ps) =>
-          id -> ps.copy(elo = ps.elo + ea.getOrElse(id, 0.0))
-      })
+      val changeEloPlayers = ea.iterator.flatMap {
+        case (user, addElo) =>
+          players.get(user).map { ps =>
+            user -> ps.copy(elo = ps.elo + addElo)
+          }
+      }.toMap
+      pss.copy(players = players ++ changeEloPlayers)
     }
 
     /**
