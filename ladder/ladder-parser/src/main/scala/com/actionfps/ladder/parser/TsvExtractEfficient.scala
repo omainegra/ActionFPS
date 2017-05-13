@@ -15,7 +15,9 @@ object TsvExtractEfficient {
   def buildAggregateEfficient(path: Path,
                               nickToUser: NickToUser,
                               servers: Set[String]): Aggregate = {
-
+    val t: TsvExtract = TsvExtract(servers, nickToUser)
+    import java.nio.charset.Charset
+    val chr = Charset.forName("UTF-8")
     val serversList = servers.toList
     val serversListBytes = serversList.map(_.getBytes("UTF-8"))
     var start = Aggregate.empty
@@ -43,85 +45,27 @@ object TsvExtractEfficient {
 
         if (bb.get(offset + 1) == '[') {
           lineMatches = true
-
-          while (bb.get(offset).toInt != ' '.toInt) {
-            offset = offset + 1
-          }
           offset = offset + 1
-
-          val nickStart = offset
-
-          while (bb.get(offset).toInt != ' '.toInt) {
-            offset = offset + 1
-          }
-
-          val nickEnd = offset
-
-
-          while (bb.get(offset).toInt != ' '.toInt) {
-            offset = offset + 1
-          }
-
-          val uaEnd = offset
 
           while (bb.get(offset).toInt != '\n'.toInt) {
             offset = offset + 1
           }
 
           val lineEnd = offset
-          import java.nio.charset.Charset
-          val chr = Charset.forName("UTF-8")
 
-          val nickname = {
+          val fullLine = {
             bb.position(0)
-            bb.position(nickStart)
             val charbuf = chr.decode(bb)
-            charbuf.limit(nickEnd - nickStart)
+            charbuf.limit(lineEnd)
             val strbuf = new StringBuffer(charbuf)
             strbuf.toString
           }
-
-          if (nickToUser.nicknameExists(nickname)) {
-            val instant = {
-              bb.position(0)
-              val charbuf = chr.decode(bb)
-              charbuf.limit(sampleInstant.length)
-              val strbuf = new StringBuffer(charbuf)
-              Instant.parse(strbuf.toString)
-            }
-
-            val userO = nickToUser.userOfNickname(nickname, instant)
-            val user = userO.get
-
-            val server = {
-              bb.position(instantEnd + 1)
-              val charbuf = chr.decode(bb)
-              charbuf.limit(serverEnd - instantEnd - 1)
-              val strbuf = new StringBuffer(charbuf)
-              strbuf.toString
-            }
-            val serverThere = serversList.contains(server)
-            if (serverThere) {
-
-              val message = {
-                bb.position(uaEnd + 1)
-                val cahrbuf = chr.decode(bb)
-                cahrbuf.limit(lineEnd - 1 - uaEnd)
-                val strbuf = new StringBuffer(cahrbuf)
-                strbuf.toString
-              }
-              val tmu = TimedUserMessage(
-                instant = instant,
-                user = user,
-                message = message
-              )
-//              println(tmu, tmu.user.length, tmu.message.length)
+          t.unapply(fullLine).foreach {
+            case (_, tmu) =>
               start = start.includeLine(tmu)
-            }
-
           }
 
-          ch.position(lineStartPos + offset + 1)
+          ch.position(lineStartPos + lineEnd + 1)
           lineStartPos = ch.position()
         } else {
 
