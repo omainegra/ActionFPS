@@ -80,6 +80,7 @@ object TsvExtractEfficient {
               }
             } {
               t.unapplyHint(line = fullLine,
+                             nickname = nickname,
                              instantEnd = instantEnd,
                              serverEnd = serverEnd,
                              payloadStart = ipStart)

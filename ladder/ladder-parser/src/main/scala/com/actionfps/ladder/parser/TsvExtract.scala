@@ -34,6 +34,7 @@ case class TsvExtract(servers: Set[String], nickToUser: NickToUser) {
 
   def unapplyHint(line: String,
                   payloadStart: Int,
+                  nickname: String,
                   instantEnd: Int,
                   serverEnd: Int): Option[(String, TimedUserMessage)] = {
     val server = line.substring(instantEnd + 1, serverEnd)
@@ -52,7 +53,6 @@ case class TsvExtract(servers: Set[String], nickToUser: NickToUser) {
         val nickEndPosition = offset
         offset = offset + 1
         val payloadStartPosition = offset
-        val nickname = message.substring(nickStartPosition, nickEndPosition)
         if (!nickToUser.nicknameExists(nickname))
           None
         else {
