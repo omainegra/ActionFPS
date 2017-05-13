@@ -33,6 +33,8 @@ $ sbt 'set inMemoryCache in web := true' web/run
 
 #### Benchmarks
 
+We use [sbt-jmh](https://github.com/ktoso/sbt-jmh).
+
 ```
 $ sbt 'benchmark/jmh:run -prof jmh.extras.JFR -t 1 -f 1 -wi 0 -i 1 .*FullIteratorBenchmark.*'
 ... 
