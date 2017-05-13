@@ -113,19 +113,9 @@ case class GameAxisAccumulator(
         }.map(_.distinct).filter(_.nonEmpty)
       )
     }
-    val ncw = clanwars.includeFlowing(richGame)
-    var newClanwarCompleted: Option[CompleteClanwar] = None
+    val (updatedClanwars, newClanwar) = clanwars.includeFlowing(richGame)
     val newClanstats = {
-      if (ncw.complete.size == clanwars.complete.size) clanstats
-      else {
-        (ncw.complete -- clanwars.complete).headOption match {
-          case None =>
-            clanstats
-          case Some(completion) =>
-            newClanwarCompleted = Option(completion)
-            clanstats.include(completion)
-        }
-      }
+      newClanwar.map(clanstats.include).getOrElse(clanstats)
     }
     var newGames = {
       fi.games.updated(
@@ -133,10 +123,10 @@ case class GameAxisAccumulator(
         value = richGame
       )
     }
-    newClanwarCompleted.foreach { cw =>
+    newClanwar.foreach { cw =>
       newGames = newGames ++ cw.games
         .flatMap(game => newGames.get(game.id))
-        .map(_.copy(clanwar = Option(cw.id)))
+        .map(_.copy(clanwar = Some(cw.id)))
         .map(g => g.id -> g)
         .toMap
     }
@@ -144,7 +134,7 @@ case class GameAxisAccumulator(
     new GameAxisAccumulator(
       games = newGames,
       achievementsIterator = updatedAchievements,
-      clanwars = ncw,
+      clanwars = updatedClanwars,
       hof = newHof,
       clanstats = newClanstats,
       playersStats = newPs,
