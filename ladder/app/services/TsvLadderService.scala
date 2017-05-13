@@ -1,6 +1,7 @@
 package services
 
 import java.nio.file.{Files, Path}
+import java.time.{Clock, Duration}
 
 import akka.agent.Agent
 import akka.stream.ActorMaterializer
@@ -8,6 +9,7 @@ import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.util.ByteString
 import com.actionfps.ladder.parser.{Aggregate, KeyedAggregate, TsvExtract}
 import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
+import play.api.Logger
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,25 +22,20 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
     actorMaterializer: ActorMaterializer)
     extends LadderService {
   private val agent = async {
-    val nick2User = await(usersMap())
-    val tsvExtract =
-      TsvExtract(com.actionfps.ladder.parser.validServers, nick2User)
-    val result = {
-//      val source = scala.io.Source
-//        .fromFile(path.toFile)
-      // commented to speed up load - load incrementally instead of a proper future.
-//      try {
-//        source
-//          .getLines()
-//          .foldLeft(KeyedAggregate.empty[String]) {
-//            case (ka, tsvExtract(serverKey, tum)) =>
-//              ka.includeLine(serverKey)(tum)
-//            case (ka, _) => ka
-//          }
-//      } finally source.close()
+    Logger.info(s"Loading ladder from ${path}")
+    val clock = Clock.systemUTC()
+    val start = clock.instant()
+    val nickToUser = await(usersMap())
+    val resultAgent = Agent {
+      val source = scala.io.Source
+        .fromFile(path.toFile)
+      try TsvLadderService.buildAggregate(source, nickToUser)
+      finally source.close()
       KeyedAggregate.empty[String]
     }
-    Agent(result)
+    val end = clock.instant()
+    Logger.info(s"Took ${Duration.between(start, end)} to load ladder.")
+    resultAgent
   }
 
   override def aggregate: Future[Aggregate] = agent.map(_.get().total)
@@ -52,8 +49,7 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
           .apply(
             path = path,
             maxChunkSize = 2048,
-            startingPosition = 0,
-//            startingPosition = fileSize,
+            startingPosition = fileSize,
             pollingInterval = 1.second
           )
           .via(
@@ -72,5 +68,21 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
           }
       }
     }
+  }
+}
+
+object TsvLadderService {
+  def buildAggregate(source: scala.io.Source,
+                     nickToUser: NickToUser): KeyedAggregate[String] = {
+
+    val tsvExtract =
+      TsvExtract(com.actionfps.ladder.parser.validServers, nickToUser)
+    source
+      .getLines()
+      .foldLeft(KeyedAggregate.empty[String]) {
+        case (ka, tsvExtract(serverKey, tum)) =>
+          ka.includeLine(serverKey)(tum)
+        case (ka, _) => ka
+      }
   }
 }

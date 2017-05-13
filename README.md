@@ -40,6 +40,8 @@ $ sbt 'benchmark/jmh:run -prof jmh.extras.JFR -t 1 -f 1 -wi 0 -i 1 .*FullIterato
 ... 
 [info] Flight Recording output saved to: 
 [info]   /home/.../some.jfr
+
+$ sbt 'benchmark/jmh:run -prof jmh.extras.JFR -t 1 -f 1 -wi 0 -i 1 .*LadderBenchmark.*'
 ```
 
 You can open up this file in [Java Mission Control](https://www.youtube.com/watch?v=qytuEgVmhsI)

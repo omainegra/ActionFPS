@@ -100,8 +100,10 @@ class ReferenceProvider @Inject()(configuration: Configuration,
     }
 
     def users: Future[List[User]] = async {
-      val regs = await(registrations)
-      val nicks = await(nicknames)
+      val registrationsF = registrations
+      val nicknamesF = nicknames
+      val regs = await(registrationsF)
+      val nicks = await(nicknamesF)
       regs.flatMap { reg =>
         User.fromRegistration(reg, nicks)
       }
