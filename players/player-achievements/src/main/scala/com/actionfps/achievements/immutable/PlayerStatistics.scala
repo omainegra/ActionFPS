@@ -5,8 +5,7 @@ import com.actionfps.gameparser.enrichers.{JsonGame, JsonGamePlayer}
 /**
   * Created by William on 11/11/2015.
   */
-case class PlayerStatistics(playedGames: List[String],
-                            flags: Int,
+case class PlayerStatistics(flags: Int,
                             frags: Int,
                             timePlayed: Int,
                             gamesPlayed: Int) {
@@ -31,7 +30,6 @@ case class PlayerStatistics(playedGames: List[String],
   def processGame(jsonGame: JsonGame,
                   jsonGamePlayer: JsonGamePlayer): PlayerStatistics = {
     copy(
-      playedGames = playedGames :+ jsonGame.id,
       flags = flags + jsonGamePlayer.flags.getOrElse(0),
       frags = frags + jsonGamePlayer.frags,
       timePlayed = timePlayed + jsonGame.duration,
@@ -42,9 +40,5 @@ case class PlayerStatistics(playedGames: List[String],
 
 object PlayerStatistics {
   def empty =
-    PlayerStatistics(playedGames = List.empty,
-                     flags = 0,
-                     frags = 0,
-                     timePlayed = 0,
-                     gamesPlayed = 0)
+    PlayerStatistics(flags = 0, frags = 0, timePlayed = 0, gamesPlayed = 0)
 }
