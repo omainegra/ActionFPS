@@ -6,6 +6,7 @@ import akka.agent.Agent
 import com.actionfps.accumulation.GameAxisAccumulator
 import com.actionfps.accumulation.user.FullProfile
 import com.actionfps.accumulation.achievements.HallOfFame
+import com.actionfps.achievements.GameUserEvent
 import com.actionfps.clans.Clanwars
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
@@ -21,12 +22,13 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext)
     extends ClanDataProvider
     with ProvidesGames {
 
-  protected[providers] def accumulatorFutureAgent: Future[Agent[GameAxisAccumulator]]
+  protected[providers] def accumulatorFutureAgent
+    : Future[Agent[GameAxisAccumulator]]
 
   def getRecent(n: Int): Future[List[JsonGame]] =
     accumulatorFutureAgent.map(_.get().recentGames(n))
 
-  def events: Future[List[Map[String, String]]] = {
+  def events: Future[List[GameUserEvent]] = {
     accumulatorFutureAgent.map(_.get().events)
   }
 

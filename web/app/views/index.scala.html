@@ -6,7 +6,8 @@
 @import views.ladder.Table.PlayerNamer
 @import lib.WebTemplateRender
 @import views.clanwar.Clanwar.ClanIdToClan
-@(games: List[MixedGame], events: List[Map[String, String]],
+@import com.actionfps.achievements.GameUserEvent
+@(games: List[MixedGame], events: List[GameUserEvent],
         latestClanwars: List[com.actionfps.clans.ClanwarMeta],
         bulletin: Option[services.NewsService.NewsItems],
         ladder: com.actionfps.ladder.parser.Aggregate,
@@ -26,10 +27,10 @@
 <div id="live-events" class="bordered">
     <ol class="LiveEvents live-events">
         @events.take(7).map { event =>
-            <li><a href="/player/?id=@event("user")">@event("text")</a>
+            <li><a href="/player/?id=@event.userId">@event.frontEventText</a>
                 <span> </span>
                 <span class="when">
-                    <relative-time datetime="@event("date")">@event("date")</relative-time>
+                    <relative-time datetime="@event.gameId">@event.gameId</relative-time>
                 </span>
             </li>
         }

@@ -9,6 +9,7 @@ import com.actionfps.accumulation.achievements.{
 import com.actionfps.accumulation.enrich.EnrichGame.NickToUserAtTime
 import com.actionfps.accumulation.enrich.EnrichGames
 import com.actionfps.accumulation.user.FullProfile
+import com.actionfps.achievements.GameUserEvent
 import com.actionfps.api.GameAchievement
 import com.actionfps.clans.{Clanwars, CompleteClanwar}
 import com.actionfps.gameparser.enrichers._
@@ -75,7 +76,7 @@ case class GameAxisAccumulator(
     shiftedPlayersStats.isEmpty
   }
 
-  def events: List[Map[String, String]] = achievementsIterator.events.take(10)
+  def events: List[GameUserEvent] = achievementsIterator.events.take(10)
 
   def includeGames(list: List[JsonGame]): GameAxisAccumulator = {
     list.foldLeft(this)(_.includeGame(_))
@@ -87,10 +88,10 @@ case class GameAxisAccumulator(
   private def includeGame(jsonGame: JsonGame): GameAxisAccumulator = {
     import enricher.withUsersClass
     var richGame = jsonGame.withoutHosts.withUsers.withClans
-    val (newAchievements, whatsChanged) =
+    val (updatedAchievements, whatsChanged) =
       achievementsIterator.includeGame(users)(richGame)
 
-    val nhof = newAchievements
+    val nhof = updatedAchievements
       .newAchievements(whatsChanged, achievementsIterator)
       .foldLeft(hof) {
         case (ahof, (user, items)) =>
@@ -101,15 +102,16 @@ case class GameAxisAccumulator(
       }
 
     PartialFunction.condOpt(
-      newAchievements.events.dropRight(achievementsIterator.events.length)) {
+      updatedAchievements.events
+        .dropRight(achievementsIterator.events.length)) {
       case set if set.nonEmpty =>
         richGame = richGame.copy(
           achievements = Option {
             richGame.achievements.toList.flatten ++ set.map(
               map =>
                 GameAchievement(
-                  user = map("user"),
-                  text = map("text")
+                  user = map.userId,
+                  text = map.eventText
               ))
           }.map(_.distinct).filter(_.nonEmpty)
         )
@@ -144,7 +146,7 @@ case class GameAxisAccumulator(
     val newPs = playersStats.AtGame(richGame).includeGame
     new GameAxisAccumulator(
       games = newGames,
-      achievementsIterator = newAchievements,
+      achievementsIterator = updatedAchievements,
       clanwars = ncw,
       hof = nhof,
       clanstats = newClanstats,

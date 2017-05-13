@@ -1,16 +1,15 @@
 package com.actionfps.accumulation.achievements
 
-import com.actionfps.achievements.PlayerState
+import com.actionfps.achievements.{GameUserEvent, PlayerState}
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.user.User
 
 /**
   * Created by me on 15/01/2017.
   */
-case class IndividualUserAchievementsIterator(
-    user: User,
-    playerState: PlayerState,
-    events: List[Map[String, String]]) {
+case class IndividualUserAchievementsIterator(user: User,
+                                              playerState: PlayerState,
+                                              events: List[GameUserEvent]) {
   def includeGame(users: List[User])(
       jsonGame: JsonGame): IndividualUserAchievementsIterator = {
     for {
@@ -24,12 +23,8 @@ case class IndividualUserAchievementsIterator(
     } yield
       copy(
         playerState = newPs,
-        events = events ++ newEvents.map {
-          case (date, text) =>
-            Map("user" -> user.id,
-                "date" -> date,
-                "text" -> s"${user.name} $text")
-        }
+        events = events ++ newEvents.map(event =>
+          GameUserEvent.fromGameEvent(event, user))
       )
   }.headOption.getOrElse(this)
 }

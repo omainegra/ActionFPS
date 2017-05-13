@@ -1,7 +1,7 @@
 package com.actionfps.accumulation.achievements
 
-import com.actionfps.achievements.PlayerState
 import com.actionfps.achievements.immutable.CompletedAchievement
+import com.actionfps.achievements.{GameUserEvent, PlayerState}
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.user.User
 
@@ -17,7 +17,7 @@ object AchievementsIterator {
   * Iterator combining all user's data.
   */
 case class AchievementsIterator(userToState: Map[String, PlayerState],
-                                events: List[Map[String, String]]) {
+                                events: List[GameUserEvent]) {
   def isEmpty: Boolean = userToState.isEmpty && events.isEmpty
 
   /**
@@ -38,7 +38,7 @@ case class AchievementsIterator(userToState: Map[String, PlayerState],
     */
   def includeGame(users: Map[String, User])(
       jsonGame: JsonGame): (AchievementsIterator, Map[String, PlayerState]) = {
-    val oEvents = scala.collection.mutable.Buffer.empty[Map[String, String]]
+    val oEvents = scala.collection.mutable.Buffer.empty[GameUserEvent]
     val updates = scala.collection.mutable.Map.empty[String, PlayerState]
     for {
       team <- jsonGame.teams
@@ -48,12 +48,8 @@ case class AchievementsIterator(userToState: Map[String, PlayerState],
         .getOrElse(user.id, PlayerState.empty)
         .includeGame(jsonGame, team, player)(p => p.user.isDefined)
     } {
-      oEvents ++= newEvents.map {
-        case (date, text) =>
-          Map("user" -> user.id,
-              "date" -> date,
-              "text" -> s"${user.name} $text")
-      }
+      oEvents ++= newEvents.map(gameEvent =>
+        GameUserEvent.fromGameEvent(gameEvent, user))
       updates += (user.id -> newPs)
     }
 
