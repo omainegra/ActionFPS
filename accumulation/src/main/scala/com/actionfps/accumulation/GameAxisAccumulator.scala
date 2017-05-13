@@ -1,11 +1,12 @@
 package com.actionfps.accumulation
 
-import java.time.YearMonth
+import java.time.{Instant, YearMonth}
 
 import com.actionfps.accumulation.achievements.{
   AchievementsIterator,
   HallOfFame
 }
+import com.actionfps.accumulation.enrich.EnrichGame.NickToUserAtTime
 import com.actionfps.accumulation.enrich.EnrichGames
 import com.actionfps.accumulation.user.FullProfile
 import com.actionfps.api.GameAchievement
@@ -70,12 +71,28 @@ case class GameAxisAccumulator(
     list.foldLeft(this)(_.includeGame(_))
   }
 
+  private val enricher =
+    EnrichGames(
+      nickToUsers = new NickToUserAtTime {
+        override def nickToUser(nickname: String,
+                                atTime: Instant): Option[User] = {
+
+          /** Optimisation: Most players don't change names **/
+          users.valuesIterator
+            .filter(_.nickname.nickname == nickname)
+            .find(_.validAt(nickname, atTime)) orElse {
+            users.valuesIterator.find(_.validAt(nickname, atTime))
+          }
+        }
+      },
+      clans = clans.values.toList
+    )
+
   private def includeGame(jsonGame: JsonGame): GameAxisAccumulator = {
-    val enricher = EnrichGames(users.values.toList, clans.values.toList)
     import enricher.withUsersClass
     var richGame = jsonGame.withoutHosts.withUsers.withClans
     val (newAchievements, whatsChanged) =
-      achievementsIterator.includeGame(fi.users.values.toList)(richGame)
+      achievementsIterator.includeGame(users)(richGame)
 
     val nhof = newAchievements
       .newAchievements(whatsChanged, achievementsIterator)
@@ -86,6 +103,7 @@ case class GameAxisAccumulator(
               xhof.includeAchievement(user, game, ach)
           }
       }
+
     PartialFunction.condOpt(
       newAchievements.events.dropRight(achievementsIterator.events.length)) {
       case set if set.nonEmpty =>

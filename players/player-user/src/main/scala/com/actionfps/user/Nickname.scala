@@ -1,6 +1,6 @@
 package com.actionfps.user
 
-import java.time.ZonedDateTime
+import java.time.{Instant, ZonedDateTime}
 
 import com.actionfps.user.Nickname.{CurrentNickname, PreviousNickname}
 
@@ -9,19 +9,20 @@ import com.actionfps.user.Nickname.{CurrentNickname, PreviousNickname}
   */
 object Nickname {
 
-  case class CurrentNickname(nickname: String, from: ZonedDateTime) extends Nickname
+  case class CurrentNickname(nickname: String, from: Instant) extends Nickname
 
-  case class PreviousNickname(nickname: String, from: ZonedDateTime, to: ZonedDateTime) extends Nickname
+  case class PreviousNickname(nickname: String, from: Instant, to: Instant)
+      extends Nickname
 
 }
 
 sealed trait Nickname {
   def nickname: String
 
-  def from: ZonedDateTime
+  def from: Instant
 
-  def validAt(zonedDateTime: ZonedDateTime): Boolean = this match {
-    case _: CurrentNickname => zonedDateTime.isAfter(from)
-    case p: PreviousNickname => zonedDateTime.isAfter(from) && zonedDateTime.isBefore(p.to)
+  def validAt(instant: Instant): Boolean = this match {
+    case _: CurrentNickname => instant.isAfter(from)
+    case p: PreviousNickname => instant.isAfter(from) && instant.isBefore(p.to)
   }
 }

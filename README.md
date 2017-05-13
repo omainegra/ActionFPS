@@ -30,3 +30,15 @@ This is because some results are recomputed. If you'd like to cache them, use:
 ```
 $ sbt 'set inMemoryCache in web := true' web/run
 ```
+
+#### Benchmarks
+
+```
+$ sbt 'benchmark/jmh:run -prof jmh.extras.JFR -t 1 -f 1 -wi 0 -i 1 .*FullIteratorBenchmark.*'
+... 
+[info] Flight Recording output saved to: 
+[info]   /home/.../some.jfr
+```
+
+You can open up this file in [Java Mission Control](https://www.youtube.com/watch?v=qytuEgVmhsI)
+(`jmc`) to analyse performance.
