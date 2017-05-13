@@ -91,13 +91,13 @@ case class GameAxisAccumulator(
     val (updatedAchievements, whatsChanged) =
       achievementsIterator.includeGame(users)(richGame)
 
-    val nhof = updatedAchievements
+    val newHof = updatedAchievements
       .newAchievements(whatsChanged, achievementsIterator)
       .foldLeft(hof) {
-        case (ahof, (user, items)) =>
-          items.foldLeft(ahof) {
-            case (xhof, (game, ach)) =>
-              xhof.includeAchievement(user, game, ach)
+        case (currentHof, (user, items)) =>
+          items.foldLeft(currentHof) {
+            case (deeperCurrentHof, (game, ach)) =>
+              deeperCurrentHof.includeAchievement(user, game, ach)
           }
       }
 
@@ -148,7 +148,7 @@ case class GameAxisAccumulator(
       games = newGames,
       achievementsIterator = updatedAchievements,
       clanwars = ncw,
-      hof = nhof,
+      hof = newHof,
       clanstats = newClanstats,
       playersStats = newPs,
       nickToUserAtTime = nickToUserAtTime,

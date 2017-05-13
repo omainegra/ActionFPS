@@ -42,7 +42,7 @@
 @views.ladder.Table.render(WebTemplateRender.wwwLocation.resolve("ladder_table.html"), ladder)(showTime = false)
 @views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(views.PlayerRanks.PlayerRanksFilename), playersStats)
 @views.ClanRankings.render(clanStats)
-
+as part of optimisation work,
 <div id="latest-clanwars">
 @latestClanwars.map { clanwar =>
     @views.clanwar.Clanwar.render(clanwarHtmlPath = WebTemplateRender.wwwLocation.resolve(views.clanwar.Clanwar.ClanwarHtmlFile), clanwar, showPlayers = false)
