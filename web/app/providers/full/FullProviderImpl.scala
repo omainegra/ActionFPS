@@ -1,21 +1,29 @@
 package providers.full
 
+import java.nio.file.Paths
+import java.time.format.DateTimeFormatter
+import java.time.{Clock, ZonedDateTime}
 import javax.inject.{Inject, Singleton}
 
+import af.FileOffsetFinder
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.agent.Agent
-import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, OverflowStrategy}
+import akka.stream.ActorMaterializer
+import akka.stream.alpakka.file.scaladsl.FileTailSource
+import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.util.ByteString
 import com.actionfps.accumulation.GameAxisAccumulator
 import com.actionfps.clans.CompleteClanwar
-import com.actionfps.gameparser.enrichers.JsonGame
-import play.api.Logger
+import com.actionfps.gameparser.enrichers.{IpLookup, JsonGame, MapValidator}
+import lib.ForJournal
 import play.api.inject.ApplicationLifecycle
+import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
 import providers.games.GamesProvider
-import services.ChallongeService.NewClanwarCompleted
 
 import scala.async.Async._
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -29,18 +37,22 @@ import scala.util.{Failure, Success}
 @Singleton
 class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
                                  gamesProvider: GamesProvider,
+                                 configuration: Configuration,
                                  applicationLifecycle: ApplicationLifecycle)(
     implicit executionContext: ExecutionContext,
-    actorSystem: ActorSystem)
+    actorSystem: ActorSystem,
+    ipLookup: IpLookup,
+    mapValidator: MapValidator)
     extends FullProvider() {
 
   private val logger = Logger(getClass)
 
-  logger.info("Full provider initialized")
+  private val logSource =
+    Paths.get(configuration.underlying.getString("journal.large"))
 
   private implicit val actorMaterializer = ActorMaterializer()
 
-  override protected[providers] val fullStuff
+  override protected[providers] val accumulatorFutureAgent
     : Future[Agent[GameAxisAccumulator]] = async {
     val users = await(referenceProvider.users)
     val clans = await(referenceProvider.clans)
@@ -52,39 +64,82 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
         clans = clans.map(c => c.id -> c).toMap
       )
 
+    val startTime = Clock.systemUTC().instant()
+
     val newIterator =
       initial.includeGames(allGames.valuesIterator.toList.sortBy(_.id))
+
+    val endTime = Clock.systemUTC().instant()
+
+    Logger.info(
+      s"It took ${java.time.Duration.between(startTime, endTime)} to compute accumulator data.")
 
     Agent(newIterator)
   }
 
-  Source
-    .actorRef[NewRawGameDetected](10, OverflowStrategy.dropHead)
-    .mapMaterializedValue(
-      actorSystem.eventStream.subscribe(_, classOf[NewRawGameDetected]))
-    .map(_.jsonGame)
-    .mapAsync(1) { game =>
-      async {
-        val originalIteratorAgent = await(fullStuff)
-        val originalIterator = originalIteratorAgent.get()
-        val newIterator =
-          await(originalIteratorAgent.alter(_.includeGames(List(game))))
-        FullIteratorDetector(originalIterator, newIterator)
+  import com.actionfps.accumulation.ServerValidator._
+  import com.actionfps.gameparser.enrichers.Implicits._
+
+  def readNewGames(lastGameO: Option[JsonGame]): Source[JsonGame, NotUsed] = {
+    val fileOffset = lastGameO
+      .map { game =>
+        FileOffsetFinder(
+          DateTimeFormatter.ISO_INSTANT.format(
+            ZonedDateTime.parse(game.id).minusHours(1).toInstant))
+          .apply(logSource)
       }
-    }
-    .runForeach { fid =>
-      fid.detectGame
-        .map(NewRichGameDetected)
-        .foreach(actorSystem.eventStream.publish)
-      fid.detectClanwar
-        .map(NewClanwarCompleted)
-        .foreach(actorSystem.eventStream.publish)
-    }
-    .onComplete {
-      case Success(_) => logger.info("Stopped.")
-      case Failure(reason) =>
-        logger.error(s"Flow failed due to ${reason}", reason)
-    }
+      .getOrElse(0L)
+
+    FileTailSource
+      .apply(
+        path = logSource,
+        maxChunkSize = 8096,
+        pollingInterval = 1.second,
+        startingPosition = fileOffset
+      )
+      .via(akka.stream.scaladsl.Framing
+        .delimiter(ByteString.fromString("\n"), 8096, allowTruncation = false))
+      .map(_.decodeString("UTF-8"))
+      .via(gamesProvider.journalLinesToGames)
+      .filter(ForJournal.afterLastGameFilter(lastGameO))
+      .filter(_.validate.isRight)
+      .filter(_.validateServer)
+      .map(_.withGeo)
+      .map(_.flattenPlayers)
+  }
+
+  def commitGames: Flow[JsonGame, NewRichGameDetected, NotUsed] =
+    Flow[JsonGame]
+      .mapAsync(1) { game =>
+        async {
+          val originalIteratorAgent = await(accumulatorFutureAgent)
+          val originalIterator = originalIteratorAgent.get()
+          val newIterator =
+            await(originalIteratorAgent.alter(_.includeGames(List(game))))
+          await(gamesProvider.sinkGame(game))
+          val fid = FullIteratorDetector(originalIterator, newIterator)
+          val detectedGame = fid.detectGame
+            .map(NewRichGameDetected)
+          detectedGame.foreach(actorSystem.eventStream.publish)
+          val detectedClanwar = fid.detectClanwar
+          detectedClanwar.foreach(actorSystem.eventStream.publish)
+          detectedGame
+        }
+      }
+      .mapConcat(identity)
+
+  gamesProvider.lastGame.foreach { lastGame =>
+    logger.info(s"Full provider initialized. Log source ${logSource}")
+    logger.info(s"Will read from game ${lastGame.map(_.id)}")
+    readNewGames(lastGame)
+      .via(commitGames)
+      .runWith(Sink.ignore)
+      .onComplete {
+        case Success(_) => logger.info("Full provider stopped.")
+        case Failure(reason) =>
+          logger.error(s"Full provider flow failed due to: ${reason}", reason)
+      }
+  }
 
 }
 

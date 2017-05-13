@@ -26,7 +26,7 @@ object PlayerRanks {
       target.select(".elo").first().text(s"${Math.round(player.elo)}")
       target.select(".score").first().text(s"${player.score}")
       target.select(".last-played a").attr("href", s"/game/?id=${player.lastGame}")
-      target.select(".last-played time").attr("datetime", player.lastGame).first().text(player.lastGame)
+      target.select(".last-played relative-time").attr("datetime", player.lastGame).first().text(player.lastGame)
       target
     }.foreach(htmlB.select("tbody").first().appendChild)
 

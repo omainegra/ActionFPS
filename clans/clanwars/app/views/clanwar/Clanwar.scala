@@ -34,7 +34,7 @@ object Clanwar {
       if (clanwar.completed) {
         htmlB.select(".lcw").remove()
       }
-      val headerA = htmlB.select("header > h2 > a > time").first()
+      val headerA = htmlB.select("header > h2 > a > local-time").first()
       headerA.text(clanwar.id)
       headerA.attr("datetime", clanwar.id)
       headerA.parent().attr("href", s"/clanwar/?id=${clanwar.id}")

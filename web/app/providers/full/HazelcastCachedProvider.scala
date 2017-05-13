@@ -32,7 +32,7 @@ class HazelcastCachedProvider @Inject()(fullProviderR: FullProviderImpl)(
   private val keyName: String = "fullIterator"
   private val logger = Logger(getClass)
 
-  override protected[providers] val fullStuff
+  override protected[providers] val accumulatorFutureAgent
     : Future[Agent[GameAxisAccumulator]] = async {
     if (theMap.containsKey(keyName)) {
 
@@ -41,12 +41,12 @@ class HazelcastCachedProvider @Inject()(fullProviderR: FullProviderImpl)(
         case Success(good) => Agent(good)
         case Failure(reason) =>
           logger.error(s"Failed to fetch cached stuff due to $reason", reason)
-          val result = await(fullProviderR.fullStuff)
+          val result = await(fullProviderR.accumulatorFutureAgent)
           theMap.put(keyName, result.get())
           result
       }
     } else {
-      val result = await(fullProviderR.fullStuff)
+      val result = await(fullProviderR.accumulatorFutureAgent)
       theMap.put(keyName, result.get())
       result
     }
