@@ -28,11 +28,10 @@ class FullIteratorBenchmark {
   @Setup()
   def setup(): Unit = {
     val (clans, users) = FullIteratorBenchmark.fetchClansAndUsers()
-    initial = GameAxisAccumulator.empty
-      .copy(
-        users = users.map(u => u.id -> u).toMap,
-        clans = clans.map(c => c.id -> c).toMap
-      )
+    initial = GameAxisAccumulator.emptyWithUsers(
+      users = users.map(u => u.id -> u).toMap,
+      clans = clans.map(c => c.id -> c).toMap
+    )
     allGames = FullIteratorBenchmark.fetchGames()
   }
 

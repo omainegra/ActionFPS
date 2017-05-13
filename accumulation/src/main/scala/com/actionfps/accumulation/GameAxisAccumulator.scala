@@ -1,6 +1,6 @@
 package com.actionfps.accumulation
 
-import java.time.{Instant, YearMonth}
+import java.time.YearMonth
 
 import com.actionfps.accumulation.achievements.{
   AchievementsIterator,
@@ -21,6 +21,14 @@ import com.actionfps.user.User
   */
 object GameAxisAccumulator {
   def empty: GameAxisAccumulator = new GameAxisAccumulator()
+  def emptyWithUsers(users: Map[String, User],
+                     clans: Map[String, Clan]): GameAxisAccumulator = {
+    new GameAxisAccumulator()
+      .copy(users = users,
+            clans = clans,
+            nickToUserAtTime =
+              NickToUserAtTime.fromList(users.valuesIterator.toList))
+  }
 }
 
 /**
@@ -40,6 +48,7 @@ case class GameAxisAccumulator(
     clanstats: Clanstats,
     achievementsIterator: AchievementsIterator,
     hof: HallOfFame,
+    nickToUserAtTime: NickToUserAtTime,
     playersStats: PlayersStats,
     shiftedPlayersStats: PlayersStats,
     playersStatsOverTime: Map[YearMonth, PlayersStats]) { fi =>
@@ -54,6 +63,7 @@ case class GameAxisAccumulator(
       clanstats = Clanstats.empty,
       achievementsIterator = AchievementsIterator.empty,
       hof = HallOfFame.empty,
+      nickToUserAtTime = NickToUserAtTime.empty,
       playersStats = PlayersStats.empty,
       shiftedPlayersStats = PlayersStats.empty,
       playersStatsOverTime = Map.empty
@@ -72,21 +82,7 @@ case class GameAxisAccumulator(
   }
 
   private val enricher =
-    EnrichGames(
-      nickToUsers = new NickToUserAtTime {
-        override def nickToUser(nickname: String,
-                                atTime: Instant): Option[User] = {
-
-          /** Optimisation: Most players don't change names **/
-          users.valuesIterator
-            .filter(_.nickname.nickname == nickname)
-            .find(_.validAt(nickname, atTime)) orElse {
-            users.valuesIterator.find(_.validAt(nickname, atTime))
-          }
-        }
-      },
-      clans = clans.values.toList
-    )
+    EnrichGames(nickToUsers = nickToUserAtTime, clans = clans.values.toList)
 
   private def includeGame(jsonGame: JsonGame): GameAxisAccumulator = {
     import enricher.withUsersClass
@@ -146,16 +142,20 @@ case class GameAxisAccumulator(
         .toMap
     }
     val newPs = playersStats.AtGame(richGame).includeGame
-    copy(
+    new GameAxisAccumulator(
       games = newGames,
       achievementsIterator = newAchievements,
       clanwars = ncw,
       hof = nhof,
       clanstats = newClanstats,
       playersStats = newPs,
+      nickToUserAtTime = nickToUserAtTime,
       shiftedPlayersStats = newPs.onDisplay(jsonGame.endTime.toInstant),
       playersStatsOverTime =
-        playersStatsOverTime.updated(YearMonth.from(richGame.startTime), newPs)
+        playersStatsOverTime.updated(YearMonth.from(richGame.startTime),
+                                     newPs),
+      users = users,
+      clans = clans
     )
   }
 

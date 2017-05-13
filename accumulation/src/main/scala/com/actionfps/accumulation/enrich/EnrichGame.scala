@@ -46,4 +46,32 @@ object EnrichGame {
   trait NickToUserAtTime {
     def nickToUser(nickname: String, atTime: Instant): Option[User]
   }
+
+  object NickToUserAtTime {
+    def empty: NickToUserAtTime = new NickToUserAtTime {
+      override def nickToUser(nickname: String,
+                              atTime: Instant): Option[User] = None
+    }
+
+    def fromList(users: List[User]): NickToUserAtTime = new NickToUserAtTime {
+      val nickToUsersMap: Map[String, List[User]] = {
+        users.flatMap { user =>
+          user.nicknames.map { nickname =>
+            nickname.nickname -> user
+          }
+        }
+      }.groupBy(_._1)
+        .toList
+        .map {
+          case (nick, uns) => nick -> uns.map(_._2)
+        }
+        .toMap
+      override def nickToUser(nickname: String,
+                              atTime: Instant): Option[User] = {
+        nickToUsersMap
+          .get(nickname)
+          .flatMap(_.find(_.validAt(nickname, atTime)))
+      }
+    }
+  }
 }

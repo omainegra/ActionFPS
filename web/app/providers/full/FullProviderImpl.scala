@@ -58,11 +58,10 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
     val clans = await(referenceProvider.clans)
     val allGames = await(gamesProvider.games)
 
-    val initial = GameAxisAccumulator.empty
-      .copy(
-        users = users.map(u => u.id -> u).toMap,
-        clans = clans.map(c => c.id -> c).toMap
-      )
+    val initial = GameAxisAccumulator.emptyWithUsers(
+      users = users.map(u => u.id -> u).toMap,
+      clans = clans.map(c => c.id -> c).toMap
+    )
 
     val startTime = Clock.systemUTC().instant()
 
