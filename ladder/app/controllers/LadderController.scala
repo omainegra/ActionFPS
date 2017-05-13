@@ -89,7 +89,23 @@ object LadderController {
                                   atTime: Instant): Option[String] = {
         nickToUsers
           .get(nickname)
-          .flatMap(_.find(_.validAt(nickname, atTime)))
+          .flatMap { nickUsers =>
+            // check if user is valid at this time
+            // but alternatively, the ladder supports a mode
+            // where we include all data before the player registered.
+            // This is so that people receive points for the work they've
+            // already done when they were not registered.
+            nickUsers.headOption
+//            def originalNicknameUser = nickUsers.find { user =>
+//              user.nicknames
+//                .sortBy(_.from)
+//                .headOption
+//                .exists(_.from.isBefore(atTime))
+//            }
+//            nickUsers.find(_.validAt(nickname, atTime)).orElse {
+//              originalNicknameUser
+//            }
+          }
           .map(_.id)
       }
     }
