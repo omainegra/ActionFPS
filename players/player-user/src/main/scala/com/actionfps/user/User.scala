@@ -11,12 +11,16 @@ case class User(id: String,
                 email: RegistrationEmail,
                 registrationDate: ZonedDateTime,
                 nickname: CurrentNickname,
-                previousNicknames: Option[List[PreviousNickname]]) {
-  def nicknames: List[Nickname] =
-    List(nickname) ++ previousNicknames.toList.flatten
+                previousNicknames: Option[List[PreviousNickname]]) { u =>
 
+  // optimised
   def validAt(nickname: String, zonedDateTime: ZonedDateTime): Boolean = {
-    nicknames.exists(n => n.nickname == nickname && n.validAt(zonedDateTime))
+    def currentNicknameValid =
+      u.nickname.nickname == nickname && u.nickname.validAt(zonedDateTime)
+    def anyOtherValid =
+      previousNicknames.exists(
+        _.exists(n => n.nickname == nickname && n.validAt(zonedDateTime)))
+    currentNicknameValid || anyOtherValid
   }
 }
 
