@@ -7,12 +7,7 @@ import akka.agent.Agent
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.util.ByteString
-import com.actionfps.ladder.parser.{
-  Aggregate,
-  KeyedAggregate,
-  NickToUser,
-  TsvExtract
-}
+import com.actionfps.ladder.parser.{Aggregate, NickToUser, TsvExtract}
 import play.api.Logger
 
 import scala.async.Async._
@@ -25,7 +20,7 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
     implicit executionContext: ExecutionContext,
     actorMaterializer: ActorMaterializer)
     extends LadderService {
-  private val agent = async {
+  private val agent: Future[Agent[Aggregate]] = async {
     Logger.info(s"Loading ladder from ${path}")
     val clock = Clock.systemUTC()
     val start = clock.instant()
@@ -41,7 +36,7 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
     resultAgent
   }
 
-  override def aggregate: Future[Aggregate] = agent.map(_.get().total)
+  override def aggregate: Future[Aggregate] = agent.map(_.get())
 
   def run(): Unit = {
     val fileSize = Files.size(path)
@@ -67,7 +62,7 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
             tsvExtract.unapply(line).toList
           }
           .runForeach {
-            case (key, tum) => plainAgent.send(_.includeLine(key)(tum))
+            case (key, tum) => plainAgent.send(_.includeLine(tum))
           }
       }
     }
@@ -76,15 +71,15 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
 
 object TsvLadderService {
   def buildAggregate(source: scala.io.Source,
-                     nickToUser: NickToUser): KeyedAggregate[String] = {
+                     nickToUser: NickToUser): Aggregate = {
 
     val tsvExtract =
       TsvExtract(com.actionfps.ladder.parser.validServers, nickToUser)
     source
       .getLines()
-      .foldLeft(KeyedAggregate.empty[String]) {
-        case (ka, tsvExtract(serverKey, tum)) =>
-          ka.includeLine(serverKey)(tum)
+      .foldLeft(Aggregate.empty) {
+        case (ka, tsvExtract(_, tum)) =>
+          ka.includeLine(tum)
         case (ka, _) => ka
       }
   }

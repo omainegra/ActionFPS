@@ -4,25 +4,8 @@ import java.nio.file.{Files, Paths}
 
 import org.scalatest._
 import Matchers._
-import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
 
 class ParseSpec extends FreeSpec {
-  "it works" in {
-    val inputMessage =
-      "2017-01-07T23:55:05 [79.91.76.62] DaylixX gibbed w00p|Lucas"
-    val tmu =
-      TimedUserMessageExtract(NickToUser(Map("DaylixX" -> "daylixx").get))
-        .unapply(inputMessage)
-
-    val r = Aggregate.empty.includeLine(tmu.get)
-    val user = r.users("daylixx")
-    user.flags shouldEqual 0
-    user.frags shouldEqual 0
-    user.gibs shouldEqual 1
-    user.points shouldEqual 3
-    user.timePlayed shouldEqual 0
-  }
-
   "it includes new data format" in {
     val inputMessage =
       "2014-12-13T18:36:16Z\twoop.ac:1999\t[0.0.0.0] .LeXuS'' headshot [PSY]quico"
@@ -31,13 +14,12 @@ class ParseSpec extends FreeSpec {
                                 nickToUser =
                                   NickToUser(Map(".LeXuS''" -> "lexus").get))
 
-    val tsvExtract(server, tum) = inputMessage
+    val tsvExtract(_, tum) = inputMessage
 
-    val keyedAggregate = KeyedAggregate
-      .empty[String]
-      .includeLine(server)(tum)
+    val keyedAggregate = Aggregate.empty
+      .includeLine(tum)
 
-    val user = keyedAggregate.total.users("lexus")
+    val user = keyedAggregate.users("lexus")
     user.flags shouldEqual 0
     user.frags shouldEqual 0
     user.gibs shouldEqual 1
@@ -62,8 +44,6 @@ class ParseSpec extends FreeSpec {
       servers = validServers,
       nickToUser = NickToUser(u2n.get)
     )
-    val keyedAggregate = KeyedAggregate
-      .empty[String]
     val startTime = System.currentTimeMillis()
 
     val result = {
@@ -72,9 +52,9 @@ class ParseSpec extends FreeSpec {
       try {
         source
           .getLines()
-          .foldLeft(KeyedAggregate.empty[String]) {
-            case (ka, tsvExtract(serverKey, tum)) =>
-              ka.includeLine(serverKey)(tum)
+          .foldLeft(Aggregate.empty) {
+            case (aggregate, tsvExtract(_, tum)) =>
+              aggregate.includeLine(tum)
             case (ka, _) => ka
           }
       } finally source.close()
@@ -88,8 +68,8 @@ class ParseSpec extends FreeSpec {
 
   }
   "Lien parses" in {
-    val line = "2017-05-11T14:12:00Z\t62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#10000]\t[103.252.202.88] w00p|Drakas scored with the flag for CLA, new score 8"
-
+    val line =
+      "2017-05-11T14:12:00Z\t62-210-131-155.rev.poneytelecom.eu aura AssaultCube[local#10000]\t[103.252.202.88] w00p|Drakas scored with the flag for CLA, new score 8"
 
     val tsvExtract = TsvExtract(
       servers = validServers,
