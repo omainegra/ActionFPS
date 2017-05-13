@@ -14,6 +14,7 @@ import scala.annotation.tailrec
   */
 object TsvExtractEfficient {
   private val sampleInstant = "2017-05-13T07:19:09Z"
+
   def buildAggregateEfficient(path: Path,
                               nickToUser: NickToUser,
                               servers: Set[String]): Aggregate = {
@@ -36,6 +37,8 @@ object TsvExtractEfficient {
       else searchFor(from + 1, char)
     }
 
+//    val sc = ServerChecker(servers.toList)
+
     try {
       while (ch.position() < ch.size()) {
         bb.position(0)
@@ -57,23 +60,23 @@ object TsvExtractEfficient {
               nickEnd <- searchFor(nickStart + 1, ' ')
               nickAction <- searchFor(nickEnd + 1, ' ')
               nickname = {
-                val strbuf = new StringBuffer()
-                Iterator
-                  .from(nickStart + 1)
-                  .take(nickEnd - nickStart - 1)
-                  .foreach { n =>
-                    strbuf.append(bb.get(n).toChar)
-                  }
+                val strbuf = new StringBuffer(16)
+                var n = nickStart + 1
+                while (n < nickEnd) {
+                  strbuf.append(bb.get(n).toChar)
+                  n += 1
+                }
                 strbuf.toString
               }
               if nickToUser.nicknameExists(nickname)
               fullLine = {
-                val strbuf = new StringBuffer()
-
-                Iterator.from(0).take(lineEnd).foreach { n =>
-                  strbuf.append(bb.get(n).toChar)
+                val charArray = Array.fill(lineEnd)(0.toChar)
+                var n = 0
+                while (n < lineEnd) {
+                  charArray(n) = bb.get(n).toChar
+                  n = n + 1
                 }
-                strbuf.toString
+                new String(charArray)
               }
             } {
               t.unapplyHint(line = fullLine,

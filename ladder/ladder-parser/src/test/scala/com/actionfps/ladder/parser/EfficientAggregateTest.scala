@@ -10,6 +10,14 @@ import org.scalatest.Matchers._
   * Created by william on 13/5/17.
   */
 class EfficientAggregateTest extends FreeSpec {
+
+//  "server matcher works" in {
+//    assert(
+//      TsvExtractEfficient
+//        .ServerChecker(List("test"))
+//        .matchesAny(ByteBuffer.wrap(" test ".getBytes()))(1))
+//  }
+
   "it works" in {
     // todo consider edge cases
     // like "2014-12-13T18:36:16Z\twoop.ac:1999\t[\n"
