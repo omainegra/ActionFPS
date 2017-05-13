@@ -79,6 +79,13 @@ lazy val fileOffsetFinder = project
     libraryDependencies += scalacheck % "test"
   )
 
+lazy val benchmark = project
+  .dependsOn(web)
+  .enablePlugins(JmhPlugin)
+  .settings(
+    fork in run := true
+  )
+
 lazy val web = project
   .enablePlugins(PlayScala)
   .dependsOn(inters)
