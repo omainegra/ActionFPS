@@ -108,6 +108,9 @@ object LadderController {
           }
           .map(_.id)
       }
+
+      override def nicknameExists(nickname: String): Boolean =
+        nickToUsers.contains(nickname)
     }
   }
 }

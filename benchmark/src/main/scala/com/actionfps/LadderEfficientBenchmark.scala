@@ -22,8 +22,9 @@ class LadderEfficientBenchmark {
   @Benchmark
   def benchAccumulator(): Unit = {
     TsvExtractEfficient.buildAggregateEfficient(
-      Paths.get("../journals/journal.tsv"),
-      nickToUser)
+      servers = com.actionfps.ladder.parser.validServers,
+      path = Paths.get("../journals/journal.tsv"),
+      nickToUser = nickToUser)
   }
 
 }

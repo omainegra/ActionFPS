@@ -1,6 +1,8 @@
 package com.actionfps.ladder.parser
 
+import java.nio.ByteBuffer
 import java.nio.file.Files
+
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
 
@@ -9,14 +11,21 @@ import org.scalatest.Matchers._
   */
 class EfficientAggregateTest extends FreeSpec {
   "it works" in {
+    // todo consider edge cases
+    // like "2014-12-13T18:36:16Z\twoop.ac:1999\t[\n"
     val inputMessage =
-      "2014-12-13T18:36:16Z\twoop.ac:1999\t[0.0.0.0] .LeXuS'' headshot [PSY]quico\n"
+      "2014-12-13T18:36:16Z\twoop.ac:1999\t[0.0.0.0] .LeXuS'' headshot [PSY]quico\n" +
+        "2014-12-13T18:36:16Z\twoop.ac:1999\tXYZ\n" +
+        "2014-12-13T18:36:16Z\twoop.ac:1999\n" +
+        "2014-12-13T18:36:16Z\t\n" +
+        "2014-12-13T18:36:17Z\twoop.ac:1999\t[0.0.0.0] w00p|Drakas headshot [PSY]quico\n"
 
     val tempFile = Files.createTempFile("test", "tsv")
     Files.write(tempFile, inputMessage.getBytes())
 
     val aggregate = TsvExtractEfficient.buildAggregateEfficient(
-      tempFile,
+      servers = Set("woop.ac:1999"),
+      path = tempFile,
       nickToUser = NickToUser(Map(".LeXuS''" -> "lexus").get))
     val user = aggregate.users("lexus")
     user.flags shouldEqual 0
