@@ -74,3 +74,5 @@ test.db
 
 # benchmarking
 *.jfr
+
+.attach_*

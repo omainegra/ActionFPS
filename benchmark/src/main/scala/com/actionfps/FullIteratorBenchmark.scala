@@ -40,7 +40,7 @@ class FullIteratorBenchmark {
   var initial: GameAxisAccumulator = _
 
   @Benchmark
-  def wellHelloThere(): Unit = {
+  def benchAccumulator(): Unit = {
     initial.includeGames(allGames.valuesIterator.toList.sortBy(_.id))
   }
 
