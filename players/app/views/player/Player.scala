@@ -114,7 +114,6 @@ object Player {
         doc.select(".games-played").first().text(achievements.playerStatistics.gamesPlayed.toString)
         doc.select(".frags").first().text(achievements.playerStatistics.frags.toString)
 
-
         fullProfile.rank match {
           case None =>
             doc.select(".rank").remove()
@@ -123,10 +122,6 @@ object Player {
             doc.select(".elo-rank").first().text(rank.rank.getOrElse("").toString)
             doc.select(".elo-points").first().text(Math.round(rank.elo).toString)
         }
-
-        fullProfile.playerGameCounts.map { gc =>
-          views.html.game_counts(gc.counts)
-        }.map(_.body).foreach(doc.select(".basics").first().append)
 
     }
 
