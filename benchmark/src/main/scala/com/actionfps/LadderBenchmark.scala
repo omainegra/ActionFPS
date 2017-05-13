@@ -1,6 +1,7 @@
 package com.actionfps
 
-import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
+import com.actionfps.ladder.parser.NickToUser
+import controllers.LadderController
 import org.openjdk.jmh.annotations.{Benchmark, Scope, Setup, State}
 import services.TsvLadderService
 
@@ -14,9 +15,7 @@ class LadderBenchmark {
   @Setup()
   def setup(): Unit = {
     val (_, users) = FullIteratorBenchmark.fetchClansAndUsers()
-    nickToUser = NickToUser { nickname =>
-      users.find(_.nickname.nickname == nickname).map(_.id)
-    }
+    nickToUser = LadderController.nickToUserFromUsers(users)
   }
 
   @Benchmark

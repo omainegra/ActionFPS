@@ -2,8 +2,6 @@ package com.actionfps.ladder.parser
 
 import java.time.Instant
 
-import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
-
 /**
   * Created by me on 11/05/2017.
   */
@@ -16,9 +14,9 @@ case class TsvExtract(servers: Set[String], nickToUser: NickToUser) {
       val regex = s"""\\[([^\\]]+)\\] ([^ ]+) (.*)""".r
       message match {
         case regex(ip, nick, content) =>
-          nickToUser.userOfNickname(nick) match {
+          val timestamp = Instant.parse(splittedLine(0))
+          nickToUser.userOfNickname(nick, timestamp) match {
             case Some(uuser) =>
-              val timestamp = Instant.parse(splittedLine(0))
               Some(server -> TimedUserMessage(timestamp, uuser, content))
             case None => None
           }
@@ -27,6 +25,7 @@ case class TsvExtract(servers: Set[String], nickToUser: NickToUser) {
     } else None
   }
 }
+
 object TsvExtract {
   def empty =
     TsvExtract(servers = Set.empty,

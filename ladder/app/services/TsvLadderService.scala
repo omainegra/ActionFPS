@@ -7,8 +7,12 @@ import akka.agent.Agent
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.util.ByteString
-import com.actionfps.ladder.parser.{Aggregate, KeyedAggregate, TsvExtract}
-import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
+import com.actionfps.ladder.parser.{
+  Aggregate,
+  KeyedAggregate,
+  NickToUser,
+  TsvExtract
+}
 import play.api.Logger
 
 import scala.async.Async._
@@ -31,7 +35,6 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
         .fromFile(path.toFile)
       try TsvLadderService.buildAggregate(source, nickToUser)
       finally source.close()
-      KeyedAggregate.empty[String]
     }
     val end = clock.instant()
     Logger.info(s"Took ${Duration.between(start, end)} to load ladder.")
@@ -57,7 +60,7 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
                                                    2048,
                                                    allowTruncation = false))
           .map(_.decodeString("UTF-8"))
-//          .drop(1) // we might be mid-line
+          .drop(1) // may be mid-line
           .mapConcat { line =>
             val tsvExtract =
               TsvExtract(com.actionfps.ladder.parser.validServers, nick2user)

@@ -9,8 +9,8 @@ import javax.inject._
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
 import com.actionfps.ladder.parser._
+import com.actionfps.user.User
 import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.libs.json.Json
@@ -30,11 +30,9 @@ class LadderController @Inject()(configuration: Configuration,
     extends Controller {
   private implicit val actorMaterializer = ActorMaterializer()
 
-  private def nickToUser: Future[NickToUser] =
-    providesUsers.users.map(users =>
-      NickToUser { nickname =>
-        users.find(_.nickname.nickname == nickname).map(_.id)
-    })
+  private def nickToUser: Future[NickToUser] = async {
+    LadderController.nickToUserFromUsers(await(providesUsers.users))
+  }
 
   private val ladderService = new TsvLadderService(
     Paths
@@ -69,6 +67,30 @@ class LadderController @Inject()(configuration: Configuration,
                     WebTemplateRender.wwwLocation.resolve("ladder_table.html"),
                     await(aggregate))(showTime = true))
             ))
+      }
+    }
+  }
+}
+object LadderController {
+  def nickToUserFromUsers(users: List[User]): NickToUser = {
+    val nickToUsers = users
+      .flatMap { u =>
+        u.nicknames.map(_.nickname).map { n =>
+          n -> u
+        }
+      }
+      .groupBy(_._1)
+      .map {
+        case (n, us) =>
+          n -> us.map(_._2)
+      }
+    new NickToUser {
+      override def userOfNickname(nickname: String,
+                                  atTime: Instant): Option[String] = {
+        nickToUsers
+          .get(nickname)
+          .flatMap(_.find(_.validAt(nickname, atTime)))
+          .map(_.id)
       }
     }
   }
