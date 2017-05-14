@@ -12,7 +12,7 @@ class ParseSpec extends FreeSpec {
 
     val tsvExtract = TsvExtract(servers = Set("woop.ac:1999"),
                                 nickToUser =
-                                  NickToUser(Map(".LeXuS''" -> "lexus").get))
+                                  NickToUser(Map(".LeXuS''" -> "lexus")))
 
     val tsvExtract(_, tum) = inputMessage
 
@@ -42,7 +42,7 @@ class ParseSpec extends FreeSpec {
 
     val tsvExtract = TsvExtract(
       servers = validServers,
-      nickToUser = NickToUser(u2n.get)
+      nickToUser = NickToUser(u2n)
     )
     val startTime = System.currentTimeMillis()
 
@@ -73,7 +73,7 @@ class ParseSpec extends FreeSpec {
 
     val tsvExtract = TsvExtract(
       servers = validServers,
-      nickToUser = NickToUser(Map("w00p|Drakas" -> "drakas").get)
+      nickToUser = NickToUser(Map("w00p|Drakas" -> "drakas"))
     )
 
     info(s"${tsvExtract.unapply(line)}")

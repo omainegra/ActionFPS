@@ -85,6 +85,5 @@ object TsvExtract {
   }
 
   def empty =
-    TsvExtract(servers = Set.empty,
-               nickToUser = NickToUser(Function.const(None)))
+    TsvExtract(servers = Set.empty, nickToUser = NickToUser(Map.empty))
 }

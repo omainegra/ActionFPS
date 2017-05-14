@@ -3,6 +3,8 @@ package com.actionfps.ladder.parser
 import java.nio.ByteBuffer
 import java.nio.file.Files
 
+import bloomfilter.mutable.BloomFilter
+import com.clearspring.analytics.stream.membership.{BloomFilter => ABF}
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
 
@@ -17,6 +19,43 @@ class EfficientAggregateTest extends FreeSpec {
 //        .ServerChecker(List("test"))
 //        .matchesAny(ByteBuffer.wrap(" test ".getBytes()))(1))
 //  }
+
+//  "We can use ByteBuffer comparisons" in {
+//    val b: ByteBuffer = ByteBuffer.wrap("X woop.ac Z E".getBytes()).asReadOnlyBuffer()
+//    val b2: ByteBuffer = ByteBuffer.wrap("woop.ac".getBytes()).asReadOnlyBuffer()
+//    b.position(2)
+//    b.limit(b2.remaining())
+//    assert(b.hashCode() == b2.hashCode())
+//    assert(b == b2)
+//  }
+
+  "We can use byte array sets wrapped by ByteBuffers" in {
+    val x = "woop.ac"
+    val y = ByteBuffer.wrap(List("woop", ".ac").mkString("").getBytes())
+    val sX = Set(ByteBuffer.wrap(x.getBytes()))
+    assert(sX.contains(y))
+  }
+
+  "I understand bloom filter correctly" in {
+    val bf = new ABF(10, 10)
+    val serverName = "woop.ac:1999"
+    bf.add(serverName)
+    assert(bf.isPresent(serverName))
+  }
+  "I understand bloom filter correctly (2)" in {
+    val bf = new ABF(10, 10)
+    val serverName = "woop.ac:1999"
+    bf.add(serverName.getBytes())
+    assert(bf.isPresent(serverName.getBytes()))
+  }
+
+  "'Super fast' bloom filter works" in {
+    val expectedElements = 1000000
+    val falsePositiveRate = 0.1
+    val bf = BloomFilter[Array[Byte]](expectedElements, falsePositiveRate)
+    bf.add("What".getBytes())
+    assert(bf.mightContain("What".getBytes()))
+  }
 
   "it works" in {
     // todo consider edge cases
@@ -43,10 +82,11 @@ class EfficientAggregateTest extends FreeSpec {
     val tempFile = Files.createTempFile("test", "tsv")
     Files.write(tempFile, multiplied.getBytes())
 
+    val ntu = Map(".LeXuS''" -> "lexus")
     val aggregate = TsvExtractEfficient.buildAggregateEfficient(
       servers = Set("woop.ac:1999"),
       path = tempFile,
-      nickToUser = NickToUser(Map(".LeXuS''" -> "lexus").get))
+      nickToUser = NickToUser(ntu))
     val user = aggregate.users("lexus")
     user.flags shouldEqual 0
     user.frags shouldEqual 0

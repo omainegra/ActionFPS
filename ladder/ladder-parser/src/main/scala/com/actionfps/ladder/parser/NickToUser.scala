@@ -6,18 +6,21 @@ import java.time.Instant
   * Created by me on 11/05/2017.
   */
 trait NickToUser {
-  def nicknameExists(nickname: String): Boolean
+  def nicknames: Set[String]
   def userOfNickname(nickname: String, atTime: Instant): Option[String]
+  def nicknameExists(nickname: String): Boolean = nicknames.contains(nickname)
 }
 
 object NickToUser {
-  def apply(f: String => Option[String]): NickToUser = new NickToUser {
-    override def userOfNickname(nickname: String,
-                                atTime: Instant): Option[String] =
-      f(nickname)
+  def apply(n: Map[String, String]): NickToUser = {
+    val nicksSet = n.keySet
+    new NickToUser {
+      override def userOfNickname(nickname: String,
+                                  atTime: Instant): Option[String] =
+        n.get(nickname)
 
-    override def nicknameExists(nickname: String): Boolean =
-      f(nickname).isDefined
+      override def nicknames: Set[String] = nicksSet
+    }
   }
-  def empty: NickToUser = apply(Function.const(None))
+  def empty: NickToUser = apply(Map.empty)
 }

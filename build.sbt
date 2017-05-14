@@ -201,8 +201,9 @@ lazy val ladderParser =
     libraryDependencies += scalatest % "test",
     libraryDependencies += gameParser,
     libraryDependencies += {
-      "com.clearspring.analytics"%"stream"%"2.7.0"
-    }
+      "com.clearspring.analytics" % "stream" % "2.7.0"
+    },
+    libraryDependencies += "com.github.alexandrnikitin" %% "bloom-filter" % "0.9.0"
   )
 
 lazy val ladder =

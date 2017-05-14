@@ -84,7 +84,10 @@ object LadderController {
         case (n, us) =>
           n -> us.map(_._2)
       }
+    val nicks = nickToUsers.keySet
     new NickToUser {
+      def nicknames: Set[String] = nicks
+
       override def userOfNickname(nickname: String,
                                   atTime: Instant): Option[String] = {
         nickToUsers
