@@ -70,7 +70,7 @@ object TsvExtractEfficient {
               val lineLength = lineEnd - lineStart
               lines = lines + 1
               def fullLine = {
-                val charArray = Array.fill(lineLength)(0.toChar)
+                val charArray = new Array[Char](lineLength)
                 var n = 0
                 while (n < lineLength) {
                   charArray(n) = bb.get(lineStart + n).toChar
@@ -94,13 +94,14 @@ object TsvExtractEfficient {
                               case SearchBad => None
                               case nickEnd =>
                                 val nickname = {
-                                  val strbuf = new StringBuffer(24)
+                                  val nickLength = nickEnd - nickStart
+                                  val charArray = new Array[Char](nickLength)
                                   var n = 0
-                                  while (n < (nickEnd - nickStart)) {
-                                    strbuf.append(bb.get(nickStart + n).toChar)
+                                  while (n < nickLength) {
+                                    charArray(n) = bb.get(nickStart + n).toChar
                                     n += 1
                                   }
-                                  strbuf.toString
+                                  new String(charArray)
                                 }
                                 Some(nickname)
                             }
