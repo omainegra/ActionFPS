@@ -23,13 +23,14 @@ object TsvExtractEfficient {
 //    servers.map(_.getBytes()).foreach(serversFilter.add)
 
     val serversByteSet = servers.map(_.getBytes()).map(ByteBuffer.wrap)
-    val serversByteList = servers.map(_.getBytes()).map(ByteBuffer.wrap).toList.toArray
+    val serversByteList =
+      servers.map(_.getBytes()).map(ByteBuffer.wrap).toList.toArray
 
 //    @tailrec
     def exists(bl: Array[ByteBuffer])(f: ByteBuffer => Boolean): Boolean = {
       var i = 0
-      while ( i < bl.length ) {
-        if ( f(bl(i)) ) return true
+      while (i < bl.length) {
+        if (f(bl(i))) return true
         i += 1
       }
       false
@@ -166,13 +167,12 @@ object TsvExtractEfficient {
                                   case Some(serverName)
                                       if servers.contains(serverName) =>
                                     val nickLength = nickEnd - nickStart
-                                    bb.position(nickStart)
-                                    if (exists(nicknameByteList)(
-                                          bytesMatch(nickStart,
-                                                     nickLength,
-                                                     _))) {
+                                    val nicknameBar =
+                                      byteArrayOf(nickStart, nickLength)
+                                    if (nicknamesByteSet.contains(
+                                          ByteBuffer.wrap(nicknameBar))) {
                                       Some(
-                                        stringOf(nickStart, nickLength) -> serverName)
+                                        new String(nicknameBar) -> serverName)
                                     } else None
                                   case _ => None
                                 }
