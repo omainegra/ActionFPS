@@ -58,13 +58,11 @@ object TsvExtractEfficient {
           searchFor(instantEnd, '\n') match {
             case SearchBad =>
               bufferDone = true
-              // forget the last line, I suppose?
               if (readBytes < BufferSize) {
                 allDone = true
                 bufferDone = true
               } else {
                 val newPosition = ch.position() - bb.limit() + lineStart
-//                println(s"Moving to position ${newPosition}; ${bb.limit()}; ${lineStart}")
                 ch.position(newPosition)
                 bb.rewind()
               }
@@ -96,7 +94,7 @@ object TsvExtractEfficient {
                               case SearchBad => None
                               case nickEnd =>
                                 val nickname = {
-                                  val strbuf = new StringBuffer(16)
+                                  val strbuf = new StringBuffer(24)
                                   var n = 0
                                   while (n < (nickEnd - nickStart)) {
                                     strbuf.append(bb.get(nickStart + n).toChar)
@@ -111,13 +109,14 @@ object TsvExtractEfficient {
                 }
               }
 
-              nickname
-                .filter(nickToUser.nicknameExists)
-                .flatMap(_ => t.unapply(fullLine))
-                .foreach {
-                  case (_, tmu) =>
-                    start = start.includeLine(tmu)
-                }
+              nickname match {
+                case Some(n) if nickToUser.nicknameExists(n) =>
+                  t.unapply(fullLine) match {
+                    case Some((_, tmu)) => start = start.includeLine(tmu)
+                    case _ =>
+                  }
+                case _ =>
+              }
 
               lineStart = lineEnd + 1
           }
