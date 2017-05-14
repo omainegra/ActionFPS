@@ -23,6 +23,17 @@ object TsvExtractEfficient {
 //    servers.map(_.getBytes()).foreach(serversFilter.add)
 
     val serversByteSet = servers.map(_.getBytes()).map(ByteBuffer.wrap)
+    val serversByteList = servers.map(_.getBytes()).map(ByteBuffer.wrap).toList.toArray
+
+//    @tailrec
+    def exists(bl: Array[ByteBuffer])(f: ByteBuffer => Boolean): Boolean = {
+      bl.exists(f)
+//      bl match {
+//        case h :: tail =>
+//          if (f(h)) true else exists(tail)(f)
+//        case Nil => false
+//      }
+    }
 
 //    val nicknamesFilter =
 //      BloomFilter[Array[Byte]](numberOfItems = 1000, falsePositiveRate = 0.2)
@@ -30,6 +41,8 @@ object TsvExtractEfficient {
 
     val nicknamesByteSet =
       nickToUser.nicknames.map(_.getBytes()).map(ByteBuffer.wrap)
+
+    val nicknameByteList = nicknamesByteSet.toList.toArray
 
     val t: TsvExtract = TsvExtract(servers, nickToUser)
     import java.nio.charset.Charset
@@ -93,6 +106,19 @@ object TsvExtractEfficient {
                 new String(charArray)
               }
 
+              def bytesMatch(start: Int,
+                             length: Int,
+                             smaller: ByteBuffer): Boolean = {
+                if (smaller.limit() != length) false
+                else {
+                  val originalLimit = bb.limit()
+                  bb.limit(start + length)
+                  val result = bb.equals(smaller)
+                  bb.limit(originalLimit)
+                  result
+                }
+              }
+
               def byteArrayOf(start: Int, length: Int): Array[Byte] = {
                 val byteArray = new Array[Byte](length)
                 var n = 0
@@ -122,11 +148,12 @@ object TsvExtractEfficient {
                                 def server: Option[String] = {
                                   val serverStart = instantEnd + 1
                                   val serverLength = serverEnd - serverStart
-                                  val bar =
-                                    byteArrayOf(serverStart, serverLength)
-                                  if (serversByteSet.contains(
-                                        ByteBuffer.wrap(bar))) {
-                                    Some(new String(bar))
+                                  bb.position(serverStart)
+                                  if (exists(serversByteList)(
+                                        bytesMatch(serverStart,
+                                                   serverLength,
+                                                   _))) {
+                                    Some(stringOf(serverStart, serverLength))
                                   } else None
                                 }
 
@@ -134,12 +161,13 @@ object TsvExtractEfficient {
                                   case Some(serverName)
                                       if servers.contains(serverName) =>
                                     val nickLength = nickEnd - nickStart
-                                    val nicknameBar =
-                                      byteArrayOf(nickStart, nickLength)
-                                    if (nicknamesByteSet.contains(
-                                          ByteBuffer.wrap(nicknameBar))) {
+                                    bb.position(nickStart)
+                                    if (exists(nicknameByteList)(
+                                          bytesMatch(nickStart,
+                                                     nickLength,
+                                                     _))) {
                                       Some(
-                                        new String(nicknameBar) -> serverName)
+                                        stringOf(nickStart, nickLength) -> serverName)
                                     } else None
                                   case _ => None
                                 }
@@ -149,8 +177,7 @@ object TsvExtractEfficient {
                 }
               }
               nicknameServer match {
-                case Some((n, s))
-                    if nickToUser.nicknameExists(n) && servers.contains(s) =>
+                case Some((n, s)) =>
                   t.unapply(fullLine) match {
                     case Some((_, tmu)) => start = start.includeLine(tmu)
                     case _ =>

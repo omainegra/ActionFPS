@@ -36,6 +36,15 @@ class EfficientAggregateTest extends FreeSpec {
     assert(sX.contains(y))
   }
 
+  "Two byte buffers can be compared" in {
+    val shorter = ByteBuffer.wrap("woop.ac".getBytes())
+    val longer = ByteBuffer.wrap("hello woop.ac there".getBytes())
+    longer.position("hello ".length)
+    longer.limit(shorter.limit() + longer.position())
+    info(s"${shorter.remaining()}, ${longer.remaining()}")
+    assert(shorter.equals(longer))
+  }
+
   "I understand bloom filter correctly" in {
     val bf = new ABF(10, 10)
     val serverName = "woop.ac:1999"

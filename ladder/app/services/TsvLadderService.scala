@@ -31,14 +31,14 @@ class TsvLadderService(path: Path, usersMap: () => Future[NickToUser])(
     val start = clock.instant()
     val nickToUser = await(usersMap())
     val resultAgent = Agent {
-//      TsvExtractEfficient.buildAggregateEfficient(
-//        path,
-//        nickToUser,
-//        servers = com.actionfps.ladder.parser.validServers)
-      val source = scala.io.Source
-        .fromFile(path.toFile)
-      try TsvExtract.buildAggregate(source, nickToUser)
-      finally source.close()
+      TsvExtractEfficient.buildAggregateEfficient(
+        path,
+        nickToUser,
+        servers = com.actionfps.ladder.parser.validServers)
+//      val source = scala.io.Source
+//        .fromFile(path.toFile)
+//      try TsvExtract.buildAggregate(source, nickToUser)
+//      finally source.close()
     }
     val end = clock.instant()
     Logger.info(s"Took ${Duration.between(start, end)} to load ladder.")
