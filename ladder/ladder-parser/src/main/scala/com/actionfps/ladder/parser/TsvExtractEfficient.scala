@@ -6,9 +6,11 @@ import java.nio.channels.SeekableByteChannel
 import java.nio.file.Files
 import java.time.Instant
 
-import bloomfilter.mutable.BloomFilter
-
-import scala.annotation.tailrec
+import com.actionfps.ladder.parser.bytebuffer.{
+  ByteBufferExtract,
+  ByteBufferMatch,
+  ByteBufferSearch
+}
 
 /**
   * Created by william on 13/5/17.
@@ -19,15 +21,9 @@ object TsvExtractEfficient {
   def buildAggregateEfficient(path: Path,
                               nickToUser: NickToUser,
                               servers: Set[String]): Aggregate = {
-//    val serversFilter =
-//      BloomFilter[Array[Byte]](numberOfItems = 10, falsePositiveRate = 0.1)
-//    servers.map(_.getBytes()).foreach(serversFilter.add)
-
-    val serversByteSet = servers.map(_.getBytes()).map(ByteBuffer.wrap)
     val serversByteList =
       servers.map(_.getBytes()).map(ByteBuffer.wrap).toList.toArray
 
-//    @tailrec
     def exists(bl: Array[ByteBuffer])(f: ByteBuffer => Boolean): Boolean = {
       var i = 0
       while (i < bl.length) {
@@ -35,19 +31,7 @@ object TsvExtractEfficient {
         i += 1
       }
       false
-//      bl match {
-//        case h :: tail =>
-//          if (f(h)) true else exists(tail)(f)
-//        case Nil => false
-//      }
     }
-
-//    val nicknamesFilter =
-//      BloomFilter[Array[Byte]](numberOfItems = 1000, falsePositiveRate = 0.2)
-//    nickToUser.nicknames.map(_.getBytes()).foreach(nicknamesFilter.add)
-
-    val nicknamesByteSet =
-      nickToUser.nicknames.map(_.getBytes()).map(ByteBuffer.wrap)
 
     val nicknamesByteMap: Map[ByteBuffer, String] =
       nickToUser.nickToUser.map {
@@ -55,39 +39,29 @@ object TsvExtractEfficient {
           ByteBuffer.wrap(n.getBytes()) -> u
       }
 
-    val nicknameByteList = nicknamesByteSet.toList.toArray
-
-    val t: TsvExtract = TsvExtract(servers, nickToUser)
-    import java.nio.charset.Charset
-    val chr = Charset.forName("ISO-8859-1")
-    val serversList = servers.toList
-    val serversListBytes = serversList.map(_.getBytes("UTF-8"))
     var start = Aggregate.empty
     val ch: SeekableByteChannel = Files.newByteChannel(path)
-//    val BufferSize = 1024
     val BufferSize = 1024 * 8
     val bb = ByteBuffer.allocateDirect(BufferSize)
     ch.position(0)
     bb.position(0)
-    val SearchBad = -1
-
-    @tailrec
-    def searchFor(from: Int, char: Char, lim: Int): Int = {
-      if (lim <= from) SearchBad
-      else if (bb.get(from) == char.toInt) from
-      else searchFor(from + 1, char, lim)
-    }
-
-//    val sc = ServerChecker(servers.toList)
 
     var lines = 0
+
+    val byteBufferSearch = ByteBufferSearch(bb)
+    import byteBufferSearch.searchFor
+    import ByteBufferSearch.SearchBad
+    val byteBufferMatch = ByteBufferMatch(bb)
+    import byteBufferMatch.bytesMatch
+    val byteBufferExtract = ByteBufferExtract(bb)
+    import byteBufferExtract.byteArrayOf
+    import byteBufferExtract.stringOf
 
     try {
       var allDone = false
       while (ch.position() < ch.size() && !allDone) {
         val readBytes = ch.read(bb)
         bb.limit(readBytes)
-        // navigate to second tab, and by this point we'll know a server name too
         var lineStart = 0
 
         var bufferDone = false
@@ -108,39 +82,6 @@ object TsvExtractEfficient {
             case lineEnd =>
               val lineLength = lineEnd - lineStart
               lines = lines + 1
-
-              def stringOf(start: Int, length: Int): String = {
-                val charArray = new Array[Char](length)
-                var n = 0
-                while (n < length) {
-                  charArray(n) = bb.get(start + n).toChar
-                  n = n + 1
-                }
-                new String(charArray)
-              }
-
-              def bytesMatch(start: Int,
-                             length: Int,
-                             smaller: ByteBuffer): Boolean = {
-                if (smaller.limit() != length) false
-                else {
-                  val originalLimit = bb.limit()
-                  bb.limit(start + length)
-                  val result = bb.equals(smaller)
-                  bb.limit(originalLimit)
-                  result
-                }
-              }
-
-              def byteArrayOf(start: Int, length: Int): Array[Byte] = {
-                val byteArray = new Array[Byte](length)
-                var n = 0
-                while (n < length) {
-                  byteArray(n) = bb.get(start + n)
-                  n = n + 1
-                }
-                byteArray
-              }
 
               def fullLine = stringOf(lineStart, lineLength)
 
