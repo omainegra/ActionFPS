@@ -6,10 +6,11 @@ import java.nio.channels.SeekableByteChannel
 import java.nio.file.Files
 import java.time.Instant
 
-import com.actionfps.ladder.parser.bytebuffer.{
+import com.actionfps.ladder.parser.performance.{
   ByteBufferExtract,
   ByteBufferMatch,
-  ByteBufferSearch
+  ByteBufferSearch,
+  LineChannelReader
 }
 
 /**
@@ -46,8 +47,6 @@ object TsvExtractEfficient {
     ch.position(0)
     bb.position(0)
 
-    var lines = 0
-
     val byteBufferSearch = ByteBufferSearch(bb)
     import byteBufferSearch.searchFor
     import ByteBufferSearch.SearchBad
@@ -57,97 +56,73 @@ object TsvExtractEfficient {
     import byteBufferExtract.byteArrayOf
     import byteBufferExtract.stringOf
 
-    try {
-      var allDone = false
-      while (ch.position() < ch.size() && !allDone) {
-        val readBytes = ch.read(bb)
-        bb.limit(readBytes)
-        var lineStart = 0
+    def processLine(lineStart: Int, lineEnd: Int): Unit = {
 
-        var bufferDone = false
-        while (!bufferDone) {
-          val instantEnd = lineStart + sampleInstant.length
-          // bug: doesn't read the last line
-          searchFor(instantEnd, '\n', bb.limit()) match {
-            case SearchBad =>
-              bufferDone = true
-              if (readBytes < BufferSize) {
-                allDone = true
-                bufferDone = true
-              } else {
-                val newPosition = ch.position() - bb.limit() + lineStart
-                ch.position(newPosition)
-                bb.rewind()
-              }
-            case lineEnd =>
-              val lineLength = lineEnd - lineStart
-              lines = lines + 1
+      val instantEnd = lineStart + sampleInstant.length
+      val lineLength = lineEnd - lineStart
+      def fullLine = stringOf(lineStart, lineLength)
 
-              def fullLine = stringOf(lineStart, lineLength)
-
-              def user: Option[(String, Int)] = {
-                searchFor(instantEnd + 1, '\t', lineEnd) match {
+      def user: Option[(String, Int)] = {
+        searchFor(instantEnd + 1, '\t', lineEnd) match {
+          case SearchBad => None
+          case serverEnd if serverEnd <= lineEnd =>
+            searchFor(serverEnd + 1, '[', lineEnd) match {
+              case SearchBad => None
+              case ipStart =>
+                searchFor(ipStart, ' ', lineEnd) match {
                   case SearchBad => None
-                  case serverEnd if serverEnd <= lineEnd =>
-                    searchFor(serverEnd + 1, '[', lineEnd) match {
+                  case nickStartM1 =>
+                    val nickStart = nickStartM1 + 1
+                    searchFor(nickStart + 1, ' ', lineEnd) match {
                       case SearchBad => None
-                      case ipStart =>
-                        searchFor(ipStart, ' ', lineEnd) match {
-                          case SearchBad => None
-                          case nickStartM1 =>
-                            val nickStart = nickStartM1 + 1
-                            searchFor(nickStart + 1, ' ', lineEnd) match {
-                              case SearchBad => None
-                              case nickEnd =>
-                                def server: Option[String] = {
-                                  val serverStart = instantEnd + 1
-                                  val serverLength = serverEnd - serverStart
-                                  bb.position(serverStart)
-                                  if (exists(serversByteList)(
-                                        bytesMatch(serverStart,
-                                                   serverLength,
-                                                   _))) {
-                                    Some(stringOf(serverStart, serverLength))
-                                  } else None
-                                }
+                      case nickEnd =>
+                        def server: Option[String] = {
+                          val serverStart = instantEnd + 1
+                          val serverLength = serverEnd - serverStart
+                          bb.position(serverStart)
+                          if (exists(serversByteList)(
+                                bytesMatch(serverStart, serverLength, _))) {
+                            Some(stringOf(serverStart, serverLength))
+                          } else None
+                        }
 
-                                server match {
-                                  case Some(serverName)
-                                      if servers.contains(serverName) =>
-                                    val nickLength = nickEnd - nickStart
-                                    val nicknameBar =
-                                      byteArrayOf(nickStart, nickLength)
-                                    nicknamesByteMap.get(
-                                      ByteBuffer.wrap(nicknameBar)) match {
-                                      case Some(u) => Some(u -> nickEnd)
-                                      case None => None
-                                    }
-                                  case _ => None
-                                }
+                        server match {
+                          case Some(serverName)
+                              if servers.contains(serverName) =>
+                            val nickLength = nickEnd - nickStart
+                            val nicknameBar =
+                              byteArrayOf(nickStart, nickLength)
+                            nicknamesByteMap.get(ByteBuffer.wrap(nicknameBar)) match {
+                              case Some(u) => Some(u -> nickEnd)
+                              case None => None
                             }
+                          case _ => None
                         }
                     }
                 }
-              }
-              user match {
-                case Some((u, nickEnd)) =>
-                  val fl = fullLine
-                  val instantStr = fl.substring(0, sampleInstant.length)
-                  val msgOffset = nickEnd - lineStart + 1
-                  val tum = TimedUserMessage(
-                    instant = Instant.parse(instantStr),
-                    user = u,
-                    message = fl.substring(msgOffset)
-                  )
-                  start = start.includeLine(tum)
-                case _ =>
-              }
-
-              lineStart = lineEnd + 1
-          }
+            }
         }
-
       }
+      user match {
+        case Some((u, nickEnd)) =>
+          val fl = fullLine
+          val instantStr = fl.substring(0, sampleInstant.length)
+          val msgOffset = nickEnd - lineStart + 1
+          val tum = TimedUserMessage(
+            instant = Instant.parse(instantStr),
+            user = u,
+            message = fl.substring(msgOffset)
+          )
+          start = start.includeLine(tum)
+        case _ =>
+      }
+
+    }
+
+    val lcr = LineChannelReader(ch, bb)
+    try lcr.process { (lineStart, lineEnd) =>
+      processLine(lineStart, lineEnd)
+      true
     } finally ch.close()
     start
   }
