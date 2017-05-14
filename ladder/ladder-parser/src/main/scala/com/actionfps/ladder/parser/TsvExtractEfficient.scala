@@ -6,12 +6,7 @@ import java.nio.channels.SeekableByteChannel
 import java.nio.file.Files
 import java.time.Instant
 
-import com.actionfps.ladder.parser.performance.{
-  ByteBufferExtract,
-  ByteBufferMatch,
-  ByteBufferSearch,
-  LineChannelReader
-}
+import com.actionfps.ladder.parser.performance._
 
 /**
   * Created by william on 13/5/17.
@@ -24,15 +19,6 @@ object TsvExtractEfficient {
                               servers: Set[String]): Aggregate = {
     val serversByteList =
       servers.map(_.getBytes()).map(ByteBuffer.wrap).toList.toArray
-
-    def exists(bl: Array[ByteBuffer])(f: ByteBuffer => Boolean): Boolean = {
-      var i = 0
-      while (i < bl.length) {
-        if (f(bl(i))) return true
-        i += 1
-      }
-      false
-    }
 
     val nicknamesByteMap: Map[ByteBuffer, String] =
       nickToUser.nickToUser.map {
@@ -56,16 +42,32 @@ object TsvExtractEfficient {
     import byteBufferExtract.byteArrayOf
     import byteBufferExtract.stringOf
 
+    def serverMatches(instantEnd: Int, serverEnd: Int): Boolean = {
+      val serverStart = instantEnd + 1
+      val serverLength = serverEnd - serverStart
+      bb.position(serverStart)
+      ByteBufferArrayExists.exists(serversByteList)(
+        bytesMatch(serverStart, serverLength, _))
+    }
+
+    def matchNicknameToUser(nickStart: Int, nickEnd: Int): Option[String] = {
+      val nickLength = nickEnd - nickStart
+      val nicknameBar =
+        byteArrayOf(nickStart, nickLength)
+      nicknamesByteMap.get(ByteBuffer.wrap(nicknameBar))
+    }
+
     def processLine(lineStart: Int, lineEnd: Int): Unit = {
 
       val instantEnd = lineStart + sampleInstant.length
       val lineLength = lineEnd - lineStart
-      def fullLine = stringOf(lineStart, lineLength)
 
-      def user: Option[(String, Int)] = {
+      def fetchLine() = stringOf(lineStart, lineLength)
+
+      def userO: Option[(String, Int)] = {
         searchFor(instantEnd + 1, '\t', lineEnd) match {
           case SearchBad => None
-          case serverEnd if serverEnd <= lineEnd =>
+          case serverEnd =>
             searchFor(serverEnd + 1, '[', lineEnd) match {
               case SearchBad => None
               case ipStart =>
@@ -76,42 +78,26 @@ object TsvExtractEfficient {
                     searchFor(nickStart + 1, ' ', lineEnd) match {
                       case SearchBad => None
                       case nickEnd =>
-                        def server: Option[String] = {
-                          val serverStart = instantEnd + 1
-                          val serverLength = serverEnd - serverStart
-                          bb.position(serverStart)
-                          if (exists(serversByteList)(
-                                bytesMatch(serverStart, serverLength, _))) {
-                            Some(stringOf(serverStart, serverLength))
-                          } else None
-                        }
-
-                        server match {
-                          case Some(serverName)
-                              if servers.contains(serverName) =>
-                            val nickLength = nickEnd - nickStart
-                            val nicknameBar =
-                              byteArrayOf(nickStart, nickLength)
-                            nicknamesByteMap.get(ByteBuffer.wrap(nicknameBar)) match {
-                              case Some(u) => Some(u -> nickEnd)
-                              case None => None
-                            }
-                          case _ => None
-                        }
+                        if (serverMatches(instantEnd, serverEnd)) {
+                          matchNicknameToUser(nickStart, nickEnd).map { u =>
+                            u -> nickEnd
+                          }
+                        } else None
                     }
                 }
             }
         }
       }
-      user match {
-        case Some((u, nickEnd)) =>
-          val fl = fullLine
-          val instantStr = fl.substring(0, sampleInstant.length)
+
+      userO match {
+        case Some((user, nickEnd)) =>
+          val line = fetchLine()
+          val instantStr = line.substring(0, sampleInstant.length)
           val msgOffset = nickEnd - lineStart + 1
           val tum = TimedUserMessage(
             instant = Instant.parse(instantStr),
-            user = u,
-            message = fl.substring(msgOffset)
+            user = user,
+            message = line.substring(msgOffset)
           )
           start = start.includeLine(tum)
         case _ =>
