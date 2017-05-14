@@ -81,38 +81,32 @@ object TsvExtractEfficient {
                 new String(charArray)
               }
 
-//              println(s"Line ${lines} processing: ${fullLine}")
-              for {
-                serverEnd <- searchFor(instantEnd + 1, '\t')
-                ipStart <- searchFor(serverEnd + 1, '[')
-                nickStart <- searchFor(ipStart, ' ').map(_ + 1)
-                nickEnd <- searchFor(nickStart + 1, ' ')
-                nickAction <- searchFor(nickEnd + 1, ' ')
-                nickname = {
-                  val strbuf = new StringBuffer(16)
-                  var n = 0
-                  while (n < (nickEnd - nickStart)) {
-                    strbuf.append(bb.get(nickStart + n).toChar)
-                    n += 1
+              def nickname: Option[String] = {
+                for {
+                  serverEnd <- searchFor(instantEnd + 1, '\t')
+                  ipStart <- searchFor(serverEnd + 1, '[')
+                  nickStart <- searchFor(ipStart, ' ').map(_ + 1)
+                  nickEnd <- searchFor(nickStart + 1, ' ')
+                  nickname = {
+                    val strbuf = new StringBuffer(16)
+                    var n = 0
+                    while (n < (nickEnd - nickStart)) {
+                      strbuf.append(bb.get(nickStart + n).toChar)
+                      n += 1
+                    }
+                    strbuf.toString
                   }
-                  strbuf.toString
-                }
-                if nickToUser.nicknameExists(nickname)
-
-              } {
-//                println(s"FL = '${fullLine}'")
-                t.unapply(line = fullLine)
-//                t.unapplyHint(line = fullLine,
-//                               nickname = nickname,
-//                               instantEnd = instantEnd - lineStart,
-//                               serverEnd = serverEnd - lineStart,
-//                               payloadStart = ipStart - lineStart)
-                  .foreach {
-                    case (_, tmu) =>
-                      start = start.includeLine(tmu)
-                  }
-
+                } yield nickname
               }
+
+              nickname
+                .filter(nickToUser.nicknameExists)
+                .flatMap(_ => t.unapply(fullLine))
+                .foreach {
+                  case (_, tmu) =>
+                    start = start.includeLine(tmu)
+                }
+
               lineStart = lineEnd + 1
           }
         }
