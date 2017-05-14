@@ -4,6 +4,7 @@ import java.nio.file.Path
 import java.nio.ByteBuffer
 import java.nio.channels.SeekableByteChannel
 import java.nio.file.Files
+import java.time.Instant
 
 import bloomfilter.mutable.BloomFilter
 
@@ -47,6 +48,12 @@ object TsvExtractEfficient {
 
     val nicknamesByteSet =
       nickToUser.nicknames.map(_.getBytes()).map(ByteBuffer.wrap)
+
+    val nicknamesByteMap: Map[ByteBuffer, String] =
+      nickToUser.nickToUser.map {
+        case (n, u) =>
+          ByteBuffer.wrap(n.getBytes()) -> u
+      }
 
     val nicknameByteList = nicknamesByteSet.toList.toArray
 
@@ -137,7 +144,7 @@ object TsvExtractEfficient {
 
               def fullLine = stringOf(lineStart, lineLength)
 
-              def nicknameServer: Option[(String, String)] = {
+              def user: Option[(String, Int)] = {
                 searchFor(instantEnd + 1, '\t', lineEnd) match {
                   case SearchBad => None
                   case serverEnd if serverEnd <= lineEnd =>
@@ -169,11 +176,11 @@ object TsvExtractEfficient {
                                     val nickLength = nickEnd - nickStart
                                     val nicknameBar =
                                       byteArrayOf(nickStart, nickLength)
-                                    if (nicknamesByteSet.contains(
-                                          ByteBuffer.wrap(nicknameBar))) {
-                                      Some(
-                                        new String(nicknameBar) -> serverName)
-                                    } else None
+                                    nicknamesByteMap.get(
+                                      ByteBuffer.wrap(nicknameBar)) match {
+                                      case Some(u) => Some(u -> nickEnd)
+                                      case None => None
+                                    }
                                   case _ => None
                                 }
                             }
@@ -181,12 +188,17 @@ object TsvExtractEfficient {
                     }
                 }
               }
-              nicknameServer match {
-                case Some((n, s)) =>
-                  t.unapply(fullLine) match {
-                    case Some((_, tmu)) => start = start.includeLine(tmu)
-                    case _ =>
-                  }
+              user match {
+                case Some((u, nickEnd)) =>
+                  val fl = fullLine
+                  val instantStr = fl.substring(0, sampleInstant.length)
+                  val msgOffset = nickEnd - lineStart + 1
+                  val tum = TimedUserMessage(
+                    instant = Instant.parse(instantStr),
+                    user = u,
+                    message = fl.substring(msgOffset)
+                  )
+                  start = start.includeLine(tum)
                 case _ =>
               }
 

@@ -114,6 +114,8 @@ object LadderController {
 
       override def nicknameExists(nickname: String): Boolean =
         nickToUsers.contains(nickname)
+      private val n2u = nickToUsers.map { case (k, v) => k -> v.head.id }
+      override def nickToUser: Map[String, String] = n2u
     }
   }
 }

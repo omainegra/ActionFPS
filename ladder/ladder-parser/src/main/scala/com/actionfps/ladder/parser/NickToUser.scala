@@ -7,6 +7,7 @@ import java.time.Instant
   */
 trait NickToUser {
   def nicknames: Set[String]
+  def nickToUser: Map[String, String]
   def userOfNickname(nickname: String, atTime: Instant): Option[String]
   def nicknameExists(nickname: String): Boolean = nicknames.contains(nickname)
 }
@@ -20,6 +21,8 @@ object NickToUser {
         n.get(nickname)
 
       override def nicknames: Set[String] = nicksSet
+
+      override def nickToUser: Map[String, String] = n
     }
   }
   def empty: NickToUser = apply(Map.empty)
