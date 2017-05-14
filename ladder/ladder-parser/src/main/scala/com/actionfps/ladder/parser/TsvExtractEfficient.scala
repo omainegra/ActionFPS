@@ -27,7 +27,12 @@ object TsvExtractEfficient {
 
 //    @tailrec
     def exists(bl: Array[ByteBuffer])(f: ByteBuffer => Boolean): Boolean = {
-      bl.exists(f)
+      var i = 0
+      while ( i < bl.length ) {
+        if ( f(bl(i)) ) return true
+        i += 1
+      }
+      false
 //      bl match {
 //        case h :: tail =>
 //          if (f(h)) true else exists(tail)(f)
