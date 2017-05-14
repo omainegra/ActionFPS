@@ -41,31 +41,47 @@ object TsvExtractEfficient {
 
 //    val sc = ServerChecker(servers.toList)
 
+    var lines = 0
+
     try {
       var allDone = false
       while (ch.position() < ch.size() && !allDone) {
         val readBytes = ch.read(bb)
+        bb.limit(readBytes)
         // navigate to second tab, and by this point we'll know a server name too
         var lineStart = 0
 
         var bufferDone = false
         while (!bufferDone) {
           val instantEnd = lineStart + sampleInstant.length
-
+          // bug: doesn't read the last line
           searchFor(instantEnd, '\n') match {
             case None =>
               bufferDone = true
               // forget the last line, I suppose?
-              if ( readBytes < BufferSize ) {
+              if (readBytes < BufferSize) {
                 allDone = true
                 bufferDone = true
               } else {
                 val newPosition = ch.position() - bb.limit() + lineStart
+//                println(s"Moving to position ${newPosition}; ${bb.limit()}; ${lineStart}")
                 ch.position(newPosition)
                 bb.rewind()
               }
             case Some(lineEnd) =>
               val lineLength = lineEnd - lineStart
+              lines = lines + 1
+              def fullLine = {
+                val charArray = Array.fill(lineLength)(0.toChar)
+                var n = 0
+                while (n < lineLength) {
+                  charArray(n) = bb.get(lineStart + n).toChar
+                  n = n + 1
+                }
+                new String(charArray)
+              }
+
+//              println(s"Line ${lines} processing: ${fullLine}")
               for {
                 serverEnd <- searchFor(instantEnd + 1, '\t')
                 ipStart <- searchFor(serverEnd + 1, '[')
@@ -82,15 +98,7 @@ object TsvExtractEfficient {
                   strbuf.toString
                 }
                 if nickToUser.nicknameExists(nickname)
-                fullLine = {
-                  val charArray = Array.fill(lineLength)(0.toChar)
-                  var n = 0
-                  while (n < lineLength) {
-                    charArray(n) = bb.get(lineStart + n).toChar
-                    n = n + 1
-                  }
-                  new String(charArray)
-                }
+
               } {
 //                println(s"FL = '${fullLine}'")
                 t.unapply(line = fullLine)

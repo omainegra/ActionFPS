@@ -28,8 +28,20 @@ class EfficientAggregateTest extends FreeSpec {
         "2014-12-13T18:36:16Z\t\n" +
         "2014-12-13T18:36:17Z\twoop.ac:1999\t[0.0.0.0] w00p|Drakas headshot [PSY]quico\n"
 
+    def multiplied = inputMessage * 200
+    def multipliedWithNumbers = {
+      (inputMessage * 200)
+        .split('\n')
+        .zipWithIndex
+        .map {
+          case (l, i) =>
+            l.replaceFirst("\t", s"\t${i}")
+        }
+        .mkString("\n") + "\n"
+    }
+
     val tempFile = Files.createTempFile("test", "tsv")
-    Files.write(tempFile, (inputMessage * 200).getBytes())
+    Files.write(tempFile, multiplied.getBytes())
 
     val aggregate = TsvExtractEfficient.buildAggregateEfficient(
       servers = Set("woop.ac:1999"),
