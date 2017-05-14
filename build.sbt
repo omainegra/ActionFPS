@@ -199,7 +199,10 @@ lazy val ladderParser =
     base = file("ladder/ladder-parser")
   ).settings(
     libraryDependencies += scalatest % "test",
-    libraryDependencies += gameParser
+    libraryDependencies += gameParser,
+    libraryDependencies += {
+      "com.clearspring.analytics"%"stream"%"2.7.0"
+    }
   )
 
 lazy val ladder =

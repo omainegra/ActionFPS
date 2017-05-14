@@ -33,10 +33,10 @@ object TsvExtractEfficient {
     val SearchBad = -1
 
     @tailrec
-    def searchFor(from: Int, char: Char): Int = {
-      if (bb.limit() <= from) SearchBad
+    def searchFor(from: Int, char: Char, lim: Int): Int = {
+      if (lim <= from) SearchBad
       else if (bb.get(from) == char.toInt) from
-      else searchFor(from + 1, char)
+      else searchFor(from + 1, char, lim)
     }
 
 //    val sc = ServerChecker(servers.toList)
@@ -55,7 +55,7 @@ object TsvExtractEfficient {
         while (!bufferDone) {
           val instantEnd = lineStart + sampleInstant.length
           // bug: doesn't read the last line
-          searchFor(instantEnd, '\n') match {
+          searchFor(instantEnd, '\n', bb.limit()) match {
             case SearchBad =>
               bufferDone = true
               if (readBytes < BufferSize) {
@@ -69,40 +69,47 @@ object TsvExtractEfficient {
             case lineEnd =>
               val lineLength = lineEnd - lineStart
               lines = lines + 1
-              def fullLine = {
-                val charArray = new Array[Char](lineLength)
+
+              def stringOf(start: Int, length: Int): String = {
+                val charArray = new Array[Char](length)
                 var n = 0
-                while (n < lineLength) {
-                  charArray(n) = bb.get(lineStart + n).toChar
+                while (n < length) {
+                  charArray(n) = bb.get(start + n).toChar
                   n = n + 1
                 }
                 new String(charArray)
               }
 
+              def fullLine = stringOf(lineStart, lineLength)
+
               def nickname: Option[String] = {
-                searchFor(instantEnd + 1, '\t') match {
+                searchFor(instantEnd + 1, '\t', lineEnd) match {
                   case SearchBad => None
-                  case serverEnd =>
-                    searchFor(serverEnd + 1, '[') match {
+                  case serverEnd if serverEnd <= lineEnd =>
+                    searchFor(serverEnd + 1, '[', lineEnd) match {
                       case SearchBad => None
                       case ipStart =>
-                        searchFor(ipStart, ' ') match {
+                        searchFor(ipStart, ' ', lineEnd) match {
                           case SearchBad => None
                           case nickStartM1 =>
                             val nickStart = nickStartM1 + 1
-                            searchFor(nickStart + 1, ' ') match {
+                            searchFor(nickStart + 1, ' ', lineEnd) match {
                               case SearchBad => None
                               case nickEnd =>
+                                def server: Option[String] = {
+                                  val s = {
+                                    val serverStart = instantEnd + 1
+                                    val serverLength = serverEnd - serverStart
+                                    stringOf(serverStart, serverLength)
+                                  }
+                                  Some(s)
+                                }
+
                                 val nickname = {
                                   val nickLength = nickEnd - nickStart
-                                  val charArray = new Array[Char](nickLength)
-                                  var n = 0
-                                  while (n < nickLength) {
-                                    charArray(n) = bb.get(nickStart + n).toChar
-                                    n += 1
-                                  }
-                                  new String(charArray)
+                                  stringOf(nickStart, nickLength)
                                 }
+
                                 Some(nickname)
                             }
                         }
