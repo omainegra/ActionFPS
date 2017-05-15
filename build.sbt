@@ -124,7 +124,7 @@ lazy val web = project
     ),
     // Disabled by default, so that it behaves more like PROD.
     inMemoryCache := false,
-    javaOptions in IntegrationTest += s"-Dgeolitecity.dat=${geoLiteCity.value}",
+    PlayKeys.devSettings += "geolitecity.dat" -> s"${geoLiteCity.value}",
     PlayKeys.playRunHooks ++= {
       if (inMemoryCache.value) Some(HazelcastRunHook()) else None
     }.toSeq,
@@ -135,14 +135,14 @@ lazy val web = project
     PlayKeys.devSettings += "journal.large" -> "journals/journal.tsv",
     PlayKeys.devSettings += "journal.games" -> "journals/games.tsv",
     scriptClasspath := Seq("*", "../conf/"),
-    mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map {
-      f =>
-        f -> s"resources/${f.getName}"
-    },
+    mappings in Universal += geoLiteCity.value -> s"resources/${geoLiteCity.value.getName}",
+    geoLiteCity := baseDirectory.value / "geoip-resources" / "GeoLiteCityv6.dat",
     version := "5.0",
     buildInfoPackage := "af",
     buildInfoOptions += BuildInfoOption.ToJson
   )
+
+lazy val geoLiteCity = SettingKey[File]("GeoLiteCityv6.dat location")
 
 lazy val inMemoryCache = SettingKey[Boolean](
   "Use an in-memory Hazelcast cache for increased iteration performance.")

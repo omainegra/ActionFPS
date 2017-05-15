@@ -2,6 +2,10 @@
 	default \
 	it \
 
+
+GEOCITY_DAT := GeoLiteCityv6.dat
+GEOCITY_SOURCE := http://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz
+
 default: reference-data
 	sbt test 'show dist'
 
@@ -12,6 +16,11 @@ reference-data: \
 	journals/games.tsv \
 	journals/journal.tsv \
 	journals/sample-journal.tsv \
+	web/geoip-resources/$(GEOCITY_DAT) \
+
+web/geoip-resources/$(GEOCITY_DAT):
+	mkdir -p web/geoip-resources
+	curl $(GEOCITY_SOURCE) | gunzip > web/geoip-resources/$(GEOCITY_DAT)
 
 it: reference-data
 	sbt it:test

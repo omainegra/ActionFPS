@@ -3,6 +3,8 @@ package modules
 /**
   * Created by William on 01/01/2016.
   */
+import java.io.File
+
 import com.actionfps.accumulation.ReferenceMapValidator
 import com.actionfps.accumulation.user.GeoIpLookup
 import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
@@ -19,7 +21,8 @@ class GamesProviderDeciderModule extends Module {
   override def bindings(environment: Environment,
                         configuration: Configuration): List[Binding[_]] = {
     val bindings = mutable.Buffer.empty[Binding[_]]
-    bindings += bind[IpLookup].toInstance(GeoIpLookup)
+    bindings += bind[IpLookup].toInstance(GeoIpLookup(new File(
+      configuration.underlying.getString("geolitecity.dat")).getAbsoluteFile))
     val useCached =
       configuration.getString("full.provider").contains("hazelcast-cached")
     logger.info(s"Use cached? ${useCached}")
