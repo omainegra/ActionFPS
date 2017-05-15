@@ -8,10 +8,19 @@ import org.scalatest.{FunSuite, Matchers}
   */
 class TemplateSpec extends FunSuite with Matchers {
   test("It doesn't fail for empty data") {
-    val result = views.rendergame.Live.render(mapMapping = Maps.mapToImage, game =
-      CurrentGameStatus(
-        when = "", reasonablyActive = true, hasFlags = true, map = None, mode = None, minRemain = 123,
-        updatedTime = "", players = None, spectators = None, now = Dev.game.now,
+    val result = views.rendergame.Live.render(
+      mapMapping = Maps.mapToImage,
+      game = CurrentGameStatus(
+        when = "",
+        reasonablyActive = true,
+        hasFlags = true,
+        map = None,
+        mode = None,
+        minRemain = 123,
+        updatedTime = "",
+        players = None,
+        spectators = None,
+        now = Dev.game.now,
         teams = List.empty
       ),
       servers = Nil

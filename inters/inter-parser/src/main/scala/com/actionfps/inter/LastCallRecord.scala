@@ -8,6 +8,7 @@ import java.time.{Duration, Instant}
 case class LastCallRecord(users: Map[String, Instant],
                           servers: Map[String, Instant],
                           ips: Map[String, Instant]) {
+
   /** Return if updated <=> had effect, so emit a record **/
   def include(interOut: InterOut): Option[LastCallRecord] = {
     import interOut.userMessage._
@@ -19,7 +20,9 @@ case class LastCallRecord(users: Map[String, Instant],
     val acceptByServer = servers.get(serverId) match {
       case None => true
       case Some(latestServerInstant) =>
-        instant.minus(LastCallRecord.ServerTimeout).isAfter(latestServerInstant)
+        instant
+          .minus(LastCallRecord.ServerTimeout)
+          .isAfter(latestServerInstant)
     }
     val acceptByIp = ips.get(ip) match {
       case None => true

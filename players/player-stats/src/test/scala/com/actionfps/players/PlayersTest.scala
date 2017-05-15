@@ -8,9 +8,8 @@ import org.scalatest.{FunSuite, Matchers}
 /**
   * Created by Lucas on 04/01/2016.
   */
-class PlayersTest
-  extends FunSuite
-    with Matchers {
+class PlayersTest extends FunSuite with Matchers {
+
   /**
     * Test is disabled because we need json-formats dependency in test
     * but that depends on accumulation - and accumulation depends on json-formats
@@ -28,6 +27,6 @@ class PlayersTest
     val counts = atGame.includeGame.AtGame(game.copy(id = "2015-12-27T00:00Z")).includeGame.gameCounts("sanzo").counts
     counts(ZonedDateTime.parse("2015-12-26T00:00Z")) shouldBe 1
     counts(ZonedDateTime.parse("2015-12-27T00:00Z")) shouldBe 1
-    */
+   */
   }
 }

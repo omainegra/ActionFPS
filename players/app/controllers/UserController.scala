@@ -17,12 +17,15 @@ import com.actionfps.formats.json.Formats._
 
 @Singleton
 //noinspection TypeAnnotation
-class UserController @Inject()(configuration: Configuration,
-                               playersProvider: PlayersProvider,
-                               wSClient: WSClient)
-                              (implicit executionContext: ExecutionContext) extends Controller {
+class UserController @Inject()(
+    configuration: Configuration,
+    playersProvider: PlayersProvider,
+    wSClient: WSClient)(implicit executionContext: ExecutionContext)
+    extends Controller {
 
-  val authDir = Paths.get(configuration.underlying.getString("af.user.keys.path")).toAbsolutePath
+  val authDir = Paths
+    .get(configuration.underlying.getString("af.user.keys.path"))
+    .toAbsolutePath
   if (!Files.exists(authDir)) {
     Files.createDirectory(authDir)
   }
@@ -35,7 +38,13 @@ class UserController @Inject()(configuration: Configuration,
     private def generate(): Unit = {
       import scala.sys.process._
       List("ssh-keygen", "-t", "dsa", "-f", privPath.toString, "-N", "").!
-      List("openssl", "dsa", "-in", privPath.toString, "-pubout", "-out", pubPath.toString).!
+      List("openssl",
+           "dsa",
+           "-in",
+           privPath.toString,
+           "-pubout",
+           "-out",
+           pubPath.toString).!
     }
 
     private def cleanGet(): String = {
@@ -55,21 +64,29 @@ class UserController @Inject()(configuration: Configuration,
 
   val googleUri = "https://www.googleapis.com/oauth2/v3/tokeninfo"
 
-  def authTokenPost() = Action.async(BodyParsers.parse.form(UserController.userForm)) { req =>
-    getByToken(req.body.idToken)
-  }
+  def authTokenPost() =
+    Action.async(BodyParsers.parse.form(UserController.userForm)) { req =>
+      getByToken(req.body.idToken)
+    }
 
   def getByToken(idToken: String) = {
     async {
-      val response = await(wSClient.url(googleUri).withQueryString("id_token" -> idToken).get())
-      assert((response.json \ "aud").as[String].startsWith("566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9"))
+      val response = await(
+        wSClient.url(googleUri).withQueryString("id_token" -> idToken).get())
+      assert(
+        (response.json \ "aud")
+          .as[String]
+          .startsWith("566822418457-bqerpiju1kajn53d8qumc6o8t2mn0ai9"))
       (response.json \ "email").asOpt[String] match {
         case Some(email) =>
           await(playersProvider.users).find(_.email.matches(email)) match {
             case Some(theUser) =>
-              Ok(JsObject(Map("user" -> JsString(theUser.id), "privKey" -> JsString(ForUser(theUser.id).getOrUpdate()))))
+              Ok(JsObject(
+                Map("user" -> JsString(theUser.id),
+                    "privKey" -> JsString(ForUser(theUser.id).getOrUpdate()))))
             case None =>
-              logger.info(s"User with mail ${email} is not registered, but tried to fetch a key.")
+              logger.info(
+                s"User with mail ${email} is not registered, but tried to fetch a key.")
               NotFound(s"Could not find user with your e-mail ${email}")
           }
         case _ =>
@@ -96,6 +113,5 @@ object UserController {
       "id_token" -> text
     )(IdToken.apply)(IdToken.unapply)
   )
-
 
 }

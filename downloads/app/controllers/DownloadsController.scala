@@ -8,7 +8,8 @@ import services.LatestReleaseService
 /**
   * Created by me on 04/02/2017.
   */
-class DownloadsController @Inject()(latestReleaseService: LatestReleaseService) extends Controller {
+class DownloadsController @Inject()(latestReleaseService: LatestReleaseService)
+    extends Controller {
   def game = Action { request =>
     val latestRelease = latestReleaseService.latestRelease()
     request.getQueryString("os").collect {
@@ -19,9 +20,11 @@ class DownloadsController @Inject()(latestReleaseService: LatestReleaseService) 
       case Some(Some(downloadLink)) =>
         SeeOther(downloadLink)
       case Some(None) =>
-        NotFound("Could not find a download link for your OS. Contact us if issue persists.")
+        NotFound(
+          "Could not find a download link for your OS. Contact us if issue persists.")
       case None =>
-        NotFound("Required 'os' parameter must be one of: 'windows', 'linux', 'mac'.")
+        NotFound(
+          "Required 'os' parameter must be one of: 'windows', 'linux', 'mac'.")
     }
   }
 }

@@ -5,7 +5,11 @@ import com.typesafe.sbt.GitPlugin.autoImport.git
 import sbt.Keys.{name, version}
 import sbt.{AutoPlugin, Plugins, SettingKey}
 import sbtbuildinfo.BuildInfoPlugin
-import sbtbuildinfo.BuildInfoPlugin.autoImport.{BuildInfoKey, buildInfoBuildNumber, buildInfoKeys}
+import sbtbuildinfo.BuildInfoPlugin.autoImport.{
+  BuildInfoKey,
+  buildInfoBuildNumber,
+  buildInfoKeys
+}
 
 object WebBuildInfo extends AutoPlugin {
 

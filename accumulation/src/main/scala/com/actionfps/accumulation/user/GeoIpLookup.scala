@@ -18,7 +18,8 @@ case class GeoIpLookup(file: File) extends IpLookup {
         IpLookup.IpLookupResult(
           countryCode = Option(loc.countryCode),
           countryName = Option(loc.countryName),
-          timezone = Option(timeZone.timeZoneByCountryAndRegion(loc.countryCode, loc.region))
+          timezone = Option(
+            timeZone.timeZoneByCountryAndRegion(loc.countryCode, loc.region))
         )
     }
   }

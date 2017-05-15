@@ -21,6 +21,7 @@ package com.actionfps.accumulation
   * }}}
   */
 object ClanTagNicknameMatcher {
+
   /**
     * Match clan tag format with a nickname
     * @param format eg w00p|* or *|w00p

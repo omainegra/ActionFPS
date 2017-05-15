@@ -21,8 +21,10 @@ import scala.concurrent._
   * Uses Cached HTTP Client to avoid request limits.
   */
 @Singleton
-class LatestReleaseService @Inject()(implicit executionContext: ExecutionContext) {
-  private val client: CloseableHttpClient = CachingHttpClientBuilder.create().build()
+class LatestReleaseService @Inject()(
+    implicit executionContext: ExecutionContext) {
+  private val client: CloseableHttpClient =
+    CachingHttpClientBuilder.create().build()
   private val context = HttpCacheContext.create()
 
   def latestRelease(): ReleaseLinks = {
@@ -35,23 +37,30 @@ class LatestReleaseService @Inject()(implicit executionContext: ExecutionContext
 
 }
 
-
 object LatestReleaseService {
 
-  case class ReleaseLinks(windowsLink: Option[String], linuxLink: Option[String], osxLink: Option[String])
+  case class ReleaseLinks(windowsLink: Option[String],
+                          linuxLink: Option[String],
+                          osxLink: Option[String])
 
   object ReleaseLinks {
 
-    def getLatestRelease(httpClient: HttpClient, httpContext: HttpContext): ReleaseLinks = {
-      val theUrl = "https://api.github.com/repos/ActionFPS/ActionFPS-Game/releases/latest"
+    def getLatestRelease(httpClient: HttpClient,
+                         httpContext: HttpContext): ReleaseLinks = {
+      val theUrl =
+        "https://api.github.com/repos/ActionFPS/ActionFPS-Game/releases/latest"
       val httpGet = new HttpGet(theUrl)
       val resp = httpClient.execute(httpGet, httpContext)
       val str = EntityUtils.toString(resp.getEntity)
       val json = Json.parse(str)
       val links = (json \\ "browser_download_url").flatMap(_.asOpt[String])
       ReleaseLinks(
-        windowsLink = links.find(_.endsWith(".exe")).orElse(links.find(_.endsWith(".msi"))),
-        linuxLink = links.find(_.endsWith(".bz2")).orElse(links.find(_.endsWith(".deb"))),
+        windowsLink = links
+          .find(_.endsWith(".exe"))
+          .orElse(links.find(_.endsWith(".msi"))),
+        linuxLink = links
+          .find(_.endsWith(".bz2"))
+          .orElse(links.find(_.endsWith(".deb"))),
         osxLink = links.find(_.endsWith(".dmg"))
       )
     }

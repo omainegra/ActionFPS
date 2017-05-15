@@ -13,7 +13,8 @@ object RegistrationEmail {
 
   private val cipherName = "RSA/ECB/PKCS1PADDING"
 
-  final case class PlainRegistrationEmail(email: String) extends RegistrationEmail {
+  final case class PlainRegistrationEmail(email: String)
+      extends RegistrationEmail {
     override def stringValue: String = s"$mailto$email"
 
     override def matches(emailString: String): Boolean = emailString == email
@@ -27,24 +28,30 @@ object RegistrationEmail {
       val cipher = Cipher.getInstance(cipherName)
       cipher.init(Cipher.ENCRYPT_MODE, publicKey)
       SecureRegistrationEmail(
-        encrypted = DatatypeConverter.printHexBinary(cipher.doFinal(email.getBytes())),
+        encrypted =
+          DatatypeConverter.printHexBinary(cipher.doFinal(email.getBytes())),
         hashed = hashedEmail
       )
     }
   }
 
-  final case class SecureRegistrationEmail(encrypted: String, hashed: String) extends RegistrationEmail {
+  final case class SecureRegistrationEmail(encrypted: String, hashed: String)
+      extends RegistrationEmail {
     override def stringValue: String = s"$secureEmailPrefix$encrypted:$hashed"
 
-    override def matches(emailString: String): Boolean = hashed == PlainRegistrationEmail(emailString).hashedEmail
+    override def matches(emailString: String): Boolean =
+      hashed == PlainRegistrationEmail(emailString).hashedEmail
 
     def decrypt(implicit privateKey: PrivateKey): PlainRegistrationEmail = {
       val cipher = Cipher.getInstance(cipherName)
       cipher.init(Cipher.DECRYPT_MODE, privateKey)
-      PlainRegistrationEmail(email = new String(cipher.doFinal(DatatypeConverter.parseHexBinary(encrypted))))
+      PlainRegistrationEmail(
+        email = new String(
+          cipher.doFinal(DatatypeConverter.parseHexBinary(encrypted))))
     }
 
-    override def secured(implicit publicKey: PublicKey): SecureRegistrationEmail = this
+    override def secured(
+        implicit publicKey: PublicKey): SecureRegistrationEmail = this
   }
 
   val mailto = "mailto:"

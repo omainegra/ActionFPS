@@ -69,7 +69,7 @@ class WebTemplateRender @Inject()() {
       } else el.first()
     }
 
-    if ( sourceLink ) {
+    if (sourceLink) {
       val lineExtra =
         Some(line.value).filter(_ > 0).map(l => s"#L${l}").getOrElse("")
       bottomLinksElement
@@ -84,7 +84,7 @@ class WebTemplateRender @Inject()() {
       bottomLinksElement.appendElement("a").attr("href", l).text("View JSON")
     }
 
-    if ( bottomLinksElement.children().isEmpty ) {
+    if (bottomLinksElement.children().isEmpty) {
       bottomLinksElement.remove()
     }
 

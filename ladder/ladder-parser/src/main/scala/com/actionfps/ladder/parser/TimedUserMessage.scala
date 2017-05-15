@@ -8,7 +8,7 @@ import java.time.Instant
 case class TimedUserMessage(instant: Instant, user: String, message: String) {
   private def headWord: Option[String] = {
     val idx = message.indexOf(" ")
-    if ( idx >= 0 ) Some(message.substring(0, idx)) else None
+    if (idx >= 0) Some(message.substring(0, idx)) else None
   }
 
   def killed: Boolean = headWord.exists(killWords.contains)

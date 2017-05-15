@@ -1,6 +1,7 @@
 package com.actionfps.clans
 
 import com.actionfps.api.Game
+
 /**
   * Created by William on 02/01/2016.
   */
@@ -13,9 +14,9 @@ object Clanwar {
 
   def gamesAreCompatible(previousGame: Game, nextGame: Game): Boolean = {
     previousGame.server == nextGame.server &&
-      previousGame.clangame.nonEmpty && previousGame.clangame == nextGame.clangame &&
-      previousGame.teamSize == nextGame.teamSize &&
-      previousGame.endTime.plusHours(1).isAfter(nextGame.endTime)
+    previousGame.clangame.nonEmpty && previousGame.clangame == nextGame.clangame &&
+    previousGame.teamSize == nextGame.teamSize &&
+    previousGame.endTime.plusHours(1).isAfter(nextGame.endTime)
   }
 
 }
@@ -52,9 +53,9 @@ sealed trait Clanwar {
   }
 }
 
-
 sealed trait IncompleteClanwar extends Clanwar {
-  def potentialNextGame(jsonGame: Game): Option[Either[TwoGamesNoWinnerClanwar, CompleteClanwar]] = this match {
+  def potentialNextGame(jsonGame: Game)
+    : Option[Either[TwoGamesNoWinnerClanwar, CompleteClanwar]] = this match {
     case nc: NewClanwar =>
       nc.nextGame(jsonGame)
     case tg: TwoGamesNoWinnerClanwar =>
@@ -62,9 +63,13 @@ sealed trait IncompleteClanwar extends Clanwar {
   }
 }
 
-case class TwoGamesNoWinnerClanwar(clans: Set[String], firstGame: Game, secondGame: Game) extends IncompleteClanwar {
+case class TwoGamesNoWinnerClanwar(clans: Set[String],
+                                   firstGame: Game,
+                                   secondGame: Game)
+    extends IncompleteClanwar {
   def nextGame(jsonGame: Game): Option[CompleteClanwar] = {
-    if (Clanwar.gamesAreCompatible(previousGame = secondGame, nextGame = jsonGame)) Option {
+    if (Clanwar.gamesAreCompatible(previousGame = secondGame,
+                                   nextGame = jsonGame)) Option {
       val gameScores = GameScores.fromGames(
         clans = clans,
         games = List(firstGame, secondGame, jsonGame)
@@ -87,35 +92,43 @@ case class TwoGamesNoWinnerClanwar(clans: Set[String], firstGame: Game, secondGa
   * @param scores map from clan ID to their score
   * @param games
   */
-case class CompleteClanwar(winner: Option[String], clans: Set[String], scores: Map[String, Int], games: List[Game]) extends Clanwar {
+case class CompleteClanwar(winner: Option[String],
+                           clans: Set[String],
+                           scores: Map[String, Int],
+                           games: List[Game])
+    extends Clanwar {
   def isTie: Boolean = winner.isEmpty
 
   def loser: Option[String] = (clans -- winner.toSet).headOption
 }
 
-case class NewClanwar(clans: Set[String], firstGame: Game) extends IncompleteClanwar {
-  def nextGame(jsonGame: Game): Option[Either[TwoGamesNoWinnerClanwar, CompleteClanwar]] = {
-    if (Clanwar.gamesAreCompatible(previousGame = firstGame, nextGame = jsonGame)) Option {
+case class NewClanwar(clans: Set[String], firstGame: Game)
+    extends IncompleteClanwar {
+  def nextGame(jsonGame: Game)
+    : Option[Either[TwoGamesNoWinnerClanwar, CompleteClanwar]] = {
+    if (Clanwar.gamesAreCompatible(previousGame = firstGame,
+                                   nextGame = jsonGame)) Option {
       val gameScores = GameScores.fromGames(
         clans = clans,
         games = List(firstGame, jsonGame)
       )
       gameScores.winner match {
         case Some(winner) =>
-          Right(CompleteClanwar(
-            clans = clans,
-            games = List(firstGame, jsonGame),
-            scores = gameScores.scores,
-            winner = Option(winner)
-          ))
+          Right(
+            CompleteClanwar(
+              clans = clans,
+              games = List(firstGame, jsonGame),
+              scores = gameScores.scores,
+              winner = Option(winner)
+            ))
         case None =>
-          Left(TwoGamesNoWinnerClanwar(
-            clans = clans,
-            firstGame = firstGame,
-            secondGame = jsonGame
-          ))
+          Left(
+            TwoGamesNoWinnerClanwar(
+              clans = clans,
+              firstGame = firstGame,
+              secondGame = jsonGame
+            ))
       }
-    }
-    else None
+    } else None
   }
 }

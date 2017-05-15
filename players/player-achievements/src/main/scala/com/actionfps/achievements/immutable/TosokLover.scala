@@ -18,8 +18,11 @@ object TosokLover {
 
   def begin = Achieving(0)
 
-  case class Achieving(counter: Int) extends TosokLover with PartialAchievement {
-    def processGame(jsonGame: JsonGame): Option[Either[Achieving, Achieved.type]] = {
+  case class Achieving(counter: Int)
+      extends TosokLover
+      with PartialAchievement {
+    def processGame(
+        jsonGame: JsonGame): Option[Either[Achieving, Achieved.type]] = {
       if (jsonGame.mode == "team one shot, one kill") {
         Option {
           copy(counter = counter + 1) match {

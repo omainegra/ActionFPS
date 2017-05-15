@@ -12,14 +12,16 @@ case class UserStatistics(frags: Int,
                           flags: Int,
                           lastSeen: Instant,
                           timePlayed: Long,
-                          points: Int
-                         ) {
+                          points: Int) {
 
   def displayed(instant: Instant): UserStatistics = {
+
     /**
       * After 30 days, every 30 days = 50% loss of points.
       */
-    val dt = Math.max(0, instant.getEpochSecond - lastSeen.getEpochSecond - UserStatistics.TimeShift)
+    val dt = Math.max(
+      0,
+      instant.getEpochSecond - lastSeen.getEpochSecond - UserStatistics.TimeShift)
     copy(
       points = (points * Math.exp(-UserStatistics.TimeFactor * dt)).toInt
     )
@@ -30,7 +32,8 @@ case class UserStatistics(frags: Int,
     gibs = gibs + other.gibs,
     flags = flags + other.flags,
     timePlayed = timePlayed + other.timePlayed,
-    lastSeen = if (lastSeen.isAfter(other.lastSeen)) lastSeen else other.lastSeen,
+    lastSeen =
+      if (lastSeen.isAfter(other.lastSeen)) lastSeen else other.lastSeen,
     points = points + other.points
   )
 
@@ -57,13 +60,14 @@ case class UserStatistics(frags: Int,
 
   def see(atTime: Instant): UserStatistics = {
     if (atTime.isBefore(lastSeen)) this
-    else copy(
-      lastSeen = atTime,
-      timePlayed = timePlayed + {
-        val d = atTime.getEpochSecond - lastSeen.getEpochSecond
-        if (d < 120) d else 0
-      }
-    )
+    else
+      copy(
+        lastSeen = atTime,
+        timePlayed = timePlayed + {
+          val d = atTime.getEpochSecond - lastSeen.getEpochSecond
+          if (d < 120) d else 0
+        }
+      )
   }
 
   def timePlayedText: String = {

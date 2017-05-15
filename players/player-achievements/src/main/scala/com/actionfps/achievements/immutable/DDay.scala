@@ -22,12 +22,15 @@ object DDay {
   sealed trait NotAchieved extends PartialAchievement
 
   case object NotStarted extends DDay with NotAchieved {
-    def includeGame(jsonGame: JsonGame) = Achieving(onDay = jsonGame.day, counter = 1)
+    def includeGame(jsonGame: JsonGame) =
+      Achieving(onDay = jsonGame.day, counter = 1)
 
     override def progress: Int = 0
   }
 
-  case class Achieving(onDay: String, counter: Int) extends DDay with NotAchieved {
+  case class Achieving(onDay: String, counter: Int)
+      extends DDay
+      with NotAchieved {
     def includeGame(jsonGame: JsonGame): Either[Achieving, Achieved.type] = {
       val day = jsonGame.day
       if (day == onDay) {

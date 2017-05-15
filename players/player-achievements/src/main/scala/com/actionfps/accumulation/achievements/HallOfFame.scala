@@ -6,15 +6,19 @@ import com.actionfps.achievements.immutable._
   * Created by me on 01/04/2016.
   */
 case class HallOfFame(achievements: List[HallOfFame.AchievementRecord]) {
-  def isEmpty: Boolean = achievements.isEmpty || achievements.forall(_.players.isEmpty)
+  def isEmpty: Boolean =
+    achievements.isEmpty || achievements.forall(_.players.isEmpty)
 
-  def includeAchievement(user: String, game: String, achievement: CompletedAchievement): HallOfFame = {
+  def includeAchievement(user: String,
+                         game: String,
+                         achievement: CompletedAchievement): HallOfFame = {
     val nl = achievements.map {
       case ar if ar.achievement.title == achievement.title =>
-        ar.copy(players = ar.players :+ HallOfFame.AchievementRecordPlayer(
-          user = user,
-          atGame = game
-        ))
+        ar.copy(
+          players = ar.players :+ HallOfFame.AchievementRecordPlayer(
+            user = user,
+            atGame = game
+          ))
       case o => o
     }
     copy(
@@ -22,17 +26,18 @@ case class HallOfFame(achievements: List[HallOfFame.AchievementRecord]) {
     )
   }
 
-  def reversed: HallOfFame = copy(achievements = achievements.map(ar => ar.reversed))
+  def reversed: HallOfFame =
+    copy(achievements = achievements.map(ar => ar.reversed))
 }
 
 object HallOfFame {
 
-
   def empty = HallOfFame(
-    achievements = achievements.map(achievement =>
-      AchievementRecord(
-        achievement = achievement,
-        players = List.empty
+    achievements = achievements.map(
+      achievement =>
+        AchievementRecord(
+          achievement = achievement,
+          players = List.empty
       ))
   )
 
@@ -49,7 +54,8 @@ object HallOfFame {
     TerribleGame.Achieved(0): Achievement
   )
 
-  case class AchievementRecord(achievement: Achievement, players: List[AchievementRecordPlayer]) {
+  case class AchievementRecord(achievement: Achievement,
+                               players: List[AchievementRecordPlayer]) {
     def reversed: AchievementRecord = copy(players = players.reverse)
   }
 
