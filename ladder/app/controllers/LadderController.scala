@@ -73,49 +73,10 @@ class LadderController @Inject()(configuration: Configuration,
 }
 object LadderController {
   def nickToUserFromUsers(users: List[User]): NickToUser = {
-    val nickToUsers = users
-      .flatMap { u =>
-        u.nicknames.map(_.nickname).map { n =>
-          n -> u
-        }
+    NickToUser(users.flatMap { u =>
+      u.nicknames.map(_.nickname).map { n =>
+        n -> u.id
       }
-      .groupBy(_._1)
-      .map {
-        case (n, us) =>
-          n -> us.map(_._2)
-      }
-    val nicks = nickToUsers.keySet
-    new NickToUser {
-      def nicknames: Set[String] = nicks
-
-      override def userOfNickname(nickname: String,
-                                  atTime: Instant): Option[String] = {
-        nickToUsers
-          .get(nickname)
-          .flatMap { nickUsers =>
-            // check if user is valid at this time
-            // but alternatively, the ladder supports a mode
-            // where we include all data before the player registered.
-            // This is so that people receive points for the work they've
-            // already done when they were not registered.
-            nickUsers.headOption
-//            def originalNicknameUser = nickUsers.find { user =>
-//              user.nicknames
-//                .sortBy(_.from)
-//                .headOption
-//                .exists(_.from.isBefore(atTime))
-//            }
-//            nickUsers.find(_.validAt(nickname, atTime)).orElse {
-//              originalNicknameUser
-//            }
-          }
-          .map(_.id)
-      }
-
-      override def nicknameExists(nickname: String): Boolean =
-        nickToUsers.contains(nickname)
-      private val n2u = nickToUsers.map { case (k, v) => k -> v.head.id }
-      override def nickToUser: Map[String, String] = n2u
-    }
+    }.toMap)
   }
 }

@@ -19,7 +19,7 @@ case class TsvExtract(servers: Set[String], nickToUser: NickToUser) {
             message match {
               case regex(ip, nick, content) =>
                 val timestamp = Instant.parse(splittedLine(0))
-                nickToUser.userOfNickname(nick, timestamp) match {
+                nickToUser.nickToUser.get(nick) match {
                   case Some(uuser) =>
                     Some(server -> TimedUserMessage(timestamp, uuser, content))
                   case None => None
@@ -28,41 +28,6 @@ case class TsvExtract(servers: Set[String], nickToUser: NickToUser) {
             }
           } else None
         } else None
-      } else None
-    } else None
-  }
-
-  def unapplyHint(line: String,
-                  payloadStart: Int,
-                  nickname: String,
-                  instantEnd: Int,
-                  serverEnd: Int): Option[(String, TimedUserMessage)] = {
-    val server = line.substring(instantEnd + 1, serverEnd)
-    if (servers.contains(server)) {
-      val message = line.substring(serverEnd + 1)
-      if (message.length > 0 && message.charAt(0) == '[') {
-        var offset = 0
-        while (message.charAt(offset) != ' ') {
-          offset = offset + 1
-        }
-        offset = offset + 1
-        val nickStartPosition = offset
-        while (message.charAt(offset) != ' ') {
-          offset = offset + 1
-        }
-        val nickEndPosition = offset
-        offset = offset + 1
-        val payloadStartPosition = offset
-        if (!nickToUser.nicknameExists(nickname))
-          None
-        else {
-          val timestamp = Instant.parse(line.substring(0, instantEnd))
-          nickToUser.userOfNickname(nickname, timestamp).map { user =>
-            server -> TimedUserMessage(timestamp,
-                                       user,
-                                       message.substring(payloadStartPosition))
-          }
-        }
       } else None
     } else None
   }
