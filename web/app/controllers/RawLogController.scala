@@ -16,7 +16,7 @@ class RawLogController(logFile: Path, components: ControllerComponents)
   @Inject()
   def this(configuration: Configuration, components: ControllerComponents) =
     this(
-      ForJournal.ForConfig(configuration.underlying).lastLogPathO.get,
+      ForJournal.ForConfig(configuration.underlying).logJournalPath,
       components
     )
 }
