@@ -210,7 +210,6 @@ object ValidServers {
   implicit val fromResource = ValidServers(
     validServers.map(v => v.logId -> v).toMap)
 
-
   case class ValidServer(logId: String,
                          name: String,
                          timezone: ZoneId,

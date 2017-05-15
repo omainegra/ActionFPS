@@ -18,22 +18,23 @@ object Clanstats {
       lost = completeClanwar.winner.nonEmpty && !won
       tied = completeClanwar.winner.isEmpty
       team <- Conclusion.conclude(completeClanwar.games).team(clan)
-    } yield Clanstat(
-      id = clan,
-      elo = 1000,
-      wins = if (won) 1 else 0,
-      losses = if (lost) 1 else 0,
-      ties = if (tied) 1 else 0,
-      wars = 1,
-      frags = team.frags,
-      deaths = team.deaths,
-      games = completeClanwar.games.size,
-      gameWins = completeClanwar.games.count(_.winnerClan.contains(clan)),
-      score = team.players.map(_._2.score).sum,
-      flags = team.flags,
-      rank = None,
-      lastClanwar = Option(completeClanwar.id)
-    )
+    } yield
+      Clanstat(
+        id = clan,
+        elo = 1000,
+        wins = if (won) 1 else 0,
+        losses = if (lost) 1 else 0,
+        ties = if (tied) 1 else 0,
+        wars = 1,
+        frags = team.frags,
+        deaths = team.deaths,
+        games = completeClanwar.games.size,
+        gameWins = completeClanwar.games.count(_.winnerClan.contains(clan)),
+        score = team.players.map(_._2.score).sum,
+        flags = team.flags,
+        rank = None,
+        lastClanwar = Option(completeClanwar.id)
+      )
   }.toList
 }
 
@@ -42,30 +43,32 @@ case class Clanstats(clans: Map[String, Clanstat]) {
 
   def shiftedElo(instant: Instant): Clanstats = {
     copy(
-      clans.toList.map { case (k, clanstat) => k -> {
-        clanstat.lastClanwar match {
-          case Some(lastClanwar) =>
-
-            /**
-              * Decay at 50% per 30 days after initial 30 days.
-              */
-            val duration = Duration.between(Instant.parse(lastClanwar), instant)
-            val minus30Days = duration.minusDays(30)
-            if (minus30Days.isNegative) clanstat else {
-              val powFactor = minus30Days.getSeconds / (3600.0 * 24 * 30)
-              val pow = Math.pow(0.5, powFactor)
-              clanstat.copy(
-                elo = Math.round(clanstat.elo * pow)
-              )
+      clans.toList.map {
+        case (k, clanstat) =>
+          k -> {
+            clanstat.lastClanwar match {
+              case Some(lastClanwar) =>
+                /**
+                  * Decay at 50% per 30 days after initial 30 days.
+                  */
+                val duration =
+                  Duration.between(Instant.parse(lastClanwar), instant)
+                val minus30Days = duration.minusDays(30)
+                if (minus30Days.isNegative) clanstat
+                else {
+                  val powFactor = minus30Days.getSeconds / (3600.0 * 24 * 30)
+                  val pow = Math.pow(0.5, powFactor)
+                  clanstat.copy(
+                    elo = Math.round(clanstat.elo * pow)
+                  )
+                }
+              case None =>
+                clanstat
             }
-          case None =>
-            clanstat
-        }
-      }
+          }
       }.toMap
     ).refreshedRanks
   }
-
 
   def onlyRanked: Clanstats = copy(
     clans = clans.filter { case (_, clan) => clan.rank.nonEmpty }
@@ -82,12 +85,20 @@ case class Clanstats(clans: Map[String, Clanstat]) {
   )
 
   def refreshedRanks: Clanstats = {
-    val updatedRanks = clans.collect { case (clan, stat) if stat.wars >= 5 =>
-      stat
-    }.toList.sortBy(_.elo).reverse.zipWithIndex.map { case (stat, idx) =>
-      val rank = idx + 1
-      stat.id -> stat.copy(rank = Some(rank))
-    }
+    val updatedRanks = clans
+      .collect {
+        case (clan, stat) if stat.wars >= 5 =>
+          stat
+      }
+      .toList
+      .sortBy(_.elo)
+      .reverse
+      .zipWithIndex
+      .map {
+        case (stat, idx) =>
+          val rank = idx + 1
+          stat.id -> stat.copy(rank = Some(rank))
+      }
     copy(clans = clans ++ updatedRanks)
   }
 
@@ -95,17 +106,21 @@ case class Clanstats(clans: Map[String, Clanstat]) {
     val newClans = clans ++ {
       for {
         stat <- Clanstats.stats(completeClanwar)
-      } yield stat.id -> {
-        clans.get(stat.id) match {
-          case Some(clan) => clan + stat
-          case None => stat
+      } yield
+        stat.id -> {
+          clans.get(stat.id) match {
+            case Some(clan) => clan + stat
+            case None => stat
+          }
         }
-      }
     }.toMap
     val conclusion = Conclusion.conclude(completeClanwar.allGames)
-    val (winnerResult, loserResult) = completeClanwar.clans.toList.sortBy { clanId =>
-      conclusion.team(clanId).map(_.score)
-    }.reverse.flatMap(clanId => newClans.get(clanId)) match {
+    val (winnerResult, loserResult) = completeClanwar.clans.toList
+      .sortBy { clanId =>
+        conclusion.team(clanId).map(_.score)
+      }
+      .reverse
+      .flatMap(clanId => newClans.get(clanId)) match {
       case List(winner, loser) =>
         val delta = winner.elo - loser.elo
         val p = 1f / (1 + Math.pow(10, -delta / 400f))
@@ -117,12 +132,12 @@ case class Clanstats(clans: Map[String, Clanstat]) {
           elo = loser.elo - k * (pd - p)
         )
     }
-    copy(clans =
-      newClans ++ Map(
-        winnerResult.id -> winnerResult,
-        loserResult.id -> loserResult
-      )
-    ).refreshedRanks
+    copy(
+      clans =
+        newClans ++ Map(
+          winnerResult.id -> winnerResult,
+          loserResult.id -> loserResult
+        )).refreshedRanks
   }
 }
 

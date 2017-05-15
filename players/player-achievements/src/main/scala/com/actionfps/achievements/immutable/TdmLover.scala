@@ -19,7 +19,8 @@ object TdmLover {
   def begin = Achieving(counter = 0)
 
   case class Achieving(counter: Int) extends TdmLover with PartialAchievement {
-    def processGame(jsonGame: JsonGame): Option[Either[Achieving, Achieved.type]] = {
+    def processGame(
+        jsonGame: JsonGame): Option[Either[Achieving, Achieved.type]] = {
       if (jsonGame.mode == "team deathmatch") {
         Option {
           copy(counter = counter + 1) match {

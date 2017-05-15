@@ -4,7 +4,7 @@ import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 
 class IntegrationSpec
-  extends PlaySpec
+    extends PlaySpec
     with GuiceOneServerPerSuite
     with OneBrowserPerTest
     with HtmlUnitFactory {
@@ -20,10 +20,12 @@ class IntegrationSpec
         cssSelector("#live-events ol li").findAllElements mustNot be(empty)
       }
       withClue("Latest clanwar") {
-        cssSelector("#latest-clanwars .GameCard").findAllElements mustNot be(empty)
+        cssSelector("#latest-clanwars .GameCard").findAllElements mustNot be(
+          empty)
       }
       withClue("Existing games") {
-        cssSelector("#existing-games .GameCard").findAllElements mustNot be(empty)
+        cssSelector("#existing-games .GameCard").findAllElements mustNot be(
+          empty)
       }
     }
     "Navigate properly to an event" in {
@@ -76,8 +78,11 @@ class IntegrationSpec
     }
     "Aura 1999 is listed in Servers" in {
       go to s"$root/servers/"
-      forExactly(1, findAll(cssSelector("a[href='assaultcube://aura.woop.ac:1999']")).toList) { element =>
-        element.text mustEqual "aura.woop.ac 1999"
+      forExactly(1,
+                 findAll(cssSelector(
+                   "a[href='assaultcube://aura.woop.ac:1999']")).toList) {
+        element =>
+          element.text mustEqual "aura.woop.ac 1999"
       }
     }
     "Provide a master server" in {
@@ -90,7 +95,8 @@ class IntegrationSpec
     }
   }
 
-  implicit override lazy val webDriver: WebDriver = HtmlUnitFactory.createWebDriver(false)
+  implicit override lazy val webDriver: WebDriver =
+    HtmlUnitFactory.createWebDriver(false)
 
   def root = s"""http://localhost:$port"""
 

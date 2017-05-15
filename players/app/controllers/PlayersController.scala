@@ -88,9 +88,10 @@ class PlayersController @Inject()(common: WebTemplateRender,
         Ok(Json.toJson(ranks))
       else
         Ok(
-          renderTemplate(title = Some("Player Rankings"),
-                         jsonLink = Some("?format=json"))(
-            views.html.player.gh_link(views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(
+          renderTemplate(
+            title = Some("Player Rankings"),
+            jsonLink = Some("?format=json"))(views.html.player.gh_link(
+            views.PlayerRanks.render(WebTemplateRender.wwwLocation.resolve(
                                        views.PlayerRanks.PlayerRanksFilename),
                                      ranks))))
     }
@@ -114,7 +115,8 @@ class PlayersController @Inject()(common: WebTemplateRender,
                     WebTemplateRender.wwwLocation.resolve(
                       views.player.Player.PlayerFile),
                     player,
-                    await(ladderController.aggregate).ranked.find(_.user == id))
+                    await(ladderController.aggregate).ranked
+                      .find(_.user == id))
                 }
               }
             }

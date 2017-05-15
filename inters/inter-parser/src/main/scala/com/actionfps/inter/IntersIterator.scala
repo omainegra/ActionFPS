@@ -5,7 +5,8 @@ package com.actionfps.inter
   *
   * Notify clients of an '!inter' message on a server by a registered user.
   */
-case class IntersIterator(lastCallRecord: LastCallRecord, interOut: Option[InterOut]) {
+case class IntersIterator(lastCallRecord: LastCallRecord,
+                          interOut: Option[InterOut]) {
   def acceptInterOut(interOut: InterOut): IntersIterator = {
     lastCallRecord.include(interOut) match {
       case None => resetInterOut
@@ -23,7 +24,8 @@ object IntersIterator {
     interOut = None
   )
 
-  def scan(intersIterator: IntersIterator, interOut: InterOut): IntersIterator = {
+  def scan(intersIterator: IntersIterator,
+           interOut: InterOut): IntersIterator = {
     intersIterator.acceptInterOut(interOut)
   }
 }

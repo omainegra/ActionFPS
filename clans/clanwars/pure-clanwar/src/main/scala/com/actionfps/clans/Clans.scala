@@ -4,7 +4,11 @@ import java.time.ZonedDateTime
 
 import com.actionfps.api.{Game, GameAchievement}
 
-case class ClanwarPlayer(flags: Int, frags: Int, score: Int, name: String, user: Option[String],
+case class ClanwarPlayer(flags: Int,
+                         frags: Int,
+                         score: Int,
+                         name: String,
+                         user: Option[String],
                          awards: Set[String]) {
   def +(other: ClanwarPlayer) =
     copy(
@@ -17,9 +21,14 @@ case class ClanwarPlayer(flags: Int, frags: Int, score: Int, name: String, user:
   def award(id: String) = copy(awards = awards + id)
 }
 
-case class ClanwarTeam(clan: String, name: Option[String], score: Int, flags: Int,
-                       frags: Int, deaths: Int,
-                       players: Map[String, ClanwarPlayer], won: Set[String]) {
+case class ClanwarTeam(clan: String,
+                       name: Option[String],
+                       score: Int,
+                       flags: Int,
+                       frags: Int,
+                       deaths: Int,
+                       players: Map[String, ClanwarPlayer],
+                       won: Set[String]) {
   def +(other: ClanwarTeam) = copy(
     score = score + other.score,
     flags = flags + other.flags,
@@ -63,33 +72,34 @@ object ClanNamer {
 }
 object Conclusion {
 
-
   def conclude(games: List[Game]) = {
     val allTeams = for {
       game <- games
       team <- game.teams
       clan <- team.clan
-    } yield ClanwarTeam(
-      clan = clan,
-      name = None,
-      frags = team.frags,
-      deaths = team.players.map(_.deaths).sum,
-      score = if (game.winnerClan.contains(clan)) 1 else 0,
-      won = Set(game.id),
-      flags = team.flags.getOrElse(0),
-      players = {
-        for {
-          player <- team.players
-        } yield player.name -> ClanwarPlayer(
-          flags = player.flags.getOrElse(0),
-          frags = player.frags,
-          score = player.score.getOrElse(0),
-          user = player.user,
-          name = player.name,
-          awards = Set.empty
-        )
-      }.toMap
-    )
+    } yield
+      ClanwarTeam(
+        clan = clan,
+        name = None,
+        frags = team.frags,
+        deaths = team.players.map(_.deaths).sum,
+        score = if (game.winnerClan.contains(clan)) 1 else 0,
+        won = Set(game.id),
+        flags = team.flags.getOrElse(0),
+        players = {
+          for {
+            player <- team.players
+          } yield
+            player.name -> ClanwarPlayer(
+              flags = player.flags.getOrElse(0),
+              frags = player.frags,
+              score = player.score.getOrElse(0),
+              user = player.user,
+              name = player.name,
+              awards = Set.empty
+            )
+        }.toMap
+      )
 
     Conclusion(
       teams = allTeams
@@ -97,7 +107,8 @@ object Conclusion {
         .mapValues(_.reduce(_ + _))
         .values
         .toList
-        .sortBy(_.score).reverse
+        .sortBy(_.score)
+        .reverse
     )
   }
 }
@@ -113,9 +124,7 @@ case class ClanwarMeta(id: String,
   )
 
   def achievements: Option[List[GameAchievement]] = {
-    Option(games.sortBy(_.id).reverse.flatMap(_.achievements).flatten).filter(_.nonEmpty)
+    Option(games.sortBy(_.id).reverse.flatMap(_.achievements).flatten)
+      .filter(_.nonEmpty)
   }
 }
-
-
-

@@ -19,7 +19,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
   *
   * @todo make it tidy
   */
-class ChallongeSubmitTest extends TestKit(ActorSystem("MySpec")) with FreeSpecLike with BeforeAndAfterAll {
+class ChallongeSubmitTest
+    extends TestKit(ActorSystem("MySpec"))
+    with FreeSpecLike
+    with BeforeAndAfterAll {
 
   implicit val mat = ActorMaterializer()
 
@@ -32,7 +35,8 @@ class ChallongeSubmitTest extends TestKit(ActorSystem("MySpec")) with FreeSpecLi
 
   "Test the flow works" ignore {
     val flow = WinFlow(challongeClient).gameAny
-    val (pub, sub) = TestSource.probe[Game]
+    val (pub, sub) = TestSource
+      .probe[Game]
       .via(flow)
       .toMat(TestSink.probe[Int])(Keep.both)
       .run()
@@ -42,13 +46,22 @@ class ChallongeSubmitTest extends TestKit(ActorSystem("MySpec")) with FreeSpecLi
 
   "It works" ignore {
     val ids = Await.result(challongeClient.fetchTournamentIds(), 5.seconds)
-    val res = Await.result(challongeClient.attemptSubmit("af_test_tournament", "woop", 2, "tee", 1), 5.seconds)
+    val res = Await.result(
+      challongeClient.attemptSubmit("af_test_tournament", "woop", 2, "tee", 1),
+      5.seconds)
     info(s"$ids")
     info(s"$res")
   }
 
   "It submits an attachment" ignore {
-    val res = Await.result(challongeClient.attemptSubmit("af_test_tournament", "imnt", 22, "tyd", 11, Some("https://actionfps.com/blah")), 10.seconds)
+    val res = Await.result(
+      challongeClient.attemptSubmit("af_test_tournament",
+                                    "imnt",
+                                    22,
+                                    "tyd",
+                                    11,
+                                    Some("https://actionfps.com/blah")),
+      10.seconds)
     info(s"$res")
   }
 

@@ -16,9 +16,10 @@ object Butcher {
   case class Achieved(frags: Int) extends Butcher with CompletedAchievement
 
   case object NotAchieved extends Butcher with AwaitingAchievement {
-    def processGame(game: JsonGame,
-                    player: JsonGamePlayer,
-                    isRegisteredPlayer: JsonGamePlayer => Boolean): Option[Achieved] = {
+    def processGame(
+        game: JsonGame,
+        player: JsonGamePlayer,
+        isRegisteredPlayer: JsonGamePlayer => Boolean): Option[Achieved] = {
       for {
         "ctf" <- List(game.mode)
         firstTeam <- game.teams

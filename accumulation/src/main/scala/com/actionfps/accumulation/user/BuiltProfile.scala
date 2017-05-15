@@ -8,7 +8,10 @@ import com.actionfps.user.User
 /**
   * Created by me on 15/01/2017.
   */
-case class BuiltProfile(user: User, recentGames: List[JsonGame],
-                        achievements: Option[AchievementsRepresentation], rank: Option[PlayerStat],
+case class BuiltProfile(user: User,
+                        recentGames: List[JsonGame],
+                        achievements: Option[AchievementsRepresentation],
+                        rank: Option[PlayerStat],
                         location: Option[LocationInfo],
-                        gameCounts: Option[PlayerGameCounts], favouriteMap: Option[String])
+                        gameCounts: Option[PlayerGameCounts],
+                        favouriteMap: Option[String])

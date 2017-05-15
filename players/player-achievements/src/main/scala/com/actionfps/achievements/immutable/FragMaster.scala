@@ -16,15 +16,17 @@ object FragMaster extends Incremental {
     Option(inputType.frags)
   }
 
-  override def levelDescription(level: Int): String = Map(
-    500 -> "Well, that's a start.",
-    1000 -> "Already lost count.",
-    2000 -> "I'm quite good at this!",
-    5000 -> "I've seen blood.",
-    10000 -> "That Rambo guy got nothin' on me."
-  ).getOrElse(level, s"Achieve $level frags")
+  override def levelDescription(level: Int): String =
+    Map(
+      500 -> "Well, that's a start.",
+      1000 -> "Already lost count.",
+      2000 -> "I'm quite good at this!",
+      5000 -> "I've seen blood.",
+      10000 -> "That Rambo guy got nothin' on me."
+    ).getOrElse(level, s"Achieve $level frags")
 
-  override def eventLevelTitle(level: Int): String = s"achieved Frag Master level $level"
+  override def eventLevelTitle(level: Int): String =
+    s"achieved Frag Master level $level"
 
   override def title: String = "Frag Master"
 

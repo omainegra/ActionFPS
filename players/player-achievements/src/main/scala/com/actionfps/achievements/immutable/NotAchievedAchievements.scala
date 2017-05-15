@@ -1,12 +1,17 @@
 package com.actionfps.achievements.immutable
 
 import com.actionfps.achievements.MapAchievements
-import com.actionfps.gameparser.enrichers.{JsonGame, JsonGamePlayer, JsonGameTeam}
+import com.actionfps.gameparser.enrichers.{
+  JsonGame,
+  JsonGamePlayer,
+  JsonGameTeam
+}
 
 object NotAchievedAchievements {
   def empty = NotAchievedAchievements(
     //    captureMaster = Option(CaptureMaster.fresh(List.empty)),
-    captureMaster = Option(CaptureMaster.fresh(MapAchievements.captureMaster.toList.map(_.name))),
+    captureMaster = Option(
+      CaptureMaster.fresh(MapAchievements.captureMaster.toList.map(_.name))),
     cubeAddict = Option(CubeAddict.begin),
     dDay = Option(DDay.NotStarted),
     flagMaster = Option(FlagMaster.begin),
@@ -19,18 +24,17 @@ object NotAchievedAchievements {
   )
 }
 
-case class NotAchievedAchievements
-(captureMaster: Option[CaptureMaster.Achieving],
- cubeAddict: Option[CubeAddict.Achieving],
- dDay: Option[DDay.NotAchieved],
- flagMaster: Option[FlagMaster.Achieving],
- fragMaster: Option[FragMaster.Achieving],
- maverick: Option[Maverick.NotAchieved.type],
- butcher: Option[Butcher.NotAchieved.type],
- tdmLover: Option[TdmLover.Achieving],
- terribleGame: Option[TerribleGame.NotAchieved.type],
- tosokLover: Option[TosokLover.Achieving]
-) {
+case class NotAchievedAchievements(
+    captureMaster: Option[CaptureMaster.Achieving],
+    cubeAddict: Option[CubeAddict.Achieving],
+    dDay: Option[DDay.NotAchieved],
+    flagMaster: Option[FlagMaster.Achieving],
+    fragMaster: Option[FragMaster.Achieving],
+    maverick: Option[Maverick.NotAchieved.type],
+    butcher: Option[Butcher.NotAchieved.type],
+    tdmLover: Option[TdmLover.Achieving],
+    terribleGame: Option[TerribleGame.NotAchieved.type],
+    tosokLover: Option[TosokLover.Achieving]) {
   def combined: List[IncompleteAchievement] = {
     def collect(items: Option[IncompleteAchievement]*) = items.flatten.toList
     collect(
@@ -47,10 +51,15 @@ case class NotAchievedAchievements
     )
   }
 
-  def include(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer)(isRegisteredPlayer: JsonGamePlayer => Boolean): Option[(NotAchievedAchievements, List[String], List[CompletedAchievement])] = {
+  def include(jsonGame: JsonGame,
+              jsonGameTeam: JsonGameTeam,
+              jsonGamePlayer: JsonGamePlayer)(
+      isRegisteredPlayer: JsonGamePlayer => Boolean): Option[
+    (NotAchievedAchievements, List[String], List[CompletedAchievement])] = {
     var me = this
     val newEvents = scala.collection.mutable.ListBuffer.empty[String]
-    val achievedAchievements = scala.collection.mutable.ListBuffer.empty[CompletedAchievement]
+    val achievedAchievements =
+      scala.collection.mutable.ListBuffer.empty[CompletedAchievement]
     captureMaster.foreach { a =>
       a.includeGame(jsonGame, jsonGameTeam, jsonGamePlayer).foreach {
         case (cm, cmcO) =>
@@ -68,38 +77,35 @@ case class NotAchievedAchievements
       }
     }
 
-    cubeAddict foreach {
-      a =>
-        a.include(jsonGame).foreach {
-          case Left((achieving, achievedO)) =>
-            me = me.copy(cubeAddict = Option(achieving))
-            achievedO.foreach { achieved =>
-              newEvents += CubeAddict.eventLevelTitle(achieved.level)
-              achievedAchievements += achieved
-            }
-          case Right(completed) =>
-            me = me.copy(cubeAddict = None)
-            achievedAchievements += completed
-            newEvents += "became Cube Addict"
-        }
+    cubeAddict foreach { a =>
+      a.include(jsonGame).foreach {
+        case Left((achieving, achievedO)) =>
+          me = me.copy(cubeAddict = Option(achieving))
+          achievedO.foreach { achieved =>
+            newEvents += CubeAddict.eventLevelTitle(achieved.level)
+            achievedAchievements += achieved
+          }
+        case Right(completed) =>
+          me = me.copy(cubeAddict = None)
+          achievedAchievements += completed
+          newEvents += "became Cube Addict"
+      }
     }
 
-    flagMaster foreach {
-      a =>
-        a.include((jsonGame, jsonGamePlayer)).foreach {
-          case Left((achieving, achievedO)) =>
-            me = me.copy(flagMaster = Option(achieving))
-            achievedO.foreach { achieved =>
-              achievedAchievements += achieved
-              newEvents += FlagMaster.eventLevelTitle(achieved.level)
-            }
-          case Right(completed) =>
-            achievedAchievements += completed
-            me = me.copy(flagMaster = Option.empty)
-            newEvents += "became Flag Master"
-        }
+    flagMaster foreach { a =>
+      a.include((jsonGame, jsonGamePlayer)).foreach {
+        case Left((achieving, achievedO)) =>
+          me = me.copy(flagMaster = Option(achieving))
+          achievedO.foreach { achieved =>
+            achievedAchievements += achieved
+            newEvents += FlagMaster.eventLevelTitle(achieved.level)
+          }
+        case Right(completed) =>
+          achievedAchievements += completed
+          me = me.copy(flagMaster = Option.empty)
+          newEvents += "became Flag Master"
+      }
     }
-
 
     fragMaster foreach {
       case a =>
@@ -118,7 +124,8 @@ case class NotAchievedAchievements
     }
 
     dDay foreach {
-      case a@DDay.NotStarted => me = me.copy(dDay = Option(a.includeGame(jsonGame)))
+      case a @ DDay.NotStarted =>
+        me = me.copy(dDay = Option(a.includeGame(jsonGame)))
       case a: DDay.Achieving =>
         a.includeGame(jsonGame) match {
           case Right(achieved) =>
@@ -130,36 +137,33 @@ case class NotAchievedAchievements
         }
     }
 
-    maverick foreach {
-      a =>
-        a.processGame(jsonGame, jsonGamePlayer, isRegisteredPlayer).foreach {
-          achieved =>
-            achievedAchievements += achieved
-            me = me.copy(maverick = None)
-            newEvents += "became Maverick"
-        }
+    maverick foreach { a =>
+      a.processGame(jsonGame, jsonGamePlayer, isRegisteredPlayer).foreach {
+        achieved =>
+          achievedAchievements += achieved
+          me = me.copy(maverick = None)
+          newEvents += "became Maverick"
+      }
     }
 
-    butcher foreach {
-      a =>
-        a.processGame(jsonGame, jsonGamePlayer, isRegisteredPlayer).foreach {
-          achieved =>
-            achievedAchievements += achieved
-            me = me.copy(butcher = None)
-            newEvents += "became Butcher"
-        }
+    butcher foreach { a =>
+      a.processGame(jsonGame, jsonGamePlayer, isRegisteredPlayer).foreach {
+        achieved =>
+          achievedAchievements += achieved
+          me = me.copy(butcher = None)
+          newEvents += "became Butcher"
+      }
     }
 
-    tdmLover foreach {
-      a =>
-        a.processGame(jsonGame).foreach {
-          case Left(achieving) =>
-            me = me.copy(tdmLover = Option(achieving))
-          case Right(achieved) =>
-            achievedAchievements += achieved
-            newEvents += "became TDM Lover"
-            me = me.copy(tdmLover = None)
-        }
+    tdmLover foreach { a =>
+      a.processGame(jsonGame).foreach {
+        case Left(achieving) =>
+          me = me.copy(tdmLover = Option(achieving))
+        case Right(achieved) =>
+          achievedAchievements += achieved
+          newEvents += "became TDM Lover"
+          me = me.copy(tdmLover = None)
+      }
     }
 
     tosokLover foreach { a =>
@@ -173,20 +177,18 @@ case class NotAchievedAchievements
       }
     }
 
-    terribleGame foreach {
-      a =>
-        a.processGame(jsonGamePlayer).foreach {
-          achieved =>
-            achievedAchievements += achieved
-            me = me.copy(terribleGame = None)
-            newEvents += "had a terrible game"
-        }
+    terribleGame foreach { a =>
+      a.processGame(jsonGamePlayer).foreach { achieved =>
+        achievedAchievements += achieved
+        me = me.copy(terribleGame = None)
+        newEvents += "had a terrible game"
+      }
     }
 
     if (me == this && newEvents.isEmpty && achievedAchievements.isEmpty) None
-    else Option {
-      (me, newEvents.toList, achievedAchievements.toList)
-    }
+    else
+      Option {
+        (me, newEvents.toList, achievedAchievements.toList)
+      }
   }
 }
-
