@@ -126,7 +126,7 @@ object Dev {
       registrationDate = ZonedDateTime.now().minusDays(5),
       nickname = CurrentNickname(
         nickname = "w00p|Boo",
-        from = ZonedDateTime.now().minusDays(2)
+        from = ZonedDateTime.now().minusDays(2).toInstant
       )
     )
   )

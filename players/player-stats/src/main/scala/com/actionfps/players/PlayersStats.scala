@@ -16,18 +16,16 @@ case class PlayersStats(players: Map[String, PlayerStat],
     */
   def onDisplay(atTime: Instant): PlayersStats = {
 
-    val modifiedPlayerStat = for {
-      (id, playerStat) <- players
+    val updatedWithNewElo = for {
+      (id, playerStat) <- players.iterator
+        if playerStat.games >= PlayersStats.MinGamesForRank
       playerGameCounts <- gameCounts.get(id)
       realElo = playerStat.elo
-      displayElo = realElo * Math.min(
-        1,
-        playerGameCounts
-          .gamesSince(atTime.minus(PlayersStats.N)) / PlayersStats.S)
-    } yield
-      id -> {
-        playerStat.copy(elo = displayElo)
-      }
+      eloScaleFactor = Math.min(1, playerGameCounts.gamesSince(atTime.minus(PlayersStats.N)) / PlayersStats.S)
+    displayElo = realElo * eloScaleFactor
+      if displayElo > 0
+      } yieldplayerStat.copy(elo = displayElo)
+
 
     copy(players = players ++ modifiedPlayerStat).updatedRanks
   }
@@ -45,9 +43,13 @@ case class PlayersStats(players: Map[String, PlayerStat],
         case (stat, int) => stat.user -> stat.copy(rank = Option(int + 1))
       }
     copy(
-      players = players ++ ur
+      players = PlayersStats
+        .computePlayersWithRanks(updatedWithNewElo.toList)
+        .toMap
     )
   }
+
+  def isEmpty: Boolean = players.isEmpty && gameCounts.isEmpty
 
   def onlyRanked: PlayersStats = copy(
     players = players.filter { case (k, v) => v.rank.isDefined }
@@ -65,7 +67,7 @@ case class PlayersStats(players: Map[String, PlayerStat],
           player.user
             .flatMap(players.get)
             .map(_.elo)
-            .getOrElse(1000: Double)
+            .getOrElse(PlayersStats.DefaultElo)
         }.sum
       }
     }
@@ -86,7 +88,7 @@ case class PlayersStats(players: Map[String, PlayerStat],
           user = user,
           name = player.name,
           games = 1,
-          elo = 1000,
+          elo = PlayersStats.DefaultElo,
           wins = if (isWinning) 1 else 0,
           losses = if (isLosing) 1 else 0,
           ties = if (game.isTie) 1 else 0,
@@ -129,19 +131,25 @@ case class PlayersStats(players: Map[String, PlayerStat],
 
     private def updatedElos: PlayersStats = {
       val ea = eloAdditions
-      pss.copy(players = players.map {
-        case (id, ps) =>
-          id -> ps.copy(elo = ps.elo + ea.getOrElse(id, 0.0))
-      })
+      val changeEloPlayers = ea.iterator.flatMap {
+        case (user, addElo) =
+       > players.get(user).map {  ps =>
+          user -> ps.copy(elo = ps.elo + addElo)
+        }
+      }.toMap
+      pss.copy(players = players ++ changeEloPlayers)
     }
 
+    /**
+      * Previously this updated the ranks, but now that we use "display ranks",
+      * this does not have to update the ranks.
+      */
     def includeGame: PlayersStats = {
       if (countElo)
         includeBaseStats
           .AtGame(game)
           .updatedElos
-          .updatedRanks
-      else includeBaseStats.updatedRanks
+      else includeBaseStats
     }
 
     private[players] def countElo: Boolean = {
@@ -183,13 +191,14 @@ case class PlayersStats(players: Map[String, PlayerStat],
 }
 
 object PlayersStats {
-
   def empty = PlayersStats(
     players = Map.empty,
     gameCounts = Map.empty
   )
 
+  val DefaultElo: Double = 1000
   val N: Duration = Duration.ofDays(31)
   val S: Double = 7.0
+  val MinGamesForRank = 10
 
 }

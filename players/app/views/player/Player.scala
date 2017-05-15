@@ -43,7 +43,7 @@ object Player {
         cl.select("p").first().text(ca.description)
         cl.select("a")
           .attr("href", s"/game/?id=${ca.at}")
-          .select("time")
+          .select("relative-time")
           .attr("datetime", ca.at)
           .first()
           .text(ca.at)
@@ -164,13 +164,6 @@ object Player {
               .text(Math.round(rank.elo).toString)
         }
 
-        fullProfile.playerGameCounts
-          .map { gc =>
-            views.html.game_counts(gc.counts)
-          }
-          .map(_.body)
-          .foreach(doc.select(".basics").first().append)
-
     }
 
     rankedStat match {
@@ -207,7 +200,7 @@ object Player {
         target.select("a").attr("href", s"/game/?id=${game.id}")
         target.select(".mode-map").first().text(s"${game.mode} @ ${game.map}")
         target
-          .select("time")
+          .select("relative-time")
           .attr("datetime", DateTimeFormatter.ISO_INSTANT.format(game.endTime))
           .first()
           .text(DateTimeFormatter.ISO_INSTANT.format(game.endTime))

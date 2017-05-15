@@ -1,5 +1,6 @@
 package services
 
+import java.time.ZonedDateTime
 import javax.inject.{Inject, Singleton}
 
 import akka.actor.ActorSystem
@@ -27,6 +28,13 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient,
     .mapMaterializedValue(
       actorSystem.eventStream.subscribe(_, classOf[NewClanwarCompleted]))
     .map(_.clanwarCompleted)
+    .filter { clanwar =>
+      // don't allow old clanwars to be committed
+      // todo add a journal for clanwar persistence
+      ZonedDateTime
+        .parse(clanwar.id)
+        .isAfter(ZonedDateTime.now().minusHours(3))
+    }
     .via(WinFlow(challongeClient).clanwarAny)
     .to(Sink.foreach(item => Logger.info(s"Sunk clanwar: ${item}")))
     .run()

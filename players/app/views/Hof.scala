@@ -33,7 +33,10 @@ object Hof {
                 .first()
                 .text(user)
               pt.select("td a").attr("href", s"/game/?id=${time}")
-              pt.select("time").attr("datetime", time).first().text(time)
+              pt.select("relative-time")
+                .attr("datetime", time)
+                .first()
+                .text(time)
               pt
           }
           .foreach(rowTemplate.parent().appendChild)

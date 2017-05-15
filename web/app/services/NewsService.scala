@@ -97,22 +97,22 @@ object NewsService {
             </a>
           </h3>
           <p>Published:
-            <time is="relative-time" datetime={formattedPostedTime}>
+            <relative-time datetime={formattedPostedTime}>
               {formattedPostedTime}
-            </time>{if (!postDate.isEqual(updateDate))
+            </relative-time>{if (!postDate.isEqual(updateDate))
             <span>
               <br/>
               Updated:
-              <time is="relative-time" datetime={formattedUpdatedTime}>
+              <relative-time datetime={formattedUpdatedTime}>
                 {formattedUpdatedTime}
-              </time>
+              </relative-time>
             </span>}
           </p>
           {previous.map{p =>
           <div><hr/>
           <p>
-          <time is="relative-time" datetime={p.formattedPostedTime}>
-            {p.formattedPostedTime}</time>:
+          <relative-time datetime={p.formattedPostedTime}>
+            {p.formattedPostedTime}</relative-time>:
             <a href={p.url}>{p.title}</a>
           </p></div>
         }.toList}

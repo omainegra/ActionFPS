@@ -24,9 +24,7 @@ import scala.util.{Failure, Success, Try}
   * So it's only slow on very first load.
   */
 @Singleton
-class HazelcastCachedProvider @Inject()(
-    fullProviderR: FullProviderImpl,
-    applicationLifecycle: ApplicationLifecycle)(
+class HazelcastCachedProvider @Inject()(fullProviderR: FullProviderImpl)(
     implicit executionContext: ExecutionContext)
     extends FullProvider() {
   private val hz = HazelcastClient.newHazelcastClient()
@@ -34,7 +32,7 @@ class HazelcastCachedProvider @Inject()(
   private val keyName: String = "fullIterator"
   private val logger = Logger(getClass)
 
-  override protected[providers] val fullStuff
+  override protected[providers] val accumulatorFutureAgent
     : Future[Agent[GameAxisAccumulator]] = async {
     if (theMap.containsKey(keyName)) {
 
@@ -43,21 +41,14 @@ class HazelcastCachedProvider @Inject()(
         case Success(good) => Agent(good)
         case Failure(reason) =>
           logger.error(s"Failed to fetch cached stuff due to $reason", reason)
-          val result = await(fullProviderR.fullStuff)
+          val result = await(fullProviderR.accumulatorFutureAgent)
           theMap.put(keyName, result.get())
           result
       }
     } else {
-      val result = await(fullProviderR.fullStuff)
+      val result = await(fullProviderR.accumulatorFutureAgent)
       theMap.put(keyName, result.get())
       result
     }
-  }
-
-  applicationLifecycle.addStopHook(() => Future.successful(hz.shutdown()))
-
-  override def reloadReference(): Future[GameAxisAccumulator] = async {
-    val ref = await(fullProviderR.reloadReference())
-    await(await(fullStuff).alter(ref))
   }
 }

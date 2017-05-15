@@ -71,3 +71,8 @@ cache.tmp
 serverlog_*
 geoip-resources
 test.db
+
+# benchmarking
+*.jfr
+
+.attach_*

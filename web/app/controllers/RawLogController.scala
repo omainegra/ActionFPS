@@ -12,7 +12,7 @@ import play.api.mvc.ControllerComponents
   */
 @Singleton
 class RawLogController(logFile: Path, components: ControllerComponents)
-    extends LogController(logFile, components) {
+    extends LogController(logFile.toAbsolutePath, components) {
   @Inject()
   def this(configuration: Configuration, components: ControllerComponents) =
     this(

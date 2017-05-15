@@ -62,6 +62,8 @@ lazy val root =
 lazy val logServer = project
   .in(file("log-server"))
   .enablePlugins(PlayScala)
+  .aggregate(fileOffsetFinder)
+  .dependsOn(fileOffsetFinder)
   .settings(
     libraryDependencies += alpakkaFile,
     libraryDependencies += gameParser,
@@ -69,6 +71,20 @@ lazy val logServer = project
     libraryDependencies += jwtPlay,
     libraryDependencies += scalatest % "test",
     initialCommands in console := "import controllers.LogController._"
+  )
+
+lazy val fileOffsetFinder = project
+  .in(file("log-server/file-offset-finder"))
+  .settings(
+    libraryDependencies += scalatest % "test",
+    libraryDependencies += scalacheck % "test"
+  )
+
+lazy val benchmark = project
+  .dependsOn(web)
+  .enablePlugins(JmhPlugin)
+  .settings(
+    fork in run := true
   )
 
 lazy val web = project
@@ -107,8 +123,18 @@ lazy val web = project
       seleniumJava % "it",
       ehcache
     ),
+    // Disabled by default, so that it behaves more like PROD.
+    inMemoryCache := false,
     javaOptions in IntegrationTest += s"-Dgeolitecity.dat=${geoLiteCity.value}",
-    PlayKeys.playRunHooks += HazelcastRunHook(),
+    PlayKeys.playRunHooks ++= {
+      if (inMemoryCache.value) Some(HazelcastRunHook()) else None
+    }.toSeq,
+    PlayKeys.devSettings ++= {
+      if (inMemoryCache.value) Some("full.provider" -> "hazelcast-cached")
+      else None
+    }.toSeq,
+    PlayKeys.devSettings += "journal.large" -> "journals/journal.tsv",
+    PlayKeys.devSettings += "journal.games" -> "journals/games.tsv",
     scriptClasspath := Seq("*", "../conf/"),
     mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map {
       f =>
@@ -118,6 +144,9 @@ lazy val web = project
     buildInfoPackage := "af",
     buildInfoOptions += BuildInfoOption.ToJson
   )
+
+lazy val inMemoryCache = SettingKey[Boolean](
+  "Use an in-memory Hazelcast cache for increased iteration performance.")
 
 lazy val inters =
   Project(
@@ -369,7 +398,9 @@ lazy val games =
     .settings(
       libraryDependencies ++= Seq(
         jsoup,
-        async
+        akkaAgent,
+        async,
+        alpakkaFile
       )
     )
 

@@ -24,9 +24,7 @@ import com.actionfps.formats.json.Formats._
 class UserController @Inject()(configuration: Configuration,
                                playersProvider: PlayersProvider,
                                wSClient: WSClient,
-                               components: ControllerComponents)(
-    implicit executionContext: ExecutionContext)
-    extends AbstractController(components) {
+                               components: ControllerComponents)(implicit executionContext: ExecutionContext) extends AbstractController(components) {
 
   val authDir = Paths
     .get(configuration.underlying.getString("af.user.keys.path"))
@@ -69,10 +67,11 @@ class UserController @Inject()(configuration: Configuration,
 
   val googleUri = "https://www.googleapis.com/oauth2/v3/tokeninfo"
 
-  def authTokenPost() = Action(parse.form(UserController.userForm)).async {
+  def authTokenPost() =
+    Action(parse.form(UserController.userForm)).async {
     req =>
       getByToken(req.body.idToken)
-  }
+    }
 
   def getByToken(idToken: String) = {
     async {

@@ -6,6 +6,7 @@ import akka.agent.Agent
 import com.actionfps.accumulation.GameAxisAccumulator
 import com.actionfps.accumulation.user.FullProfile
 import com.actionfps.accumulation.achievements.HallOfFame
+import com.actionfps.achievements.GameUserEvent
 import com.actionfps.clans.Clanwars
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
@@ -21,47 +22,46 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext)
     extends ClanDataProvider
     with ProvidesGames {
 
-  protected[providers] def fullStuff: Future[Agent[GameAxisAccumulator]]
+  protected[providers] def accumulatorFutureAgent
+    : Future[Agent[GameAxisAccumulator]]
 
   def getRecent(n: Int): Future[List[JsonGame]] =
-    fullStuff.map(_.get().recentGames(n))
+    accumulatorFutureAgent.map(_.get().recentGames(n))
 
-  def events: Future[List[Map[String, String]]] = {
-    fullStuff.map(_.get().events)
+  def events: Future[List[GameUserEvent]] = {
+    accumulatorFutureAgent.map(_.get().events)
   }
 
   def clanwars: Future[Clanwars] = {
-    fullStuff.map(_.get().clanwars)
+    accumulatorFutureAgent.map(_.get().clanwars)
   }
 
   def playerRanks: Future[PlayersStats] = {
-    fullStuff.map(_.get().shiftedPlayersStats)
+    accumulatorFutureAgent.map(_.get().shiftedPlayersStats)
   }
 
   def playerRanksOverTime: Future[Map[YearMonth, PlayersStats]] = {
-    fullStuff.map(_.get().playersStatsOverTime)
+    accumulatorFutureAgent.map(_.get().playersStatsOverTime)
   }
 
   def clanstats: Future[Clanstats] = {
-    fullStuff.map(_.get().clanstats)
+    accumulatorFutureAgent.map(_.get().clanstats)
   }
 
   def hof: Future[HallOfFame] = {
-    fullStuff.map(_.get().hof)
+    accumulatorFutureAgent.map(_.get().hof)
   }
 
   def allGames: Future[List[JsonGame]] = {
-    fullStuff.map(_.get().games.values.toList.sortBy(_.id))
+    accumulatorFutureAgent.map(_.get().games.values.toList.sortBy(_.id))
   }
 
   def game(id: String): Future[Option[JsonGame]] = {
-    fullStuff.map(_.get().games.get(id))
+    accumulatorFutureAgent.map(_.get().games.get(id))
   }
 
   def getPlayerProfileFor(id: String): Future[Option[FullProfile]] = {
-    fullStuff.map(_.get()).map(_.getProfileFor(id))
+    accumulatorFutureAgent.map(_.get()).map(_.getProfileFor(id))
   }
-
-  def reloadReference(): Future[GameAxisAccumulator]
 
 }

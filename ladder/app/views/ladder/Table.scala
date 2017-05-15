@@ -42,7 +42,7 @@ object Table {
           target.select(".time-played").first().text(us.timePlayedText)
 
           target
-            .select(".last-seen time")
+            .select(".last-seen relative-time")
             .attr("datetime", us.lastSeenText)
             .first()
             .text(us.lastSeenText)

@@ -20,12 +20,12 @@ object Render {
     target.select(".heading").first().text(mixedGame.heading)
     if (mixedGame.now.isEmpty) {
       target
-        .select("time")
+        .select("relative-time")
         .attr("datetime", mixedGame.game.endTime.toString)
         .first()
         .text(mixedGame.game.endTime.toString)
     } else {
-      target.select("time").remove()
+      target.select("relative-time").remove()
     }
     mixedGame.demoLink match {
       case None => target.select(".demo-link").remove()
@@ -104,7 +104,7 @@ object Render {
       case Some(clanwar) =>
         doc.select(".of-clanwar a").attr("href", s"/clanwar/?id=$clanwar")
         doc
-          .select(".of-clanwar time")
+          .select(".of-clanwar relative-time")
           .attr("datetime", clanwar)
           .first()
           .text(clanwar)
