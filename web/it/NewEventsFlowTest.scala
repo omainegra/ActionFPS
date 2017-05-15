@@ -28,7 +28,10 @@ class NewEventsFlowTest
     new GuiceApplicationBuilder()
       .configure(
         "journal.large" -> tmpFile.toString,
-        "journal.games" -> Files.createTempFile("games", ".tsv").toAbsolutePath.toString
+        "journal.games" -> Files
+          .createTempFile("games", ".tsv")
+          .toAbsolutePath
+          .toString
       )
       .build()
   }

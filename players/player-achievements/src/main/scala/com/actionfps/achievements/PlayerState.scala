@@ -11,9 +11,16 @@ import com.actionfps.gameparser.enrichers.{
   JsonGameTeam
 }
 
-case class PlayerState(combined: NotAchievedAchievements,
-                       playerStatistics: PlayerStatistics, events: Vector[GameEvent], achieved: Vector[(String, immutable.CompletedAchievement)]) {
-  def includeGame(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer)(isRegisteredPlayer: JsonGamePlayer => Boolean): Option[(PlayerState, Vector[GameEvent])] = {
+case class PlayerState(
+    combined: NotAchievedAchievements,
+    playerStatistics: PlayerStatistics,
+    events: Vector[GameEvent],
+    achieved: Vector[(String, immutable.CompletedAchievement)]) {
+  def includeGame(jsonGame: JsonGame,
+                  jsonGameTeam: JsonGameTeam,
+                  jsonGamePlayer: JsonGamePlayer)(
+      isRegisteredPlayer: JsonGamePlayer => Boolean)
+    : Option[(PlayerState, Vector[GameEvent])] = {
     val nps = playerStatistics.processGame(jsonGame, jsonGamePlayer)
     combined
       .include(jsonGame, jsonGameTeam, jsonGamePlayer)(isRegisteredPlayer)

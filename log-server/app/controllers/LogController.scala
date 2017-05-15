@@ -23,7 +23,8 @@ import play.api.mvc._
 
 import scala.concurrent.duration._
 
-abstract class LogController(sourceFile: Path, components: ControllerComponents)
+abstract class LogController(sourceFile: Path,
+                             components: ControllerComponents)
     extends AbstractController(components) {
   Logger.info(s"Log controller for ${sourceFile}")
   def stream = Action { request =>

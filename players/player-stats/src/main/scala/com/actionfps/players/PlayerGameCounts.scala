@@ -13,7 +13,8 @@ object PlayerGameCounts {
     PlayerGameCounts(games = List.empty, counts = ListMap.empty)
 }
 
-case class PlayerGameCounts(games: List[Instant], counts: ListMap[ZonedDateTime, Int]) {
+case class PlayerGameCounts(games: List[Instant],
+                            counts: ListMap[ZonedDateTime, Int]) {
   def gamesSince(instant: Instant): Int = {
     // performance optimisation for .count()
     @tailrec

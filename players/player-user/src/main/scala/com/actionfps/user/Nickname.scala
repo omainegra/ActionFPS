@@ -9,10 +9,10 @@ import com.actionfps.user.Nickname.{CurrentNickname, PreviousNickname}
   */
 object Nickname {
 
-  case class CurrentNickname(nickname: String, from: Instant)
-      extends Nickname
+  case class CurrentNickname(nickname: String, from: Instant) extends Nickname
 
-  case class PreviousNickname(nickname: String, from: Instant, to: Instant) extends Nickname
+  case class PreviousNickname(nickname: String, from: Instant, to: Instant)
+      extends Nickname
 
 }
 

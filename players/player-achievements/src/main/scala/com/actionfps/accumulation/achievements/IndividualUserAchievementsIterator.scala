@@ -7,8 +7,11 @@ import com.actionfps.user.User
 /**
   * Created by me on 15/01/2017.
   */
-case class IndividualUserAchievementsIterator(user: User, playerState: PlayerState, events: List[GameUserEvent]) {
-  def includeGame(users: List[User])(jsonGame: JsonGame): IndividualUserAchievementsIterator = {
+case class IndividualUserAchievementsIterator(user: User,
+                                              playerState: PlayerState,
+                                              events: List[GameUserEvent]) {
+  def includeGame(users: List[User])(
+      jsonGame: JsonGame): IndividualUserAchievementsIterator = {
     for {
       team <- jsonGame.teams
       player <- team.players
@@ -17,10 +20,11 @@ case class IndividualUserAchievementsIterator(user: User, playerState: PlayerSta
         p =>
           users.exists(u => u.validAt(p.name, jsonGame.endTime.toInstant))
       }
-    } yield copy(
-      playerState = newPs,
-      events = events ++ newEvents.map (event =>
-        GameUserEvent.fromGameEvent(event,user))
-    )
+    } yield
+      copy(
+        playerState = newPs,
+        events = events ++ newEvents.map(event =>
+          GameUserEvent.fromGameEvent(event, user))
+      )
   }.headOption.getOrElse(this)
 }

@@ -16,32 +16,20 @@ case class PlayersStats(players: Map[String, PlayerStat],
     */
   def onDisplay(atTime: Instant): PlayersStats = {
 
-    val updatedWithNewElo = for {
-      (id, playerStat) <- players.iterator
+    val updatedWithNewElo =
+      for {
+        (id, playerStat) <- players.iterator
         if playerStat.games >= PlayersStats.MinGamesForRank
-      playerGameCounts <- gameCounts.get(id)
-      realElo = playerStat.elo
-      eloScaleFactor = Math.min(1, playerGameCounts.gamesSince(atTime.minus(PlayersStats.N)) / PlayersStats.S)
-    displayElo = realElo * eloScaleFactor
-      if displayElo > 0
-      } yieldplayerStat.copy(elo = displayElo)
+        playerGameCounts <- gameCounts.get(id)
+        realElo = playerStat.elo
+        eloScaleFactor = Math.min(
+          1,
+          playerGameCounts
+            .gamesSince(atTime.minus(PlayersStats.N)) / PlayersStats.S)
+        displayElo = realElo * eloScaleFactor
+        if displayElo > 0
+      } yield playerStat.copy(elo = displayElo)
 
-
-    copy(players = players ++ modifiedPlayerStat).updatedRanks
-  }
-
-  def isEmpty: Boolean = players.isEmpty && gameCounts.isEmpty
-
-  private def updatedRanks = {
-    val ur = players.values.toList
-      .sortBy(_.elo)
-      .reverse
-      .filter(_.games >= Players.MIN_GAMES_RANK)
-      .zipWithIndex
-      .collect {
-        case (stat, _) if stat.elo == 0 => stat.user -> stat.copy(rank = None)
-        case (stat, int) => stat.user -> stat.copy(rank = Option(int + 1))
-      }
     copy(
       players = PlayersStats
         .computePlayersWithRanks(updatedWithNewElo.toList)
@@ -132,10 +120,10 @@ case class PlayersStats(players: Map[String, PlayerStat],
     private def updatedElos: PlayersStats = {
       val ea = eloAdditions
       val changeEloPlayers = ea.iterator.flatMap {
-        case (user, addElo) =
-       > players.get(user).map {  ps =>
-          user -> ps.copy(elo = ps.elo + addElo)
-        }
+        case (user, addElo) =>
+          players.get(user).map { ps =>
+            user -> ps.copy(elo = ps.elo + addElo)
+          }
       }.toMap
       pss.copy(players = players ++ changeEloPlayers)
     }
@@ -200,5 +188,15 @@ object PlayersStats {
   val N: Duration = Duration.ofDays(31)
   val S: Double = 7.0
   val MinGamesForRank = 10
+
+  def computePlayersWithRanks(
+      players: List[PlayerStat]): List[(String, PlayerStat)] = {
+    players
+      .sortBy(player => -player.elo)
+      .zipWithIndex
+      .map {
+        case (stat, int) => stat.user -> stat.copy(rank = Some(int + 1))
+      }
+  }
 
 }

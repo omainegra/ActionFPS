@@ -5,7 +5,10 @@ import com.actionfps.gameparser.enrichers.{JsonGame, JsonGamePlayer}
 /**
   * Created by William on 11/11/2015.
   */
-case class PlayerStatistics( flags: Int, frags: Int, timePlayed: Int, gamesPlayed: Int) {
+case class PlayerStatistics(flags: Int,
+                            frags: Int,
+                            timePlayed: Int,
+                            gamesPlayed: Int) {
   def timePlayedStr: String = {
     timePlayed / 60 match {
       case 0 => "not enough"
@@ -36,5 +39,6 @@ case class PlayerStatistics( flags: Int, frags: Int, timePlayed: Int, gamesPlaye
 }
 
 object PlayerStatistics {
-  def empty = PlayerStatistics( flags = 0, frags = 0, timePlayed = 0, gamesPlayed = 0)
+  def empty =
+    PlayerStatistics(flags = 0, frags = 0, timePlayed = 0, gamesPlayed = 0)
 }

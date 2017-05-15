@@ -12,10 +12,12 @@ import com.actionfps.user.User
   */
 case class EnrichGame(jsonGame: JsonGame) {
   def withUsers(userFinder: NickToUserAtTime): JsonGame = {
-    jsonGame.transformPlayers((_, player) =>
-      player.copy(user = userFinder
-            .nickToUser(player.name, jsonGame.endTime.toInstant).map(_.id))
-    )
+    jsonGame.transformPlayers(
+      (_, player) =>
+        player.copy(
+          user = userFinder
+            .nickToUser(player.name, jsonGame.endTime.toInstant)
+            .map(_.id)))
   }
 
   def withClans(clans: List[Clan]): JsonGame = {

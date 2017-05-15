@@ -12,8 +12,7 @@ class LadderParseTest extends FreeSpec with Matchers {
       val tme = TimedUserMessageExtract(new NickToUser {
         override def userOfNickname(nickname: String): Option[String] =
           if (nickname == "egg") Some("egghead") else None
-      }).unapply(LadderParseTest.sampleMessage)
-        .value
+      }).unapply(LadderParseTest.sampleMessage).value
       assert(tme.gibbed)
       assert(!tme.scored)
       assert(!tme.killed)

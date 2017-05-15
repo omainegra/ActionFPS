@@ -2,7 +2,10 @@ package com.actionfps.accumulation
 
 import java.time.YearMonth
 
-import com.actionfps.accumulation.achievements.{AchievementsIterator, HallOfFame}
+import com.actionfps.accumulation.achievements.{
+  AchievementsIterator,
+  HallOfFame
+}
 import com.actionfps.accumulation.enrich.EnrichGame.NickToUserAtTime
 import com.actionfps.accumulation.enrich.EnrichGames
 import com.actionfps.accumulation.user.FullProfile
@@ -39,17 +42,17 @@ object GameAxisAccumulator {
   * Or if a clanwar is completed, it will be attached to the game for better cross linking.
   */
 case class GameAxisAccumulator(
-users: Map[String, User],
- games: Map[String, JsonGame],
- clans: Map[String, Clan],
- clanwars: Clanwars,
- clanstats: Clanstats,
- achievementsIterator: AchievementsIterator,
- hof: HallOfFame,
- nickToUserAtTime: NickToUserAtTime,playersStats: PlayersStats,
- shiftedPlayersStats: PlayersStats,
- playersStatsOverTime: Map[YearMonth, PlayersStats]) {
-  fi =>
+    users: Map[String, User],
+    games: Map[String, JsonGame],
+    clans: Map[String, Clan],
+    clanwars: Clanwars,
+    clanstats: Clanstats,
+    achievementsIterator: AchievementsIterator,
+    hof: HallOfFame,
+    nickToUserAtTime: NickToUserAtTime,
+    playersStats: PlayersStats,
+    shiftedPlayersStats: PlayersStats,
+    playersStatsOverTime: Map[YearMonth, PlayersStats]) { fi =>
 
   /** For Hazelcast caching **/
   def this() =
@@ -73,8 +76,6 @@ users: Map[String, User],
     shiftedPlayersStats.isEmpty
   }
 
-
-
   def events: List[GameUserEvent] = achievementsIterator.events.take(10)
 
   def includeGames(list: List[JsonGame]): GameAxisAccumulator = {
@@ -87,7 +88,8 @@ users: Map[String, User],
   private def includeGame(jsonGame: JsonGame): GameAxisAccumulator = {
     import enricher.withUsersClass
     var richGame = jsonGame.withoutHosts.withUsers.withClans
-    val (updatedAchievements, whatsChanged, newAchievements) = achievementsIterator.includeGame(users)(richGame)
+    val (updatedAchievements, whatsChanged, newAchievements) =
+      achievementsIterator.includeGame(users)(richGame)
 
     val newHof = updatedAchievements
       .newAchievements(whatsChanged, achievementsIterator)
