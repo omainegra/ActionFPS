@@ -103,14 +103,13 @@ case class GameAxisAccumulator(
 
     if (newAchievements.nonEmpty) {
       richGame = richGame.copy(
-        achievements = Option {
-          richGame.achievements.toList.flatten ++ newAchievements.map(
+        achievements = Some(
+          newAchievements.map(
             map =>
               GameAchievement(
                 user = map.userId,
-                text = map.eventText
-            ))
-        }.map(_.distinct).filter(_.nonEmpty)
+                text = map.frontEventText
+            ))).filter(_.nonEmpty)
       )
     }
     val (updatedClanwars, newClanwar) = clanwars.includeFlowing(richGame)

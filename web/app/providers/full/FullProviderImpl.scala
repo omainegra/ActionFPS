@@ -120,10 +120,12 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
           val detectedGame = fid.detectGame
             .map(NewRichGameDetected)
           detectedGame.foreach(actorSystem.eventStream.publish)
-          val detectedClanwar = fid.detectClanwar
-          detectedClanwar.foreach(actorSystem.eventStream.publish)
+          fid.detectClanwar
+            .map(services.ChallongeService.NewClanwarCompleted)
+            .foreach(actorSystem.eventStream.publish)
           detectedGame
         }
+
       }
       .mapConcat(identity)
 
