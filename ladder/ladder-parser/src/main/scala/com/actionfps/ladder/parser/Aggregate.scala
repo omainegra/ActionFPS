@@ -25,10 +25,7 @@ case class Aggregate(users: Map[String, UserStatistics]) {
         value = {
           val previousUser =
             users.getOrElse(tmu.user, UserStatistics.empty(time = tmu.instant))
-          if (tmu.killed) previousUser.kill
-          else if (tmu.gibbed) previousUser.gib
-          else if (tmu.scored) previousUser.flag
-          else previousUser
+          tmu.userAction.apply(previousUser)
         }.see(tmu.instant)
       )
     )

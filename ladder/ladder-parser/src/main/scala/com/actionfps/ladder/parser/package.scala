@@ -5,14 +5,8 @@ package com.actionfps.ladder
   */
 package object parser {
 
-  private[ladder] val killWords = Set("busted",
-                                      "picked off",
-                                      "peppered",
-                                      "sprayed",
-                                      "punctured",
-                                      "shredded",
-                                      "busted",
-                                      "busted")
+  private[ladder] val killWords =
+    Set("busted", "picked off", "peppered", "sprayed", "punctured", "shredded")
   private[ladder] val gibWords =
     Set("slashed", "splattered", "headshot", "gibbed")
   private[ladder] val scoredWords = Set("scored")

@@ -21,7 +21,13 @@ case class TsvExtract(servers: Set[String], nickToUser: NickToUser) {
                 val timestamp = Instant.parse(splittedLine(0))
                 nickToUser.nickToUser.get(nick) match {
                   case Some(uuser) =>
-                    Some(server -> TimedUserMessage(timestamp, uuser, content))
+                    val idxAction = content.indexOf(" ")
+                    if (idxAction >= 0) {
+                      val headWord = content.substring(0, idxAction)
+                      UserAction.wordToAction.get(headWord).map { action =>
+                        server -> TimedUserMessage(timestamp, uuser, action)
+                      }
+                    } else None
                   case None => None
                 }
               case _ => None

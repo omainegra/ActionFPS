@@ -20,6 +20,12 @@ object TsvExtractEfficient {
     val serversByteList =
       servers.map(_.getBytes()).map(ByteBuffer.wrap).toList.toArray
 
+    val (actionsKeysArr, actionsArr) = {
+      val list = UserAction.wordToAction.toList
+      (list.map(_._1.getBytes()).map(ByteBuffer.wrap).toArray,
+       list.map(_._2).toArray)
+    }
+
     val nicknamesByteMap: Map[ByteBuffer, String] =
       nickToUser.nickToUser.map {
         case (n, u) =>
@@ -57,14 +63,24 @@ object TsvExtractEfficient {
       nicknamesByteMap.get(ByteBuffer.wrap(nicknameBar))
     }
 
+    def matchAction(actionStart: Int, actionEnd: Int): Option[UserAction] = {
+      val actionLength = actionEnd - actionStart
+      bb.position(actionStart)
+      ByteBufferArrayExists.indexOf(actionsKeysArr)(
+        bytesMatch(actionStart, actionLength, _)) match {
+        case -1 => None
+        case idx => Some(actionsArr(idx))
+      }
+    }
+
     def processLine(lineStart: Int, lineEnd: Int): Unit = {
 
       val instantEnd = lineStart + sampleInstant.length
       val lineLength = lineEnd - lineStart
 
-      def fetchLine() = stringOf(lineStart, lineLength)
+      def fetchInstant() = stringOf(lineStart, sampleInstant.length)
 
-      def userO: Option[(String, Int)] = {
+      def userO: Option[(String, UserAction)] = {
         searchFor(instantEnd + 1, '\t', lineEnd) match {
           case SearchBad => None
           case serverEnd =>
@@ -79,8 +95,20 @@ object TsvExtractEfficient {
                       case SearchBad => None
                       case nickEnd =>
                         if (serverMatches(instantEnd, serverEnd)) {
-                          matchNicknameToUser(nickStart, nickEnd).map { u =>
-                            u -> nickEnd
+                          matchNicknameToUser(nickStart, nickEnd) match {
+                            case Some(u) =>
+                              searchFor(nickEnd + 1, ' ', lineEnd) match {
+                                case SearchBad => None
+                                case actionEnd =>
+                                  val actionStart = nickEnd + 1
+                                  matchAction(actionStart, actionEnd) match {
+                                    case Some(action) =>
+                                      Some((u, action))
+                                    case None =>
+                                      None
+                                  }
+                              }
+                            case None => None
                           }
                         } else None
                     }
@@ -90,14 +118,11 @@ object TsvExtractEfficient {
       }
 
       userO match {
-        case Some((user, nickEnd)) =>
-          val line = fetchLine()
-          val instantStr = line.substring(0, sampleInstant.length)
-          val msgOffset = nickEnd - lineStart + 1
+        case Some((user, userAction)) =>
           val tum = TimedUserMessage(
-            instant = Instant.parse(instantStr),
+            instant = Instant.parse(fetchInstant()),
             user = user,
-            message = line.substring(msgOffset)
+            userAction = userAction
           )
           start = start.includeLine(tum)
         case _ =>
