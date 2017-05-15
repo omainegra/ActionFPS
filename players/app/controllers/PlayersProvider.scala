@@ -21,5 +21,5 @@ trait PlayersProvider {
   def hof: Future[HallOfFame]
 
   def playerRanks: Future[PlayersStats]
-  
+
 }

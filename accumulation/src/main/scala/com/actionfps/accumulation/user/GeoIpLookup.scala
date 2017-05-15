@@ -20,7 +20,8 @@ object GeoIpLookup extends IpLookup {
       (List(A, B, C, D, E) ++ F).filter(_.exists()).head
     } catch {
       case e: Throwable =>
-        throw new IllegalArgumentException(s"Coult not find GeoLiteCityv6.dat. Might want to set System property 'geolitecity.dat'")
+        throw new IllegalArgumentException(
+          s"Coult not find GeoLiteCityv6.dat. Might want to set System property 'geolitecity.dat'")
     }
   }
 
@@ -33,7 +34,8 @@ object GeoIpLookup extends IpLookup {
         IpLookup.IpLookupResult(
           countryCode = Option(loc.countryCode),
           countryName = Option(loc.countryName),
-          timezone = Option(timeZone.timeZoneByCountryAndRegion(loc.countryCode, loc.region))
+          timezone = Option(
+            timeZone.timeZoneByCountryAndRegion(loc.countryCode, loc.region))
         )
     }
   }

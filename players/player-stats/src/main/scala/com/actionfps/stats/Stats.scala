@@ -22,19 +22,20 @@ object Stats {
   }
 
   object PunchCard {
-    val hours: List[String] = List("12a") ++ (1 to 11).map(_ + "a") ++ List("12p") ++ (1 to 11).map(_ + "p")
+    val hours: List[String] = List("12a") ++ (1 to 11).map(_ + "a") ++ List(
+      "12p") ++ (1 to 11).map(_ + "p")
 
     private def emptyHours = (0 to 23).map(n => n -> 0).toMap
 
     def empty: PunchCard = PunchCard(
-      dows =
-        ListMap(DayOfWeek.values().sorted.map { dow =>
-          dow -> emptyHours
-        }: _*)
+      dows = ListMap(DayOfWeek.values().sorted.map { dow =>
+        dow -> emptyHours
+      }: _*)
     )
   }
 
-  case class GameCounter(dates: ListMap[ZonedDateTime, Int], punchCard: PunchCard) {
+  case class GameCounter(dates: ListMap[ZonedDateTime, Int],
+                         punchCard: PunchCard) {
     def include(id: String): GameCounter = {
       val date = ZonedDateTime.parse(id)
       val parsedDay = date

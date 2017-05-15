@@ -10,7 +10,9 @@ object GameScores {
     GameScores(
       scores = {
         val winners = games.flatMap(_.winnerClan)
-        clans.toList.map { clan => (clan, winners.count(_ == clan)) }
+        clans.toList.map { clan =>
+          (clan, winners.count(_ == clan))
+        }
       }.toMap
     )
   }

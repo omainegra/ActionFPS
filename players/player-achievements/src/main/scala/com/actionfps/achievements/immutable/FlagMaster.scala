@@ -19,15 +19,17 @@ object FlagMaster extends Incremental {
     }
   }
 
-  override def levelDescription(level: Int): String = Map(
-    50 -> "What's that blue thing?",
-    100 -> "I'm supposed to bring this back?",
-    200 -> "What do you mean it's TDM?",
-    500 -> "Yeah, I know where it goes.",
-    1000 -> "Can I keep one at least?"
-  ).getOrElse(level, s"Achieve $level flags")
+  override def levelDescription(level: Int): String =
+    Map(
+      50 -> "What's that blue thing?",
+      100 -> "I'm supposed to bring this back?",
+      200 -> "What do you mean it's TDM?",
+      500 -> "Yeah, I know where it goes.",
+      1000 -> "Can I keep one at least?"
+    ).getOrElse(level, s"Achieve $level flags")
 
-  override def eventLevelTitle(level: Int): String = s"achieved Flag Master level $level"
+  override def eventLevelTitle(level: Int): String =
+    s"achieved Flag Master level $level"
 
   override def title: String = "Flag Master"
 

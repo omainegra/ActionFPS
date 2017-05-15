@@ -14,9 +14,10 @@ sealed trait Maverick {
 object Maverick {
 
   case object NotAchieved extends Maverick with AwaitingAchievement {
-    def processGame(game: JsonGame,
-                    player: JsonGamePlayer,
-                    isRegisteredPlayer: JsonGamePlayer => Boolean): Option[Achieved] = {
+    def processGame(
+        game: JsonGame,
+        player: JsonGamePlayer,
+        isRegisteredPlayer: JsonGamePlayer => Boolean): Option[Achieved] = {
       for {
         "ctf" <- List(game.mode)
         winningTeam <- game.teams
@@ -31,13 +32,13 @@ object Maverick {
         playerFlags <- player.flags
         if winningTeamFlags == playerFlags
         if winningTeamFlags >= 5
-      } yield Achieved(
-        flags = playerFlags
-      )
+      } yield
+        Achieved(
+          flags = playerFlags
+        )
     }.headOption
   }
 
   case class Achieved(flags: Int) extends Maverick with CompletedAchievement
 
 }
-

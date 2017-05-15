@@ -9,11 +9,19 @@ import com.actionfps.user.User
 /**
   * Created by me on 15/01/2017.
   */
-case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Option[PlayerState],
-                       rank: Option[PlayerStat], playerGameCounts: Option[PlayerGameCounts]) {
+case class FullProfile(user: User,
+                       recentGames: List[JsonGame],
+                       achievements: Option[PlayerState],
+                       rank: Option[PlayerStat],
+                       playerGameCounts: Option[PlayerGameCounts]) {
 
   def build = BuiltProfile(
-    user, recentGames, achievements.map(_.buildAchievements), rank, locationInfo, playerGameCounts,
+    user,
+    recentGames,
+    achievements.map(_.buildAchievements),
+    rank,
+    locationInfo,
+    playerGameCounts,
     favouriteMap = mostCommon(recentGames.map(_.map))
   )
 
@@ -24,10 +32,11 @@ case class FullProfile(user: User, recentGames: List[JsonGame], achievements: Op
         .flatMap(_.teams)
         .flatMap(_.players)
         .filter(_.user.contains(user.id))
-      Some(LocationInfo(
-        timezone = mostCommon(myPlayers.flatMap(_.timezone)),
-        countryCode = mostCommon(myPlayers.flatMap(_.countryCode)),
-        countryName = mostCommon(myPlayers.flatMap(_.countryName))
-      ))
+      Some(
+        LocationInfo(
+          timezone = mostCommon(myPlayers.flatMap(_.timezone)),
+          countryCode = mostCommon(myPlayers.flatMap(_.countryCode)),
+          countryName = mostCommon(myPlayers.flatMap(_.countryName))
+        ))
     }
 }

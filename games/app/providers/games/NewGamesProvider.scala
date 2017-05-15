@@ -15,25 +15,35 @@ import scala.concurrent.ExecutionContext
 /**
   * Created by William on 09/12/2015.
   */
-
 object NewGamesProvider {
 
-  def newGamesSource(implicit actorSystem: ActorSystem, executionContext: ExecutionContext): Source[Event, Boolean] = {
+  def newGamesSource(
+      implicit actorSystem: ActorSystem,
+      executionContext: ExecutionContext): Source[Event, Boolean] = {
     Source
       .actorRef[NewRichGameDetected](10, OverflowStrategy.dropHead)
-      .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[NewRichGameDetected]))
+      .mapMaterializedValue(
+        actorSystem.eventStream.subscribe(_, classOf[NewRichGameDetected]))
       .map(_.jsonGame)
       .map(NewGamesProvider.gameToEvent)
   }
 
   def gameToEvent(game: JsonGame): Event = {
-    val b = Json.toJson(game.withoutHosts).asInstanceOf[JsObject].+("isNew" -> JsBoolean(true))
+    val b = Json
+      .toJson(game.withoutHosts)
+      .asInstanceOf[JsObject]
+      .+("isNew" -> JsBoolean(true))
 
-    val gameHtml = views.rendergame.Render.renderMixedGame(MixedGame.fromJsonGame(game))
+    val gameHtml =
+      views.rendergame.Render.renderMixedGame(MixedGame.fromJsonGame(game))
     Event(
       id = Option(game.id),
       name = Option("new-game"),
-      data = Json.toJson(b).asInstanceOf[JsObject].+("html" -> JsString(gameHtml.body)).toString()
+      data = Json
+        .toJson(b)
+        .asInstanceOf[JsObject]
+        .+("html" -> JsString(gameHtml.body))
+        .toString()
     )
   }
 }

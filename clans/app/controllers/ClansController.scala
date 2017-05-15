@@ -26,9 +26,10 @@ import com.actionfps.formats.json.Formats._
 class ClansController @Inject()(webTemplateRender: WebTemplateRender,
                                 clansProvider: ClansProvider,
                                 clanDataProvider: ClanDataProvider,
-                                components: ControllerComponents)
-                               (implicit configuration: Configuration,
-                                executionContext: ExecutionContext) extends AbstractController(components) {
+                                components: ControllerComponents)(
+    implicit configuration: Configuration,
+    executionContext: ExecutionContext)
+    extends AbstractController(components) {
 
   private def namerF = async {
     val clans = await(clansProvider.clans)

@@ -17,7 +17,8 @@ case class KeyedAggregate[T](aggregates: Map[T, Aggregate], total: Aggregate) {
   }
 
   def includeLine(key: T)(tmu: TimedUserMessage): KeyedAggregate[T] = {
-    includeAggregate(key)(aggregates.getOrElse(key, Aggregate.empty).includeLine(tmu))
+    includeAggregate(key)(
+      aggregates.getOrElse(key, Aggregate.empty).includeLine(tmu))
   }
 }
 

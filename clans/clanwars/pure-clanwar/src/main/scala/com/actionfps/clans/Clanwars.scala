@@ -12,19 +12,26 @@ object Clanwars {
   )
 }
 
-case class Clanwars(incomplete: Set[IncompleteClanwar], complete: Set[CompleteClanwar]) {
+case class Clanwars(incomplete: Set[IncompleteClanwar],
+                    complete: Set[CompleteClanwar]) {
   def isEmpty: Boolean = incomplete.isEmpty && complete.isEmpty
 
   def includeGame(jsonGame: Game): Option[Clanwars] = {
-    incomplete.flatMap(ic => ic.potentialNextGame(jsonGame).map(n => ic -> n)).headOption.map {
-      case (ic, Left(nc)) =>
-        copy(incomplete = incomplete - ic + nc)
-      case (ic, Right(cc)) =>
-        copy(incomplete = incomplete - ic, complete + cc)
-    } orElse Clanwar.begin(jsonGame).map(cw => copy(incomplete = incomplete + cw))
+    incomplete
+      .flatMap(ic => ic.potentialNextGame(jsonGame).map(n => ic -> n))
+      .headOption
+      .map {
+        case (ic, Left(nc)) =>
+          copy(incomplete = incomplete - ic + nc)
+        case (ic, Right(cc)) =>
+          copy(incomplete = incomplete - ic, complete + cc)
+      } orElse Clanwar
+      .begin(jsonGame)
+      .map(cw => copy(incomplete = incomplete + cw))
   }
 
-  def includeFlowing(jsonGame: Game): Clanwars = includeGame(jsonGame).getOrElse(this)
+  def includeFlowing(jsonGame: Game): Clanwars =
+    includeGame(jsonGame).getOrElse(this)
 
   def all: Set[Clanwar] = incomplete ++ complete
 }

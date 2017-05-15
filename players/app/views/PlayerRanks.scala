@@ -17,18 +17,34 @@ object PlayerRanks {
     val htmlB = Jsoup.parse(wwwRoot.toFile, "UTF-8")
 
     val trs = htmlB.select("tbody > tr")
-    playersStats.onlyRanked.players.values.toList.sortBy(_.rank).map { player =>
-      val target = trs.first().clone()
-      target.select(".rank").first().text(player.rank.getOrElse("-").toString)
-      target.select(".user a").attr("href", s"/player/?id=${player.user}").first().text(player.name)
-      target.select(".games").first().text(s"${player.games}")
-      target.select(".won").first().text(s"${player.wins}")
-      target.select(".elo").first().text(s"${Math.round(player.elo)}")
-      target.select(".score").first().text(s"${player.score}")
-      target.select(".last-played a").attr("href", s"/game/?id=${player.lastGame}")
-      target.select(".last-played time").attr("datetime", player.lastGame).first().text(player.lastGame)
-      target
-    }.foreach(htmlB.select("tbody").first().appendChild)
+    playersStats.onlyRanked.players.values.toList
+      .sortBy(_.rank)
+      .map { player =>
+        val target = trs.first().clone()
+        target
+          .select(".rank")
+          .first()
+          .text(player.rank.getOrElse("-").toString)
+        target
+          .select(".user a")
+          .attr("href", s"/player/?id=${player.user}")
+          .first()
+          .text(player.name)
+        target.select(".games").first().text(s"${player.games}")
+        target.select(".won").first().text(s"${player.wins}")
+        target.select(".elo").first().text(s"${Math.round(player.elo)}")
+        target.select(".score").first().text(s"${player.score}")
+        target
+          .select(".last-played a")
+          .attr("href", s"/game/?id=${player.lastGame}")
+        target
+          .select(".last-played time")
+          .attr("datetime", player.lastGame)
+          .first()
+          .text(player.lastGame)
+        target
+      }
+      .foreach(htmlB.select("tbody").first().appendChild)
 
     trs.remove()
     Html(htmlB.body().html())

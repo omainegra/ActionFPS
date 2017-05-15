@@ -3,9 +3,7 @@ package com.actionfps.achievements.immutable
 /**
   * Created by William on 12/11/2015.
   */
-
-trait Incremental extends Serializable {
-  inc =>
+trait Incremental extends Serializable { inc =>
 
   sealed trait CoreType
 
@@ -39,12 +37,15 @@ trait Incremental extends Serializable {
 
   def begin = Achieving(counter = 0, level = levels.head)
 
-  case class Achieving(counter: Int, level: Int) extends CoreType with PartialAchievement {
+  case class Achieving(counter: Int, level: Int)
+      extends CoreType
+      with PartialAchievement {
     def title: String = inc.levelTitle(level)
 
     override def description: String = inc.levelDescription(level)
 
-    def include(inputType: InputType): Option[Either[(Achieving, Option[AchievedLevel]), Completed.type]] = {
+    def include(inputType: InputType)
+      : Option[Either[(Achieving, Option[AchievedLevel]), Completed.type]] = {
       for {
         increment <- filter(inputType)
         incremented = counter + increment
@@ -54,11 +55,14 @@ trait Incremental extends Serializable {
           nextLevelO match {
             case None => Right(Completed)
             case Some(nextLevel) =>
-              Left(Achieving(counter = incremented, level = nextLevel) -> Option(AchievedLevel(level = level)))
+              Left(
+                Achieving(counter = incremented, level = nextLevel) -> Option(
+                  AchievedLevel(level = level)))
           }
-        } else Left(
-          copy(counter = incremented) -> Option.empty
-        )
+        } else
+          Left(
+            copy(counter = incremented) -> Option.empty
+          )
 
       }
     }

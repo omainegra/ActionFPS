@@ -16,10 +16,10 @@ import scala.concurrent.ExecutionContext
   * Serve static assets from 'www' directory for development & test purposes.
   */
 class Forwarder @Inject()(environment: Environment,
-                          components: ControllerComponents)
-                         (implicit executionContext: ExecutionContext,
-                          fileMimeTypes: FileMimeTypes)
-  extends AbstractController(components)  {
+                          components: ControllerComponents)(
+    implicit executionContext: ExecutionContext,
+    fileMimeTypes: FileMimeTypes)
+    extends AbstractController(components) {
 
   require(!environment.isProd, s"Environment is ${environment}")
 

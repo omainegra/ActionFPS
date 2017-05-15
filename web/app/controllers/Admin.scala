@@ -14,7 +14,8 @@ import providers.full.FullProvider
 class Admin @Inject()(fullProvider: FullProvider,
                       referenceProvider: ReferenceProvider,
                       configuration: Configuration,
-  components: ControllerComponents)extends AbstractController(components) {
+                      components: ControllerComponents)
+    extends AbstractController(components) {
 
   /**
     * Reloads reference data and forces [[FullProvider]] to reevaluate usernames and clans for all games.

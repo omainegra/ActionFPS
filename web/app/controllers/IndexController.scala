@@ -24,8 +24,9 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
                                 referenceProvider: ReferenceProvider,
                                 fullProvider: FullProvider,
                                 ladderController: LadderController,
-                                components: ControllerComponents)
-                               (implicit executionContext: ExecutionContext) extends AbstractController(components) {
+                                components: ControllerComponents)(
+    implicit executionContext: ExecutionContext)
+    extends AbstractController(components) {
 
   import webTemplateRender._
 

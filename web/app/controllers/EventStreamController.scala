@@ -22,9 +22,10 @@ import EventStreamController._
 @Singleton
 class EventStreamController @Inject()(pingerService: PingerService,
                                       referenceProvider: ReferenceProvider,
-                                      components: ControllerComponents)
-                                     (implicit actorSystem: ActorSystem,
-                                      executionContext: ExecutionContext) extends AbstractController(components) {
+                                      components: ControllerComponents)(
+    implicit actorSystem: ActorSystem,
+    executionContext: ExecutionContext)
+    extends AbstractController(components) {
 
   private def namerF: Future[ClanNamer] = async {
     val clans = await(referenceProvider.clans)

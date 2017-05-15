@@ -15,10 +15,10 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class MasterServerController @Inject()(configuration: Configuration,
-                             providesServers: ProvidesServers,
-                             components: ControllerComponents)
-                            (implicit executionContext: ExecutionContext)
-  extends AbstractController(components) {
+                                       providesServers: ProvidesServers,
+                                       components: ControllerComponents)(
+    implicit executionContext: ExecutionContext)
+    extends AbstractController(components) {
 
   def ms: Action[AnyContent] = Action.async {
     async {

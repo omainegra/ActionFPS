@@ -12,13 +12,18 @@ import play.twirl.api.Html
   */
 object Render {
 
-  private def renderGameHtmlPath = WebTemplateRender.wwwLocation.resolve("render_game.html").toFile
+  private def renderGameHtmlPath =
+    WebTemplateRender.wwwLocation.resolve("render_game.html").toFile
 
   def fillHeader(target: Element, mixedGame: MixedGame): Unit = {
     mixedGame.url.foreach(url => target.select("a").first().attr("href", url))
     target.select(".heading").first().text(mixedGame.heading)
     if (mixedGame.now.isEmpty) {
-      target.select("time").attr("datetime", mixedGame.game.endTime.toString).first().text(mixedGame.game.endTime.toString)
+      target
+        .select("time")
+        .attr("datetime", mixedGame.game.endTime.toString)
+        .first()
+        .text(mixedGame.game.endTime.toString)
     } else {
       target.select("time").remove()
     }
@@ -30,7 +35,11 @@ object Render {
     mixedGame.acLink match {
       case None => target.select(".server-link").remove()
       case Some(acLink) =>
-        target.select("a.server-link").attr("href", acLink).first().text(s"on ${mixedGame.now.get.server}")
+        target
+          .select("a.server-link")
+          .attr("href", acLink)
+          .first()
+          .text(s"on ${mixedGame.now.get.server}")
     }
 
     mixedGame.now.flatMap(_.minRemain).map {
@@ -46,17 +55,22 @@ object Render {
   def renderMixedGame(mixedGame: MixedGame): Html = {
     val doc: Document = Jsoup.parse(renderGameHtmlPath, "UTF-8")
     fillHeader(doc.select("header").first(), mixedGame)
-    doc.select("article").addClass(mixedGame.className).attr("style", mixedGame.bgStyle)
+    doc
+      .select("article")
+      .addClass(mixedGame.className)
+      .attr("style", mixedGame.bgStyle)
 
     mixedGame.players match {
       case None => doc.select(".dm-players").remove()
       case Some(dms) =>
         val lis = doc.select(".dm-players").select("li")
-        dms.map { dm =>
-          val tgt = lis.first().clone()
-          tgt.select("span").first().text(dm)
-          tgt
-        }.foreach(lis.first().parent().appendChild)
+        dms
+          .map { dm =>
+            val tgt = lis.first().clone()
+            tgt.select("span").first().text(dm)
+            tgt
+          }
+          .foreach(lis.first().parent().appendChild)
         lis.remove()
     }
     mixedGame.spectators match {
@@ -64,39 +78,54 @@ object Render {
         doc.select(".spectators").remove()
       case Some(specs) =>
         val lis = doc.select(".spectators li")
-        specs.map { spec =>
-          val tgt = lis.first().clone()
-          tgt.select("span").first().text(spec)
-          tgt
-        }.foreach(lis.first().parent().appendChild)
+        specs
+          .map { spec =>
+            val tgt = lis.first().clone()
+            tgt.select("span").first().text(spec)
+            tgt
+          }
+          .foreach(lis.first().parent().appendChild)
         lis.remove()
     }
 
     val teams = doc.select(".teams > .team")
 
-    mixedGame.game.teams.map { team =>
-      val target = teams.first().clone()
-      views.rendergame.Render.renderTeam(target, team, mixedGame)
-      target
-    }.foreach(doc.select(".teams").first().appendChild)
+    mixedGame.game.teams
+      .map { team =>
+        val target = teams.first().clone()
+        views.rendergame.Render.renderTeam(target, team, mixedGame)
+        target
+      }
+      .foreach(doc.select(".teams").first().appendChild)
     teams.remove()
 
     mixedGame.game.clanwar match {
       case None => doc.select(".of-clanwar").remove()
       case Some(clanwar) =>
         doc.select(".of-clanwar a").attr("href", s"/clanwar/?id=$clanwar")
-        doc.select(".of-clanwar time").attr("datetime", clanwar).first().text(clanwar)
+        doc
+          .select(".of-clanwar time")
+          .attr("datetime", clanwar)
+          .first()
+          .text(clanwar)
     }
     import scala.collection.JavaConverters._
     mixedGame.game.achievements match {
       case None => doc.select(".g-achievements").remove()
       case Some(achievements) =>
         val theChildren = doc.select(".g-achievements").first().children()
-        achievements.map { ach =>
-          val cloned = theChildren.clone()
-          cloned.select("a").attr("href", s"/player/?id=${ach.user}").first().text(ach.text)
-          cloned
-        }.flatMap(_.asScala.toList).foreach(doc.select(".g-achievements").first().appendChild)
+        achievements
+          .map { ach =>
+            val cloned = theChildren.clone()
+            cloned
+              .select("a")
+              .attr("href", s"/player/?id=${ach.user}")
+              .first()
+              .text(ach.text)
+            cloned
+          }
+          .flatMap(_.asScala.toList)
+          .foreach(doc.select(".g-achievements").first().appendChild)
         theChildren.remove()
     }
 
@@ -108,14 +137,15 @@ object Render {
       case None => target.select(".flags").remove()
       case Some(flags) => target.select(".flags").first().text(s"$flags")
     }
-    target.select(".frags").first().text(s"${
-      spectator.frags
-    }")
+    target.select(".frags").first().text(s"${spectator.frags}")
 
     spectator.user match {
-      case Some(user) => target.select(".name a").attr("href", s"/player/?id=${
-        user
-      }").first().text(spectator.name)
+      case Some(user) =>
+        target
+          .select(".name a")
+          .attr("href", s"/player/?id=${user}")
+          .first()
+          .text(spectator.name)
       case None => target.select(".name").first().text(spectator.name)
     }
   }
@@ -125,13 +155,14 @@ object Render {
       case None => target.select(".flags").remove()
       case Some(flags) => target.select(".flags").first().text(s"$flags")
     }
-    target.select(".frags").first().text(s"${
-      player.frags
-    }")
+    target.select(".frags").first().text(s"${player.frags}")
     player.user match {
-      case Some(user) => target.select(".name a").attr("href", s"/player/?id=${
-        user
-      }").first().text(player.name)
+      case Some(user) =>
+        target
+          .select(".name a")
+          .attr("href", s"/player/?id=${user}")
+          .first()
+          .text(player.name)
       case None => target.select(".name").first().text(player.name)
     }
   }
@@ -139,18 +170,16 @@ object Render {
   def renderTeam(doc: Element, team: GameTeam, mixedGame: MixedGame): Unit = {
     val teamSpectators = mixedGame.teamSpectators.get(team.name)
     if (team.name.equalsIgnoreCase("rvsf")) {
-      doc.select(".team-header img").attr("src", doc.select(".team-header img").attr("data-rvsf-src"))
+      doc
+        .select(".team-header img")
+        .attr("src", doc.select(".team-header img").attr("data-rvsf-src"))
     }
     team.flags match {
       case Some(flags) =>
         doc.select(".team-header .score").first().text(s"$flags")
-        doc.select(".team-header .subscore").first().text(s"${
-          team.frags
-        }")
+        doc.select(".team-header .subscore").first().text(s"${team.frags}")
       case None =>
-        doc.select(".team-header .score").first().text(s"${
-          team.frags
-        }")
+        doc.select(".team-header .score").first().text(s"${team.frags}")
         doc.select(".team-header .subscore").remove()
     }
 
@@ -158,19 +187,21 @@ object Render {
     val playersPlayers = playersOl.select(".player")
     val playersSpectators = playersOl.select(".spectator")
 
-    team.players.map {
-      player =>
+    team.players
+      .map { player =>
         val target = playersPlayers.first().clone()
         views.rendergame.Render.renderPlayer(target, player)
         target
-    }.foreach(playersOl.appendChild)
+      }
+      .foreach(playersOl.appendChild)
 
-    teamSpectators.toList.flatten.map {
-      spectator =>
+    teamSpectators.toList.flatten
+      .map { spectator =>
         val target = playersSpectators.first().clone()
         views.rendergame.Render.renderSpectator(target, spectator)
         target
-    }.foreach(playersOl.appendChild)
+      }
+      .foreach(playersOl.appendChild)
 
     playersPlayers.remove()
     playersSpectators

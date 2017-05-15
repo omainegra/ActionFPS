@@ -16,8 +16,9 @@ import com.actionfps.formats.json.Formats._
 class GamesController @Inject()(webTemplateRender: WebTemplateRender,
                                 providesClanNames: ProvidesClanNames,
                                 providesGames: ProvidesGames,
-                                components: ControllerComponents)
-                               (implicit executionContext: ExecutionContext) extends AbstractController(components) {
+                                components: ControllerComponents)(
+    implicit executionContext: ExecutionContext)
+    extends AbstractController(components) {
 
   def recentGames: Action[AnyContent] = Action.async { implicit request =>
     async {

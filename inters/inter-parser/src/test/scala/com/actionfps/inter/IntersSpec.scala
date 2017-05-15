@@ -19,9 +19,12 @@ class IntersSpec extends FreeSpec {
     )
   }
 
-  private def closeInterOutMessage = sampleUserMessage.copy(instant = sampleUserMessage.instant.plusSeconds(50))
+  private def closeInterOutMessage =
+    sampleUserMessage.copy(instant = sampleUserMessage.instant.plusSeconds(50))
 
-  private def farInterOutMessage = closeInterOutMessage.copy(instant = closeInterOutMessage.instant.plusSeconds(500))
+  private def farInterOutMessage =
+    closeInterOutMessage.copy(
+      instant = closeInterOutMessage.instant.plusSeconds(500))
 
   private def sampleInterOut = sampleUserMessage.interOut.value
 
@@ -29,13 +32,17 @@ class IntersSpec extends FreeSpec {
 
   private def farInterOut = farInterOutMessage.interOut.value
 
-
   "UserMessage.interOut produces an InterOut" in {
     sampleUserMessage.interOut should not be empty
   }
 
   "IntersIterator + LastCallRecord timeouts work" in {
-    List(sampleInterOut, sampleInterOut, closeInterOut, closeInterOut, farInterOut, farInterOut)
+    List(sampleInterOut,
+         sampleInterOut,
+         closeInterOut,
+         closeInterOut,
+         farInterOut,
+         farInterOut)
       .scanLeft(IntersIterator.empty)(IntersIterator.scan)
       .map(_.interOut.isDefined)
       .drop(1) shouldEqual List(true, false, false, false, true, false)

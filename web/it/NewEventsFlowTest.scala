@@ -16,20 +16,24 @@ import scala.concurrent.duration._
   * We test new game additions here.
   */
 class NewEventsFlowTest
-  extends PlaySpec
+    extends PlaySpec
     with GuiceOneServerPerSuite
     with OneBrowserPerTest
     with HtmlUnitFactory {
 
   private val sourceUrl = "https://gist.github.com/ScalaWilliam/ebff0a56f57a7966a829/raw/" +
     "732629d6bfb01a39dffe57ad22a54b3bad334019/gistfile1.txt"
-  private val tmpFile = Files.createTempFile("serverlog", ".log").toAbsolutePath
+  private val tmpFile =
+    Files.createTempFile("serverlog", ".log").toAbsolutePath
   override implicit lazy val app: Application = {
     new GuiceApplicationBuilder()
       .configure("af.games.urls" -> new util.ArrayList())
       .configure(
         "af.journal.paths.0" -> tmpFile.toString,
-        "af.games.persistence.path" -> Files.createTempFile("games", ".log").toAbsolutePath.toString
+        "af.games.persistence.path" -> Files
+          .createTempFile("games", ".log")
+          .toAbsolutePath
+          .toString
       )
       .build()
   }

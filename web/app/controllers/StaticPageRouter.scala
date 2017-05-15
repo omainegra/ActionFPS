@@ -20,7 +20,8 @@ import play.api.routing.SimpleRouter
 class StaticPageRouter @Inject()(common: WebTemplateRender,
                                  environment: Environment,
                                  components: ControllerComponents)
-    extends AbstractController(components) with SimpleRouter {
+    extends AbstractController(components)
+    with SimpleRouter {
 
   import collection.JavaConverters._
 

@@ -15,7 +15,7 @@ import scala.concurrent.duration._
   * Created by me on 18/01/2017.
   */
 class FullFlowTest
-  extends PlaySpec
+    extends PlaySpec
     with GuiceOneServerPerSuite
     with OneBrowserPerTest
     with HtmlUnitFactory {
@@ -32,7 +32,10 @@ class FullFlowTest
       .configure("af.games.urls" -> new util.ArrayList())
       .configure(
         "af.journal.paths.0" -> tmpFile.toString,
-        "af.games.persistence.path" -> Files.createTempFile("games", ".log").toAbsolutePath.toString
+        "af.games.persistence.path" -> Files
+          .createTempFile("games", ".log")
+          .toAbsolutePath
+          .toString
       )
       .build()
   }

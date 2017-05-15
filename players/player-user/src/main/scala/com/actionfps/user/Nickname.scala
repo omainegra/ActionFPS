@@ -9,9 +9,13 @@ import com.actionfps.user.Nickname.{CurrentNickname, PreviousNickname}
   */
 object Nickname {
 
-  case class CurrentNickname(nickname: String, from: ZonedDateTime) extends Nickname
+  case class CurrentNickname(nickname: String, from: ZonedDateTime)
+      extends Nickname
 
-  case class PreviousNickname(nickname: String, from: ZonedDateTime, to: ZonedDateTime) extends Nickname
+  case class PreviousNickname(nickname: String,
+                              from: ZonedDateTime,
+                              to: ZonedDateTime)
+      extends Nickname
 
 }
 
@@ -22,6 +26,7 @@ sealed trait Nickname {
 
   def validAt(zonedDateTime: ZonedDateTime): Boolean = this match {
     case _: CurrentNickname => zonedDateTime.isAfter(from)
-    case p: PreviousNickname => zonedDateTime.isAfter(from) && zonedDateTime.isBefore(p.to)
+    case p: PreviousNickname =>
+      zonedDateTime.isAfter(from) && zonedDateTime.isBefore(p.to)
   }
 }

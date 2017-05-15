@@ -6,7 +6,6 @@ import services.LatestReleaseService.ReleaseLinks
 /**
   * Created by me on 04/02/2017.
   */
-
 class LatestReleaseTest extends FreeSpec with Matchers {
   "It works" in {
     val client = CachingHttpClientBuilder.create().build()

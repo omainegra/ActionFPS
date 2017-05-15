@@ -11,7 +11,11 @@ import play.api.mvc.Results._
 /**
   * Created by me on 30/12/2016.
   */
-case class Signature(playername: String, countrycode: Option[String], interrank: Option[Int], ladderrank: Option[Int], gamecount: Option[Int],
+case class Signature(playername: String,
+                     countrycode: Option[String],
+                     interrank: Option[Int],
+                     ladderrank: Option[Int],
+                     gamecount: Option[Int],
                      map: Option[String]) {
 
   def result(sigTemplateSvgPath: Path): Result = {
@@ -21,13 +25,26 @@ case class Signature(playername: String, countrycode: Option[String], interrank:
     val doc = Jsoup.parse(tplString, baseUrl, Parser.xmlParser())
     doc.outputSettings().indentAmount(0).prettyPrint(false)
     doc.select("#player-name").first().text(s"${playername}")
-    doc.select("#inter-rank").first().text(s"Inter rank: ${interrank.getOrElse("-")}")
-    doc.select("#ladder-rank").first().text(s"Ladder rank: ${ladderrank.getOrElse("-")}")
-    doc.select("#game-count").first().text(s"Game count: ${gamecount.getOrElse("-")}")
+    doc
+      .select("#inter-rank")
+      .first()
+      .text(s"Inter rank: ${interrank.getOrElse("-")}")
+    doc
+      .select("#ladder-rank")
+      .first()
+      .text(s"Ladder rank: ${ladderrank.getOrElse("-")}")
+    doc
+      .select("#game-count")
+      .first()
+      .text(s"Game count: ${gamecount.getOrElse("-")}")
 
     countrycode match {
       case Some(code) =>
-        doc.select("#country-flag").attr("xlink:href", s"https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/2.8.0/flags/1x1/${code.toLowerCase()}.svg")
+        doc
+          .select("#country-flag")
+          .attr(
+            "xlink:href",
+            s"https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/2.8.0/flags/1x1/${code.toLowerCase()}.svg")
       case None =>
         doc.select("#country-flag").remove()
     }

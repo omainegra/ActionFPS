@@ -17,4 +17,3 @@ case class EnrichGames(users: List[User], clans: List[Clan]) {
   }
 
 }
-

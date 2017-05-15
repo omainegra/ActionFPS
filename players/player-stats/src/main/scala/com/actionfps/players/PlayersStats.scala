@@ -7,8 +7,8 @@ import com.actionfps.api.Game
 /**
   * Created by me on 26/05/2016.
   */
-case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String, PlayerGameCounts]) {
-  pss =>
+case class PlayersStats(players: Map[String, PlayerStat],
+                        gameCounts: Map[String, PlayerGameCounts]) { pss =>
 
   /**
     * Based on https://github.com/ScalaWilliam/ActionFPS/issues/216#issuecomment-271111260
@@ -20,22 +20,30 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
       (id, playerStat) <- players
       playerGameCounts <- gameCounts.get(id)
       realElo = playerStat.elo
-      displayElo = realElo * Math.min(1, playerGameCounts.gamesSince(atTime.minus(PlayersStats.N)) / PlayersStats.S)
-    } yield id -> {
-      playerStat.copy(elo = displayElo)
-    }
+      displayElo = realElo * Math.min(
+        1,
+        playerGameCounts
+          .gamesSince(atTime.minus(PlayersStats.N)) / PlayersStats.S)
+    } yield
+      id -> {
+        playerStat.copy(elo = displayElo)
+      }
 
-    copy(players = players ++ modifiedPlayerStat)
-      .updatedRanks
+    copy(players = players ++ modifiedPlayerStat).updatedRanks
   }
 
   def isEmpty: Boolean = players.isEmpty && gameCounts.isEmpty
 
   private def updatedRanks = {
-    val ur = players.values.toList.sortBy(_.elo).reverse.filter(_.games >= Players.MIN_GAMES_RANK).zipWithIndex.collect {
-      case (stat, _) if stat.elo == 0 => stat.user -> stat.copy(rank = None)
-      case (stat, int) => stat.user -> stat.copy(rank = Option(int + 1))
-    }
+    val ur = players.values.toList
+      .sortBy(_.elo)
+      .reverse
+      .filter(_.games >= Players.MIN_GAMES_RANK)
+      .zipWithIndex
+      .collect {
+        case (stat, _) if stat.elo == 0 => stat.user -> stat.copy(rank = None)
+        case (stat, int) => stat.user -> stat.copy(rank = Option(int + 1))
+      }
     copy(
       players = players ++ ur
     )
@@ -53,12 +61,11 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
 
     private def teamsElo: List[Double] = {
       game.teams.map { team =>
-        team.players.map {
-          player =>
-            player.user
-              .flatMap(players.get)
-              .map(_.elo)
-              .getOrElse(1000: Double)
+        team.players.map { player =>
+          player.user
+            .flatMap(players.get)
+            .map(_.elo)
+            .getOrElse(1000: Double)
         }.sum
       }
     }
@@ -66,26 +73,30 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
     private def includeBaseStats: PlayersStats = {
       val ps = for {
         team <- game.teams
-        teamScore = Option(team.players.flatMap(_.score)).filter(_.nonEmpty).map(_.sum).getOrElse(0)
+        teamScore = Option(team.players.flatMap(_.score))
+          .filter(_.nonEmpty)
+          .map(_.sum)
+          .getOrElse(0)
         isWinning = game.winner.contains(team.name)
         isLosing = game.winner.nonEmpty && !isWinning
         player <- team.players
         user <- player.user
-      } yield PlayerStat(
-        user = user,
-        name = player.name,
-        games = 1,
-        elo = 1000,
-        wins = if (isWinning) 1 else 0,
-        losses = if (isLosing) 1 else 0,
-        ties = if (game.isTie) 1 else 0,
-        score = player.score.getOrElse(0),
-        flags = player.flags.getOrElse(0),
-        frags = player.frags,
-        deaths = player.deaths,
-        lastGame = game.id,
-        rank = None
-      )
+      } yield
+        PlayerStat(
+          user = user,
+          name = player.name,
+          games = 1,
+          elo = 1000,
+          wins = if (isWinning) 1 else 0,
+          losses = if (isLosing) 1 else 0,
+          ties = if (game.isTie) 1 else 0,
+          score = player.score.getOrElse(0),
+          flags = player.flags.getOrElse(0),
+          frags = player.frags,
+          deaths = player.deaths,
+          lastGame = game.id,
+          rank = None
+        )
 
       pss.copy(
         players = players ++ ps.map { p =>
@@ -93,7 +104,9 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
         },
         gameCounts = gameCounts ++
           game.users.map { user =>
-            user -> gameCounts.getOrElse(user, PlayerGameCounts.empty).include(ZonedDateTime.parse(game.id))
+            user -> gameCounts
+              .getOrElse(user, PlayerGameCounts.empty)
+              .include(ZonedDateTime.parse(game.id))
           }
       )
     }
@@ -102,7 +115,10 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
       {
         for {
           team <- game.teams
-          teamScore <- Option(team.players.flatMap(_.score)).filter(_.nonEmpty).map(_.sum).toList
+          teamScore <- Option(team.players.flatMap(_.score))
+            .filter(_.nonEmpty)
+            .map(_.sum)
+            .toList
           if teamScore > 0
           player <- team.players
           user <- player.user
@@ -113,11 +129,10 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
 
     private def updatedElos: PlayersStats = {
       val ea = eloAdditions
-      pss.copy(players =
-        players.map { case (id, ps) =>
+      pss.copy(players = players.map {
+        case (id, ps) =>
           id -> ps.copy(elo = ps.elo + ea.getOrElse(id, 0.0))
-        }
-      )
+      })
     }
 
     def includeGame: PlayersStats = {
@@ -130,7 +145,10 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
     }
 
     private[players] def countElo: Boolean = {
-      game.teams.forall(_.players.forall(_.score.isDefined)) && game.teams.map(_.players.size).toSet.size == 1
+      game.teams.forall(_.players.forall(_.score.isDefined)) && game.teams
+        .map(_.players.size)
+        .toSet
+        .size == 1
     }
 
     private def eloAdditions: Map[String, Double] = {
@@ -155,7 +173,8 @@ case class PlayersStats(players: Map[String, PlayerStat], gameCounts: Map[String
         contribution <- contribs.get(user)
         eloAddition = {
           if (points >= 0) contribution * points
-          else ((1 - contribution) + 2 / team.players.size.toDouble - 1) * points
+          else
+            ((1 - contribution) + 2 / team.players.size.toDouble - 1) * points
         }
       } yield user -> eloAddition
     }.toMap
@@ -172,7 +191,5 @@ object PlayersStats {
 
   val N: Duration = Duration.ofDays(31)
   val S: Double = 7.0
-
-
 
 }

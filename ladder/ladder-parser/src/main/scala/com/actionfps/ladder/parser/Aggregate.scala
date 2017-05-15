@@ -23,7 +23,8 @@ case class Aggregate(users: Map[String, UserStatistics]) {
       users = users.updated(
         key = tmu.user,
         value = {
-          val previousUser = users.getOrElse(tmu.user, UserStatistics.empty(time = tmu.instant))
+          val previousUser =
+            users.getOrElse(tmu.user, UserStatistics.empty(time = tmu.instant))
           if (tmu.killed) previousUser.kill
           else if (tmu.gibbed) previousUser.gib
           else if (tmu.scored) previousUser.flag
@@ -38,7 +39,9 @@ case class Aggregate(users: Map[String, UserStatistics]) {
   }
 
   def ranked: List[Aggregate.RankedStat] = {
-    users.toList.sortBy(_._2.points).reverse.zipWithIndex.map { case ((id, s), r) => RankedStat(id, r + 1, s) }
+    users.toList.sortBy(_._2.points).reverse.zipWithIndex.map {
+      case ((id, s), r) => RankedStat(id, r + 1, s)
+    }
   }
 
   def displayed(instant: Instant): Aggregate = {
@@ -49,16 +52,22 @@ case class Aggregate(users: Map[String, UserStatistics]) {
 
   def trimmed(instant: Instant): Aggregate = {
     Aggregate(
-      users = users.filter { case (u, us) =>
-        val lessThanOneDay = Duration.between(us.lastSeen, instant).minus(Duration.ofDays(1)).isNegative
-        us.points >= 100 || lessThanOneDay
+      users = users.filter {
+        case (u, us) =>
+          val lessThanOneDay = Duration
+            .between(us.lastSeen, instant)
+            .minus(Duration.ofDays(1))
+            .isNegative
+          us.points >= 100 || lessThanOneDay
       }
     )
   }
 }
 
 object Aggregate {
-  case class RankedStat(user: String, rank: Int, userStatistics: UserStatistics)
+  case class RankedStat(user: String,
+                        rank: Int,
+                        userStatistics: UserStatistics)
 
   def empty = Aggregate(users = Map.empty)
 }

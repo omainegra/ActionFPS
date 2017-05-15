@@ -1,6 +1,10 @@
 package com.actionfps.achievements.immutable
 
-import com.actionfps.gameparser.enrichers.{JsonGameTeam, JsonGamePlayer, JsonGame}
+import com.actionfps.gameparser.enrichers.{
+  JsonGameTeam,
+  JsonGamePlayer,
+  JsonGame
+}
 
 /**
   * Created by William on 12/11/2015.
@@ -28,17 +32,24 @@ object CaptureMapCompletion {
     override def rvsf: Int = targetPerSide
   }
 
-  case class Achieving(map: String, cla: Int, rvsf: Int) extends CaptureMapCompletion {
+  case class Achieving(map: String, cla: Int, rvsf: Int)
+      extends CaptureMapCompletion {
 
-    def include(jsonGame: JsonGame, jsonGameTeam: JsonGameTeam, jsonGamePlayer: JsonGamePlayer): Option[Either[Achieving, Achieved]] = {
+    def include(jsonGame: JsonGame,
+                jsonGameTeam: JsonGameTeam,
+                jsonGamePlayer: JsonGamePlayer)
+      : Option[Either[Achieving, Achieved]] = {
       if (jsonGame.mode == "ctf" && jsonGame.map.equalsIgnoreCase(map)) {
         val incrementedTeams =
-          if (jsonGameTeam.name.equalsIgnoreCase("cla")) (Math.min(cla + 1, targetPerSide), rvsf)
+          if (jsonGameTeam.name.equalsIgnoreCase("cla"))
+            (Math.min(cla + 1, targetPerSide), rvsf)
           else (cla, Math.min(rvsf + 1, targetPerSide))
         incrementedTeams match {
           case (`cla`, `rvsf`) => Option.empty
-          case (`targetPerSide`, `targetPerSide`) => Option(Right(Achieved(map)))
-          case (newCla, newRvsf) => Option(Left(copy(cla = newCla, rvsf = newRvsf)))
+          case (`targetPerSide`, `targetPerSide`) =>
+            Option(Right(Achieved(map)))
+          case (newCla, newRvsf) =>
+            Option(Left(copy(cla = newCla, rvsf = newRvsf)))
         }
       } else Option.empty
     }

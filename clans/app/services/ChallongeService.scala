@@ -15,15 +15,17 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class ChallongeService @Inject()(challongeClient: ChallongeClient,
-                                 applicationLifecycle: ApplicationLifecycle)
-                                (implicit executionContext: ExecutionContext,
-                                 actorSystem: ActorSystem) {
+                                 applicationLifecycle: ApplicationLifecycle)(
+    implicit executionContext: ExecutionContext,
+    actorSystem: ActorSystem) {
 
   private implicit val actorMaterializer = ActorMaterializer()
 
   Source
-    .actorRef[NewClanwarCompleted](bufferSize = 10, OverflowStrategy.dropBuffer)
-    .mapMaterializedValue(actorSystem.eventStream.subscribe(_, classOf[NewClanwarCompleted]))
+    .actorRef[NewClanwarCompleted](bufferSize = 10,
+                                   OverflowStrategy.dropBuffer)
+    .mapMaterializedValue(
+      actorSystem.eventStream.subscribe(_, classOf[NewClanwarCompleted]))
     .map(_.clanwarCompleted)
     .via(WinFlow(challongeClient).clanwarAny)
     .to(Sink.foreach(item => Logger.info(s"Sunk clanwar: ${item}")))
