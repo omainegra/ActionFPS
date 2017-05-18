@@ -1,6 +1,6 @@
 language: scala
 # https://github.com/nativelibs4java/scalaxy-streams/commit/01ffbadeece7e2db8b21373fcdc25298845869d4
-sudo: true
+sudo: false
 scala:
   - 2.11.8
 cache:
@@ -8,8 +8,7 @@ cache:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot/
     - geoip-resources
-before_script:
-  - sudo chmod +x /usr/local/bin/sbt
+    - web/geoip-resources
 script:
   - make travis
 jdk:
