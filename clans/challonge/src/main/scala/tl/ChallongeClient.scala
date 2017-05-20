@@ -53,11 +53,7 @@ class ChallongeClient(
     * Match ID is returned if addition logically successful.
     */
   def attemptSubmit(tournamentId: String,
-                    winnerClanId: String,
-                    winnerScore: Int,
-                    loserClanId: String,
-                    loserScore: Int,
-                    clanwarId: Option[String] = None): Future[Option[Int]] = {
+                    clanwarWon: ClanwarWon): Future[Option[Int]] = {
     async {
       val forTournament = ForTournament(tournamentId)
       val response = await(
@@ -68,14 +64,18 @@ class ChallongeClient(
           .get())
       val matchPlayers =
         tryWithInfo(response)(r => OpenMatchPlayers.fromJsonString(r.body))
-      matchPlayers.find(m =>
-        Set(m.firstName, m.secondName) == Set(winnerClanId, loserClanId)) match {
+      matchPlayers.find(
+        m =>
+          Set(m.firstName, m.secondName) == Set(clanwarWon.winnerId,
+                                                clanwarWon.loserId)) match {
         case None => None
         case Some(m) =>
           val winnerId =
-            if (m.firstName == winnerClanId) m.firstId else m.secondId
+            if (m.firstName == clanwarWon.winnerId) m.firstId else m.secondId
           val fm = forTournament.ForMatch(m.matchId)
-          val fw = fm.ForWinner(winnerId, winnerScore, loserScore)
+          val fw = fm.ForWinner(winnerId,
+                                clanwarWon.winnerScore,
+                                clanwarWon.loserScore)
           val endResult = tryWithInfo {
             await(
               wSClient
@@ -87,19 +87,15 @@ class ChallongeClient(
           } { k =>
             Some(fm.extractUpdateResponse(k.json).get)
           }
-          clanwarId match {
-            case None => endResult
-            case Some(cid) =>
-              val fc = fm.ForClanwar(clanwarId = cid)
-              await(
-                wSClient
-                  .url(fc.postLinkAttachmentUrl)
-                  .challongeAuth
-                  .withQueryString(fc.matchAttachmentParameter,
-                                   fc.matchDescriptionParameter)
-                  .post(""))
-              endResult
-          }
+          val fc = fm.ForClanwar(clanwarId = clanwarWon.clanwarId)
+          await(
+            wSClient
+              .url(fc.postLinkAttachmentUrl)
+              .challongeAuth
+              .withQueryString(fc.matchAttachmentParameter,
+                               fc.matchDescriptionParameter)
+              .post(""))
+          endResult
       }
     }
   }
@@ -107,6 +103,13 @@ class ChallongeClient(
 }
 
 object ChallongeClient {
+
+  case class ClanwarWon(clanwarId: String,
+                        winnerId: String,
+                        winnerScore: Int,
+                        loserId: String,
+                        loserScore: Int)
+
   def tryWithInfo[V](t: WSResponse)(f: WSResponse => V): V = {
     try f(t)
     catch {
