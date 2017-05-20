@@ -33,17 +33,6 @@ class ChallongeSubmitTest
     result shouldBe 5
   }
 
-  "Test the flow works" ignore {
-    val flow = WinFlow(challongeClient).gameAny
-    val (pub, sub) = TestSource
-      .probe[Game]
-      .via(flow)
-      .toMat(TestSink.probe[Int])(Keep.both)
-      .run()
-    //    pub.sendNext(Dev.completedGame)
-    info(s"${sub.request(1).expectNext(123)}")
-  }
-
   "It works" ignore {
     val ids = Await.result(challongeClient.fetchTournamentIds(), 5.seconds)
     val res = Await.result(
