@@ -20,6 +20,8 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient,
     implicit executionContext: ExecutionContext,
     actorSystem: ActorSystem) {
 
+  Logger.info(s"Challonge service started.")
+
   private implicit val actorMaterializer = ActorMaterializer()
 
   Source
