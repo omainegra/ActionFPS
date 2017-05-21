@@ -1,5 +1,5 @@
 // todo consider closed tournament + open matches
-var OpenMatchPlayers = Java.type('tl.OpenMatchPlayers');
+var OpenMatchPlayers = Java.type('af.challonge.OpenMatchPlayers');
 
 function Tournament() {
 }

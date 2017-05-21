@@ -1,4 +1,4 @@
-package tl
+package af.challonge
 
 import java.util.Scanner
 import javax.script.ScriptException

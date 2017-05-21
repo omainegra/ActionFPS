@@ -1,28 +1,25 @@
-package tl
+package af.challonge
 
 import javax.inject.{Inject, Singleton}
 
 import play.api.Configuration
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
-import tl.ChallongeClient._
+import ChallongeClient._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import scala.async.Async._
 
 @Singleton
-class ChallongeClient(
-    wSClient: WSClient,
-    uri: String,
-    username: String,
-    password: String)(implicit executionContext: ExecutionContext) {
+class ChallongeClient(uri: String, val username: String, val password: String)(
+    implicit wSClient: WSClient,
+    executionContext: ExecutionContext) {
 
   @Inject
-  def this(wSClient: WSClient, configuration: Configuration)(
-      implicit executionContext: ExecutionContext) =
+  def this(configuration: Configuration)(implicit wSClient: WSClient,
+                                         executionContext: ExecutionContext) =
     this(
-      wSClient,
-      "https://api.challonge.com/v1",
+      ChallongeClient.DefaultUrl,
       configuration.underlying.getString("challonge.username"),
       configuration.underlying.getString("challonge.password")
     )
@@ -103,6 +100,8 @@ class ChallongeClient(
 }
 
 object ChallongeClient {
+
+  val DefaultUrl = "https://api.challonge.com/v1"
 
   case class ClanwarWon(clanwarId: String,
                         winnerId: String,

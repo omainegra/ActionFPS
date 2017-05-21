@@ -1,4 +1,4 @@
-package tl
+package af.challonge
 
 import java.io.InputStreamReader
 import java.util.function.Consumer

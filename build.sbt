@@ -301,7 +301,8 @@ lazy val clansChallonge = Project(
       scalatest % "it,test",
       async,
       ws % "provided",
-      akkaStreamTestkit % "it"
+      akkaStreamTestkit % "it",
+      challongeJava % "it"
     )
   )
 

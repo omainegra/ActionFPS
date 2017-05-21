@@ -1,6 +1,7 @@
 package services
 
 import java.io.File
+import java.nio.file.{Path, Paths}
 import java.time.Instant
 import javax.inject._
 
@@ -23,7 +24,7 @@ import scala.util.{Failure, Success}
   * Notify clients of an '!inter' message on a server by a registered user.
   */
 @Singleton
-class IntersService(pickedFile: Option[File],
+class IntersService(pickedFile: Path,
                     oneSignalsAppId: String,
                     oneSignalsApiKey: String,
                     discordHookUrl: String)(
@@ -40,14 +41,8 @@ class IntersService(pickedFile: Option[File],
       wSClient: WSClient,
       actorSystem: ActorSystem) = {
     this(
-      pickedFile = configuration.underlying
-        .getStringList("af.journal.paths")
-        .asScala
-        .map(new File(_))
-        .toList
-        .filter(_.exists())
-        .sortBy(_.lastModified())
-        .lastOption,
+      pickedFile =
+        Paths.get(configuration.underlying.getString("journal.large")),
       oneSignalsAppId =
         configuration.underlying.getString(IntersService.OneSignalsAppIdKey),
       oneSignalsApiKey =
@@ -61,35 +56,33 @@ class IntersService(pickedFile: Option[File],
 
   implicit val actorMaterializer = ActorMaterializer()
 
-  pickedFile.foreach { f =>
-    logger.info(s"Tailing for inters from ${f}...")
-    IntersFlow
-      .eventsSource(
-        sourcePath = f.toPath,
-        startInstant = Instant.now(),
-        nicknameToUser = () =>
-          referenceProvider.users.map { users =>
-            new NicknameToUser {
-              override def userOf(nickname: String): Option[String] =
-                users.find(_.nickname.nickname == nickname).map(_.id)
-            }
-        }
-      )
-      .withAttributes(ActorAttributes.supervisionStrategy {
-        case NonFatal(e) =>
-          logger.error(s"Failed an element due to ${e}", e)
-          Supervision.Resume
-      })
-      .alsoTo(DiscordInters(discordHookUrl).pushOutFlow)
-      .alsoTo(OneSignalInters(key = oneSignalsApiKey, appId = oneSignalsAppId).pushOutFlow)
-      .runForeach(actorSystem.eventStream.publish)
-      .onComplete {
-        case Success(_) =>
-          logger.info(s"Flow finished.")
-        case Failure(reason) =>
-          logger.error(s"Failed due to ${reason}", reason)
+  logger.info(s"Tailing for inters from ${pickedFile}...")
+  IntersFlow
+    .eventsSource(
+      sourcePath = pickedFile,
+      startInstant = Instant.now(),
+      nicknameToUser = () =>
+        referenceProvider.users.map { users =>
+          new NicknameToUser {
+            override def userOf(nickname: String): Option[String] =
+              users.find(_.nickname.nickname == nickname).map(_.id)
+          }
       }
-  }
+    )
+    .withAttributes(ActorAttributes.supervisionStrategy {
+      case NonFatal(e) =>
+        logger.error(s"Failed an element due to ${e}", e)
+        Supervision.Resume
+    })
+    .alsoTo(DiscordInters(discordHookUrl).pushOutFlow)
+    .alsoTo(OneSignalInters(key = oneSignalsApiKey, appId = oneSignalsAppId).pushOutFlow)
+    .runForeach(actorSystem.eventStream.publish)
+    .onComplete {
+      case Success(_) =>
+        logger.info(s"Flow finished.")
+      case Failure(reason) =>
+        logger.error(s"Failed due to ${reason}", reason)
+    }
 
 }
 

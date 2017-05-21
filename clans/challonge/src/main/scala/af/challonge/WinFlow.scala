@@ -1,9 +1,9 @@
-package tl
+package af.challonge
 
+import af.challonge.ChallongeClient.ClanwarWon
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.actionfps.clans.CompleteClanwar
-import tl.ChallongeClient.ClanwarWon
 
 import scala.concurrent.ExecutionContext
 
