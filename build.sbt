@@ -294,15 +294,15 @@ lazy val clansChallonge = Project(
   id = "clans-challonge",
   base = file("clans/challonge")
 ).dependsOn(pureClanwar)
-  .configs(IntegrationTest)
-  .settings(Defaults.itSettings: _*)
+  .configs(FunTest)
+  .settings(inConfig(FunTest)(Defaults.testSettings): _*)
   .settings(
     libraryDependencies ++= Seq(
-      scalatest % "it,test",
+      scalatest % "fun,test",
       async,
-      ws % "provided",
-      akkaStreamTestkit % "it",
-      challongeJava % "it"
+      ws,
+      akkaStreamTestkit % "fun",
+      challongeJava
     )
   )
 
@@ -423,3 +423,5 @@ lazy val downloads =
     )
     .configs(IntegrationTest)
     .settings(Defaults.itSettings: _*)
+
+lazy val FunTest = config("fun") extend (Test)
