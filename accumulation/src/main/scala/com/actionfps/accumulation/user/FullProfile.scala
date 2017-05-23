@@ -40,3 +40,13 @@ case class FullProfile(user: User,
         ))
     }
 }
+
+object FullProfile {
+  def apply(user: User): FullProfile = FullProfile(
+    user = user,
+    recentGames = List.empty,
+    achievements = None,
+    rank = None,
+    playerGameCounts = None
+  )
+}
