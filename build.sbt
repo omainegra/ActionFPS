@@ -159,6 +159,7 @@ lazy val inters =
     .aggregate(interParser)
     .settings(
       scalaSource in IntegrationTest := baseDirectory.value / "it",
+      resolvers += Resolver.jcenterRepo,
       libraryDependencies ++= Seq(
         gameParser,
         async,
