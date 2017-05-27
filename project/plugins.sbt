@@ -1,10 +1,10 @@
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.14")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.15")
 
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.7.0")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.9.2")
+addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.9.3")
 
 resolvers += Resolver.url(
   "bintray-ScalaWilliam-sbt-plugins",
