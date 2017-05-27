@@ -3,7 +3,6 @@ package modules
 /**
   * Created by William on 01/01/2016.
   */
-import com.google.inject.AbstractModule
 import controllers.{
   PlayersProvider,
   ProvidesClanNames,
@@ -13,18 +12,18 @@ import controllers.{
   ProvidesUsersList
 }
 import lib.{ClanDataProvider, ClansProvider}
+import play.api.inject.{SimpleModule, bind}
 import providers.ReferenceProvider
 import providers.full.{FullProvider, PlayersProviderImpl}
 
-class ProviderModule extends AbstractModule {
-  def configure(): Unit = {
-    bind(classOf[PlayersProvider]).to(classOf[PlayersProviderImpl])
-    bind(classOf[ProvidesServers]).to(classOf[ReferenceProvider])
-    bind(classOf[ClanDataProvider]).to(classOf[FullProvider])
-    bind(classOf[ClansProvider]).to(classOf[ReferenceProvider])
-    bind(classOf[ProvidesGames]).to(classOf[FullProvider])
-    bind(classOf[ProvidesClanNames]).to(classOf[ReferenceProvider])
-    bind(classOf[ProvidesUsersList]).to(classOf[ReferenceProvider])
-    bind(classOf[ProvidesUsers]).to(classOf[ReferenceProvider])
-  }
-}
+class ProviderModule
+    extends SimpleModule(
+      bind[PlayersProvider].to[PlayersProviderImpl],
+      bind[ProvidesServers].to[ReferenceProvider],
+      bind[ClanDataProvider].to[FullProvider],
+      bind[ClansProvider].to[ReferenceProvider],
+      bind[ProvidesGames].to[FullProvider],
+      bind[ProvidesClanNames].to[ReferenceProvider],
+      bind[ProvidesUsersList].to[ReferenceProvider],
+      bind[ProvidesUsers].to[ReferenceProvider]
+    )

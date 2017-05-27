@@ -8,7 +8,7 @@ import com.actionfps.accumulation.user.GeoIpLookup
 import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
 import play.api.inject._
 import play.api.{Configuration, Environment, Logger}
-import providers.full.{FullProvider, HazelcastCachedProvider}
+import providers.full.{FullProvider, FullProviderImpl, HazelcastCachedProvider}
 
 import scala.collection.mutable
 
@@ -27,6 +27,8 @@ class GamesProviderDeciderModule extends Module {
     logger.info(s"Use cached? ${useCached}")
     if (useCached) {
       bindings += bind[FullProvider].to[HazelcastCachedProvider]
+    } else {
+      bindings += bind[FullProvider].to[FullProviderImpl]
     }
     bindings += bind[MapValidator].toInstance(
       ReferenceMapValidator.referenceMapValidator)
