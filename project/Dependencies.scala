@@ -22,7 +22,7 @@ object Dependencies {
   val scalatestPlus
     : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0-RC1"
   val alpakkaFile
-    : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.8"
+    : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.9"
   val seleniumJava
     : ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "3.4.0"
   val seleniumHtmlUnit
@@ -36,7 +36,7 @@ object Dependencies {
   val akkaTestkit: ModuleID = akka("testkit")
 
   private def akka(stuff: String) =
-    "com.typesafe.akka" %% s"akka-$stuff" % "2.5.1"
+    "com.typesafe.akka" %% s"akka-$stuff" % "2.5.2"
 
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 
@@ -47,9 +47,9 @@ object Dependencies {
   val raptureJsonPlay
     : ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M9" exclude ("com.typesafe.play", "play-json")
 
-  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.0-RC1"
+  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.0-RC2"
 
-  val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.12.1"
-  val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.12.1"
+  val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.13.0"
+  val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.13.0"
 
 }

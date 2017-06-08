@@ -77,7 +77,10 @@ class UserController @Inject()(configuration: Configuration,
   def getByToken(idToken: String) = {
     async {
       val response = await(
-        wSClient.url(googleUri).withQueryString("id_token" -> idToken).get())
+        wSClient
+          .url(googleUri)
+          .withQueryStringParameters("id_token" -> idToken)
+          .get())
       assert(
         (response.json \ "aud")
           .as[String]

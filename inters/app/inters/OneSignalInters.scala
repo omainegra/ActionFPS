@@ -43,7 +43,7 @@ case class OneSignalInters(key: String, appId: String)(
               Some(await {
                 wSClient
                   .url(targetUrl)
-                  .withHeaders("Authorization" -> s"Basic ${key}")
+                  .withHttpHeaders("Authorization" -> s"Basic ${key}")
                   .post(postBody)
               })
             case None => None
