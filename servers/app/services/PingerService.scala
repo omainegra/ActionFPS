@@ -18,8 +18,8 @@ import play.api.Logger
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.EventSource.Event
 import play.api.libs.iteratee.Concurrent
+import play.api.libs.iteratee.streams.IterateeStreams
 import play.api.libs.json.{JsObject, JsString, Json}
-import play.api.libs.streams.Streams
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,7 +43,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
   private val (liveGamesEnum, liveGamesChan) = Concurrent.broadcast[Event]
 
   private val liveGamesSource =
-    Source.fromPublisher(Streams.enumeratorToPublisher(liveGamesEnum))
+    Source.fromPublisher(IterateeStreams.enumeratorToPublisher(liveGamesEnum))
 
   private val status = Agent(Map.empty[String, Event])
 

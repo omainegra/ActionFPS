@@ -13,7 +13,7 @@ import controllers.ClansController.ClanView
 import lib.{ClanDataProvider, Clanner, ClansProvider, WebTemplateRender}
 import play.api.Configuration
 import play.api.libs.json.{Json, Writes}
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 import views.ClanRankings
 import views.clanwar.Clanwar.ClanIdToClan
 import views.rendergame.MixedGame
@@ -25,10 +25,11 @@ import com.actionfps.formats.json.Formats._
 @Singleton
 class ClansController @Inject()(webTemplateRender: WebTemplateRender,
                                 clansProvider: ClansProvider,
-                                clanDataProvider: ClanDataProvider)(
+                                clanDataProvider: ClanDataProvider,
+                                components: ControllerComponents)(
     implicit configuration: Configuration,
     executionContext: ExecutionContext)
-    extends Controller {
+    extends AbstractController(components) {
 
   private def namerF = async {
     val clans = await(clansProvider.clans)

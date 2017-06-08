@@ -14,8 +14,7 @@ import com.actionfps.pinger._
 import com.actionfps.user.RegistrationEmail.PlainRegistrationEmail
 import com.actionfps.user.User
 import lib.{Clanner, WebTemplateRender}
-import play.api.mvc.Action
-import play.api.mvc.Results._
+import play.api.mvc.{AbstractController, ControllerComponents}
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import play.api.routing.sird._
@@ -29,10 +28,12 @@ import scala.concurrent.ExecutionContext
   * Created by me on 11/12/2016.
   * This is for development use to iterate quickly without having to load in the real data.
   */
-class Dev @Inject()(
-    webTemplateRender: WebTemplateRender,
-    newsService: NewsService)(implicit executionContext: ExecutionContext)
-    extends SimpleRouter {
+class Dev @Inject()(webTemplateRender: WebTemplateRender,
+                    newsService: NewsService,
+                    components: ControllerComponents)(
+    implicit executionContext: ExecutionContext)
+    extends AbstractController(components)
+    with SimpleRouter {
 
   private implicit class RichHtml(html: Html) {
     def transform(f: String => String): Html = {
@@ -48,7 +49,7 @@ class Dev @Inject()(
     case GET(p"/live-template/") => liveTemplate
     case GET(p"/clanwars/") => clanwarTemplate
     case GET(p"/sig.svg") =>
-      Action { request =>
+      Action.apply { request =>
         views.player
           .Signature(interrank = Some(1),
                      playername = "w00p|Drakas",
@@ -64,7 +65,7 @@ class Dev @Inject()(
         Ok(Html("""<img src="../sig.svg">"""))
       }
     case GET(p"/player/") =>
-      Action { implicit req =>
+      Action.apply { implicit req =>
         Ok(
           webTemplateRender.renderTemplate(title = None)(
             views.player.Player
@@ -79,7 +80,7 @@ class Dev @Inject()(
       }
   }
 
-  private def clanwarTemplate = Action { implicit req =>
+  private def clanwarTemplate = Action.apply { implicit req =>
     implicit val namer = Dev.namer
     implicit val clanner = Dev.clanner
     implicit val clanid = Dev.clanidToClan
@@ -93,7 +94,7 @@ class Dev @Inject()(
     Ok(webTemplateRender.renderTemplate(title = None)(fh))
   }
 
-  private def liveTemplate = Action { implicit req =>
+  private def liveTemplate = Action.apply { implicit req =>
     val html = views.rendergame.Live
       .render(mapMapping = Maps.mapToImage, game = Dev.game, servers = Nil)
     val fh = Html(html.body + "<hr/>")

@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
 
-  val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.1"
+  val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.3"
   val scalacheck: ModuleID = "org.scalacheck" %% "scalacheck" % "1.13.5"
   val sourcecode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.1.3"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
@@ -10,16 +10,21 @@ object Dependencies {
   val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.18"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.2"
   val hazelcastClient
-    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.6.5"
+    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.1"
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.3"
   val httpClientCache
     : ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.3"
+  val playIteratees
+    : ModuleID = "com.typesafe.play" %% "play-iteratees" % "2.6.1"
+  val playIterateesStreams
+    : ModuleID = "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1"
+
   val scalatestPlus
-    : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0"
+    : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0-RC1"
   val alpakkaFile
-    : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.7"
+    : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.9"
   val seleniumJava
-    : ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "2.53.1"
+    : ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "3.4.0"
   val seleniumHtmlUnit
     : ModuleID = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0"
 
@@ -31,20 +36,20 @@ object Dependencies {
   val akkaTestkit: ModuleID = akka("testkit")
 
   private def akka(stuff: String) =
-    "com.typesafe.akka" %% s"akka-$stuff" % "2.4.17"
+    "com.typesafe.akka" %% s"akka-$stuff" % "2.5.2"
 
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 
-  val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.5.1"
+  val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.5.2"
   val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.9.0"
   val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.9.0"
 
-  val jsonQuote: ModuleID = "net.maffoo" %% "jsonquote-play" % "0.4.0"
-
   val raptureJsonPlay
-    : ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M8"
+    : ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M9" exclude ("com.typesafe.play", "play-json")
 
-  val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.12.1"
-  val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.12.1"
+  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.0-RC2"
+
+  val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.13.0"
+  val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.13.0"
 
 }

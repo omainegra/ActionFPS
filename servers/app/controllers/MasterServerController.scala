@@ -3,8 +3,9 @@ package controllers
 import javax.inject._
 
 import com.actionfps.servers.ServerRecord
+import play.api.Configuration
+import play.api.mvc._
 import controllers.MasterServerController._
-import play.api.mvc.{Action, AnyContent, Controller}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -13,9 +14,11 @@ import scala.concurrent.ExecutionContext
   * Created by William on 31/12/2015.
   */
 @Singleton
-class MasterServerController @Inject()(providesServers: ProvidesServers)(
+class MasterServerController @Inject()(configuration: Configuration,
+                                       providesServers: ProvidesServers,
+                                       components: ControllerComponents)(
     implicit executionContext: ExecutionContext)
-    extends Controller {
+    extends AbstractController(components) {
 
   def ms: Action[AnyContent] = Action.async {
     async {

@@ -6,8 +6,7 @@ import akka.stream.scaladsl.Source
 import com.actionfps.gameparser.enrichers.JsonGame
 import org.apache.commons.csv.CSVFormat
 import play.api.libs.json.Json
-import play.api.mvc.Results._
-import play.api.mvc.{Action, AnyContent, RequestHeader}
+import play.api.mvc._
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import play.api.routing.sird._
@@ -21,9 +20,11 @@ import com.actionfps.formats.json.Formats._
   * Provide a batch list of all games in different formats.
   */
 @Singleton
-class AllGames @Inject()(providesGames: ProvidesGames)(
+class AllGames @Inject()(providesGames: ProvidesGames,
+                         components: ControllerComponents)(
     implicit executionContext: ExecutionContext)
-    extends SimpleRouter {
+    extends AbstractController(components)
+    with SimpleRouter {
 
   import providesGames._
 

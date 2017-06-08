@@ -7,6 +7,7 @@ import lib.WebTemplateRender
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.Environment
+import play.api.mvc.{AbstractController, ControllerComponents}
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 
@@ -17,8 +18,10 @@ import play.api.routing.SimpleRouter
   */
 @Singleton
 class StaticPageRouter @Inject()(common: WebTemplateRender,
-                                 environment: Environment)
-    extends SimpleRouter {
+                                 environment: Environment,
+                                 components: ControllerComponents)
+    extends AbstractController(components)
+    with SimpleRouter {
 
   import collection.JavaConverters._
 

@@ -1,1 +1,1 @@
-libraryDependencies += "com.hazelcast" % "hazelcast" % "3.6.5"
+libraryDependencies += "com.hazelcast" % "hazelcast" % "3.8"

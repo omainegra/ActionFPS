@@ -4,6 +4,10 @@ import java.nio.file.{Files, Path, Paths}
 import java.util.Base64
 import javax.inject.{Inject, Singleton}
 
+import play.api.{Configuration, Logger}
+import play.api.libs.ws.WSClient
+import play.api.mvc._
+import play.api.data._
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.{JsObject, JsString}
@@ -17,11 +21,12 @@ import com.actionfps.formats.json.Formats._
 
 @Singleton
 //noinspection TypeAnnotation
-class UserController @Inject()(
-    configuration: Configuration,
-    playersProvider: PlayersProvider,
-    wSClient: WSClient)(implicit executionContext: ExecutionContext)
-    extends Controller {
+class UserController @Inject()(configuration: Configuration,
+                               playersProvider: PlayersProvider,
+                               wSClient: WSClient,
+                               components: ControllerComponents)(
+    implicit executionContext: ExecutionContext)
+    extends AbstractController(components) {
 
   val authDir = Paths
     .get(configuration.underlying.getString("af.user.keys.path"))
@@ -65,14 +70,17 @@ class UserController @Inject()(
   val googleUri = "https://www.googleapis.com/oauth2/v3/tokeninfo"
 
   def authTokenPost() =
-    Action.async(BodyParsers.parse.form(UserController.userForm)) { req =>
+    Action(parse.form(UserController.userForm)).async { req =>
       getByToken(req.body.idToken)
     }
 
   def getByToken(idToken: String) = {
     async {
       val response = await(
-        wSClient.url(googleUri).withQueryString("id_token" -> idToken).get())
+        wSClient
+          .url(googleUri)
+          .withQueryStringParameters("id_token" -> idToken)
+          .get())
       assert(
         (response.json \ "aud")
           .as[String]

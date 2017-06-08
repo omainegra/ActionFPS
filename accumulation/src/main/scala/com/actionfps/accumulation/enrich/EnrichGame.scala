@@ -37,7 +37,8 @@ case class EnrichGame(jsonGame: JsonGame) {
     newGame.copy(
       clangame = PartialFunction.condOpt(newGame.teams.map(_.clan)) {
         case List(Some(a), Some(b)) if a != b => Set(a, b)
-      })
+      }
+    )
   }
 }
 

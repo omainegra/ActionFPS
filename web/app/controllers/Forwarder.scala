@@ -5,7 +5,9 @@ import java.util.stream.Collectors
 import javax.inject._
 
 import play.Environment
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.http.FileMimeTypes
+import play.api.mvc._
+
 import scala.concurrent.ExecutionContext
 
 /**
@@ -13,9 +15,11 @@ import scala.concurrent.ExecutionContext
   *
   * Serve static assets from 'www' directory for development & test purposes.
   */
-class Forwarder @Inject()(environment: Environment)(
-    implicit executionContext: ExecutionContext)
-    extends Controller {
+class Forwarder @Inject()(environment: Environment,
+                          components: ControllerComponents)(
+    implicit executionContext: ExecutionContext,
+    fileMimeTypes: FileMimeTypes)
+    extends AbstractController(components) {
 
   require(!environment.isProd, s"Environment is ${environment}")
 

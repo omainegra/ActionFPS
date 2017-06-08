@@ -5,20 +5,20 @@ import javax.inject._
 import com.actionfps.clans.ClanNamer
 import lib.WebTemplateRender
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 import views.rendergame.MixedGame
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
-
 import com.actionfps.formats.json.Formats._
 
 @Singleton
-class GamesController @Inject()(
-    webTemplateRender: WebTemplateRender,
-    providesClanNames: ProvidesClanNames,
-    providesGames: ProvidesGames)(implicit executionContext: ExecutionContext)
-    extends Controller {
+class GamesController @Inject()(webTemplateRender: WebTemplateRender,
+                                providesClanNames: ProvidesClanNames,
+                                providesGames: ProvidesGames,
+                                components: ControllerComponents)(
+    implicit executionContext: ExecutionContext)
+    extends AbstractController(components) {
 
   def recentGames: Action[AnyContent] = Action.async { implicit request =>
     async {

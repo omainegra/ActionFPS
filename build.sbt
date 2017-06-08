@@ -1,10 +1,11 @@
 import Dependencies._
 
 name := "actionfps"
+
 organization in ThisBuild := "com.actionfps"
 javaOptions in ThisBuild += "-Duser.timezone=UTC"
 javaOptions in run in ThisBuild += "-Duser.timezone=UTC"
-scalaVersion in ThisBuild := "2.11.8"
+scalaVersion in ThisBuild := "2.12.2"
 scalacOptions in ThisBuild := Seq(
   "-unchecked",
   "-deprecation",
@@ -120,7 +121,8 @@ lazy val web = project
       scalatest % "it,test",
       seleniumHtmlUnit % "it",
       seleniumJava % "it",
-      cache
+      ehcache,
+      guice
     ),
     // Disabled by default, so that it behaves more like PROD.
     inMemoryCache := false,
@@ -167,9 +169,8 @@ lazy val inters =
         scalatest % Test,
         scalatest % "it",
         raptureJsonPlay,
-        json,
-        ws,
-        jsonQuote
+        playJson,
+        ws
       )
     )
 
@@ -229,8 +230,7 @@ lazy val jsonFormats =
     base = file("web/json-formats")
   ).dependsOn(accumulation)
     .settings(
-      libraryDependencies += json,
-      libraryDependencies += jsonQuote,
+      libraryDependencies += playJson,
       resolvers += Resolver.jcenterRepo
     )
 
@@ -368,6 +368,8 @@ lazy val servers =
     .dependsOn(webTemplate)
     .settings(
       libraryDependencies ++= Seq(
+        playIteratees,
+        playIterateesStreams,
         async,
         akkaAgent,
         serverPinger
@@ -415,7 +417,7 @@ lazy val downloads =
         fluentHc,
         httpClientCache,
         alpakkaFile,
-        json
+        playJson
       ),
       scalaSource in IntegrationTest := baseDirectory.value / "it",
       libraryDependencies += scalatest % Test,

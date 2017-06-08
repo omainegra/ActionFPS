@@ -174,6 +174,8 @@ trait Formats {
     }
   }
 
+  implicit val swr: Reads[ServerRecord] = Json.reads[ServerRecord]
+
   implicit val cf: OFormat[Clan] = Json.format[Clan]
 
   implicit val pcWrites: Writes[PunchCard] = Writes[PunchCard] { pc =>

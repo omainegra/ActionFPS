@@ -2,14 +2,15 @@ package controllers
 
 import javax.inject.Inject
 
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{AbstractController, ControllerComponents}
 import services.LatestReleaseService
 
 /**
   * Created by me on 04/02/2017.
   */
-class DownloadsController @Inject()(latestReleaseService: LatestReleaseService)
-    extends Controller {
+class DownloadsController @Inject()(latestReleaseService: LatestReleaseService,
+                                    components: ControllerComponents)
+    extends AbstractController(components) {
   def game = Action { request =>
     val latestRelease = latestReleaseService.latestRelease()
     request.getQueryString("os").collect {

@@ -8,7 +8,7 @@ import javax.inject._
 
 import org.jsoup.Jsoup
 import play.api.mvc.Results._
-import play.api.mvc.{Action, RequestHeader}
+import play.api.mvc._
 import play.twirl.api.Html
 
 /**
@@ -16,7 +16,8 @@ import play.twirl.api.Html
   *
   * Here we use the DOM Templating technique of manipulating the HTML tree.
   */
-class WebTemplateRender @Inject()() {
+class WebTemplateRender @Inject()(controllerComponents: ControllerComponents)
+    extends AbstractController(controllerComponents) {
 
   /**
     * @param title Set the title tag content to this.

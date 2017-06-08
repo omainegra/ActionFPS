@@ -9,7 +9,7 @@ import com.actionfps.clans.{ClanNamer, CompleteClanwar}
 import lib.KeepAliveEvents
 import play.api.libs.EventSource.Event
 import play.api.libs.json.{Json, Writes}
-import play.api.mvc.{Action, Controller}
+import play.api.mvc._
 import providers.ReferenceProvider
 import providers.games.NewGamesProvider
 import services.ChallongeService.NewClanwarCompleted
@@ -21,10 +21,11 @@ import EventStreamController._
 
 @Singleton
 class EventStreamController @Inject()(pingerService: PingerService,
-                                      referenceProvider: ReferenceProvider)(
+                                      referenceProvider: ReferenceProvider,
+                                      components: ControllerComponents)(
     implicit actorSystem: ActorSystem,
     executionContext: ExecutionContext)
-    extends Controller {
+    extends AbstractController(components) {
 
   private def namerF: Future[ClanNamer] = async {
     val clans = await(referenceProvider.clans)

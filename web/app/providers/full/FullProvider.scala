@@ -4,20 +4,18 @@ import java.time.YearMonth
 
 import akka.agent.Agent
 import com.actionfps.accumulation.GameAxisAccumulator
-import com.actionfps.accumulation.user.FullProfile
 import com.actionfps.accumulation.achievements.HallOfFame
+import com.actionfps.accumulation.user.FullProfile
 import com.actionfps.achievements.GameUserEvent
 import com.actionfps.clans.Clanwars
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
 import com.actionfps.stats.Clanstats
-import com.google.inject.ImplementedBy
-import controllers.{PlayersProvider, ProvidesGames}
+import controllers.ProvidesGames
 import lib.ClanDataProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@ImplementedBy(classOf[FullProviderImpl])
 abstract class FullProvider()(implicit executionContext: ExecutionContext)
     extends ClanDataProvider
     with ProvidesGames {

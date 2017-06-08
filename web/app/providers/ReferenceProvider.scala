@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 
 import com.actionfps.accumulation.Clan
 import play.api.Configuration
-import play.api.cache.CacheApi
+import play.api.cache.AsyncCacheApi
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 
@@ -30,7 +30,7 @@ import lib.ClansProvider
   */
 @Singleton
 class ReferenceProvider @Inject()(configuration: Configuration,
-                                  cacheApi: CacheApi)(
+                                  cacheApi: AsyncCacheApi)(
     implicit wSClient: WSClient,
     executionContext: ExecutionContext)
     extends ProvidesServers
@@ -47,7 +47,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
   }
 
   private def fetch(key: String) = async {
-    cacheApi.get[String](key) match {
+    await(cacheApi.get[String](key)) match {
       case Some(value) => value
       case None =>
         val url = configuration.underlying.getString(s"af.reference.${key}")
@@ -57,7 +57,7 @@ class ReferenceProvider @Inject()(configuration: Configuration,
             throw new RuntimeException(
               s"Received unexpected response ${other.status} for ${url}")
         }
-        cacheApi.set(key, value, Duration.apply("1h"))
+        await(cacheApi.set(key, value, Duration.apply("1h")))
         value
     }
   }

@@ -6,7 +6,7 @@ import javax.inject._
 import com.actionfps.clans.ClanNamer
 import lib.{Clanner, WebTemplateRender}
 import play.api.Logger
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 import providers.ReferenceProvider
 import providers.full.FullProvider
 import services.NewsService
@@ -23,9 +23,10 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
                                 newsService: NewsService,
                                 referenceProvider: ReferenceProvider,
                                 fullProvider: FullProvider,
-                                ladderController: LadderController)(
+                                ladderController: LadderController,
+                                components: ControllerComponents)(
     implicit executionContext: ExecutionContext)
-    extends Controller {
+    extends AbstractController(components) {
 
   import webTemplateRender._
 
@@ -70,7 +71,7 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
         .named
       Ok(
         renderTemplate(
-          title = None,
+          title = Some("ActionFPS First Person Shooter"),
           sourceLink = false,
           wide = true
         )(views.html.index(
