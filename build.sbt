@@ -22,9 +22,6 @@ resolvers in ThisBuild += Resolver.mavenLocal
 resolvers in ThisBuild += Resolver.bintrayRepo("scalawilliam", "maven")
 resolvers in ThisBuild += Resolver.bintrayRepo("actionfps", "maven")
 
-// temporary: https://groups.google.com/d/msg/play-framework/div4xgSVsjo/1btWIv9fAwAJ
-resolvers in ThisBuild += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
-
 updateOptions in ThisBuild := (updateOptions in ThisBuild).value
   .withCachedResolution(true)
 
@@ -124,7 +121,8 @@ lazy val web = project
       scalatest % "it,test",
       seleniumHtmlUnit % "it",
       seleniumJava % "it",
-      ehcache
+      ehcache,
+      guice
     ),
     // Disabled by default, so that it behaves more like PROD.
     inMemoryCache := false,
