@@ -7,8 +7,8 @@ object Dependencies {
   val sourcecode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.1.3"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
   val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.4"
-  val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.18"
-  val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.2"
+  val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.19"
+  val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.3"
   val hazelcastClient
     : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.1"
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.3"
