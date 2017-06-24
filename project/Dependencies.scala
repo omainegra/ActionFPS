@@ -10,7 +10,7 @@ object Dependencies {
   val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.19"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.3"
   val hazelcastClient
-    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.1"
+    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.2"
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.3"
   val httpClientCache
     : ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.3"
@@ -20,7 +20,7 @@ object Dependencies {
     : ModuleID = "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1"
 
   val scalatestPlus
-    : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0-RC1"
+    : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0"
   val alpakkaFile
     : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.9"
   val seleniumJava
@@ -36,7 +36,7 @@ object Dependencies {
   val akkaTestkit: ModuleID = akka("testkit")
 
   private def akka(stuff: String) =
-    "com.typesafe.akka" %% s"akka-$stuff" % "2.5.2"
+    "com.typesafe.akka" %% s"akka-$stuff" % "2.5.3"
 
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 
@@ -47,7 +47,7 @@ object Dependencies {
   val raptureJsonPlay
     : ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M9" exclude ("com.typesafe.play", "play-json")
 
-  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.0-RC2"
+  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.0"
 
   val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.13.0"
   val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.13.0"
