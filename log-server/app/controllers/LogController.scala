@@ -27,8 +27,8 @@ abstract class LogController(sourceFile: Path,
                              components: ControllerComponents)
     extends AbstractController(components) {
   Logger.info(s"Log controller for ${sourceFile}")
-  def stream = Action { request =>
-    if (!request.jwtSession.isEmpty()) {
+  def stream = Action { request: RequestHeader =>
+    if (request.jwtSession.signature != "") {
       require(request.jwtSession.claim.isValid(IssuerName))
     }
     val logAccess: LogAccess = request.jwtSession.claimData
