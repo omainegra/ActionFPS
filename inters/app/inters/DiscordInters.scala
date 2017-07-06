@@ -4,6 +4,7 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink}
 import com.actionfps.inter.InterOut
 import com.actionfps.servers.ValidServers
+import play.api.Logger
 import play.api.libs.json.JsObject
 import play.api.libs.ws.{WSClient, WSResponse}
 
@@ -22,7 +23,7 @@ case class DiscordInters(hookUrl: String)(
     validServers: ValidServers) {
 
   def pushOutFlow: Sink[InterOut, NotUsed] =
-    Flow[InterOut].mapAsync(1)(pushInterOut).to(Sink.ignore)
+    Flow[InterOut].mapAsync(100)(pushInterOut).to(Sink.foreach(m => Logger.info(s"Play Inter push result: ${m}")))
 
   def pushInterOut(interOut: InterOut): Future[Option[WSResponse]] = {
     async {
