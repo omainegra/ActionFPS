@@ -23,7 +23,15 @@ case class DiscordInters(hookUrl: String)(
     validServers: ValidServers) {
 
   def pushOutFlow: Sink[InterOut, NotUsed] =
-    Flow[InterOut].mapAsync(100)(pushInterOut).to(Sink.foreach(m => Logger.info(s"Play Inter push result: ${m}")))
+    Flow[InterOut]
+      .mapAsync(100) { m =>
+        val r = pushInterOut(m)
+        r.onComplete { r =>
+          Logger.info(s"Play Inter push result: ${m}")
+        }
+        r
+      }
+      .to(Sink.ignore)
 
   def pushInterOut(interOut: InterOut): Future[Option[WSResponse]] = {
     async {
