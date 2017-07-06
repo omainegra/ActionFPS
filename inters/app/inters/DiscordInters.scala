@@ -27,7 +27,7 @@ case class DiscordInters(hookUrl: String)(
       .mapAsync(100) { m =>
         val r = pushInterOut(m)
         r.onComplete { r =>
-          Logger.info(s"Play Inter push result: ${m}")
+          Logger.info(s"Play Inter push result: ${r}")
         }
         r
       }
