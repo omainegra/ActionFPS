@@ -29,6 +29,10 @@ case class DiscordInters(hookUrl: String)(
         r.onComplete { r =>
           Logger.info(s"Play Inter push result: ${r}")
         }
+        r.onFailure {
+          case f =>
+            Logger.error(s"Failure due to ${f}", f)
+        }
         r
       }
       .to(Sink.ignore)
