@@ -41,6 +41,7 @@ case class OneSignalInters(key: String, appId: String)(
                 "url": ${s"https://actionfps.com/servers/?join=${addr}"}
               }""".as[JsObject]
               Some(await {
+                import play.api.libs.ws.JsonBodyWritables._
                 wSClient
                   .url(targetUrl)
                   .withHttpHeaders("Authorization" -> s"Basic ${key}")

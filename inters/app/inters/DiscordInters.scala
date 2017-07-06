@@ -56,6 +56,7 @@ case class DiscordInters(hookUrl: String)(
                 "url": ${s"https://actionfps.com/servers/?join=${addr}"}
                 } ] }""".as[JsObject]
               Some(await {
+                import play.api.libs.ws.JsonBodyWritables._
                 wSClient
                   .url(hookUrl)
                   .post(postBody)
