@@ -7,7 +7,9 @@ import javax.inject._
 import af.inters.{DiscordInters, IntersFlow, OneSignalInters}
 import af.inters.IntersFlow.NicknameToUser
 import akka.actor.ActorSystem
+import akka.stream.scaladsl.{Flow, Sink}
 import akka.stream.{ActorAttributes, ActorMaterializer, Supervision}
+import com.actionfps.inter.InterOut
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import providers.ReferenceProvider
@@ -76,6 +78,8 @@ class IntersService(pickedFile: File,
         logger.error(s"Failed an element due to ${e}", e)
         Supervision.Resume
     })
+    .alsoTo(Flow[InterOut].to(Sink.foreach(i =>
+      logger.info(s"Found inter: ${i}"))))
     .alsoTo(DiscordInters(discordHookUrl).pushOutFlow)
     .alsoTo(OneSignalInters(key = oneSignalsApiKey, appId = oneSignalsAppId).pushOutFlow)
     .runForeach(actorSystem.eventStream.publish)
