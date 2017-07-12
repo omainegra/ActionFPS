@@ -4,10 +4,10 @@ object Dependencies {
 
   val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.3"
   val scalacheck: ModuleID = "org.scalacheck" %% "scalacheck" % "1.13.5"
-  val sourcecode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.1.3"
+  val sourcecode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.1.4"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.6"
   val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.4"
-  val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.1.19"
+  val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.2.0"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.3"
   val hazelcastClient
     : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.2"
@@ -20,7 +20,7 @@ object Dependencies {
     : ModuleID = "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1"
 
   val scalatestPlus
-    : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0"
+    : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.0"
   val alpakkaFile
     : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.10"
   val seleniumJava
@@ -49,7 +49,7 @@ object Dependencies {
 
   val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.2"
 
-  val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.13.0"
-  val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.13.0"
+  val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.14.0"
+  val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.14.0"
 
 }
