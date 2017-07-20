@@ -1,13 +1,13 @@
 import org.openqa.selenium.WebDriver
 import org.scalatest.Inspectors._
 import org.scalatestplus.play._
-import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 
 import scala.util.Try
 
 class IntegrationSpec
     extends PlaySpec
-    with GuiceOneServerPerSuite
+    with BaseOneServerPerSuite
+    with TheApplicationFactory
     with OneBrowserPerTest
     with HtmlUnitFactory {
 

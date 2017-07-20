@@ -1,8 +1,7 @@
 import java.io.File
 import java.nio.file.Files
 
-import org.scalatestplus.play.guice.GuiceOneServerPerSuite
-import org.scalatestplus.play.{HtmlUnitFactory, OneBrowserPerTest, PlaySpec}
+import org.scalatestplus.play.{BaseOneServerPerSuite, HtmlUnitFactory, OneBrowserPerTest, PlaySpec}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import providers.full.FullProviderImpl
@@ -18,7 +17,8 @@ import scala.concurrent.duration._
   */
 class NewEventsFlowTest
     extends PlaySpec
-    with GuiceOneServerPerSuite
+    with BaseOneServerPerSuite
+    with TheApplicationFactory
     with OneBrowserPerTest
     with HtmlUnitFactory {
 
