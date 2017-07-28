@@ -5,7 +5,7 @@ name := "actionfps"
 organization in ThisBuild := "com.actionfps"
 javaOptions in ThisBuild += "-Duser.timezone=UTC"
 javaOptions in run in ThisBuild += "-Duser.timezone=UTC"
-scalaVersion in ThisBuild := "2.12.2"
+scalaVersion in ThisBuild := "2.12.3"
 scalacOptions in ThisBuild := Seq(
   "-unchecked",
   "-deprecation",
