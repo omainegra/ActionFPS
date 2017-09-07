@@ -6,11 +6,11 @@ object Dependencies {
   val scalacheck: ModuleID = "org.scalacheck" %% "scalacheck" % "1.13.5"
   val sourcecode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.1.4"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.7"
-  val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.4"
+  val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.5"
   val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.2.1"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.3"
   val hazelcastClient
-    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.4"
+    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.5"
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.3"
   val httpClientCache
     : ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.3"
@@ -24,7 +24,7 @@ object Dependencies {
   val alpakkaFile
     : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.11"
   val seleniumJava
-    : ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "3.5.2"
+    : ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "3.5.3"
   val seleniumHtmlUnit
     : ModuleID = "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0"
 
