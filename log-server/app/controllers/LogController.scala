@@ -221,8 +221,10 @@ object LogController {
   /** To issue, do:
   * $ sbt logServer/console
   * ...
-  * scala> issueJwt(key = "LOLOL", logAccess = LogAccess(Set("ip")), expireSeconds = 200)
+  * scala> val key = "<key from config>"
+  * scala> issueJwt(key = key, logAccess = LogAccess(Set("ip")), expireSeconds = 200)
   * ey.ab.cd
+  * scala> issueJwt(key = key, logAccess = LogAccess(Set("ip")), expireSeconds = 3600 * 24 * 180)
   */
 
 }
