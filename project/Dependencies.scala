@@ -1,7 +1,6 @@
 import sbt._
 
 object Dependencies {
-
   val scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.4"
   val scalacheck: ModuleID = "org.scalacheck" %% "scalacheck" % "1.13.5"
   val sourcecode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.1.4"
@@ -20,7 +19,7 @@ object Dependencies {
     : ModuleID = "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1"
 
   val scalatestPlus
-    : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.1"
+    : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2"
   val alpakkaFile
     : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.11"
   val seleniumJava
@@ -47,7 +46,7 @@ object Dependencies {
   val raptureJsonPlay
     : ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M9" exclude ("com.typesafe.play", "play-json")
 
-  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.3"
+  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.5"
 
   val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.14.0"
   val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.14.0"
