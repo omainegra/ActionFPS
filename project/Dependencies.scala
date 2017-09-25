@@ -9,7 +9,7 @@ object Dependencies {
   val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.2.1"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.3"
   val hazelcastClient
-    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.5"
+    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.6"
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.3"
   val httpClientCache
     : ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.3"
@@ -21,7 +21,7 @@ object Dependencies {
   val scalatestPlus
     : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2"
   val alpakkaFile
-    : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.11"
+    : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.12"
   val seleniumJava
     : ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "3.5.3"
   val seleniumHtmlUnit
