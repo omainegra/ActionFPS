@@ -63,7 +63,7 @@ class ChallongeClient(
           .challongeAuth
           .get())
       val matchPlayers =
-        tryWithInfo(response)(r => OpenMatchPlayers.fromJsonString(r.body))
+        tryWithInfo(response)(r => OpenMatchPlayers.fromJson(r.json))
       matchPlayers.find(
         m =>
           Set(m.firstName, m.secondName) == Set(clanwarWon.winnerId,

@@ -1,12 +1,6 @@
 package tl
 
-import java.io.InputStreamReader
-import java.util.function.Consumer
-import javax.script.ScriptEngineManager
-
-import play.api.libs.json.{JsString, JsValue}
-
-import scala.collection.mutable
+import play.api.libs.json._
 
 /**
   * Created by me on 31/12/2016.
@@ -18,24 +12,37 @@ case class OpenMatchPlayers(matchId: Int,
                             secondName: String)
 
 object OpenMatchPlayers {
-  private val scriptingEngine =
-    new ScriptEngineManager().getEngineByName("javascript")
-  scriptingEngine.eval(
-    new InputStreamReader(
-      getClass.getResourceAsStream("challonge_extract.js")))
-
-  def fromJsonString(jsonString: String): List[OpenMatchPlayers] =
-    this.synchronized {
-      val buffer = mutable.Buffer.empty[OpenMatchPlayers]
-      val cons = new Consumer[OpenMatchPlayers] {
-        override def accept(t: OpenMatchPlayers): Unit = buffer.append(t)
-      }
-      scriptingEngine.put("inputJson", jsonString)
-      scriptingEngine.put("cons", cons)
-      scriptingEngine.eval(
-        "for each (i in Tournament.fromJSON(inputJson).getOpenMatchesPlayers()) cons(i);")
-      buffer.toList
+  def fromJson(json:JsValue): List[OpenMatchPlayers] = {
+    def getParticipantName(id: Int): String = {
+      (json \ "tournament" \ "participants")
+        .as[JsArray]
+        .value
+        .map(v => (v \ "participant").as[JsObject])
+        .find(o => (o \ "id").as[Int] == id)
+        .map(_ \ "name")
+        .map(_.as[String])
+        .getOrElse(throw new IllegalStateException(
+          s"Cannot find Participant ID ${id}"))
     }
+
+    (json \ "tournament" \ "matches")
+      .as[JsArray]
+      .value
+      .map(v => (v \ "match").as[JsObject])
+      .filter(mo => (mo \ "state").as[String] == "open")
+      .map { matchObject =>
+        val player1 = (matchObject \ "player1_id").as[Int]
+        val player2 = (matchObject \ "player2_id").as[Int]
+        OpenMatchPlayers(
+          matchId = (matchObject \ "id").as[Int],
+          firstId = player1,
+          firstName = getParticipantName(player1),
+          secondId = player2,
+          secondName = getParticipantName(player2)
+        )
+      }
+      .toList
+  }
 
 }
 

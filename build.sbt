@@ -299,6 +299,7 @@ lazy val clansChallonge = Project(
   .settings(Defaults.itSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
+      playJson,
       scalatest % "it,test",
       async,
       ws % "provided",
