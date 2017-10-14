@@ -24,8 +24,7 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient)(
   private implicit val actorMaterializer = ActorMaterializer()
 
   Source
-    .actorRef[NewClanwarCompleted](bufferSize = 10,
-                                   OverflowStrategy.dropBuffer)
+    .actorRef[NewClanwarCompleted](bufferSize = 10, OverflowStrategy.dropBuffer)
     .mapMaterializedValue(
       actorSystem.eventStream.subscribe(_, classOf[NewClanwarCompleted]))
     .map(_.clanwarCompleted)
@@ -35,6 +34,10 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient)(
       ZonedDateTime
         .parse(clanwar.id)
         .isAfter(ZonedDateTime.now().minusHours(3))
+    }
+    .map { cc =>
+      Logger.info(s"Pushing down clanwar: ${cc}")
+      cc
     }
     .mapConcat(cc => WinFlow.detectWinnerLoserClanwar(cc).toList)
     .via(WinFlow(challongeClient).clanwarWon)
