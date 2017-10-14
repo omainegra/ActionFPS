@@ -45,7 +45,7 @@ class ChallongeSubmitTest
     result shouldBe 5
   }
 
-  "It works" in {
+  "It works" ignore {
     val ids = Await.result(challongeClient.fetchTournamentIds(), 5.seconds)
     val res = Await.result(
       challongeClient.attemptSubmit("af_test_tournament",
@@ -55,7 +55,7 @@ class ChallongeSubmitTest
     info(s"$res")
   }
 
-  "It submits an attachment" in {
+  "It submits an attachment" ignore {
     val res = Await.result(
       challongeClient.attemptSubmit("af_test_tournament",
                                     ClanwarWon("abcd", "imnt", 22, "tyd", 11)),

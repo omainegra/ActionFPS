@@ -9,6 +9,7 @@ import akka.stream.{ActorMaterializer, OverflowStrategy}
 import com.actionfps.clans.CompleteClanwar
 import play.api.Logger
 import services.ChallongeService.NewClanwarCompleted
+import tl.ChallongeClient.ClanwarWon
 import tl.{ChallongeClient, WinFlow}
 
 import scala.concurrent.ExecutionContext
@@ -40,16 +41,24 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient)(
       cc
     }
     .mapConcat(cc => WinFlow.detectWinnerLoserClanwar(cc).toList)
+    .merge(Source.single(ChallongeService.sampleClanwarWon))
     .via(WinFlow(challongeClient).clanwarWon)
     .runWith(Sink.foreach(item => Logger.info(s"Sunk clanwar: ${item}")))
     .onComplete {
       case Success(_) => Logger.info("Challonge Service flow completed.")
       case Failure(reason) =>
-        Logger.error(s"Challonge Service flow to: ${reason}", reason)
+        Logger.error(s"Challonge Service flow failed due to: ${reason}", reason)
     }
 
 }
 
 object ChallongeService {
+  val sampleClanwarWon = ClanwarWon(
+    clanwarId = "ABC",
+    winnerId = "noob",
+    winnerScore = 1,
+    loserId = "boon",
+    loserScore = 0
+  )
   case class NewClanwarCompleted(clanwarCompleted: CompleteClanwar)
 }
