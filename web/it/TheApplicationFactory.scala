@@ -9,7 +9,7 @@ import play.api.{Application, ApplicationLoader, Environment}
 trait TheApplicationFactory extends FakeApplicationFactory {
   override def fakeApplication: Application = {
     val context = ApplicationLoader.createContext(Environment.simple())
-    val loader = new TheApplicationLoader()
+    val loader = new CompileTimeApplicationLoader()
     loader.load(context)
   }
 }
