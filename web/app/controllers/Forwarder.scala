@@ -36,7 +36,7 @@ class Forwarder @Inject()(environment: Environment,
 
   def getAsset(path: String): Action[AnyContent] = {
     require(!environment.isProd,
-            s"Environment is ${environment.mode()}. Expected Prod.")
+            s"Environment is ${environment.mode()}. Expected non-Prod.")
 
     resources.find(_.endsWith(path)) match {
       case Some(v) =>
