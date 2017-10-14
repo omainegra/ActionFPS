@@ -121,6 +121,12 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   val challongeServiceO: Option[ChallongeService] =
     if (challongeEnabled) Some(wire[ChallongeService]) else None
   val intersServiceO: Option[IntersService] =
-    if (intersEnabled) Some(wire[IntersService]) else None
+    if (intersEnabled)
+      Some(
+        new IntersService(configuration)(referenceProvider,
+                                         executionContext,
+                                         wsClient,
+                                         actorSystem))
+    else None
 
 }
