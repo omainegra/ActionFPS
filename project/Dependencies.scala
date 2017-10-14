@@ -8,8 +8,7 @@ object Dependencies {
   val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.5"
   val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.2.1"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.3"
-  val hazelcastClient
-    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.6"
+  val hazelcastClient: ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.6"
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.3"
   val httpClientCache
     : ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.3"
@@ -50,5 +49,9 @@ object Dependencies {
 
   val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.14.0"
   val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.14.0"
+
+  val macwireMacros: ModuleID = "com.softwaremill.macwire" %% "macros" % "2.3.0"
+  val macwireUtil: ModuleID = "com.softwaremill.macwire" %% "util" % "2.3.0"
+  val macwireProxy: ModuleID = "com.softwaremill.macwire" %% "proxy" % "2.3.0"
 
 }

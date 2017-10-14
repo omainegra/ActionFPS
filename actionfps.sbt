@@ -122,7 +122,9 @@ lazy val web = project
       seleniumHtmlUnit % "it",
       seleniumJava % "it",
       ehcache,
-      guice
+      macwireMacros % "provided",
+      macwireUtil,
+      macwireProxy
     ),
     // Disabled by default, so that it behaves more like PROD.
     inMemoryCache := false,

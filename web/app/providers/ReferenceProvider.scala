@@ -29,7 +29,7 @@ import lib.ClansProvider
   * Provides reference data from CSV URLs.
   */
 @Singleton
-class ReferenceProvider @Inject()(configuration: Configuration,
+final class ReferenceProvider @Inject()(configuration: Configuration,
                                   cacheApi: AsyncCacheApi)(
     implicit wSClient: WSClient,
     executionContext: ExecutionContext)

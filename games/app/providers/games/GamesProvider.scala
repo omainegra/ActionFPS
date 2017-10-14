@@ -20,7 +20,7 @@ import scala.concurrent._
 import scala.concurrent.duration._
 
 @Singleton
-class GamesProvider(gameJournalPath: Path)(
+final class GamesProvider(gameJournalPath: Path)(
     implicit executionContext: ExecutionContext) {
 
   @Inject
