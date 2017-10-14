@@ -24,17 +24,17 @@ class ChallongeSubmitTest
 
   implicit lazy val mat = ActorMaterializer()
 
-  private val challongeUsername =
+  private lazy val challongeUsername =
     util.Properties.envOrNone("CHALLONGE_USERNAME").getOrElse {
       throw new IllegalArgumentException("'CHALLONGE_USERNAME' is not set.")
     }
 
-  private val challongePassword =
+  private lazy val challongePassword =
     util.Properties.envOrNone("CHALLONGE_PASSWORD").getOrElse {
       throw new IllegalArgumentException("'CHALLONGE_PASSWORD' is not set.")
     }
 
-  val challongeClient =
+  private lazy val challongeClient =
     new ChallongeClient(AhcWSClient(),
                         ChallongeClient.DefaultUri,
                         challongeUsername,
