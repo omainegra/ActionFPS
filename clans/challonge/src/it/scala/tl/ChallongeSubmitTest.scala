@@ -24,14 +24,28 @@ class ChallongeSubmitTest
 
   implicit lazy val mat = ActorMaterializer()
 
-  val challongeClient = new ChallongeClient(AhcWSClient(), "/", "q", "z")
+  private val challongeUsername =
+    util.Properties.envOrNone("CHALLONGE_USERNAME").getOrElse {
+      throw new IllegalArgumentException("'CHALLONGE_USERNAME' is not set.")
+    }
+
+  private val challongePassword =
+    util.Properties.envOrNone("CHALLONGE_PASSWORD").getOrElse {
+      throw new IllegalArgumentException("'CHALLONGE_PASSWORD' is not set.")
+    }
+
+  val challongeClient =
+    new ChallongeClient(AhcWSClient(),
+                        ChallongeClient.DefaultUri,
+                        challongeUsername,
+                        challongePassword)
 
   "test it works" ignore {
     val result = Await.result(challongeClient.fetchTournamentIds(), 10.seconds)
     result shouldBe 5
   }
 
-  "It works" ignore {
+  "It works" in {
     val ids = Await.result(challongeClient.fetchTournamentIds(), 5.seconds)
     val res = Await.result(
       challongeClient.attemptSubmit("af_test_tournament",
@@ -41,7 +55,7 @@ class ChallongeSubmitTest
     info(s"$res")
   }
 
-  "It submits an attachment" ignore {
+  "It submits an attachment" in {
     val res = Await.result(
       challongeClient.attemptSubmit("af_test_tournament",
                                     ClanwarWon("abcd", "imnt", 22, "tyd", 11)),

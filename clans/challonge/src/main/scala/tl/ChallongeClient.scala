@@ -22,7 +22,7 @@ class ChallongeClient(
       implicit executionContext: ExecutionContext) =
     this(
       wSClient,
-      "https://api.challonge.com/v1",
+      ChallongeClient.DefaultUri,
       configuration.underlying.getString("challonge.username"),
       configuration.underlying.getString("challonge.password")
     )
@@ -45,7 +45,8 @@ class ChallongeClient(
         .url(GetTournaments.getProgressTournamentsUrl)
         .challongeAuth
         .get())
-    tryWithInfo(resp)(r => GetTournaments.extractTournamentIds(r.json))
+    tryWithInfo("Fetch tournament IDs")(resp)(r =>
+      GetTournaments.extractTournamentIds(r.json))
   }
 
   /**
@@ -63,7 +64,8 @@ class ChallongeClient(
           .challongeAuth
           .get())
       val matchPlayers =
-        tryWithInfo(response)(r => OpenMatchPlayers.fromJson(r.json))
+        tryWithInfo(s"Fetch match players for ${tournamentId}")(response)(r =>
+          OpenMatchPlayers.fromJson(r.json))
       matchPlayers.find(
         m =>
           Set(m.firstName, m.secondName) == Set(clanwarWon.winnerId,
@@ -76,7 +78,7 @@ class ChallongeClient(
           val fw = fm.ForWinner(winnerId,
                                 clanwarWon.winnerScore,
                                 clanwarWon.loserScore)
-          val endResult = tryWithInfo {
+          val endResult = tryWithInfo(s"Submit for match ${m.matchId}") {
             await(
               wSClient
                 .url(fm.updateUrl)
@@ -103,6 +105,7 @@ class ChallongeClient(
 }
 
 object ChallongeClient {
+  val DefaultUri: String = "https://api.challonge.com/v1"
 
   case class ClanwarWon(clanwarId: String,
                         winnerId: String,
@@ -110,12 +113,13 @@ object ChallongeClient {
                         loserId: String,
                         loserScore: Int)
 
-  def tryWithInfo[V](t: WSResponse)(f: WSResponse => V): V = {
+  def tryWithInfo[V](m: String)(t: WSResponse)(f: WSResponse => V): V = {
     try f(t)
     catch {
       case NonFatal(e) =>
-        throw new RuntimeException(s"Failed due to input ${t}, ${t.body}: $e",
-                                   e)
+        throw new RuntimeException(
+          s"Failed due to input ${t} (${m}), ${t.body.take(100)}...: $e",
+          e)
     }
   }
 }
