@@ -49,7 +49,7 @@ class ChallongeSubmitTest
     val ids = Await.result(challongeClient.fetchTournamentIds(), 5.seconds)
     val res = Await.result(
       challongeClient.attemptSubmit("af_test_tournament",
-                                    ClanwarWon("abcd", "woop", 2, "tee", 1)),
+                                    ClanwarWon("abcd", "pi", 2, "zz", 1)),
       5.seconds)
     info(s"$ids")
     info(s"$res")

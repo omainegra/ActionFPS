@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
 case class WinFlow(challongeClient: ChallongeClient)(
     implicit executionContext: ExecutionContext) {
 
-  def clanwarWon: Flow[ClanwarWon, Int, NotUsed] = {
+  def clanwarWon: Flow[ClanwarWon, Option[Int], NotUsed] = {
     Flow[ClanwarWon]
       .mapAsync(2) { clanwarWon =>
         challongeClient.fetchTournamentIds().map { ids =>
@@ -27,7 +27,6 @@ case class WinFlow(challongeClient: ChallongeClient)(
         case (i, w) =>
           challongeClient.attemptSubmit(i, w)
       }
-      .mapConcat(_.toList)
   }
 
 }
