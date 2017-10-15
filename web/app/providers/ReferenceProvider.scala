@@ -6,7 +6,7 @@ import javax.inject.{Inject, Singleton}
 import com.actionfps.accumulation.Clan
 import play.api.Configuration
 import play.api.cache.AsyncCacheApi
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 import play.api.libs.ws.WSClient
 
 import scala.async.Async._
@@ -30,7 +30,7 @@ import lib.ClansProvider
   */
 @Singleton
 final class ReferenceProvider @Inject()(configuration: Configuration,
-                                  cacheApi: AsyncCacheApi)(
+                                        cacheApi: AsyncCacheApi)(
     implicit wSClient: WSClient,
     executionContext: ExecutionContext)
     extends ProvidesServers
@@ -113,7 +113,8 @@ final class ReferenceProvider @Inject()(configuration: Configuration,
 
   def users: Future[List[User]] = Users.users
 
-  private implicit val serverRecordRead = Json.reads[ServerRecord]
+  private implicit val serverRecordRead: Reads[ServerRecord] =
+    Json.reads[ServerRecord]
 
   def servers: Future[List[ServerRecord]] = Servers.servers
 

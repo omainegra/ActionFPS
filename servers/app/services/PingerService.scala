@@ -36,7 +36,7 @@ class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
     implicit actorSystem: ActorSystem,
     executionContext: ExecutionContext) {
 
-  implicit val actorMaterializer = ActorMaterializer()
+  implicit val actorMaterializer: ActorMaterializer = ActorMaterializer()
 
   private val logger = Logger(getClass)
 

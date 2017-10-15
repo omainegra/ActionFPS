@@ -50,9 +50,9 @@ object FullIteratorBenchmark {
 
   def fetchClansAndUsers(): (List[Clan], List[User]) = {
     import scala.concurrent.ExecutionContext.Implicits.global
-    implicit val actorSystem = ActorSystem()
-    implicit val actorMaterializer = ActorMaterializer()
-    implicit val wsClient = AhcWSClient()
+    implicit val actorSystem: ActorSystem = ActorSystem()
+    implicit val actorMaterializer: ActorMaterializer = ActorMaterializer()
+    implicit val wsClient: AhcWSClient = AhcWSClient()
     val cacheManager = CacheManager.create
     try {
       cacheManager.addCache("testCache")

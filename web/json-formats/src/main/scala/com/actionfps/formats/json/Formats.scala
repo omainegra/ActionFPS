@@ -44,9 +44,9 @@ trait Formats {
   private val DefaultZonedDateTimeWrites =
     Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](
       DateTimeFormatter.ISO_INSTANT)
-  private implicit val jsonFormat = {
+  private implicit val jsonFormat: OWrites[ViewFields] = {
 
-    implicit val ZonedWrite =
+    implicit val ZonedWrite: Writes[ZonedDateTime] =
       Writes.temporalWrites[ZonedDateTime, DateTimeFormatter](
         DateTimeFormatter.ISO_ZONED_DATE_TIME)
     Json.writes[ViewFields]
@@ -83,18 +83,20 @@ trait Formats {
         }
       case _ => JsError("Could not read a string for e-mail address")
     }
-  private implicit val vf = DefaultZonedDateTimeWrites
-  private implicit val pnFormat = Json.format[PreviousNickname]
-  private implicit val cnFormat = Json.format[CurrentNickname]
+  private implicit val vf: Writes[ZonedDateTime] = DefaultZonedDateTimeWrites
+  private implicit val pnFormat: OFormat[PreviousNickname] =
+    Json.format[PreviousNickname]
+  private implicit val cnFormat: OFormat[CurrentNickname] =
+    Json.format[CurrentNickname]
   implicit def userWrite(implicit publicKey: PublicKey): Writes[User] =
     Writes[User](u =>
       Json.writes[User].writes(u.copy(email = u.email.secured)))
   implicit val userRead: Reads[User] = Json.reads[User]
 
   implicit def clanwarWrites(implicit namer: ClanNamer): Writes[Clanwar] = {
-    implicit val ccww = {
-      implicit val cpww = Json.format[ClanwarPlayer]
-      implicit val ctww = Json.format[ClanwarTeam]
+    implicit val ccww: Writes[Conclusion] = {
+      implicit val cpww: OFormat[ClanwarPlayer] = Json.format[ClanwarPlayer]
+      implicit val ctww: OFormat[ClanwarTeam] = Json.format[ClanwarTeam]
       Writes[Conclusion](con => Json.format[Conclusion].writes(con.named))
     }
     val clanwarFormat: Writes[Clanwar] = Writes[Clanwar] {
@@ -111,7 +113,7 @@ trait Formats {
   }
 
   implicit def writeClanwars(implicit namer: ClanNamer): Writes[Clanstats] = {
-    implicit val clanstatWrites = Json.writes[Clanstat]
+    implicit val clanstatWrites: OWrites[Clanstat] = Json.writes[Clanstat]
     Writes[Clanstats](cs => Json.writes[Clanstats].writes(cs.named))
   }
 
@@ -119,48 +121,57 @@ trait Formats {
     Writes[Clanstat](cs => Json.writes[Clanstat].writes(cs.named))
   }
 
-  private implicit val cmc = Writes[CaptureMapCompletion] { cmc =>
-    import cmc._
-    JsObject(
-      Map(
-        "map" -> JsString(map),
-        "completed" -> JsBoolean(isCompleted),
-        "cla" -> JsString(s"$cla/${CaptureMapCompletion.targetPerSide}"),
-        "rvsf" -> JsString(s"$rvsf/${CaptureMapCompletion.targetPerSide}")
-      ))
-  }
-  private implicit val captureMasterWriter = Writes[CaptureMaster] { cm =>
-    JsObject(
-      Map(
-        "maps" -> JsArray(cm.all.sortBy(_.map).map(x => Json.toJson(x)))
-      ))
-  }
-  private implicit val caFormats = Json.writes[CompletedAchievement]
-  private implicit val paFormats = Json.writes[PartialAchievement]
-  private implicit val saFormats = Json.writes[SwitchNotAchieved]
-  private implicit val arFormats = Json.writes[AchievementsRepresentation]
-  private implicit val lif = Json.writes[LocationInfo]
-  private implicit val hofarpW =
+  private implicit val cmc: Writes[CaptureMapCompletion] =
+    Writes[CaptureMapCompletion] { cmc =>
+      import cmc._
+      JsObject(
+        Map(
+          "map" -> JsString(map),
+          "completed" -> JsBoolean(isCompleted),
+          "cla" -> JsString(s"$cla/${CaptureMapCompletion.targetPerSide}"),
+          "rvsf" -> JsString(s"$rvsf/${CaptureMapCompletion.targetPerSide}")
+        ))
+    }
+  private implicit val captureMasterWriter: Writes[CaptureMaster] =
+    Writes[CaptureMaster] { cm =>
+      JsObject(
+        Map(
+          "maps" -> JsArray(cm.all.sortBy(_.map).map(x => Json.toJson(x)))
+        ))
+    }
+  private implicit val caFormats: OWrites[CompletedAchievement] =
+    Json.writes[CompletedAchievement]
+  private implicit val paFormats: OWrites[PartialAchievement] =
+    Json.writes[PartialAchievement]
+  private implicit val saFormats: OWrites[SwitchNotAchieved] =
+    Json.writes[SwitchNotAchieved]
+  private implicit val arFormats: OWrites[AchievementsRepresentation] =
+    Json.writes[AchievementsRepresentation]
+  private implicit val lif: OWrites[LocationInfo] = Json.writes[LocationInfo]
+  private implicit val hofarpW: OWrites[HallOfFame.AchievementRecordPlayer] =
     Json.writes[HallOfFame.AchievementRecordPlayer]
-  private implicit val achW = Writes[Achievement](ach =>
+  private implicit val achW: Writes[Achievement] = Writes[Achievement](ach =>
     Json.toJson(Map("title" -> ach.title, "description" -> ach.description)))
-  private implicit val hofarW = Json.writes[HallOfFame.AchievementRecord]
+  private implicit val hofarW: OWrites[HallOfFame.AchievementRecord] =
+    Json.writes[HallOfFame.AchievementRecord]
   implicit val hofW: OWrites[HallOfFame] = Json.writes[HallOfFame]
 
-  private implicit val psw = Json.writes[PlayerStat]
+  private implicit val psw: OWrites[PlayerStat] = Json.writes[PlayerStat]
 
-  private implicit val writes = Writes[PlayerGameCounts](pgc =>
-    JsArray(pgc.counts.map {
-      case (d, n) =>
-        JsObject(
-          Map(
-            "date" -> JsString(d.toString.take(10)),
-            "count" -> JsNumber(n)
-          ))
-    }.toList))
+  private implicit val writes: Writes[PlayerGameCounts] =
+    Writes[PlayerGameCounts](pgc =>
+      JsArray(pgc.counts.map {
+        case (d, n) =>
+          JsObject(
+            Map(
+              "date" -> JsString(d.toString.take(10)),
+              "count" -> JsNumber(n)
+            ))
+      }.toList))
 
   implicit val writeStats: OWrites[PlayersStats] = Json.writes[PlayersStats]
-  private implicit val fmts = Json.format[PlayerStatistics]
+  private implicit val fmts: OFormat[PlayerStatistics] =
+    Json.format[PlayerStatistics]
 
   implicit def bpwrites(implicit publicKey: PublicKey): Writes[BuiltProfile] =
     Json.writes[BuiltProfile]

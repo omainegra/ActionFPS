@@ -17,8 +17,8 @@ import scala.concurrent.{Await, Future}
   * Created by me on 18/01/2017.
   */
 class IntersServiceSpec extends FreeSpec with BeforeAndAfterAll {
-  implicit lazy val actorSystem = ActorSystem()
-  implicit lazy val actorMaterializer = ActorMaterializer()
+  implicit lazy val actorSystem: ActorSystem = ActorSystem()
+  implicit lazy val actorMaterializer: ActorMaterializer = ActorMaterializer()
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate()

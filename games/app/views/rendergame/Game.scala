@@ -10,7 +10,7 @@ case class Now(server: NowServer, minRemain: Option[Int])
 case class GDA(text: String, user: String)
 
 object MixedGame {
-  def fromJsonGame(jsonGame: JsonGame) = {
+  def fromJsonGame(jsonGame: JsonGame): MixedGame = {
     MixedGame(isNew = false,
               game = jsonGame,
               now = None,
@@ -38,20 +38,22 @@ case class MixedGame(isNew: Boolean,
   def acLink: Option[String] =
     now.map(now => s"assaultcube://${now.server.server}")
 
-  def onServer = now.map(_.server.server)
+  def onServer: Option[String] = now.map(_.server.server)
 
-  def demoLink =
+  def demoLink: Option[String] =
     if (now.isEmpty && server.contains("aura"))
       id.map(i => s"""http://woop.ac:81/find-demo.php?time=$i&map=$map""")
     else None
 
-  def url = id.map(i => s"/game/?id=$i")
+  def url: Option[String] = id.map(i => s"/game/?id=$i")
 
   def heading = s"$mode @ $map"
 
-  def bgImage = Maps.mapToImage.get(map)
+  def bgImage: Option[String] = Maps.mapToImage.get(map)
 
-  def bgStyle = bgImage.map(i => s"background-image: url('$i')").getOrElse("")
+  def bgStyle: String =
+    bgImage.map(i => s"background-image: url('$i')").getOrElse("")
 
-  def className = (if (now.isDefined) "isLive" else if (isNew) "isNew" else "")
+  def className: String =
+    (if (now.isDefined) "isLive" else if (isNew) "isNew" else "")
 }

@@ -12,7 +12,7 @@ import com.actionfps.stats.Clanstat
 import controllers.ClansController.ClanView
 import lib.{ClanDataProvider, Clanner, ClansProvider, WebTemplateRender}
 import play.api.Configuration
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, OWrites, Writes}
 import play.api.mvc._
 import views.ClanRankings
 import views.clanwar.Clanwar.ClanIdToClan
@@ -48,7 +48,9 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
 
   def rankings: Action[AnyContent] = Action.async { implicit request =>
     async {
-      implicit val namer = await(namerF)
+      implicit val namer: ClanNamer {
+        def clanName(id: String): Option[String]
+      } = await(namerF)
       val stats = await(clanDataProvider.clanstats)
         .shiftedElo(Instant.now())
         .onlyRanked
@@ -66,7 +68,9 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
 
   def clan(id: String): Action[AnyContent] = Action.async { implicit request =>
     async {
-      implicit val namer = await(namerF)
+      implicit val namer: ClanNamer {
+        def clanName(id: String): Option[String]
+      } = await(namerF)
 
       val ccw = await(clanDataProvider.clanwars).all
         .filter(_.clans.contains(id))
@@ -99,9 +103,13 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
   def clanwar(id: String): Action[AnyContent] = Action.async {
     implicit request =>
       async {
-        implicit val namer = await(namerF)
-        implicit val clanner = await(clannerF)
-        implicit val cidtc = await(clanIdToClan)
+        implicit val namer: ClanNamer {
+          def clanName(id: String): Option[String]
+        } = await(namerF)
+        implicit val clanner: Clanner {
+          def get(id: String): Option[Clan]
+        } = await(clannerF)
+        implicit val cidtc: ClanIdToClan = await(clanIdToClan)
         await(clanDataProvider.clanwars).all.find(_.id == id) match {
           case Some(clanwar) =>
             if (request.getQueryString("format").contains("json"))
@@ -129,9 +137,13 @@ class ClansController @Inject()(webTemplateRender: WebTemplateRender,
 
   def clanwars: Action[AnyContent] = Action.async { implicit request =>
     async {
-      implicit val namer = await(namerF)
-      implicit val clanner = await(clannerF)
-      implicit val cidtc = await(clanIdToClan)
+      implicit val namer: ClanNamer {
+        def clanName(id: String): Option[String]
+      } = await(namerF)
+      implicit val clanner: Clanner {
+        def get(id: String): Option[Clan]
+      } = await(clannerF)
+      implicit val cidtc: ClanIdToClan = await(clanIdToClan)
       val cws = await(clanDataProvider.clanwars).all.toList
         .sortBy(_.id)
         .reverse
@@ -174,7 +186,7 @@ object ClansController {
 
   object ClanView {
     implicit def cww(implicit namer: ClanNamer): Writes[ClanView] = {
-      implicit val cstw = Json.writes[Clanstat]
+      implicit val cstw: OWrites[Clanstat] = Json.writes[Clanstat]
       Json.writes[ClanView]
     }
   }

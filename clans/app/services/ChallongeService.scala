@@ -22,10 +22,12 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient)(
 
   Logger.info(s"Challonge service started.")
 
-  private implicit val actorMaterializer = ActorMaterializer()
+  private implicit val actorMaterializer: ActorMaterializer =
+    ActorMaterializer()
 
   Source
-    .actorRef[NewClanwarCompleted](bufferSize = 10, OverflowStrategy.dropBuffer)
+    .actorRef[NewClanwarCompleted](bufferSize = 10,
+                                   OverflowStrategy.dropBuffer)
     .mapMaterializedValue(
       actorSystem.eventStream.subscribe(_, classOf[NewClanwarCompleted]))
     .map(_.clanwarCompleted)
@@ -47,7 +49,8 @@ class ChallongeService @Inject()(challongeClient: ChallongeClient)(
     .onComplete {
       case Success(_) => Logger.info("Challonge Service flow completed.")
       case Failure(reason) =>
-        Logger.error(s"Challonge Service flow failed due to: ${reason}", reason)
+        Logger.error(s"Challonge Service flow failed due to: ${reason}",
+                     reason)
     }
 
 }

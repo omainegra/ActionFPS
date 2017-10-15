@@ -13,7 +13,7 @@ import com.actionfps.ladder.parser.TimedUserMessageExtract.NickToUser
 import com.actionfps.ladder.parser._
 import lib.WebTemplateRender
 import play.api.Configuration
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OWrites}
 import play.api.mvc._
 import services.TsvLadderService
 import views.ladder.Table.PlayerNamer
@@ -29,7 +29,8 @@ class LadderController @Inject()(configuration: Configuration,
     implicit executionContext: ExecutionContext,
     actorSystem: ActorSystem)
     extends AbstractController(components) {
-  private implicit val actorMaterializer = ActorMaterializer()
+  private implicit val actorMaterializer: ActorMaterializer =
+    ActorMaterializer()
 
   private def nickToUser: Future[NickToUser] =
     providesUsers.users.map(users =>
@@ -53,13 +54,14 @@ class LadderController @Inject()(configuration: Configuration,
     async {
       req.getQueryString("format") match {
         case Some("json") =>
-          implicit val aggWriter = {
-            implicit val usWriter = Json.writes[UserStatistics]
+          implicit val aggWriter: OWrites[Aggregate] = {
+            implicit val usWriter: OWrites[UserStatistics] =
+              Json.writes[UserStatistics]
             Json.writes[Aggregate]
           }
           Ok(Json.toJson(await(aggregate)))
         case _ =>
-          implicit val playerNamer = PlayerNamer.fromMap(
+          implicit val playerNamer: PlayerNamer = PlayerNamer.fromMap(
             await(providesUsers.users).map(u => u.id -> u.name).toMap)
           Ok(
             common.renderTemplate(title = Some("Ladder"),

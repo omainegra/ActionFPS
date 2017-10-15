@@ -207,7 +207,7 @@ object ValidServers {
       )
   }
 
-  implicit val fromResource = ValidServers(
+  implicit val fromResource: ValidServers = ValidServers(
     validServers.map(v => v.logId -> v).toMap)
 
   case class ValidServer(logId: String,

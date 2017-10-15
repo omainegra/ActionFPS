@@ -56,7 +56,7 @@ class IntersService(pickedFile: File,
 
   private val logger = Logger(getClass)
 
-  implicit val actorMaterializer = ActorMaterializer()
+  implicit val actorMaterializer: ActorMaterializer = ActorMaterializer()
 
   private def f = pickedFile
 

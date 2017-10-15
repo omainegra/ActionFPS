@@ -12,7 +12,7 @@ sealed trait TerribleGame {
 }
 
 object TerribleGame {
-  def begin = NotAchieved
+  def begin: NotAchieved.type = NotAchieved
 
   case class Achieved(frags: Int)
       extends TerribleGame

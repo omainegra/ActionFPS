@@ -10,7 +10,7 @@ case class ClanwarPlayer(flags: Int,
                          name: String,
                          user: Option[String],
                          awards: Set[String]) {
-  def +(other: ClanwarPlayer) =
+  def +(other: ClanwarPlayer): ClanwarPlayer =
     copy(
       flags = flags + other.flags,
       frags = frags + other.frags,
@@ -18,7 +18,7 @@ case class ClanwarPlayer(flags: Int,
       awards = awards ++ other.awards
     )
 
-  def award(id: String) = copy(awards = awards + id)
+  def award(id: String): ClanwarPlayer = copy(awards = awards + id)
 }
 
 case class ClanwarTeam(clan: String,
@@ -29,7 +29,7 @@ case class ClanwarTeam(clan: String,
                        deaths: Int,
                        players: Map[String, ClanwarPlayer],
                        won: Set[String]) {
-  def +(other: ClanwarTeam) = copy(
+  def +(other: ClanwarTeam): ClanwarTeam = copy(
     score = score + other.score,
     flags = flags + other.flags,
     frags = frags + other.frags,
@@ -43,9 +43,9 @@ case class ClanwarTeam(clan: String,
 }
 
 case class Conclusion(teams: List[ClanwarTeam]) {
-  def team(clan: String) = teams.find(_.clan == clan)
+  def team(clan: String): Option[ClanwarTeam] = teams.find(_.clan == clan)
 
-  def awardMvps = copy(
+  def awardMvps: Conclusion = copy(
     teams = teams.map { team =>
       team.players.maxBy { case (_, player) => player.score } match {
         case (name, player) =>
@@ -66,13 +66,15 @@ trait ClanNamer {
 }
 
 object ClanNamer {
-  def apply(f: String => Option[String]) = new ClanNamer {
+  def apply(f: String => Option[String]): ClanNamer {
+    def clanName(id: String): Option[String]
+  } = new ClanNamer {
     override def clanName(id: String): Option[String] = f(id)
   }
 }
 object Conclusion {
 
-  def conclude(games: List[Game]) = {
+  def conclude(games: List[Game]): Conclusion = {
     val allTeams = for {
       game <- games
       team <- game.teams

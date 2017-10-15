@@ -22,7 +22,7 @@ class ChallongeSubmitTest
     with FreeSpecLike
     with BeforeAndAfterAll {
 
-  implicit lazy val mat = ActorMaterializer()
+  implicit lazy val mat: ActorMaterializer = ActorMaterializer()
 
   private lazy val challongeUsername =
     util.Properties.envOrNone("CHALLONGE_USERNAME").getOrElse {

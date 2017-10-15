@@ -12,7 +12,5 @@ trait Clanner {
 }
 
 object Clanner {
-  def apply(f: String => Option[Clan]) = new Clanner {
-    override def get(id: String): Option[Clan] = f(id)
-  }
+  def apply(f: String => Option[Clan]): Clanner = (id: String) => f(id)
 }

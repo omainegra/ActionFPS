@@ -50,7 +50,8 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
   private val logSource =
     Paths.get(configuration.underlying.getString("journal.large"))
 
-  private implicit val actorMaterializer = ActorMaterializer()
+  private implicit val actorMaterializer: ActorMaterializer =
+    ActorMaterializer()
 
   override protected[providers] val accumulatorFutureAgent
     : Future[Agent[GameAxisAccumulator]] = async {

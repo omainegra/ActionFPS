@@ -11,7 +11,7 @@ import scala.collection.immutable.ListMap
   * Created by me on 22/04/2016.
   */
 object StatsController {
-  val fmt = DateTimeFormatter.ISO_DATE
+  val fmt: DateTimeFormatter = DateTimeFormatter.ISO_DATE
   implicit val lmWriter: Writes[ListMap[ZonedDateTime, Int]] =
     Writes[ListMap[ZonedDateTime, Int]](pgc =>
       JsArray(pgc.map {

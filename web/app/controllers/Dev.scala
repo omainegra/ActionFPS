@@ -81,7 +81,9 @@ class Dev @Inject()(webTemplateRender: WebTemplateRender,
   }
 
   private def clanwarTemplate = Action.apply { implicit req =>
-    implicit val namer = Dev.namer
+    implicit val namer: ClanNamer {
+      def clanName(id: String): Option[String]
+    } = Dev.namer
     implicit val clanner = Dev.clanner
     implicit val clanid = Dev.clanidToClan
     val html = views.clanwar.Clanwar.render(
@@ -241,7 +243,9 @@ object Dev {
     scores = Map("woop" -> 2, "bleh" -> 1),
     games = List(Dev.completedGame, Dev.completedGame)
   )
-  implicit val namer = ClanNamer(Map("newbie" -> "w00p|Newbie").get)
+  implicit val namer: ClanNamer {
+    def clanName(id: String): Option[String]
+  } = ClanNamer(Map("newbie" -> "w00p|Newbie").get)
   val woopCln = Clan(
     id = "woop",
     name = "w00p",
@@ -253,7 +257,9 @@ object Dev {
       "https://cloud.githubusercontent.com/assets/2464813/12814066/25c656a4-cb34-11e5-87a7-dbff30d759c6.png"
   )
 
-  implicit val clanner = Clanner(
+  implicit val clanner: Clanner {
+    def get(id: String): Option[Clan]
+  } = Clanner(
     Map(
       "woop" -> woopCln,
       "bleh" -> woopCln.copy(
@@ -264,5 +270,5 @@ object Dev {
     ).get
   )
 
-  implicit val clanidToClan = ClanIdToClan(clanner.get)
+  implicit val clanidToClan: ClanIdToClan = ClanIdToClan(clanner.get)
 }

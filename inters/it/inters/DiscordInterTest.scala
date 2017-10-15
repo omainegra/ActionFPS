@@ -19,9 +19,10 @@ import ExecutionContext.Implicits.global
 @DoNotDiscover
 class DiscordInterTest extends WordSpec {
 
-  private implicit lazy val actorSystem = ActorSystem()
-  private implicit lazy val actorMaterializer = ActorMaterializer()
-  private implicit lazy val wsClient = AhcWSClient()
+  private implicit lazy val actorSystem: ActorSystem = ActorSystem()
+  private implicit lazy val actorMaterializer: ActorMaterializer =
+    ActorMaterializer()
+  private implicit lazy val wsClient: AhcWSClient = AhcWSClient()
   "It" must {
     "work" ignore {
       val hookUrl: String = ???

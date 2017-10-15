@@ -12,7 +12,7 @@ case class OpenMatchPlayers(matchId: Int,
                             secondName: String)
 
 object OpenMatchPlayers {
-  def fromJson(json:JsValue): List[OpenMatchPlayers] = {
+  def fromJson(json: JsValue): List[OpenMatchPlayers] = {
     def getParticipantName(id: Int): String = {
       (json \ "tournament" \ "participants")
         .as[JsArray]

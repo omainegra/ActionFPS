@@ -1,6 +1,6 @@
 package com.actionfps.user
 
-import java.security.KeyPairGenerator
+import java.security.{KeyPairGenerator, PrivateKey, PublicKey}
 
 import com.actionfps.user.RegistrationEmail.{
   PlainRegistrationEmail,
@@ -20,8 +20,8 @@ class RegistrationEmailTest extends FunSuite with Matchers {
     keyPairGenerator.generateKeyPair()
   }
 
-  private lazy implicit val privateKey = keyPair.getPrivate
-  private lazy implicit val publicKey = keyPair.getPublic
+  private lazy implicit val privateKey: PrivateKey = keyPair.getPrivate
+  private lazy implicit val publicKey: PublicKey = keyPair.getPublic
 
   private val sampleEmail = PlainRegistrationEmail("sanzo@woop.us")
 

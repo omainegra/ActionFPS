@@ -42,14 +42,14 @@ class IndexController @Inject()(webTemplateRender: WebTemplateRender,
 
   def index: Action[AnyContent] = Action.async { implicit request =>
     async {
-      implicit val playerNamer = PlayerNamer.fromMap(
+      implicit val playerNamer: PlayerNamer = PlayerNamer.fromMap(
         await(referenceProvider.Users.users)
           .map(u => u.id -> u.nickname.nickname)
           .toMap)
       val ladderAggregateF = ladderController.aggregate
-      implicit val namer = await(namerF)
-      implicit val clanner = await(clannerF)
-      implicit val clanIdToClan = ClanIdToClan(clanner.get)
+      implicit val namer: ClanNamer = await(namerF)
+      implicit val clanner: Clanner = await(clannerF)
+      implicit val clanIdToClan: ClanIdToClan = ClanIdToClan(clanner.get)
       val games = await(fullProvider.getRecent(NumberOfRecentGames))
         .map(MixedGame.fromJsonGame)
       val events = await(fullProvider.events)
