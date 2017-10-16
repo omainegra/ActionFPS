@@ -7,7 +7,6 @@ import controllers.{
   Admin,
   AllGames,
   ClansController,
-  Dev,
   DownloadsController,
   EventStreamController,
   Forwarder,
@@ -108,7 +107,6 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   implicit lazy val mapValidator: MapValidator =
     ReferenceMapValidator.referenceMapValidator
   lazy val staticPageRouter: StaticPageRouter = wire[StaticPageRouter]
-  lazy val dev: Dev = wire[Dev]
   lazy val prefix: String = "/"
   lazy val router: Routes = wire[Routes]
   lazy val challongeClient: ChallongeClient = wire[ChallongeClient]

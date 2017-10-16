@@ -1,5 +1,4 @@
 ->          /                               controllers.StaticPageRouter
-->          /dev/                           controllers.Dev
 ->          /all/                           controllers.AllGames
 GET         /assets/*file                   controllers.Forwarder.getAsset(file: String)
 
