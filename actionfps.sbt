@@ -51,20 +51,20 @@ lazy val root =
   ).aggregate(
     playerAchievements,
     web,
-    logServer,
-    inters,
+    webLogServer,
+    webInters,
     accumulation,
-    ladder,
-    downloads,
+    webLadder,
+    webDownloads,
     jsonFormats,
-    clans,
-    games,
-    players,
-    servers
+    webClans,
+    webGames,
+    webPlayers,
+    webServers
   )
 
-lazy val logServer = project
-  .in(file("log-server"))
+lazy val webLogServer = project
+  .in(file("web-log-server"))
   .enablePlugins(PlayScala)
   .aggregate(fileOffsetFinder)
   .dependsOn(fileOffsetFinder)
@@ -93,14 +93,14 @@ lazy val benchmark = project
 
 lazy val web = project
   .enablePlugins(PlayScala)
-  .dependsOn(inters)
-  .dependsOn(players)
-  .dependsOn(ladder)
-  .dependsOn(games)
-  .dependsOn(logServer)
-  .dependsOn(servers)
-  .dependsOn(clans)
-  .dependsOn(downloads)
+  .dependsOn(webInters)
+  .dependsOn(webPlayers)
+  .dependsOn(webLadder)
+  .dependsOn(webGames)
+  .dependsOn(webLogServer)
+  .dependsOn(webServers)
+  .dependsOn(webClans)
+  .dependsOn(webDownloads)
   .dependsOn(webTemplate)
   .aggregate(webTemplate)
   .enablePlugins(WebBuildInfo)
@@ -155,10 +155,10 @@ lazy val web = project
 lazy val inMemoryCache = SettingKey[Boolean](
   "Use an in-memory Hazelcast cache for increased iteration performance.")
 
-lazy val inters =
+lazy val webInters =
   Project(
-    id = "inters",
-    base = file("inters")
+    id = "web-inters",
+    base = file("web-inters")
   ).dependsOn(interParser)
     .enablePlugins(PlayScala)
     .dependsOn(accumulation)
@@ -210,10 +210,10 @@ lazy val ladderParser =
     libraryDependencies += gameParser
   )
 
-lazy val ladder =
+lazy val webLadder =
   Project(
-    id = "ladder",
-    base = file("ladder")
+    id = "web-ladder",
+    base = file("web-ladder")
   ).enablePlugins(PlayScala)
     .dependsOn(ladderParser)
     .aggregate(ladderParser)
@@ -242,19 +242,19 @@ lazy val jsonFormats =
 
 lazy val sampleLog = taskKey[File]("Sample Log")
 
-lazy val clans =
+lazy val webClans =
   Project(
-    id = "clans",
-    base = file("clans")
+    id = "web-clans",
+    base = file("web-clans")
   ).aggregate(clan)
     .aggregate(pureClanwar)
     .aggregate(clanStats)
-    .aggregate(clanwars)
+    .aggregate(webClansClanwars)
     .aggregate(clansChallonge)
     .dependsOn(clanStats)
-    .dependsOn(clanwars)
+    .dependsOn(webClansClanwars)
     .dependsOn(webTemplate)
-    .dependsOn(games)
+    .dependsOn(webGames)
     .dependsOn(clansChallonge)
     .enablePlugins(PlayScala)
     .dependsOn(jsonFormats)
@@ -269,10 +269,10 @@ lazy val clan =
     base = file("clans-clan")
   )
 
-lazy val clanwars =
+lazy val webClansClanwars =
   Project(
-    id = "clanwars",
-    base = file("clans-clanwars")
+    id = "web-clans-clanwars",
+    base = file("web-clans-clanwars")
   ).dependsOn(pureClanwar)
     .enablePlugins(PlayScala)
     .settings(
@@ -313,11 +313,11 @@ lazy val clansChallonge = Project(
     )
   )
 
-lazy val players = Project(
-  id = "players",
-  base = file("players")
+lazy val webPlayers = Project(
+  id = "web-players",
+  base = file("web-players")
 ).enablePlugins(PlayScala)
-  .dependsOn(ladder)
+  .dependsOn(webLadder)
   .dependsOn(jsonFormats)
   .dependsOn(playerUser)
   .dependsOn(playerStats)
@@ -365,10 +365,10 @@ lazy val referenceServers =
     base = file("servers-reference")
   )
 
-lazy val servers =
+lazy val webServers =
   Project(
-    id = "servers",
-    base = file("servers")
+    id = "web-servers",
+    base = file("web-servers")
   ).enablePlugins(PlayScala)
     .dependsOn(referenceServers)
     .aggregate(referenceServers)
@@ -397,10 +397,10 @@ lazy val webTemplate =
       )
     )
 
-lazy val games =
+lazy val webGames =
   Project(
-    id = "games",
-    base = file("games")
+    id = "web-games",
+    base = file("web-games")
   ).enablePlugins(PlayScala)
     .dependsOn(accumulation)
     .dependsOn(webTemplate)
@@ -413,10 +413,10 @@ lazy val games =
       )
     )
 
-lazy val downloads =
+lazy val webDownloads =
   Project(
-    id = "downloads",
-    base = file("downloads")
+    id = "web-downloads",
+    base = file("web-downloads")
   ).enablePlugins(PlayScala)
     .dependsOn(webTemplate)
     .settings(
