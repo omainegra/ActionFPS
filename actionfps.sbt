@@ -18,6 +18,10 @@ scalacOptions in ThisBuild := Seq(
   "-target:jvm-1.8"
 )
 
+sources in (Compile, doc) in ThisBuild := Seq.empty
+
+publishArtifact in (Compile, packageDoc) in ThisBuild := false
+
 resolvers in ThisBuild += Resolver.mavenLocal
 resolvers in ThisBuild += Resolver.bintrayRepo("scalawilliam", "maven")
 resolvers in ThisBuild += Resolver.bintrayRepo("actionfps", "maven")
@@ -74,7 +78,7 @@ lazy val logServer = project
   )
 
 lazy val fileOffsetFinder = project
-  .in(file("log-server/file-offset-finder"))
+  .in(file("log-server-file-offset-finder"))
   .settings(
     libraryDependencies += scalatest % "test",
     libraryDependencies += scalacheck % "test"
@@ -179,7 +183,7 @@ lazy val inters =
 lazy val interParser =
   Project(
     id = "inter-parser",
-    base = file("inters/inter-parser")
+    base = file("inters-parser")
   ).settings(
     libraryDependencies += scalatest % Test
   )
@@ -200,7 +204,7 @@ lazy val accumulation = project
 lazy val ladderParser =
   Project(
     id = "ladder-parser",
-    base = file("ladder/ladder-parser")
+    base = file("ladder-parser")
   ).settings(
     libraryDependencies += scalatest % "test",
     libraryDependencies += gameParser
@@ -229,7 +233,7 @@ lazy val ladder =
 lazy val jsonFormats =
   Project(
     id = "json-formats",
-    base = file("web/json-formats")
+    base = file("web-json-formats")
   ).dependsOn(accumulation)
     .settings(
       libraryDependencies += playJson,
@@ -262,13 +266,13 @@ lazy val clans =
 lazy val clan =
   Project(
     id = "clans-clan",
-    base = file("clans/clan")
+    base = file("clans-clan")
   )
 
 lazy val clanwars =
   Project(
     id = "clanwars",
-    base = file("clans/clanwars")
+    base = file("clans-clanwars")
   ).dependsOn(pureClanwar)
     .enablePlugins(PlayScala)
     .settings(
@@ -278,7 +282,7 @@ lazy val clanwars =
 lazy val pureClanwar =
   Project(
     id = "pure-clanwar",
-    base = file("clans/clanwars/pure-clanwar")
+    base = file("clans-clanwars-pure")
   ).dependsOn(clan)
     .settings(
       libraryDependencies += pureGame
@@ -287,7 +291,7 @@ lazy val pureClanwar =
 lazy val clanStats =
   Project(
     id = "clan-stats",
-    base = file("clans/clan-stats")
+    base = file("clans-clan-stats")
   ).dependsOn(pureClanwar)
     .settings(
       libraryDependencies += scalatest % Test
@@ -295,7 +299,7 @@ lazy val clanStats =
 
 lazy val clansChallonge = Project(
   id = "clans-challonge",
-  base = file("clans/challonge")
+  base = file("clans-challonge")
 ).dependsOn(pureClanwar)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
@@ -331,7 +335,7 @@ lazy val players = Project(
 lazy val playerStats =
   Project(
     id = "player-stats",
-    base = file("players/player-stats")
+    base = file("players-stats")
   ).settings(
     libraryDependencies += scalatest % Test,
     libraryDependencies += pureGame
@@ -339,7 +343,7 @@ lazy val playerStats =
 
 lazy val playerUser = Project(
   id = "player-user",
-  base = file("players/player-user")
+  base = file("players-user")
 ).settings(
   libraryDependencies += scalatest % Test,
   libraryDependencies += commonsCsv,
@@ -349,7 +353,7 @@ lazy val playerUser = Project(
 lazy val playerAchievements =
   Project(
     id = "player-achievements",
-    base = file("players/player-achievements")
+    base = file("players-achievements")
   ).dependsOn(playerUser)
     .settings(
       libraryDependencies += gameParser
@@ -358,7 +362,7 @@ lazy val playerAchievements =
 lazy val referenceServers =
   Project(
     id = "reference-servers",
-    base = file("servers/reference-servers")
+    base = file("servers-reference")
   )
 
 lazy val servers =
@@ -382,7 +386,7 @@ lazy val servers =
 lazy val webTemplate =
   Project(
     id = "web-template",
-    base = file("web/web-template")
+    base = file("web-template")
   ).enablePlugins(PlayScala)
     .dependsOn(jsonFormats)
     .settings(
