@@ -39,6 +39,7 @@ class WebTemplateRender @Inject()(controllerComponents: ControllerComponents)
       WebTemplateRender.wwwLocation.resolve("template.html")
     val js = Jsoup.parse(templateHtmlPath.toFile, "UTF-8")
     title.foreach(js.title)
+
     if (wide) {
       js.body.addClass("wide")
     }
@@ -62,7 +63,8 @@ class WebTemplateRender @Inject()(controllerComponents: ControllerComponents)
     js.select("#content").html(html.body)
     val prefix = "https://github.com/ScalaWilliam/ActionFPS/blob/master"
     val bottomLinksElement = {
-      val el = js.select("nav#bottom-links")
+      val el = js.select(WebTemplateRender.navBottomLinks)
+      Option(el.first()).foreach(_.children().remove())
       if (el.isEmpty) {
         val nel = js.createElement("nav").attr("id", "bottom-links")
         js.select("#content").first().appendChild(nel)
@@ -73,11 +75,11 @@ class WebTemplateRender @Inject()(controllerComponents: ControllerComponents)
     if (sourceLink) {
       val lineExtra =
         Some(line.value).filter(_ > 0).map(l => s"#L${l}").getOrElse("")
+      val repoFile = file.value.drop(WebTemplateRender.removePrefixLength)
+      val link = s"${prefix}${repoFile}${lineExtra}"
       bottomLinksElement
         .appendElement("a")
-        .attr(
-          "href",
-          s"${prefix}${file.value.drop(WebTemplateRender.removePrefixLength)}${lineExtra}")
+        .attr("href", link)
         .text("View source (GitHub)")
     }
 
@@ -105,6 +107,9 @@ class WebTemplateRender @Inject()(controllerComponents: ControllerComponents)
 }
 
 object WebTemplateRender {
+
+  val navBottomLinks = "nav#bottom-links"
+
   lazy val wwwLocation: Path = {
     List("web/dist/www", "dist/www", "www")
       .map(item => Paths.get(item))
@@ -119,7 +124,7 @@ object WebTemplateRender {
   val root: String = myFile
     .split("/", -1)
     .reverse
-    .dropWhile(_ != "web")
+    .dropWhile(_ != "web-template")
     .drop(1)
     .reverse
     .mkString("/")
