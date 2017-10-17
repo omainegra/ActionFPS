@@ -44,6 +44,11 @@ case class Aggregate(users: Map[String, UserStatistics]) {
     }
   }
 
+  def latestInstant: Option[Instant] = {
+    if (users.nonEmpty) Some(users.valuesIterator.map(_.lastSeenInstant).max)
+    else None
+  }
+
   def displayed(instant: Instant): Aggregate = {
     Aggregate(
       users = users.map { case (u, us) => u -> us.displayed(instant) }
@@ -65,9 +70,7 @@ case class Aggregate(users: Map[String, UserStatistics]) {
 }
 
 object Aggregate {
-  case class RankedStat(user: String,
-                        rank: Int,
-                        userStatistics: UserStatistics)
+  case class RankedStat(user: String, rank: Int, userStatistics: UserStatistics)
 
   def empty = Aggregate(users = Map.empty)
 }

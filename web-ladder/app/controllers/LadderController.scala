@@ -46,9 +46,16 @@ class LadderController @Inject()(configuration: Configuration,
 
   ladderService.run()
 
-  def aggregate: Future[Aggregate] =
-    ladderService.aggregate.map(
-      _.displayed(Instant.now()).trimmed(Instant.now()))
+  def aggregate: Future[Aggregate] = {
+    async {
+      val aggregate = await(ladderService.aggregate)
+      aggregate.latestInstant match {
+        case Some(latestInstant) =>
+          aggregate.displayed(latestInstant).trimmed(latestInstant)
+        case _ => aggregate
+      }
+    }
+  }
 
   def ladder: Action[AnyContent] = Action.async { implicit req =>
     async {
