@@ -75,11 +75,17 @@ class IntersService(pickedFile: File,
 
   private val intersFutureAgent: Future[Agent[List[InterOut]]] = {
     val agent = Agent(List.empty[InterOut])
+    logger.info(s"Tailing for inters from ${f} for a list...")
     FileTailSource
       .lines(f.toPath,
              maxLineSize = 4096,
              pollingInterval = 1.second,
              lf = "\n")
+      .withAttributes(ActorAttributes.supervisionStrategy {
+        case NonFatal(e) =>
+          logger.error(s"Failed an element due to ${e}", e)
+          Supervision.Resume
+      })
       .scanAsync(IntersIterator.empty) {
         case (a, line) =>
           async {
@@ -92,6 +98,8 @@ class IntersService(pickedFile: File,
       }
       .mapConcat(_.interOut.toList)
       .runForeach(interOut => agent.send(l => interOut :: l))
+      .onComplete(td =>
+        logger.info(s"Inters service list completed due to ${td}"))
     Future.successful(agent)
   }
 
