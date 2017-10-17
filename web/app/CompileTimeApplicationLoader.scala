@@ -1,4 +1,8 @@
+import java.nio.file.Paths
+
+import af.inters.{DiscordInters, OneSignalInters}
 import akka.actor.ActorSystem
+import akka.stream.scaladsl.Keep
 import com.actionfps.accumulation.ReferenceMapValidator
 import com.actionfps.accumulation.user.GeoIpLookup
 import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
@@ -116,17 +120,35 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   lazy val challongeEnabled: Boolean = configuration
     .get[Seq[String]]("play.modules.enabled")
     .contains("modules.ChallongeLoadModule")
-  lazy val intersEnabled: Boolean = configuration
-    .get[Seq[String]]("play.modules.enabled")
-    .contains("modules.IntersLoadModule")
+
   val challongeServiceO: Option[ChallongeService] =
     if (challongeEnabled) Some(wire[ChallongeService]) else None
-  lazy val intersService: IntersService =
-    new IntersService(configuration)(() => referenceProvider.users,
-                                     executionContext,
-                                     wsClient,
-                                     actorSystem)
 
-  if (intersEnabled) intersService.beginPushing()
+  lazy val intersService: IntersService =
+    new IntersService(
+      journalPath = Paths.get(configuration.get[String]("journal.large"))
+    )(() => referenceProvider.users, executionContext, wsClient, actorSystem)
+
+  intersService.beginPushing()
+
+  configuration
+    .getOptional[Configuration]("one-signals")
+    .map(OneSignalInters(_))
+    .foreach { oneSignal =>
+      intersService.newIntersSource
+        .toMat(oneSignal.pushSink)(Keep.right)
+        .run()
+        .onComplete(intersService.completionHandler)
+    }
+
+  configuration
+    .getOptional[Configuration]("discord")
+    .map(DiscordInters(_))
+    .foreach { discord =>
+      intersService.newIntersSource
+        .toMat(discord.pushSink)(Keep.right)
+        .run()
+        .onComplete(intersService.completionHandler)
+    }
 
 }

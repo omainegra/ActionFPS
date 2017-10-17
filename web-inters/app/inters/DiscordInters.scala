@@ -1,10 +1,10 @@
 package af.inters
 
-import akka.NotUsed
-import akka.stream.scaladsl.{Flow, Sink}
+import akka.{Done, NotUsed}
+import akka.stream.scaladsl.{Flow, Keep, Sink}
 import com.actionfps.inter.InterOut
 import com.actionfps.servers.ValidServers
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.libs.json.JsObject
 import play.api.libs.ws.{WSClient, WSResponse}
 
@@ -17,27 +17,27 @@ import scala.concurrent.{ExecutionContext, Future}
   * @see https://discordapp.com/developers/docs/resources/webhook#execute-webhook
   *      https://discordapp.com/developers/docs/resources/channel#embed-object
   */
-case class DiscordInters(hookUrl: String)(
-    implicit executionContext: ExecutionContext,
-    wSClient: WSClient,
-    validServers: ValidServers) {
+object DiscordInters {
+  val DiscordHookUrlKey = "hook-url"
+  def apply(configuration: Configuration): DiscordInters = {
+    DiscordInters(
+      hookUrl = configuration.get[String](DiscordHookUrlKey)
+    )
+  }
+}
 
-  def pushOutFlow: Sink[InterOut, NotUsed] =
+case class DiscordInters(hookUrl: String)(implicit validServers: ValidServers) {
+
+  def pushSink(implicit executionContext: ExecutionContext,
+               wSClient: WSClient): Sink[InterOut, Future[Done]] = {
     Flow[InterOut]
-      .mapAsync(100) { m =>
-        val r = pushInterOut(m)
-        r.onComplete { r =>
-          Logger.info(s"Play Inter push result: ${r}")
-        }
-        r.onFailure {
-          case f =>
-            Logger.error(s"Failure due to ${f}", f)
-        }
-        r
-      }
-      .to(Sink.ignore)
+      .mapAsync(10)(i => pushInterOut(i))
+      .toMat(Sink.ignore)(Keep.right)
+  }
 
-  def pushInterOut(interOut: InterOut): Future[Option[WSResponse]] = {
+  def pushInterOut(interOut: InterOut)(
+      implicit executionContext: ExecutionContext,
+      wSClient: WSClient): Future[Option[WSResponse]] = {
     async {
 
       validServers.items.get(interOut.userMessage.serverId) match {

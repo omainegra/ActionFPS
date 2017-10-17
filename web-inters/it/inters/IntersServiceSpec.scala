@@ -16,33 +16,6 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by me on 18/01/2017.
   */
-class IntersServiceSpec extends FreeSpec with BeforeAndAfterAll {
-  implicit lazy val actorSystem: ActorSystem = ActorSystem()
-  implicit lazy val actorMaterializer: ActorMaterializer = ActorMaterializer()
-
-  override protected def afterAll(): Unit = {
-    actorSystem.terminate()
-    super.afterAll()
-  }
-
-  "IntersService event flow" - {
-    "produces 1 output event only" in {
-      val flow = IntersFlow
-        .lineToEventFlow(
-          usersProvider = () =>
-            Future.successful(new NicknameToUser {
-              override def userOf(nickname: String): Option[String] =
-                IntersServiceSpec.nicknameToUser.get(nickname)
-            }),
-          instant = () => Instant.now()
-        )
-      val source =
-        Source(IntersServiceSpec.syslogEvents).via(flow).runWith(Sink.seq)
-      val gotIos = Await.result(source, 5.seconds)
-      gotIos should have size 1
-    }
-  }
-}
 
 object IntersServiceSpec {
 
