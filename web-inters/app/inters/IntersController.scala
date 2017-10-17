@@ -31,7 +31,7 @@ class IntersController @Inject()(configuration: Configuration,
         webTemplateRender.renderTemplate(
           title = Some("ActionFPS Inters")
         )(Html(<article id="servers"><div><h2>ActionFPS Inters</h2><ol>
-        {await(intersService.inters)
+        {await(intersService.inters).take(IntersController.DisplayLimit)
                 .map {
                   io =>
                     val serverName = validServers.items.get(io.userMessage.serverId).map(_.name).getOrElse(io.userMessage.serverId)
@@ -54,4 +54,7 @@ class IntersController @Inject()(configuration: Configuration,
       }
     }
   }
+}
+object IntersController {
+  val DisplayLimit = 250
 }
