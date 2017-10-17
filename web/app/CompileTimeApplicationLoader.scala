@@ -22,6 +22,7 @@ import controllers.{
   UserController,
   VersionController
 }
+import inters.IntersController
 import lib.WebTemplateRender
 import play.api.ApplicationLoader.Context
 import play.api.Configuration
@@ -94,6 +95,8 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
     wire[EventStreamController]
   lazy val masterServerController: MasterServerController =
     wire[MasterServerController]
+  lazy val intersController: IntersController =
+    wire[IntersController]
   lazy val fullProvider: FullProvider = {
     val fullProviderImpl = wire[FullProviderImpl]
     if (useCached)
@@ -118,13 +121,12 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
     .contains("modules.IntersLoadModule")
   val challongeServiceO: Option[ChallongeService] =
     if (challongeEnabled) Some(wire[ChallongeService]) else None
-  val intersServiceO: Option[IntersService] =
-    if (intersEnabled)
-      Some(
-        new IntersService(configuration)(referenceProvider,
-                                         executionContext,
-                                         wsClient,
-                                         actorSystem))
-    else None
+  lazy val intersService: IntersService =
+    new IntersService(configuration)(() => referenceProvider.users,
+                                     executionContext,
+                                     wsClient,
+                                     actorSystem)
+
+  if (intersEnabled) intersService.beginPushing()
 
 }

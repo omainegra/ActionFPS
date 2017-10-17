@@ -160,6 +160,7 @@ lazy val webInters =
     id = "web-inters",
     base = file("web-inters")
   ).dependsOn(interParser)
+    .dependsOn(webTemplate)
     .enablePlugins(PlayScala)
     .dependsOn(accumulation)
     .configs(IntegrationTest)
@@ -171,6 +172,7 @@ lazy val webInters =
       libraryDependencies ++= Seq(
         gameParser,
         async,
+        akkaAgent,
         alpakkaFile,
         scalatest % Test,
         scalatest % "it",

@@ -36,3 +36,4 @@ GET         /download-direct/game/          controllers.DownloadsController.game
 GET         /logs.tsv                       controllers.RawLogController.historical(from: String, to: Option[String])
 GET         /logs                           controllers.RawLogController.stream
 GET         /logs/stream/                   controllers.RawLogController.stream
+GET /inters/ inters.IntersController.index
