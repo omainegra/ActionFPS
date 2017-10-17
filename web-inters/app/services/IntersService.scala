@@ -34,7 +34,6 @@ import scala.util.{Failure, Success, Try}
 class IntersService(journalPath: Path)(
     implicit usersF: () => Future[List[User]],
     executionContext: ExecutionContext,
-    wSClient: WSClient,
     actorSystem: ActorSystem
 ) {
 

@@ -127,7 +127,7 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   lazy val intersService: IntersService =
     new IntersService(
       journalPath = Paths.get(configuration.get[String]("journal.large"))
-    )(() => referenceProvider.users, executionContext, wsClient, actorSystem)
+    )(() => referenceProvider.users, executionContext, actorSystem)
 
   intersService.beginPushing()
 
