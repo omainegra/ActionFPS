@@ -1,11 +1,11 @@
 package services
 
-import java.lang.management.ManagementFactory
 import java.nio.file.Path
 import java.time.Instant
 import javax.inject._
 import javax.management.ObjectName
 
+import it.FileTailSourceAdditions._
 import af.inters.IntersFlow.{NicknameToUser, ScanIterators, TimeLeeway}
 import akka.actor.ActorSystem
 import akka.agent.Agent
@@ -15,7 +15,7 @@ import akka.stream.{ActorAttributes, ActorMaterializer, Supervision}
 import akka.{Done, NotUsed}
 import com.actionfps.inter.InterOut
 import com.actionfps.user.User
-import monitoring.{LastLine, LastLineMBean}
+import monitoring.LinesMBeanMonitor
 import play.api.Logger
 import play.api.libs.ws.WSClient
 
@@ -64,34 +64,28 @@ class IntersService(journalPath: Path)(
   private val scanIterators = ScanIterators(() => nicknameToUser())
 
   private def intersSource(name: String) = {
-    // Part of https://github.com/ScalaWilliam/ActionFPS/issues/418
-    val lastLine = new LastLine()
-    val platformMBeanServer = ManagementFactory.getPlatformMBeanServer
-    val objectName = new ObjectName(s"inters.reader:type=${name}")
-    platformMBeanServer.registerMBean(lastLine, objectName)
-
     FileTailSource
       .lines(journalPath,
              maxLineSize = 8092,
              pollingInterval = 1.second,
              lf = "\n")
-      .map { line =>
-        lastLine.lastLine = Some(line)
-        line
-      }
-      .watchTermination() {
-        case (_, fd) =>
-          fd.onComplete { _ =>
-            platformMBeanServer.unregisterMBean(objectName)
-          }
-          NotUsed
-      }
+      .via(
+        LinesMBeanMonitor(new ObjectName(s"inters.reader:type=${name}")).flow)
       .scanAsync(scanIterators.initial)(scanIterators.scanAsync)
       .mapConcat(_.interOut.toList)
   }
 
-  def newIntersSource(name: String): Source[InterOut, NotUsed] =
-    intersSource(name).filter(filterRecent)
+  def newIntersSource(name: String): Source[InterOut, NotUsed] = {
+    FileTailSource
+      .newLines(journalPath,
+                maxLineSize = 8092,
+                pollingInterval = 1.second,
+                lf = "\n")
+      .via(
+        LinesMBeanMonitor(new ObjectName(s"inters.reader:type=${name}")).flow)
+      .scanAsync(scanIterators.initial)(scanIterators.scanAsync)
+      .mapConcat(_.interOut.toList)
+  }
 
   val pushToAgent: Sink[InterOut, Future[Done]] =
     Sink.foreach[InterOut](interOut => agent.send(l => interOut :: l))
