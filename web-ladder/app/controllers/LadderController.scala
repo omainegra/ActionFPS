@@ -35,7 +35,7 @@ class LadderController @Inject()(configuration: Configuration,
   private def nickToUser: Future[NickToUser] =
     providesUsers.users.map(users =>
       NickToUser { nickname =>
-        users.find(_.nickname.nickname == nickname).map(_.id)
+        users.find(_.hasNickname(nickname)).map(_.id)
     })
 
   private val ladderService = new TsvLadderService(

@@ -42,10 +42,7 @@ object TimedUserMessageExtract {
   }
 
   object NickToUser {
-    def apply(f: String => Option[String]): NickToUser = new NickToUser {
-      override def userOfNickname(nickname: String): Option[String] =
-        f(nickname)
-    }
-    def empty: NickToUser = apply(Function.const(None))
+    def apply(f: String => Option[String]): NickToUser = (nickname: String) => f(nickname)
+    def empty: NickToUser = Function.const(None)
   }
 }
