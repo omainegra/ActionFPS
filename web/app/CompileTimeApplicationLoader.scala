@@ -135,7 +135,8 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
     .getOptional[Configuration]("one-signals")
     .map(OneSignalInters(_))
     .foreach { oneSignal =>
-      intersService.newIntersSource
+      intersService
+        .newIntersSource("OneSignalsReader")
         .toMat(oneSignal.pushSink)(Keep.right)
         .run()
         .onComplete(intersService.completionHandler)
@@ -145,7 +146,8 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
     .getOptional[Configuration]("discord")
     .map(DiscordInters(_))
     .foreach { discord =>
-      intersService.newIntersSource
+      intersService
+        .newIntersSource("DiscordReader")
         .toMat(discord.pushSink)(Keep.right)
         .run()
         .onComplete(intersService.completionHandler)

@@ -1,8 +1,10 @@
 package services
 
+import java.lang.management.ManagementFactory
 import java.nio.file.Path
 import java.time.Instant
 import javax.inject._
+import javax.management.ObjectName
 
 import af.inters.IntersFlow.{NicknameToUser, ScanIterators, TimeLeeway}
 import akka.actor.ActorSystem
@@ -13,6 +15,7 @@ import akka.stream.{ActorAttributes, ActorMaterializer, Supervision}
 import akka.{Done, NotUsed}
 import com.actionfps.inter.InterOut
 import com.actionfps.user.User
+import monitoring.{LastLine, LastLineMBean}
 import play.api.Logger
 import play.api.libs.ws.WSClient
 
@@ -60,18 +63,35 @@ class IntersService(journalPath: Path)(
 
   private val scanIterators = ScanIterators(() => nicknameToUser())
 
-  private val intersSource = {
+  private def intersSource(name: String) = {
+    // Part of https://github.com/ScalaWilliam/ActionFPS/issues/418
+    val lastLine = new LastLine()
+    val platformMBeanServer = ManagementFactory.getPlatformMBeanServer
+    val objectName = new ObjectName(s"inters.reader:type=${name}")
+    platformMBeanServer.registerMBean(lastLine, objectName)
+
     FileTailSource
       .lines(journalPath,
              maxLineSize = 8092,
              pollingInterval = 1.second,
              lf = "\n")
+      .map { line =>
+        lastLine.lastLine = Some(line)
+        line
+      }
+      .watchTermination() {
+        case (_, fd) =>
+          fd.onComplete { _ =>
+            platformMBeanServer.unregisterMBean(objectName)
+          }
+          NotUsed
+      }
       .scanAsync(scanIterators.initial)(scanIterators.scanAsync)
       .mapConcat(_.interOut.toList)
   }
 
-  val newIntersSource: Source[InterOut, NotUsed] =
-    intersSource.filter(filterRecent)
+  def newIntersSource(name: String): Source[InterOut, NotUsed] =
+    intersSource(name).filter(filterRecent)
 
   val pushToAgent: Sink[InterOut, Future[Done]] =
     Sink.foreach[InterOut](interOut => agent.send(l => interOut :: l))
@@ -101,7 +121,7 @@ class IntersService(journalPath: Path)(
 
   def beginPushing(): Unit = {
     logger.info(s"Tailing for inters from ${journalPath}...")
-    intersSource
+    intersSource("Main IntersService push")
       .via(pushOutSink)
       .runForeach(_ => ())
       .onComplete(completionHandler)
@@ -117,3 +137,5 @@ class IntersService(journalPath: Path)(
   }
 
 }
+
+object IntersService {}
