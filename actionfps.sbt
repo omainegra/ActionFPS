@@ -140,7 +140,7 @@ lazy val web = project
       if (inMemoryCache.value) Some("full.provider" -> "hazelcast-cached")
       else None
     }.toSeq,
-    PlayKeys.devSettings += "journal.large" -> "journals/journal.tsv",
+    PlayKeys.devSettings += "journal.large" -> util.Properties.envOrElse("JOURNAL_LOGS_TSV", "journals/journal.tsv"),
     PlayKeys.devSettings += "journal.games" -> "journals/games.tsv",
     scriptClasspath := Seq("*", "../conf/"),
     mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map {
