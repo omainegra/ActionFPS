@@ -11,7 +11,7 @@ import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.file.scaladsl.FileTailSource
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, Sink, Source}
 import akka.util.ByteString
 import com.actionfps.accumulation.GameAxisAccumulator
 import com.actionfps.clans.CompleteClanwar
@@ -25,7 +25,6 @@ import providers.games.GamesProvider
 import scala.async.Async._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 /**
   * Created by William on 01/01/2016.
@@ -106,7 +105,9 @@ class FullProviderImpl @Inject()(logSource: Path,
       .map(_.flattenPlayers)
   }
 
-  def commitGames: Flow[JsonGame, NewRichGameDetected, NotUsed] =
+  type ChangeTriplet = (GameAxisAccumulator, JsonGame, GameAxisAccumulator)
+
+  def commitJournalAgent: Flow[JsonGame, ChangeTriplet, NotUsed] =
     Flow[JsonGame]
       .mapAsync(1) { game =>
         async {
@@ -115,31 +116,46 @@ class FullProviderImpl @Inject()(logSource: Path,
           val newIterator =
             await(originalIteratorAgent.alter(_.includeGames(List(game))))
           await(gamesProvider.sinkGame(game))
-          val fid = FullIteratorDetector(originalIterator, newIterator)
-          val detectedGame = fid.detectGame
-            .map(NewRichGameDetected)
-          detectedGame.foreach(actorSystem.eventStream.publish)
-          fid.detectClanwar
-            .map(services.ChallongeService.NewClanwarCompleted)
-            .foreach(actorSystem.eventStream.publish)
-          detectedGame
+          (originalIterator, game, newIterator)
         }
-
       }
-      .mapConcat(identity)
 
-  gamesProvider.lastGame.foreach { lastGame =>
-    logger.info(s"Full provider initialized. Log source ${logSource}")
-    logger.info(s"Will read from game ${lastGame.map(_.id)}")
-    readNewGames(lastGame)
-      .via(commitGames)
-      .runWith(Sink.ignore)
-      .onComplete {
-        case Success(_) => logger.info("Full provider stopped.")
-        case Failure(reason) =>
-          logger.error(s"Full provider flow failed due to: ${reason}", reason)
-      }
-  }
+  private val src = gamesProvider.lastGame
+    .map { lastGame =>
+      logger.info(s"Full provider initialized. Log source ${logSource}")
+      logger.info(s"Will read from game ${lastGame.map(_.id)}")
+      readNewGames(lastGame)
+        .via(commitJournalAgent)
+        .alsoTo {
+          Flow[ChangeTriplet]
+            .map {
+              case (o, _, n) =>
+                FullIteratorDetector(o, n).detectGame.map(NewRichGameDetected)
+            }
+            .to(Sink.foreach(actorSystem.eventStream.publish))
+        }
+        .alsoTo {
+          Flow[ChangeTriplet]
+            .map {
+              case (o, _, n) =>
+                FullIteratorDetector(o, n).detectClanwar
+                  .map(services.ChallongeService.NewClanwarCompleted)
+            }
+            .to(Sink.foreach(actorSystem.eventStream.publish))
+        }
+        .toMat(BroadcastHub.sink)(Keep.right)
+    }
+    .map(_.run())
+
+  val clanwarsSrcF: Future[Source[CompleteClanwar, NotUsed]] = src.map(_.mapConcat {
+    case (o, _, n) => FullIteratorDetector(o, n).detectClanwar
+  })
+
+  val gamesSrcF: Future[Source[JsonGame, NotUsed]] = src.map(_.mapConcat {
+    case (o, _, n) => FullIteratorDetector(o, n).detectGame
+  })
+
+  src.foreach(_.to(Sink.ignore).run())
 
 }
 
