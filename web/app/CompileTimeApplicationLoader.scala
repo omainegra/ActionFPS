@@ -2,7 +2,7 @@ import java.nio.file.Paths
 
 import af.inters.{DiscordInters, OneSignalInters}
 import akka.actor.ActorSystem
-import akka.stream.scaladsl.Keep
+import akka.stream.scaladsl.{Keep, Sink}
 import com.actionfps.accumulation.ReferenceMapValidator
 import com.actionfps.accumulation.user.GeoIpLookup
 import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
@@ -38,7 +38,7 @@ import play.api.mvc.EssentialFilter
 import play.filters.HttpFiltersComponents
 import play.filters.cors.CORSComponents
 import play.filters.gzip.GzipFilterComponents
-import providers.ReferenceProvider
+import providers.{ReferenceProvider, SubscribingActorSource}
 import providers.full.{
   FullProvider,
   FullProviderImpl,
@@ -47,6 +47,7 @@ import providers.full.{
 }
 import providers.games.GamesProvider
 import router.Routes
+import services.ChallongeService.NewClanwarCompleted
 import services._
 import tl.ChallongeClient
 
@@ -116,13 +117,23 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   lazy val staticPageRouter: StaticPageRouter = wire[StaticPageRouter]
   lazy val prefix: String = "/"
   lazy val router: Routes = wire[Routes]
+
+  configuration
+    .getOptional[Configuration]("challonge")
+    .filter(_.get[Boolean]("enabled"))
+    .map(ChallongeClient.apply)
+    .foreach { challongeClient =>
+      SubscribingActorSource[NewClanwarCompleted](10)
+        .via(ChallongeService.sinkFlow(challongeClient))
+        .toMat(Sink.ignore)(Keep.right)
+        .run()
+        .onComplete(intersService.completionHandler)
+    }
+
   lazy val challongeClient: ChallongeClient = wire[ChallongeClient]
   lazy val challongeEnabled: Boolean = configuration
     .get[Seq[String]]("play.modules.enabled")
     .contains("modules.ChallongeLoadModule")
-
-  val challongeServiceO: Option[ChallongeService] =
-    if (challongeEnabled) Some(wire[ChallongeService]) else None
 
   lazy val intersService: IntersService =
     new IntersService(

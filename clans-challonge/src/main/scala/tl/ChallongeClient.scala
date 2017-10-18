@@ -10,22 +10,35 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import scala.async.Async._
 
-@Singleton
-class ChallongeClient(
-    wSClient: WSClient,
-    uri: String,
-    username: String,
-    password: String)(implicit executionContext: ExecutionContext) {
+object ChallongeClient {
+  val DefaultUri: String = "https://api.challonge.com/v1"
 
-  @Inject
-  def this(wSClient: WSClient, configuration: Configuration)(
-      implicit executionContext: ExecutionContext) =
-    this(
-      wSClient,
+  def apply(configuration: Configuration)(
+      implicit wSClient: WSClient): ChallongeClient =
+    ChallongeClient(
       ChallongeClient.DefaultUri,
-      configuration.underlying.getString("challonge.username"),
-      configuration.underlying.getString("challonge.password")
+      configuration.get[String]("username"),
+      configuration.get[String]("password")
     )
+  case class ClanwarWon(clanwarId: String,
+                        winnerId: String,
+                        winnerScore: Int,
+                        loserId: String,
+                        loserScore: Int)
+
+  def tryWithInfo[V](m: String)(t: WSResponse)(f: WSResponse => V): V = {
+    try f(t)
+    catch {
+      case NonFatal(e) =>
+        throw new RuntimeException(
+          s"Failed due to input ${t} (${m}), ${t.body.take(100)}...: $e",
+          e)
+    }
+  }
+}
+
+case class ChallongeClient(uri: String, username: String, password: String)(
+    implicit wSClient: WSClient) {
 
   private val forApi = ForChallongeApi(uri)
 
@@ -39,22 +52,24 @@ class ChallongeClient(
   /**
     * Get all the open candidate tournament IDs
     */
-  def fetchTournamentIds(): Future[List[String]] = async {
-    val resp = await(
-      wSClient
-        .url(GetTournaments.getProgressTournamentsUrl)
-        .challongeAuth
-        .get())
-    tryWithInfo("Fetch tournament IDs")(resp)(r =>
-      GetTournaments.extractTournamentIds(r.json))
-  }
+  def fetchTournamentIds()(
+      implicit executionContext: ExecutionContext): Future[List[String]] =
+    async {
+      val resp = await(
+        wSClient
+          .url(GetTournaments.getProgressTournamentsUrl)
+          .challongeAuth
+          .get())
+      tryWithInfo("Fetch tournament IDs")(resp)(r =>
+        GetTournaments.extractTournamentIds(r.json))
+    }
 
   /**
     * Attempt to submit this pair of winners into the tournament.
     * Match ID is returned if addition logically successful.
     */
-  def attemptSubmit(tournamentId: String,
-                    clanwarWon: ClanwarWon): Future[Option[Int]] = {
+  def attemptSubmit(tournamentId: String, clanwarWon: ClanwarWon)(
+      implicit executionContext: ExecutionContext): Future[Option[Int]] = {
     async {
       val forTournament = ForTournament(tournamentId)
       val response = await(
@@ -102,24 +117,4 @@ class ChallongeClient(
     }
   }
 
-}
-
-object ChallongeClient {
-  val DefaultUri: String = "https://api.challonge.com/v1"
-
-  case class ClanwarWon(clanwarId: String,
-                        winnerId: String,
-                        winnerScore: Int,
-                        loserId: String,
-                        loserScore: Int)
-
-  def tryWithInfo[V](m: String)(t: WSResponse)(f: WSResponse => V): V = {
-    try f(t)
-    catch {
-      case NonFatal(e) =>
-        throw new RuntimeException(
-          s"Failed due to input ${t} (${m}), ${t.body.take(100)}...: $e",
-          e)
-    }
-  }
 }

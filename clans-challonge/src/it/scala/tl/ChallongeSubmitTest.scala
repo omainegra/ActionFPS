@@ -5,6 +5,7 @@ import akka.stream.ActorMaterializer
 import akka.testkit.TestKit
 import org.scalatest.Matchers._
 import org.scalatest._
+import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
 import tl.ChallongeClient.ClanwarWon
 
@@ -34,9 +35,10 @@ class ChallongeSubmitTest
       throw new IllegalArgumentException("'CHALLONGE_PASSWORD' is not set.")
     }
 
+  private implicit lazy val wsClient: WSClient = AhcWSClient()
+
   private lazy val challongeClient =
-    new ChallongeClient(AhcWSClient(),
-                        ChallongeClient.DefaultUri,
+    new ChallongeClient(ChallongeClient.DefaultUri,
                         challongeUsername,
                         challongePassword)
 
