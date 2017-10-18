@@ -30,77 +30,85 @@ abstract class LogController(sourceFile: Path, components: ControllerComponents)
   Logger.info(s"Log controller for ${sourceFile}")
 
   def stream = Action { implicit request =>
-    val logAccess = requireLogAccess()
-    val startTime = request.headers
-      .get(LastEventIdHeader)
-      .map(ZonedDateTime.parse)
-      .getOrElse(ZonedDateTime.now())
-      .toInstant
+    logAccessPermission match {
+      case Left(err) => Unauthorized(err)
+      case Right(logAccess) =>
+        val startTime = request.headers
+          .get(LastEventIdHeader)
+          .map(ZonedDateTime.parse)
+          .getOrElse(ZonedDateTime.now())
+          .toInstant
 
-    val outsideOfRange = {
-      startTime
-        .atZone(ZoneId.systemDefault())
-        .isBefore(
-          ZonedDateTime
-            .now()
-            .minus(LogController.OldLogsPeriod))
-    }
+        val outsideOfRange = {
+          startTime
+            .atZone(ZoneId.systemDefault())
+            .isBefore(
+              ZonedDateTime
+                .now()
+                .minus(LogController.OldLogsPeriod))
+        }
 
-    if (!logAccess.readOld && outsideOfRange)
-      Unauthorized(
-        s"We only allow ${LogController.OldLogsPeriod} period of access without keys.\n")
-    else {
-      val eventsStream = tailFromTime(sourceFile)(startTime)
-        .collect[MessageType] {
-          case ExtractMessage(zdt, server, message) => (zdt, server, message)
+        if (!logAccess.readOld && outsideOfRange)
+          Unauthorized(
+            s"We only allow ${LogController.OldLogsPeriod} period of access without keys.\n")
+        else {
+          val eventsStream = tailFromTime(sourceFile)(startTime)
+            .collect[MessageType] {
+              case ExtractMessage(zdt, server, message) =>
+                (zdt, server, message)
+            }
+            .dropWhile(_._1.toInstant.isBefore(startTime))
+            .via(logAccess.filterFlow)
+            .map[Event] {
+              case (zdt, server, message) =>
+                Event(
+                  id = Some(DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)),
+                  data = s"${DateTimeFormatter.ISO_INSTANT
+                    .format(zdt.toInstant)}\t${server}\t${message}\n",
+                  name = Some("log")
+                )
+            }
+            .merge(keepAliveEventSource)
+          Ok.chunked(eventsStream).as(ContentTypes.EVENT_STREAM)
         }
-        .dropWhile(_._1.toInstant.isBefore(startTime))
-        .via(logAccess.filterFlow)
-        .map[Event] {
-          case (zdt, server, message) =>
-            Event(
-              id = Some(DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)),
-              data = s"${DateTimeFormatter.ISO_INSTANT
-                .format(zdt.toInstant)}\t${server}\t${message}\n",
-              name = Some("log")
-            )
-        }
-        .merge(keepAliveEventSource)
-      Ok.chunked(eventsStream).as(ContentTypes.EVENT_STREAM)
     }
   }
 
   def historical(from: String, to: Option[String]) = Action {
     implicit request =>
-      val logAccess = requireLogAccess()
-
-      val fromTime = ZonedDateTime.parse(from)
-      val outsideOfRange = {
-        fromTime
-          .isBefore(
-            ZonedDateTime
-              .now()
-              .minus(LogController.OldLogsPeriod))
-      }
-
-      if (!logAccess.readOld && outsideOfRange)
-        Unauthorized(
-          s"We only allow ${LogController.OldLogsPeriod} period of access without keys.\n")
-      else {
-        val toTime = to.map(ZonedDateTime.parse).getOrElse(ZonedDateTime.now())
-        val dataSource = finiteFromFile(sourceFile)(fromTime.toInstant)
-          .collect[MessageType] {
-            case ExtractMessage(zdt, server, message) => (zdt, server, message)
+      logAccessPermission match {
+        case Left(err) => Unauthorized(err)
+        case Right(logAccess) =>
+          val fromTime = ZonedDateTime.parse(from)
+          val outsideOfRange = {
+            fromTime
+              .isBefore(
+                ZonedDateTime
+                  .now()
+                  .minus(LogController.OldLogsPeriod))
           }
-          .dropWhile(_._1.isBefore(fromTime))
-          .takeWhile(_._1.isBefore(toTime))
-          .via(logAccess.filterFlow)
-          .map {
-            case (zdt, server, message) =>
-              s"${DateTimeFormatter.ISO_INSTANT
-                .format(zdt.toInstant)}\t${server}\t${message}\n"
+
+          if (!logAccess.readOld && outsideOfRange)
+            Unauthorized(
+              s"We only allow ${LogController.OldLogsPeriod} period of access without keys.\n")
+          else {
+            val toTime =
+              to.map(ZonedDateTime.parse).getOrElse(ZonedDateTime.now())
+            val dataSource = finiteFromFile(sourceFile)(fromTime.toInstant)
+              .collect[MessageType] {
+                case ExtractMessage(zdt, server, message) =>
+                  (zdt, server, message)
+              }
+              .dropWhile(_._1.isBefore(fromTime))
+              .takeWhile(_._1.isBefore(toTime))
+              .via(logAccess.filterFlow)
+              .map {
+                case (zdt, server, message) =>
+                  s"${DateTimeFormatter.ISO_INSTANT
+                    .format(zdt.toInstant)}\t${server}\t${message}\n"
+              }
+            Ok.chunked(dataSource).as(LogController.TsvMimeType)
           }
-        Ok.chunked(dataSource).as(LogController.TsvMimeType)
       }
   }
 
@@ -139,13 +147,19 @@ object LogController {
       .map(_.decodeString("UTF-8"))
   }
 
-  def requireLogAccess()(implicit request: RequestHeader): LogAccess = {
-    if (request.jwtSession.signature != "") {
-      require(request.jwtSession.claim.isValid(IssuerName))
-    }
-    request.jwtSession.claimData
-      .asOpt[LogAccess]
-      .getOrElse(LogAccess.default)
+  def logAccessPermission(
+      implicit request: RequestHeader): Either[String, LogAccess] = {
+    def hasBearer =
+      request.headers
+        .get(JwtSession.REQUEST_HEADER_NAME)
+        .exists(_.startsWith(JwtSession.TOKEN_PREFIX))
+    def signatureEmpty = request.jwtSession.signature.nonEmpty
+    def claimValid = request.jwtSession.claim.isValid(IssuerName)
+
+    if (!hasBearer) Right(LogAccess.default)
+    else if (signatureEmpty) Right(LogAccess.default)
+    else if (claimValid) Right(request.jwtSession.claimData.as[LogAccess])
+    else Left("Invalid claim given.")
   }
 
   val OldLogsPeriod: java.time.Period = java.time.Period.ofMonths(3)
