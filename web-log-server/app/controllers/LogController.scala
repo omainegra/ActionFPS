@@ -3,11 +3,12 @@ package controllers
 import java.io.FileInputStream
 import java.nio.file.Path
 import java.time.format.DateTimeFormatter
-import java.time.{ZoneId, ZonedDateTime}
+import java.time.{Instant, ZoneId, ZonedDateTime}
 
 import af.FileOffsetFinder
 import akka.NotUsed
 import akka.actor.Cancellable
+import akka.stream.IOResult
 import akka.stream.alpakka.file.scaladsl.FileTailSource
 import akka.stream.scaladsl.{Flow, Source, StreamConverters}
 import akka.util.ByteString
@@ -21,23 +22,19 @@ import play.api.libs.EventSource.Event
 import play.api.libs.json.{Json, OFormat}
 import play.api.mvc._
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 abstract class LogController(sourceFile: Path, components: ControllerComponents)
     extends AbstractController(components) {
   Logger.info(s"Log controller for ${sourceFile}")
-  def stream = Action { request: RequestHeader =>
-    if (request.jwtSession.signature != "") {
-      require(request.jwtSession.claim.isValid(IssuerName))
-    }
-    val logAccess: LogAccess = request.jwtSession.claimData
-      .asOpt[LogAccess]
-      .getOrElse(LogAccess.default)
-    val now = ZonedDateTime.now()
+
+  def stream = Action { implicit request =>
+    val logAccess = requireLogAccess()
     val startTime = request.headers
       .get(LastEventIdHeader)
       .map(ZonedDateTime.parse)
-      .getOrElse(now)
+      .getOrElse(ZonedDateTime.now())
       .toInstant
 
     val outsideOfRange = {
@@ -53,27 +50,11 @@ abstract class LogController(sourceFile: Path, components: ControllerComponents)
       Unauthorized(
         s"We only allow ${LogController.OldLogsPeriod} period of access without keys.\n")
     else {
-      val fileOffset =
-        FileOffsetFinder(startTime.toString).apply(sourceFile)
-      val messagesStream = FileTailSource
-        .apply(
-          path = sourceFile,
-          maxChunkSize = 8096,
-          pollingInterval = 1.second,
-          startingPosition = fileOffset
-        )
-        .via(
-          akka.stream.scaladsl.Framing
-            .delimiter(ByteString.fromString("\n"),
-                       8096,
-                       allowTruncation = false))
-        .map(_.decodeString("UTF-8"))
+      val eventsStream = tailFromTime(sourceFile)(startTime)
         .collect[MessageType] {
           case ExtractMessage(zdt, server, message) => (zdt, server, message)
         }
         .dropWhile(_._1.toInstant.isBefore(startTime))
-
-      val eventsStream = messagesStream
         .via(logAccess.filterFlow)
         .map[Event] {
           case (zdt, server, message) =>
@@ -89,62 +70,83 @@ abstract class LogController(sourceFile: Path, components: ControllerComponents)
     }
   }
 
-  def historical(from: String, to: Option[String]) = Action { request =>
-    if (request.jwtSession.signature != "") {
-      require(request.jwtSession.claim.isValid(IssuerName))
-    }
-    val logAccess: LogAccess = request.jwtSession.claimData
-      .asOpt[LogAccess]
-      .getOrElse(LogAccess.default)
+  def historical(from: String, to: Option[String]) = Action {
+    implicit request =>
+      val logAccess = requireLogAccess()
 
-    val fromTime = ZonedDateTime.parse(from)
-    val outsideOfRange = {
-      fromTime
-        .isBefore(
-          ZonedDateTime
-            .now()
-            .minus(LogController.OldLogsPeriod))
-    }
+      val fromTime = ZonedDateTime.parse(from)
+      val outsideOfRange = {
+        fromTime
+          .isBefore(
+            ZonedDateTime
+              .now()
+              .minus(LogController.OldLogsPeriod))
+      }
 
-    if (!logAccess.readOld && outsideOfRange)
-      Unauthorized(
-        s"We only allow ${LogController.OldLogsPeriod} period of access without keys.\n")
-    else {
-      val fileOffset =
-        FileOffsetFinder(fromTime.toInstant.toString).apply(sourceFile)
-      val fileSource = StreamConverters
-        .fromInputStream(() => {
-          val fis = new FileInputStream(sourceFile.toFile)
-          fis.skip(fileOffset)
-          fis
-        })
-        .via(
-          akka.stream.scaladsl.Framing
-            .delimiter(ByteString.fromString("\n"),
-                       8096,
-                       allowTruncation = false))
-        .map(_.decodeString("UTF-8"))
-
-      val toTime = to.map(ZonedDateTime.parse).getOrElse(ZonedDateTime.now())
-
-      val dataSource = fileSource
-        .collect[MessageType] {
-          case ExtractMessage(zdt, server, message) => (zdt, server, message)
-        }
-        .dropWhile(_._1.isBefore(fromTime))
-        .takeWhile(_._1.isBefore(toTime))
-        .via(logAccess.filterFlow)
-        .map {
-          case (zdt, server, message) =>
-            s"${DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)}\t${server}\t${message}\n"
-        }
-      Ok.chunked(dataSource).as(LogController.TsvMimeType)
-    }
+      if (!logAccess.readOld && outsideOfRange)
+        Unauthorized(
+          s"We only allow ${LogController.OldLogsPeriod} period of access without keys.\n")
+      else {
+        val toTime = to.map(ZonedDateTime.parse).getOrElse(ZonedDateTime.now())
+        val dataSource = finiteFromFile(sourceFile)(fromTime.toInstant)
+          .collect[MessageType] {
+            case ExtractMessage(zdt, server, message) => (zdt, server, message)
+          }
+          .dropWhile(_._1.isBefore(fromTime))
+          .takeWhile(_._1.isBefore(toTime))
+          .via(logAccess.filterFlow)
+          .map {
+            case (zdt, server, message) =>
+              s"${DateTimeFormatter.ISO_INSTANT
+                .format(zdt.toInstant)}\t${server}\t${message}\n"
+          }
+        Ok.chunked(dataSource).as(LogController.TsvMimeType)
+      }
   }
 
 }
 
 object LogController {
+
+  private def tailFromTime(sourceFile: Path)(
+      startTime: Instant): Source[String, NotUsed] = {
+    val fileOffset =
+      FileOffsetFinder(startTime.toString).apply(sourceFile)
+    FileTailSource
+      .apply(
+        path = sourceFile,
+        maxChunkSize = 8096,
+        pollingInterval = 1.second,
+        startingPosition = fileOffset
+      )
+      .via(akka.stream.scaladsl.Framing
+        .delimiter(ByteString.fromString("\n"), 8096, allowTruncation = false))
+      .map(_.decodeString("UTF-8"))
+  }
+
+  def finiteFromFile(sourceFile: Path)(
+      fromTime: Instant): Source[String, Future[IOResult]] = {
+    val fileOffset =
+      FileOffsetFinder(fromTime.toString).apply(sourceFile)
+    StreamConverters
+      .fromInputStream(() => {
+        val fis = new FileInputStream(sourceFile.toFile)
+        fis.skip(fileOffset)
+        fis
+      })
+      .via(akka.stream.scaladsl.Framing
+        .delimiter(ByteString.fromString("\n"), 8096, allowTruncation = false))
+      .map(_.decodeString("UTF-8"))
+  }
+
+  def requireLogAccess()(implicit request: RequestHeader): LogAccess = {
+    if (request.jwtSession.signature != "") {
+      require(request.jwtSession.claim.isValid(IssuerName))
+    }
+    request.jwtSession.claimData
+      .asOpt[LogAccess]
+      .getOrElse(LogAccess.default)
+  }
 
   val OldLogsPeriod: java.time.Period = java.time.Period.ofMonths(3)
 
@@ -160,7 +162,7 @@ object LogController {
   /** Needed to prevent premature close of connection if not enough events coming through **/
   val keepAliveEventSource: Source[Event, Cancellable] = {
     import concurrent.duration._
-    Source.tick(10.seconds, 10.seconds, Event(""))
+    Source.tick(1.second, 10.seconds, Event(""))
   }
 
   def filterOutIp(message: String): String = {
@@ -202,6 +204,7 @@ object LogController {
     implicit val formats: OFormat[LogAccess] = Json.format[LogAccess]
   }
 
+  /** To issue, see [[app.IssueTokenApp]]  */
   def issueJwt(key: String,
                logAccess: LogAccess,
                expireSeconds: Long): String = {
@@ -216,14 +219,5 @@ object LogController {
       key
     )
   }
-
-  /** To issue, do:
-  * $ sbt logServer/console
-  * ...
-  * scala> val key = "<key from config>"
-  * scala> issueJwt(key = key, logAccess = LogAccess(Set("ip")), expireSeconds = 200)
-  * ey.ab.cd
-  * scala> issueJwt(key = key, logAccess = LogAccess(Set("ip")), expireSeconds = 3600 * 24 * 180)
-  */
 
 }
