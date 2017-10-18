@@ -87,6 +87,15 @@ class WebTemplateRender @Inject()(controllerComponents: ControllerComponents)
       bottomLinksElement.appendElement("a").attr("href", l).text("View JSON")
     }
 
+    jsonLink.foreach { l =>
+      js.select("head")
+        .first()
+        .appendElement("link")
+        .attr("href", l)
+        .attr("type", "application/json")
+        .attr("rel", "alternate")
+    }
+
     if (bottomLinksElement.children().isEmpty) {
       bottomLinksElement.remove()
     }
