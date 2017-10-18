@@ -1,39 +1,39 @@
 ->          /                               controllers.StaticPageRouter
-->          /dev/                           controllers.Dev
 ->          /all/                           controllers.AllGames
-GET         /assets/*file                   @controllers.Forwarder.getAsset(file: String)
+GET         /assets/*file                   controllers.Forwarder.getAsset(file: String)
 
-GET         /                               @controllers.IndexController.index
-GET         /game/                          @controllers.GamesController.game(id: String)
-GET         /clans/                         @controllers.ClansController.clans
-GET         /rankings/                      @controllers.ClansController.rankings
-GET         /clan/                          @controllers.ClansController.clan(id: String)
-GET         /clanwar/                       @controllers.ClansController.clanwar(id: String)
-GET         /clanwars/                      @controllers.ClansController.clanwars
-GET         /players/                       @controllers.PlayersController.players
-GET         /player/                        @controllers.PlayersController.player(id: String)
-GET         /player/by-email/               @controllers.PlayersController.playerByEmail(email: String)
-GET         /player/signature.svg           @controllers.PlayersController.playerSig(id: String)
-GET         /playerranks/                   @controllers.PlayersController.rankings
-GET         /hof/                           @controllers.PlayersController.hof
-GET         /servers/                       @controllers.ServersController.servers
-GET         /ms/                            @controllers.MasterServerController.ms
-GET         /retrieve.do                    @controllers.MasterServerController.ms
-GET         /server-updates/                @controllers.EventStreamController.serverUpdates
-GET         /recent-games/                  @controllers.GamesController.recentGames
-GET         /new-games/                     @controllers.EventStreamController.newGames
-POST        /admin/reload-reference/        @controllers.Admin.reloadReference()
-GET         /ladder/                        @controllers.LadderController.ladder
-GET         /event-stream/                  @controllers.EventStreamController.eventStream
-GET         /version/                       @controllers.VersionController.version
-GET         /user/auth-token/               @controllers.UserController.authTokenGet
-POST        /user/auth-token/               @controllers.UserController.authTokenPost
-GET         /register-play/                 @controllers.UserController.redirectPlay
-GET         /installed/                     @controllers.UserController.redirectPlay
-GET         /uninstalled/                   @controllers.UserController.redirectPlay
+GET         /                               controllers.IndexController.index
+GET         /game/                          controllers.GamesController.game(id: String)
+GET         /clans/                         controllers.ClansController.clans
+GET         /rankings/                      controllers.ClansController.rankings
+GET         /clan/                          controllers.ClansController.clan(id: String)
+GET         /clanwar/                       controllers.ClansController.clanwar(id: String)
+GET         /clanwars/                      controllers.ClansController.clanwars
+GET         /players/                       controllers.PlayersController.players
+GET         /player/                        controllers.PlayersController.player(id: String)
+GET         /player/by-email/               controllers.PlayersController.playerByEmail(email: String)
+GET         /player/signature.svg           controllers.PlayersController.playerSig(id: String)
+GET         /playerranks/                   controllers.PlayersController.rankings
+GET         /hof/                           controllers.PlayersController.hof
+GET         /servers/                       controllers.ServersController.servers
+GET         /ms/                            controllers.MasterServerController.ms
+GET         /retrieve.do                    controllers.MasterServerController.ms
+GET         /server-updates/                controllers.EventStreamController.serverUpdates
+GET         /recent-games/                  controllers.GamesController.recentGames
+GET         /new-games/                     controllers.EventStreamController.newGames
+POST        /admin/reload-reference/        controllers.Admin.reloadReference()
+GET         /ladder/                        controllers.LadderController.ladder
+GET         /event-stream/                  controllers.EventStreamController.eventStream
+GET         /version/                       controllers.VersionController.version
+GET         /user/auth-token/               controllers.UserController.authTokenGet
+POST        /user/auth-token/               controllers.UserController.authTokenPost
+GET         /register-play/                 controllers.UserController.redirectPlay
+GET         /installed/                     controllers.UserController.redirectPlay
+GET         /uninstalled/                   controllers.UserController.redirectPlay
 
-GET         /download-direct/game/          @controllers.DownloadsController.game
+GET         /download-direct/game/          controllers.DownloadsController.game
 
-GET         /logs.tsv                       @controllers.RawLogController.historical(from: String, to: Option[String])
-GET         /logs                           @controllers.RawLogController.stream
-GET         /logs/stream/                   @controllers.RawLogController.stream
+GET         /logs.tsv                       controllers.RawLogController.historical(from: String, to: Option[String])
+GET         /logs                           controllers.RawLogController.stream
+GET         /logs/stream/                   controllers.RawLogController.stream
+GET /inters/ inters.IntersController.index

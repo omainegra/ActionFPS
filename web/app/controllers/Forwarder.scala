@@ -21,8 +21,6 @@ class Forwarder @Inject()(environment: Environment,
     fileMimeTypes: FileMimeTypes)
     extends AbstractController(components) {
 
-  require(!environment.isProd, s"Environment is ${environment}")
-
   private val webDistWww = Paths.get("web/dist/www")
 
   private val distWww = Paths.get("dist/www")
@@ -37,6 +35,9 @@ class Forwarder @Inject()(environment: Environment,
   }
 
   def getAsset(path: String): Action[AnyContent] = {
+    require(!environment.isProd,
+            s"Environment is ${environment.mode()}. Expected non-Prod.")
+
     resources.find(_.endsWith(path)) match {
       case Some(v) =>
         Action {

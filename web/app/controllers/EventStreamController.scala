@@ -43,7 +43,7 @@ class EventStreamController @Inject()(pingerService: PingerService,
     }
   }
 
-  def eventStream = Action.async {
+  def eventStream: Action[AnyContent] = Action.async {
     async {
       Ok.chunked(
         content = {

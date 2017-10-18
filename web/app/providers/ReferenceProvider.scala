@@ -29,8 +29,8 @@ import lib.ClansProvider
   * Provides reference data from CSV URLs.
   */
 @Singleton
-class ReferenceProvider @Inject()(configuration: Configuration,
-                                  cacheApi: AsyncCacheApi)(
+final class ReferenceProvider @Inject()(configuration: Configuration,
+                                        cacheApi: AsyncCacheApi)(
     implicit wSClient: WSClient,
     executionContext: ExecutionContext)
     extends ProvidesServers
@@ -42,8 +42,8 @@ class ReferenceProvider @Inject()(configuration: Configuration,
   import ReferenceProvider._
 
   def unCache(): Unit = {
-    List(ClansKey, ServersKey, RegistrationsKey, NicknamesKey).foreach(
-      cacheApi.remove)
+    List(ClansKey, ServersKey, RegistrationsKey, NicknamesKey, UsersKey)
+      .foreach(cacheApi.remove)
   }
 
   private def fetch(key: String) = async {
@@ -93,19 +93,23 @@ class ReferenceProvider @Inject()(configuration: Configuration,
 
     private def rawNicknames: Future[String] = fetch(NicknamesKey)
 
-    def nicknames: Future[List[NicknameRecord]] = rawNicknames.map { bdy =>
-      val sr = new StringReader(bdy)
-      try NicknameRecord.parseRecords(sr)
-      finally sr.close()
+    private def nicknames: Future[List[NicknameRecord]] = rawNicknames.map {
+      bdy =>
+        val sr = new StringReader(bdy)
+        try NicknameRecord.parseRecords(sr)
+        finally sr.close()
     }
 
-    def users: Future[List[User]] = async {
-      val regs = await(registrations)
-      val nicks = await(nicknames)
-      regs.flatMap { reg =>
-        User.fromRegistration(reg, nicks)
+    def users: Future[List[User]] =
+      cacheApi.getOrElseUpdate[List[User]](UsersKey) {
+        async {
+          val regs = await(registrations)
+          val nicks = await(nicknames)
+          regs.flatMap { reg =>
+            User.fromRegistration(reg, nicks)
+          }
+        }
       }
-    }
 
   }
 
@@ -126,4 +130,7 @@ object ReferenceProvider {
   val ServersKey = "servers"
   val RegistrationsKey = "registrations"
   val NicknamesKey = "nicknames"
+
+  val UsersKey = "users"
+
 }

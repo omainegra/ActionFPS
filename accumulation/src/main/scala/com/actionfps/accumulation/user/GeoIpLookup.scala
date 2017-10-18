@@ -9,7 +9,7 @@ import com.maxmind.geoip.{LookupService, timeZone}
   * Created by me on 10/04/2016.
   */
 object GeoIpLookup extends IpLookup {
-  lazy val file = {
+  lazy val file: File = {
     val A = new File("resources/GeoLiteCityv6.dat")
     val B = new File("web/resources/GeoLiteCityv6.dat")
     val C = new File("../resources/GeoLiteCityv6.dat")

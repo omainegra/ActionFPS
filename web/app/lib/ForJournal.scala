@@ -38,12 +38,4 @@ object ForJournal {
     }
   }
 
-  case class ForConfig(config: Config) {
-    def logJournalPath: Path =
-      Paths.get(config.getString("journal.large")).toAbsolutePath
-
-    def gamesJournalPath: Path =
-      Paths.get(config.getString("journal.games")).toAbsolutePath
-  }
-
 }
