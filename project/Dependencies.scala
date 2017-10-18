@@ -41,8 +41,10 @@ object Dependencies {
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
 
   val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.5.2"
-  val gameParser: ModuleID = "com.actionfps" %% "game-parser" % "5.9.0"
-  val pureGame: ModuleID = "com.actionfps" %% "pure-game" % "5.9.0"
+
+  val jodaTime: ModuleID = "joda-time" % "joda-time" % "2.9.6"
+  val jodaConvert: ModuleID = "org.joda" % "joda-convert" % "1.8.1"
+  val fastparse: ModuleID = "com.lihaoyi" %% "fastparse" % "0.4.2"
 
   val raptureJsonPlay
     : ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M9" exclude ("com.typesafe.play", "play-json")
