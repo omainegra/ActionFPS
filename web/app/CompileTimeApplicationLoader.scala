@@ -1,4 +1,4 @@
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
 
 import af.inters.{DiscordInters, OneSignalInters}
 import akka.actor.ActorSystem
@@ -66,6 +66,8 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
     with _root_.controllers.AssetsComponents {
 
   override def httpFilters: Seq[EssentialFilter] = Seq(corsFilter, gzipFilter)
+  lazy val journalPath: Path =
+    Paths.get(configuration.get[String]("journal.large"))
   implicit lazy val as: ActorSystem = this.actorSystem
   implicit lazy val mimeTypes: FileMimeTypes = this.fileMimeTypes
   implicit lazy val config: Configuration = this.configuration
@@ -94,8 +96,7 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   lazy val latestReleaseService: LatestReleaseService =
     wire[LatestReleaseService]
   lazy val downloadsController: DownloadsController = wire[DownloadsController]
-  lazy val RawLogController: RawLogController =
-    new RawLogController(configuration, controllerComponents)
+  lazy val RawLogController: RawLogController = wire[RawLogController]
   lazy val eventStreamController: EventStreamController =
     wire[EventStreamController]
   lazy val masterServerController: MasterServerController =
@@ -137,7 +138,7 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
 
   lazy val intersService: IntersService =
     new IntersService(
-      journalPath = Paths.get(configuration.get[String]("journal.large"))
+      journalPath = journalPath
     )(() => referenceProvider.users, executionContext, actorSystem)
 
   intersService.beginPushing()

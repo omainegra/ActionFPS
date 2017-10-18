@@ -1,6 +1,6 @@
 package providers.full
 
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
 import java.time.format.DateTimeFormatter
 import java.time.{Clock, ZonedDateTime}
 import javax.inject.{Inject, Singleton}
@@ -35,7 +35,8 @@ import scala.util.{Failure, Success}
   * @todo Come up with a better name, perhaps separate many of the concerns as well.
   */
 @Singleton
-class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
+class FullProviderImpl @Inject()(logSource: Path,
+                                 referenceProvider: ReferenceProvider,
                                  gamesProvider: GamesProvider,
                                  configuration: Configuration,
                                  applicationLifecycle: ApplicationLifecycle)(
@@ -46,9 +47,6 @@ class FullProviderImpl @Inject()(referenceProvider: ReferenceProvider,
     extends FullProvider() {
 
   private val logger = Logger(getClass)
-
-  private val logSource =
-    Paths.get(configuration.underlying.getString("journal.large"))
 
   private implicit val actorMaterializer: ActorMaterializer =
     ActorMaterializer()

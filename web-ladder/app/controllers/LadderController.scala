@@ -3,7 +3,7 @@ package controllers
 /**
   * Created by me on 09/05/2016.
   */
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
 import java.time.Instant
 import javax.inject._
 
@@ -22,7 +22,8 @@ import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class LadderController @Inject()(configuration: Configuration,
+class LadderController @Inject()(journalPath: Path,
+                                 configuration: Configuration,
                                  providesUsers: ProvidesUsers,
                                  common: WebTemplateRender,
                                  components: ControllerComponents)(
@@ -38,11 +39,8 @@ class LadderController @Inject()(configuration: Configuration,
         users.find(_.hasNickname(nickname)).map(_.id)
     })
 
-  private val ladderService = new TsvLadderService(
-    Paths
-      .get(configuration.underlying.getString("journal.large"))
-      .toAbsolutePath,
-    () => nickToUser)
+  private val ladderService =
+    new TsvLadderService(journalPath.toAbsolutePath, () => nickToUser)
 
   ladderService.run()
 
