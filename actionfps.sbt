@@ -60,7 +60,9 @@ lazy val root =
     webClans,
     webGames,
     webPlayers,
-    webServers
+    webServers,
+    pureGame,
+    gameParser
   )
 
 lazy val webLogServer = project
@@ -429,6 +431,10 @@ lazy val webDownloads =
     )
     .configs(IntegrationTest)
     .settings(Defaults.itSettings: _*)
+
+lazy val gameLogParserApp = Project(id = "game-log-parser-app", base = file("game-log-parser/app"))
+  .enablePlugins(JavaAppPackaging)
+  .dependsOn(gameParser)
 
 lazy val pureGame = Project(id = "pure-game", base = file("game-log-parser/pure-game"))
 
