@@ -76,3 +76,5 @@ test.db
 *.jfr
 
 .attach_*
+
+*.tmp
