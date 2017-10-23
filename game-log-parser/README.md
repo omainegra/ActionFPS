@@ -83,7 +83,7 @@ Currently we don't support the 'Ideal format' for any of the tools.
 
 ## Tools
 
-### <a href="blob/master/iso_local_datetime.pl">iso_local_datetime.pl</a>
+### iso_local_datetime.pl
 
 ```bash
 ./iso_local_datetime.pl << EOF
@@ -94,7 +94,7 @@ EOF
 2016-09-01T16:21:15 [195.236.145.100] client connected
 ```
 
-### <a href="blob/master/recover_time.pl">recover_time.pl</a>
+### recover_time.pl
 
 ```bash
 ./recover_time.pl <<EOF
@@ -105,7 +105,7 @@ heredoc> EOF
 2016-09-01T15:51:21 [195.236.145.100] client connected
 ```
 
-### <a href="blob/master/individual_to_common_format.pl">individual_to_common_format.pl</a>
+### individual_to_common_format.pl
 
 ```bash
 ./individual_to_common_format.pl --server-name=woop.ac:1999 --server-ip=62.210.131.155:1999 <<EOF
@@ -228,17 +228,3 @@ including an IP address of the other person, as well as a CN of that person.
 Including the current team? Not sure if that's useful.
 
 Let's just start from the most basic stuff, which is time.
-
-# Release procedure
-
-1. Make sure you're on the Bintray organization: https://bintray.com/actionfps
-2. Add a git tag to the current clean commit ( `git tag 5.4.x` for example )
-3. `git push origin -u HEAD` to push the tag.
-4. `sbt publish`
-
-## Using
-
-```scala
-resolvers += Resolver.bintrayRepo("actionfps", "maven")
-libraryDependencies += "com.actionfps" %% "package" % "version"
-```
