@@ -62,6 +62,7 @@ lazy val root =
     webPlayers,
     webServers,
     pureGame,
+    gameLogParserApp,
     gameParser
   )
 
@@ -142,7 +143,8 @@ lazy val web = project
       if (inMemoryCache.value) Some("full.provider" -> "hazelcast-cached")
       else None
     }.toSeq,
-    PlayKeys.devSettings += "journal.large" -> util.Properties.envOrElse("JOURNAL_LOGS_TSV", "journals/journal.tsv"),
+    PlayKeys.devSettings += "journal.large" -> util.Properties
+      .envOrElse("JOURNAL_LOGS_TSV", "journals/journal.tsv"),
     PlayKeys.devSettings += "journal.games" -> "journals/games.tsv",
     scriptClasspath := Seq("*", "../conf/"),
     mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map {
@@ -432,15 +434,18 @@ lazy val webDownloads =
     .configs(IntegrationTest)
     .settings(Defaults.itSettings: _*)
 
-lazy val gameLogParserApp = Project(id = "game-log-parser-app", base = file("game-log-parser/app"))
-  .enablePlugins(JavaAppPackaging)
-  .dependsOn(gameParser)
+lazy val gameLogParserApp =
+  Project(id = "game-log-parser-app", base = file("game-log-parser/app"))
+    .enablePlugins(JavaAppPackaging)
+    .dependsOn(gameParser)
 
-lazy val pureGame = Project(id = "pure-game", base = file("game-log-parser/pure-game"))
+lazy val pureGame =
+  Project(id = "pure-game", base = file("game-log-parser/pure-game"))
 
-lazy val gameParser = Project(id = "game-parser", base = file("game-log-parser/game-parser"))
-  .dependsOn(pureGame)
-  .settings(
-    libraryDependencies ++= Seq(jodaTime, jodaConvert, fastparse),
-    libraryDependencies += scalatest % Test
-  )
+lazy val gameParser =
+  Project(id = "game-parser", base = file("game-log-parser/game-parser"))
+    .dependsOn(pureGame)
+    .settings(
+      libraryDependencies ++= Seq(jodaTime, jodaConvert, fastparse),
+      libraryDependencies += scalatest % Test
+    )
