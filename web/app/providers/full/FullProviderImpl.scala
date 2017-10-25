@@ -105,9 +105,10 @@ class FullProviderImpl @Inject()(logSource: Path,
       .map(_.flattenPlayers)
   }
 
-  type ChangeTriplet = (GameAxisAccumulator, JsonGame, GameAxisAccumulator)
+  private type ChangeTriplet =
+    (GameAxisAccumulator, JsonGame, GameAxisAccumulator)
 
-  def commitJournalAgent: Flow[JsonGame, ChangeTriplet, NotUsed] =
+  private def commitJournalAgent: Flow[JsonGame, ChangeTriplet, NotUsed] =
     Flow[JsonGame]
       .mapAsync(1) { game =>
         async {
@@ -120,42 +121,44 @@ class FullProviderImpl @Inject()(logSource: Path,
         }
       }
 
-  private val src = gamesProvider.lastGame
+  private val sourceF = gamesProvider.lastGame
     .map { lastGame =>
       logger.info(s"Full provider initialized. Log source ${logSource}")
       logger.info(s"Will read from game ${lastGame.map(_.id)}")
       readNewGames(lastGame)
         .via(commitJournalAgent)
-        .alsoTo {
-          Flow[ChangeTriplet]
-            .map {
-              case (o, _, n) =>
-                FullIteratorDetector(o, n).detectGame.map(NewRichGameDetected)
-            }
-            .to(Sink.foreach(actorSystem.eventStream.publish))
-        }
-        .alsoTo {
-          Flow[ChangeTriplet]
-            .map {
-              case (o, _, n) =>
-                FullIteratorDetector(o, n).detectClanwar
-                  .map(services.ChallongeService.NewClanwarCompleted)
-            }
-            .to(Sink.foreach(actorSystem.eventStream.publish))
-        }
         .toMat(BroadcastHub.sink)(Keep.right)
     }
     .map(_.run())
 
-  val clanwarsSrcF: Future[Source[CompleteClanwar, NotUsed]] = src.map(_.mapConcat {
-    case (o, _, n) => FullIteratorDetector(o, n).detectClanwar
-  })
+  private val clanwarsSrcF: Future[Source[CompleteClanwar, NotUsed]] =
+    sourceF.map(_.mapConcat {
+      case (o, _, n) => FullIteratorDetector(o, n).detectClanwar
+    })
 
-  val gamesSrcF: Future[Source[JsonGame, NotUsed]] = src.map(_.mapConcat {
-    case (o, _, n) => FullIteratorDetector(o, n).detectGame
-  })
+  private val gamesSrcF: Future[Source[JsonGame, NotUsed]] =
+    sourceF.map(_.mapConcat {
+      case (o, _, n) => FullIteratorDetector(o, n).detectGame
+    })
 
-  src.foreach(_.to(Sink.ignore).run())
+  private val publishGamesF = sourceF.flatMap { source =>
+    source
+      .map {
+        case (o, _, n) =>
+          FullIteratorDetector(o, n).detectGame.map(NewRichGameDetected)
+      }
+      .runForeach(actorSystem.eventStream.publish)
+  }
+
+  private val publishClansF = sourceF.flatMap { source =>
+    source
+      .map {
+        case (o, _, n) =>
+          FullIteratorDetector(o, n).detectClanwar
+            .map(services.ChallongeService.NewClanwarCompleted)
+      }
+      .runForeach(actorSystem.eventStream.publish)
+  }
 
 }
 
