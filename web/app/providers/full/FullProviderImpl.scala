@@ -1,8 +1,8 @@
 package providers.full
 
-import java.nio.file.{Path, Paths}
+import java.nio.file.Path
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.{Clock, ZonedDateTime}
 import javax.inject.{Inject, Singleton}
 
 import af.FileOffsetFinder
@@ -11,15 +11,15 @@ import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.file.scaladsl.FileTailSource
-import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, Sink, Source}
+import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, Source}
 import akka.util.ByteString
 import com.actionfps.accumulation.GameAxisAccumulator
+import com.actionfps.accumulation.ServerValidator._
 import com.actionfps.clans.CompleteClanwar
+import com.actionfps.gameparser.enrichers.Implicits._
 import com.actionfps.gameparser.enrichers.{IpLookup, JsonGame, MapValidator}
 import lib.ForJournal
-import play.api.inject.ApplicationLifecycle
-import play.api.{Configuration, Logger}
-import providers.ReferenceProvider
+import play.api.Logger
 import providers.games.GamesProvider
 
 import scala.async.Async._
@@ -34,15 +34,13 @@ import scala.concurrent.{ExecutionContext, Future}
   * @todo Come up with a better name, perhaps separate many of the concerns as well.
   */
 @Singleton
-class FullProviderImpl @Inject()(logSource: Path,
-                                 referenceProvider: ReferenceProvider,
-                                 gamesProvider: GamesProvider,
-                                 configuration: Configuration,
-                                 applicationLifecycle: ApplicationLifecycle)(
-    implicit executionContext: ExecutionContext,
-    actorSystem: ActorSystem,
-    ipLookup: IpLookup,
-    mapValidator: MapValidator)
+class FullProviderImpl @Inject()(
+    logSource: Path,
+    initialAccumulator: Future[GameAxisAccumulator],
+    gamesProvider: GamesProvider)(implicit executionContext: ExecutionContext,
+                                  actorSystem: ActorSystem,
+                                  ipLookup: IpLookup,
+                                  mapValidator: MapValidator)
     extends FullProvider() {
 
   private val logger = Logger(getClass)
@@ -52,32 +50,14 @@ class FullProviderImpl @Inject()(logSource: Path,
 
   override protected[providers] val accumulatorFutureAgent
     : Future[Agent[GameAxisAccumulator]] = async {
-    val users = await(referenceProvider.users)
-    val clans = await(referenceProvider.clans)
-    val allGames = await(gamesProvider.games)
-
-    val initial = GameAxisAccumulator.emptyWithUsers(
-      users = users.map(u => u.id -> u).toMap,
-      clans = clans.map(c => c.id -> c).toMap
-    )
-
-    val startTime = Clock.systemUTC().instant()
-
-    val newIterator =
-      initial.includeGames(allGames.valuesIterator.toList.sortBy(_.id))
-
-    val endTime = Clock.systemUTC().instant()
-
-    Logger.info(
-      s"It took ${java.time.Duration.between(startTime, endTime)} to compute accumulator data.")
-
-    Agent(newIterator)
+    Agent {
+      await(initialAccumulator).includeGames(
+        await(gamesProvider.games).valuesIterator.toList.sortBy(_.id))
+    }
   }
 
-  import com.actionfps.accumulation.ServerValidator._
-  import com.actionfps.gameparser.enrichers.Implicits._
-
-  def readNewGames(lastGameO: Option[JsonGame]): Source[JsonGame, NotUsed] = {
+  private def readNewGames(
+      lastGameO: Option[JsonGame]): Source[JsonGame, NotUsed] = {
     val fileOffset = lastGameO
       .map { game =>
         FileOffsetFinder(
@@ -97,7 +77,7 @@ class FullProviderImpl @Inject()(logSource: Path,
       .via(akka.stream.scaladsl.Framing
         .delimiter(ByteString.fromString("\n"), 8096, allowTruncation = false))
       .map(_.decodeString("UTF-8"))
-      .via(gamesProvider.journalLinesToGames)
+      .via(GamesProvider.journalLinesToGames)
       .filter(ForJournal.afterLastGameFilter(lastGameO))
       .filter(_.validate.isRight)
       .filter(_.validateServer)
@@ -121,15 +101,16 @@ class FullProviderImpl @Inject()(logSource: Path,
         }
       }
 
-  private val sourceF = gamesProvider.lastGame
-    .map { lastGame =>
-      logger.info(s"Full provider initialized. Log source ${logSource}")
-      logger.info(s"Will read from game ${lastGame.map(_.id)}")
-      readNewGames(lastGame)
-        .via(commitJournalAgent)
-        .toMat(BroadcastHub.sink)(Keep.right)
-    }
-    .map(_.run())
+  private val sourceF: Future[Source[ChangeTriplet, NotUsed]] =
+    gamesProvider.lastGame
+      .map { lastGame =>
+        logger.info(s"Full provider initialized. Log source ${logSource}")
+        logger.info(s"Will read from game ${lastGame.map(_.id)}")
+        readNewGames(lastGame)
+          .via(commitJournalAgent)
+          .toMat(BroadcastHub.sink)(Keep.right)
+          .run()
+      }
 
   private val clanwarsSrcF: Future[Source[CompleteClanwar, NotUsed]] =
     sourceF.map(_.mapConcat {

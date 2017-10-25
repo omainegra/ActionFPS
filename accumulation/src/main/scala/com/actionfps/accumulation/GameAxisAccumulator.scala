@@ -22,6 +22,13 @@ import com.actionfps.user.User
   */
 object GameAxisAccumulator {
   def empty: GameAxisAccumulator = new GameAxisAccumulator()
+  def emptyWithUsers(users: List[User],
+                     clans: List[Clan]): GameAxisAccumulator = {
+    GameAxisAccumulator.emptyWithUsers(
+      users = users.map(u => u.id -> u).toMap,
+      clans = clans.map(c => c.id -> c).toMap
+    )
+  }
   def emptyWithUsers(users: Map[String, User],
                      clans: Map[String, Clan]): GameAxisAccumulator = {
     new GameAxisAccumulator()
@@ -140,8 +147,7 @@ case class GameAxisAccumulator(
       nickToUserAtTime = nickToUserAtTime,
       shiftedPlayersStats = newPs.onDisplay(jsonGame.endTime.toInstant),
       playersStatsOverTime =
-        playersStatsOverTime.updated(YearMonth.from(richGame.startTime),
-                                     newPs),
+        playersStatsOverTime.updated(YearMonth.from(richGame.startTime), newPs),
       users = users,
       clans = clans
     )
