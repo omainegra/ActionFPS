@@ -1,0 +1,17 @@
+This sample is for ActionFPS first release that comes with authentication and stuff.
+
+Game start: ctf on ac_depot, 1 players, 15 minutes, mastermode 0, (map rev 3/15383, official, 'getmap' not prepared)
+
+Game status: ctf on ac_depot, 15 minutes remaining, open, 1 clients
+
+Status at 03-02-2017 12:22:38: 2 remote clients, 0.8 send, 0.8 rec (K/sec); Ping: #19|405|38; CSL: #0|0|0 (bytes)
+
+Game status: ctf on ac_depot, game finished, open, 2 clients
+cn name             team flag  score frag death tk ping role    host
+ 0 w00p|Drakas      RVSF   10    235    2     3  0  186 normal  123.222.222.188:drakas
+ 1 w00p|Drakas      CLA    12    305    3     2  0  180 normal  123.222.222.188:drakas:woop
+Team  CLA:  1 players,    3 frags,   12 flags
+Team RVSF:  1 players,    2 frags,   10 flags
+
+Demo "Fri Feb  3 12:22:56 2017: ctf, ac_depot, 148.95kB" recorded.
+Map height density information for ac_elevation: H = 15.68 V = 207130, A = 13214 and MA = 1123
