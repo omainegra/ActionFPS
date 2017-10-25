@@ -60,17 +60,20 @@ lazy val root =
     webClans,
     webGames,
     webPlayers,
-    webServers
+    webServers,
+    game,
+    gameLogParserApp,
+    gameLogParser
   )
 
 lazy val webLogServer = project
   .in(file("web-log-server"))
   .enablePlugins(PlayScala)
+  .dependsOn(gameLogParser)
   .aggregate(fileOffsetFinder)
   .dependsOn(fileOffsetFinder)
   .settings(
     libraryDependencies += alpakkaFile,
-    libraryDependencies += gameParser,
     libraryDependencies += jwtPlayJson,
     libraryDependencies += jwtPlay,
     libraryDependencies += scalatest % "test",
@@ -140,7 +143,8 @@ lazy val web = project
       if (inMemoryCache.value) Some("full.provider" -> "hazelcast-cached")
       else None
     }.toSeq,
-    PlayKeys.devSettings += "journal.large" -> util.Properties.envOrElse("JOURNAL_LOGS_TSV", "journals/journal.tsv"),
+    PlayKeys.devSettings += "journal.large" -> util.Properties
+      .envOrElse("JOURNAL_LOGS_TSV", "journals/journal.tsv"),
     PlayKeys.devSettings += "journal.games" -> "journals/games.tsv",
     scriptClasspath := Seq("*", "../conf/"),
     mappings in Universal ++= List(geoLiteCity.value, geoIpAsNum.value).map {
@@ -170,7 +174,6 @@ lazy val webInters =
       scalaSource in IntegrationTest := baseDirectory.value / "it",
       resolvers += Resolver.jcenterRepo,
       libraryDependencies ++= Seq(
-        gameParser,
         async,
         akkaAgent,
         alpakkaFile,
@@ -207,10 +210,10 @@ lazy val ladderParser =
   Project(
     id = "ladder-parser",
     base = file("ladder-parser")
-  ).settings(
-    libraryDependencies += scalatest % "test",
-    libraryDependencies += gameParser
-  )
+  ).dependsOn(gameLogParser)
+    .settings(
+      libraryDependencies += scalatest % "test"
+    )
 
 lazy val webLadder =
   Project(
@@ -221,11 +224,11 @@ lazy val webLadder =
     .aggregate(ladderParser)
     .dependsOn(playerUser)
     .dependsOn(webTemplate)
+    .dependsOn(gameLogParser)
     .settings(
       libraryDependencies ++= Seq(
         alpakkaFile,
         scalatest % "test",
-        gameParser,
         async,
         akkaAgent,
         jsoup
@@ -285,10 +288,8 @@ lazy val pureClanwar =
   Project(
     id = "pure-clanwar",
     base = file("clans-clanwars-pure")
-  ).dependsOn(clan)
-    .settings(
-      libraryDependencies += pureGame
-    )
+  ).dependsOn(game)
+    .dependsOn(clan)
 
 lazy val clanStats =
   Project(
@@ -338,10 +339,10 @@ lazy val playerStats =
   Project(
     id = "player-stats",
     base = file("players-stats")
-  ).settings(
-    libraryDependencies += scalatest % Test,
-    libraryDependencies += pureGame
-  )
+  ).dependsOn(game)
+    .settings(
+      libraryDependencies += scalatest % Test
+    )
 
 lazy val playerUser = Project(
   id = "player-user",
@@ -356,10 +357,8 @@ lazy val playerAchievements =
   Project(
     id = "player-achievements",
     base = file("players-achievements")
-  ).dependsOn(playerUser)
-    .settings(
-      libraryDependencies += gameParser
-    )
+  ).dependsOn(gameLogParser)
+    .dependsOn(playerUser)
 
 lazy val referenceServers =
   Project(
@@ -434,3 +433,18 @@ lazy val webDownloads =
     )
     .configs(IntegrationTest)
     .settings(Defaults.itSettings: _*)
+
+lazy val gameLogParserApp =
+  Project(id = "game-log-parser-app", base = file("game-log-parser-app"))
+    .enablePlugins(JavaAppPackaging)
+    .dependsOn(gameLogParser)
+
+lazy val game = project
+
+lazy val gameLogParser =
+  Project(id = "game-log-parser", base = file("game-log-parser"))
+    .dependsOn(game)
+    .settings(
+      libraryDependencies ++= Seq(jodaTime, jodaConvert, fastparse),
+      libraryDependencies += scalatest % Test
+    )
