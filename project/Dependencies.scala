@@ -9,7 +9,7 @@ object Dependencies {
   val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.2.1"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.3"
   val hazelcastClient
-    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.8.6"
+    : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.9"
   val fluentHc: ModuleID = "org.apache.httpcomponents" % "fluent-hc" % "4.5.3"
   val httpClientCache
     : ModuleID = "org.apache.httpcomponents" % "httpclient-cache" % "4.5.3"
@@ -21,7 +21,7 @@ object Dependencies {
   val scalatestPlus
     : ModuleID = "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2"
   val alpakkaFile
-    : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.13"
+    : ModuleID = "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.14"
   val seleniumJava
     : ModuleID = "org.seleniumhq.selenium" % "selenium-java" % "3.6.0"
   val seleniumHtmlUnit
@@ -41,9 +41,9 @@ object Dependencies {
 
   val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.5.2"
 
-  val jodaTime: ModuleID = "joda-time" % "joda-time" % "2.9.6"
-  val jodaConvert: ModuleID = "org.joda" % "joda-convert" % "1.8.1"
-  val fastparse: ModuleID = "com.lihaoyi" %% "fastparse" % "0.4.2"
+  val jodaTime: ModuleID = "joda-time" % "joda-time" % "2.9.9"
+  val jodaConvert: ModuleID = "org.joda" % "joda-convert" % "1.9.2"
+  val fastparse: ModuleID = "com.lihaoyi" %% "fastparse" % "1.0.0"
 
   val raptureJsonPlay
     : ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M9" exclude ("com.typesafe.play", "play-json")
