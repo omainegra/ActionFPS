@@ -6,7 +6,7 @@ object Dependencies {
   val sourcecode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.1.4"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.7"
   val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.5"
-  val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.2.1"
+  val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.3.0"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.3"
   val hazelcastClient
     : ModuleID = "com.hazelcast" % "hazelcast-client" % "3.9"
@@ -48,7 +48,7 @@ object Dependencies {
   val raptureJsonPlay
     : ModuleID = "com.propensive" %% "rapture-json-play" % "2.0.0-M9" exclude ("com.typesafe.play", "play-json")
 
-  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.6"
+  val playJson: ModuleID = "com.typesafe.play" %% "play-json" % "2.6.7"
 
   val jwtPlayJson: ModuleID = "com.pauldijou" %% "jwt-play-json" % "0.14.0"
   val jwtPlay: ModuleID = "com.pauldijou" %% "jwt-play" % "0.14.0"
