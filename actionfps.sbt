@@ -29,9 +29,6 @@ resolvers in ThisBuild += Resolver.bintrayRepo("actionfps", "maven")
 updateOptions in ThisBuild := (updateOptions in ThisBuild).value
   .withCachedResolution(true)
 
-incOptions in ThisBuild := (incOptions in ThisBuild).value
-  .withNameHashing(true)
-
 cancelable in Global := true
 
 fork in run in Global := true
