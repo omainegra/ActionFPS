@@ -3,18 +3,15 @@ package controllers
 /**
   * Created by William on 05/12/2015.
   */
-import javax.inject._
-
 import play.api.Configuration
 import play.api.mvc.{AbstractController, ControllerComponents}
 import providers.ReferenceProvider
 import providers.full.FullProvider
 
-@Singleton
-class Admin @Inject()(fullProvider: FullProvider,
-                      referenceProvider: ReferenceProvider,
-                      configuration: Configuration,
-                      components: ControllerComponents)
+class Admin(fullProvider: FullProvider,
+            referenceProvider: ReferenceProvider,
+            configuration: Configuration,
+            components: ControllerComponents)
     extends AbstractController(components) {
 
   /**

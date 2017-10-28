@@ -5,5 +5,6 @@ import java.time.ZonedDateTime
 /**
   * Created by me on 29/05/2016.
   */
-case class ViewFields(startTime: ZonedDateTime, winner: Option[String], winnerClan: Option[String])
-
+case class ViewFields(startTime: ZonedDateTime,
+                      winner: Option[String],
+                      winnerClan: Option[String])

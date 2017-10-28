@@ -1,7 +1,5 @@
 package controllers
 
-import javax.inject._
-
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
@@ -19,8 +17,7 @@ import services.PingerService
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class EventStreamController @Inject()(
+class EventStreamController(
     clanwarsSource: Source[CompleteClanwar, Future[NotUsed]],
     newGamesSource: Source[JsonGame, Future[NotUsed]],
     pingerService: PingerService,

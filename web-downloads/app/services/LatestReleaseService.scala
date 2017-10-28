@@ -1,7 +1,5 @@
 package services
 
-import javax.inject._
-
 import org.apache.http.client.HttpClient
 import org.apache.http.client.cache.HttpCacheContext
 import org.apache.http.client.methods.HttpGet
@@ -20,9 +18,7 @@ import scala.concurrent._
   * Load the latest release from GitHub Releases.
   * Uses Cached HTTP Client to avoid request limits.
   */
-@Singleton
-class LatestReleaseService @Inject()(
-    implicit executionContext: ExecutionContext) {
+class LatestReleaseService(implicit executionContext: ExecutionContext) {
   private val client: CloseableHttpClient =
     CachingHttpClientBuilder.create().build()
   private val context = HttpCacheContext.create()

@@ -7,7 +7,8 @@ package com.actionfps.gameparser.enrichers
   */
 object IpLookup {
 
-  case class IpLookupResult(countryCode: Option[String], countryName: Option[String],
+  case class IpLookupResult(countryCode: Option[String],
+                            countryName: Option[String],
                             timezone: Option[String])
 
   object IpLookupResult {

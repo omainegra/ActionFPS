@@ -1,6 +1,10 @@
 package com.actionfps.gameparser.ingesters.stateful
 
-import com.actionfps.gameparser.ingesters.{GameFinishedHeader, GameInProgressHeader, GameStartHeader}
+import com.actionfps.gameparser.ingesters.{
+  GameFinishedHeader,
+  GameInProgressHeader,
+  GameStartHeader
+}
 
 /**
   * Figure out a game's duration from the logs.
@@ -30,7 +34,8 @@ case object NoDurationFound extends GameDuration {
   override def next(input: String): GameDuration = {
     input match {
       case GameStartHeader(gsh) => GameInProgress(gsh.minutes, gsh.minutes)
-      case GameInProgressHeader(GameInProgressHeader(mode, remaining, map, state)) =>
+      case GameInProgressHeader(
+          GameInProgressHeader(mode, remaining, map, state)) =>
         GameInProgress(remaining, remaining)
       case _ => NoDurationFound
     }
@@ -56,9 +61,9 @@ case class GameInProgress(duration: Int, remain: Int) extends GameDuration {
 
 case class GameFinished(duration: Int) extends GameDuration {
   override def next(input: String): GameDuration = input match {
-    case GameInProgressHeader(GameInProgressHeader(mode, remaining, map, state)) =>
+    case GameInProgressHeader(
+        GameInProgressHeader(mode, remaining, map, state)) =>
       GameInProgress(remaining, remaining)
     case _ => this
   }
 }
-

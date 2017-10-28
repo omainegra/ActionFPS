@@ -53,7 +53,8 @@ object IntersFlow {
     def initial: IntersIterator = IntersIterator.empty
 
     def scanAsync(intersIterator: IntersIterator, line: String)(
-        implicit executionContext: ExecutionContext): Future[IntersIterator] = {
+        implicit executionContext: ExecutionContext)
+      : Future[IntersIterator] = {
       async {
         UserMessageFromLine(await(usersProvider()))
           .unapply(line)

@@ -16,7 +16,6 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by me on 18/01/2017.
   */
-
 object IntersServiceSpec {
 
   val oldSyslogEvent: String = {

@@ -6,7 +6,6 @@ package controllers
 import java.security.spec.X509EncodedKeySpec
 import java.security.{KeyFactory, KeyPairGenerator, PublicKey}
 import java.util.Base64
-import javax.inject._
 
 import com.actionfps.user.Registration
 import lib.WebTemplateRender
@@ -20,11 +19,10 @@ import scala.concurrent.ExecutionContext
 import com.actionfps.formats.json.Formats._
 import play.api.libs.ws.WSClient
 
-@Singleton
-class PlayersController @Inject()(common: WebTemplateRender,
-                                  playersProvider: PlayersProvider,
-                                  ladderController: LadderController,
-                                  controllerComponents: ControllerComponents)(
+class PlayersController(common: WebTemplateRender,
+                        playersProvider: PlayersProvider,
+                        ladderController: LadderController,
+                        controllerComponents: ControllerComponents)(
     implicit configuration: Configuration,
     executionContext: ExecutionContext,
     wSClient: WSClient)

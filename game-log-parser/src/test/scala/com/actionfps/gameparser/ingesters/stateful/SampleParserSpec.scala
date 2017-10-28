@@ -11,7 +11,8 @@ import org.scalatest.OptionValues._
 class SampleParserSpec extends FreeSpec {
   "Parsing for a new game" - {
     "works" in {
-      val source = scala.io.Source.fromInputStream(getClass.getResourceAsStream("/next-sample.log"))
+      val source = scala.io.Source
+        .fromInputStream(getClass.getResourceAsStream("/next-sample.log"))
       val collectedGames =
         try source
           .getLines()

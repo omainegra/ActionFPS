@@ -34,10 +34,12 @@ case class DemoRecordedCollected(demo: DemoRecorded) extends DemoCollector {
   }
 }
 
-case class DemoNotWrittenCollected(demo: DemoRecorded, followingLine: String) extends DemoCollector {
+case class DemoNotWrittenCollected(demo: DemoRecorded, followingLine: String)
+    extends DemoCollector {
   def next(input: String): DemoCollector = NoDemosCollected.next(input)
 }
 
-case class DemoWrittenCollected(demo: DemoRecorded, demoWritten: DemoWritten) extends DemoCollector {
+case class DemoWrittenCollected(demo: DemoRecorded, demoWritten: DemoWritten)
+    extends DemoCollector {
   def next(input: String): DemoCollector = NoDemosCollected.next(input)
 }

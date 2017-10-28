@@ -35,7 +35,8 @@ object UserHost {
     override def group: Option[String] = None
   }
 
-  case class AuthHost(host: String, user: String, group: Option[String]) extends UserHost {
+  case class AuthHost(host: String, user: String, group: Option[String])
+      extends UserHost {
     override def userO: Option[String] = Some(user)
   }
 

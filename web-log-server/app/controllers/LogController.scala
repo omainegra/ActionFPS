@@ -25,7 +25,8 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-abstract class LogController(sourceFile: Path, components: ControllerComponents)
+abstract class LogController(sourceFile: Path,
+                             components: ControllerComponents)
     extends AbstractController(components) {
   Logger.info(s"Log controller for ${sourceFile}")
 
@@ -62,7 +63,8 @@ abstract class LogController(sourceFile: Path, components: ControllerComponents)
             .map[Event] {
               case (zdt, server, message) =>
                 Event(
-                  id = Some(DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)),
+                  id =
+                    Some(DateTimeFormatter.ISO_INSTANT.format(zdt.toInstant)),
                   data = s"${DateTimeFormatter.ISO_INSTANT
                     .format(zdt.toInstant)}\t${server}\t${message}\n",
                   name = Some("log")

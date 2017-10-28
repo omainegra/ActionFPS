@@ -1,7 +1,7 @@
 package services
 
 import java.nio.file.Path
-import javax.inject._
+
 import javax.management.ObjectName
 
 import af.inters.IntersFlow.{NicknameToUser, ScanIterators}
@@ -28,7 +28,6 @@ import scala.util.{Failure, Success, Try}
   *
   * Notify clients of an '!inter' message on a server by a registered user.
   */
-@Singleton
 class IntersService(journalPath: Path)(
     implicit usersF: () => Future[List[User]],
     executionContext: ExecutionContext,

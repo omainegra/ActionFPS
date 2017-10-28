@@ -7,7 +7,7 @@ import fastparse.all._
 import org.scalatest._
 
 class DemoCaptureParserSpec
-  extends WordSpec
+    extends WordSpec
     with Inside
     with Inspectors
     with Matchers
@@ -16,7 +16,8 @@ class DemoCaptureParserSpec
   "Demo capture" must {
 
     "parse demo written" in {
-      val input = """demo written to file "demos/20141214_1547_local_ac_aqueous_4min_TDM.dmo" (115739 bytes)"""
+      val input =
+        """demo written to file "demos/20141214_1547_local_ac_aqueous_4min_TDM.dmo" (115739 bytes)"""
       val DemoWritten(dw) = input
       dw.filename shouldEqual "demos/20141214_1547_local_ac_aqueous_4min_TDM.dmo"
       dw.size shouldEqual "115739 bytes"
@@ -58,11 +59,11 @@ class DemoCaptureParserSpec
           |
         """.stripMargin.split("\r?\n")
 
-      val outputs = inputSequence.scanLeft(NoDemosCollected: DemoCollector)(_.next(_))
+      val outputs =
+        inputSequence.scanLeft(NoDemosCollected: DemoCollector)(_.next(_))
 
-      forExactly(1, outputs) {
-        output =>
-          output shouldBe a[DemoWrittenCollected]
+      forExactly(1, outputs) { output =>
+        output shouldBe a[DemoWrittenCollected]
       }
     }
     "Not fail a simple demo (1.2)" in {
@@ -77,20 +78,24 @@ class DemoCaptureParserSpec
           |
         """.stripMargin.split("\r?\n")
 
-      val outputs = inputSequence.scanLeft(NoDemosCollected: DemoCollector)(_.next(_))
+      val outputs =
+        inputSequence.scanLeft(NoDemosCollected: DemoCollector)(_.next(_))
 
-      forExactly(1, outputs) {
-        output =>
-          output shouldBe a[DemoWrittenCollected]
-          inside(output) {
-            case DemoWrittenCollected(DemoRecorded(dateTime, mode, map, sizeRecorded), DemoWritten(filename, sizeWritten)) =>
-              dateTime shouldBe "Sun Dec 14 16:47:14 2014"
-              mode shouldBe "team deathmatch"
-              map shouldBe "ac_aqueous"
-              sizeRecorded shouldBe "113.03kB"
-              filename shouldBe "demos/20141214_1547_local_ac_aqueous_4min_TDM.dmo"
-              sizeWritten shouldBe "115739 bytes"
-          }
+      forExactly(1, outputs) { output =>
+        output shouldBe a[DemoWrittenCollected]
+        inside(output) {
+          case DemoWrittenCollected(DemoRecorded(dateTime,
+                                                 mode,
+                                                 map,
+                                                 sizeRecorded),
+                                    DemoWritten(filename, sizeWritten)) =>
+            dateTime shouldBe "Sun Dec 14 16:47:14 2014"
+            mode shouldBe "team deathmatch"
+            map shouldBe "ac_aqueous"
+            sizeRecorded shouldBe "113.03kB"
+            filename shouldBe "demos/20141214_1547_local_ac_aqueous_4min_TDM.dmo"
+            sizeWritten shouldBe "115739 bytes"
+        }
       }
 
     }

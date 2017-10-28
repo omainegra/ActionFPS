@@ -8,8 +8,8 @@ import services.LatestReleaseService
 /**
   * Created by me on 04/02/2017.
   */
-class DownloadsController @Inject()(latestReleaseService: LatestReleaseService,
-                                    components: ControllerComponents)
+class DownloadsController(latestReleaseService: LatestReleaseService,
+                          components: ControllerComponents)
     extends AbstractController(components) {
   def game = Action { request =>
     val latestRelease = latestReleaseService.latestRelease()

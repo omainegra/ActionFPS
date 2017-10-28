@@ -6,7 +6,7 @@ package stateful
 import org.scalatest._
 
 class GameDurationCalculatorSpec
-  extends WordSpec
+    extends WordSpec
     with Inside
     with Inspectors
     with Matchers
@@ -22,7 +22,8 @@ class GameDurationCalculatorSpec
           |Game status: hunt the flag on ac_depot, 14 minutes remaining, open, 4 clients
           |Game status: team deathmatch on ac_aqueous, game finished, open, 6 clients
         """.stripMargin.split("\r?\n")
-      val outputSequence = inputSequence.scanLeft(GameDuration.empty)(GameDuration.scan).toList
+      val outputSequence =
+        inputSequence.scanLeft(GameDuration.empty)(GameDuration.scan).toList
       val List(_, _, first, second, third, fourth, fifth, _) = outputSequence
       first shouldBe NoDurationFound
       second shouldBe GameInProgress(10, 10)
@@ -31,7 +32,8 @@ class GameDurationCalculatorSpec
       fifth shouldBe GameFinished(15)
     }
     "Game duration from start can be found" in {
-      val inputData = "Game start: ctf on ac_depot, 1 players, 15 minutes, mastermode 0, (map rev 3/15383, official, 'getmap' not prepared)"
+      val inputData =
+        "Game start: ctf on ac_depot, 1 players, 15 minutes, mastermode 0, (map rev 3/15383, official, 'getmap' not prepared)"
       val result = GameDuration.parse(inputData)
       result shouldEqual GameInProgress(15, 15)
     }

@@ -1,7 +1,6 @@
 package controllers
 
 import java.nio.file.{Files, Path}
-import javax.inject.{Inject, Singleton}
 
 import lib.WebTemplateRender
 import org.jsoup.Jsoup
@@ -16,10 +15,9 @@ import play.api.routing.SimpleRouter
   *
   * Serve static pages and render them in the template.
   */
-@Singleton
-class StaticPageRouter @Inject()(common: WebTemplateRender,
-                                 environment: Environment,
-                                 components: ControllerComponents)
+class StaticPageRouter(common: WebTemplateRender,
+                       environment: Environment,
+                       components: ControllerComponents)
     extends AbstractController(components)
     with SimpleRouter {
 

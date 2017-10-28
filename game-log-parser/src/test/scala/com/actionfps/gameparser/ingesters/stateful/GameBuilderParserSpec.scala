@@ -1,12 +1,16 @@
 package com.actionfps.gameparser.ingesters.stateful
 
-import com.actionfps.gameparser.ingesters.{GameFinishedHeader, GameMode, TeamModes}
+import com.actionfps.gameparser.ingesters.{
+  GameFinishedHeader,
+  GameMode,
+  TeamModes
+}
 import com.actionfps.gameparser.ingesters.GameMode.TDM
 import com.actionfps.gameparser.ingesters.TeamModes.FragStyle
 import org.scalatest._
 
 class GameBuilderParserSpec
-  extends WordSpec
+    extends WordSpec
     with Inside
     with Inspectors
     with Matchers
@@ -40,9 +44,15 @@ class GameBuilderParserSpec
           |
         """.stripMargin.split("\r?\n")
 
-      val playersShouldBe = Set("Daimon", "~FEL~.RayDen", "|oNe|OpTic", "inter", "hu3", "~FEL~MR.JAM")
+      val playersShouldBe = Set("Daimon",
+                                "~FEL~.RayDen",
+                                "|oNe|OpTic",
+                                "inter",
+                                "hu3",
+                                "~FEL~MR.JAM")
 
-      val outputs = inputSequence.scanLeft(GameBuilderState.initial)(GameBuilderState.scan)
+      val outputs =
+        inputSequence.scanLeft(GameBuilderState.initial)(GameBuilderState.scan)
 
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
 
@@ -60,25 +70,28 @@ class GameBuilderParserSpec
               scores should have size 5
               disconnectedScores should have size 1
 
-              forExactly(1, disconnectedScores) {
-                score => inside(score) {
-                  case FragStyle.IndividualScoreDisconnected(name, team, frag, death) =>
+              forExactly(1, disconnectedScores) { score =>
+                inside(score) {
+                  case FragStyle.IndividualScoreDisconnected(name,
+                                                             team,
+                                                             frag,
+                                                             death) =>
                     name shouldBe "~FEL~MR.JAM"
                     team shouldBe "RVSF"
                     frag shouldBe 1
                     death shouldBe 7
                 }
               }
-              forExactly(1, teamScores) {
-                score => inside(score) {
+              forExactly(1, teamScores) { score =>
+                inside(score) {
                   case TeamModes.FragStyle.TeamScore(name, players, frags) =>
                     name shouldBe "RVSF"
                     players shouldBe 3
                     frags shouldBe 8
                 }
               }
-              forExactly(1, teamScores) {
-                score => inside(score) {
+              forExactly(1, teamScores) { score =>
+                inside(score) {
                   case TeamModes.FragStyle.TeamScore(name, players, frags) =>
                     name shouldBe "CLA"
                     players shouldBe 2
@@ -86,9 +99,20 @@ class GameBuilderParserSpec
                 }
               }
 
-              forExactly(1, scores) {
-                pscore => inside(pscore) {
-                  case TeamModes.FragStyle.IndividualScore(cn, name, team, score, frag, death, tk, ping, role, host, user, group) =>
+              forExactly(1, scores) { pscore =>
+                inside(pscore) {
+                  case TeamModes.FragStyle.IndividualScore(cn,
+                                                           name,
+                                                           team,
+                                                           score,
+                                                           frag,
+                                                           death,
+                                                           tk,
+                                                           ping,
+                                                           role,
+                                                           host,
+                                                           user,
+                                                           group) =>
                     cn shouldBe 3
                     name shouldBe "inter"
                     team shouldBe "CLA"
@@ -105,7 +129,6 @@ class GameBuilderParserSpec
               }
           }
       }
-
 
     }
 
@@ -126,10 +149,11 @@ class GameBuilderParserSpec
           |x
           | """.stripMargin.split("\r?\n")
 
-      for {t <- inputSequence} info(s"Line: $t")
-      val outputs = inputSequence.scanLeft(GameBuilderState.initial)(GameBuilderState.scan)
+      for { t <- inputSequence } info(s"Line: $t")
+      val outputs =
+        inputSequence.scanLeft(GameBuilderState.initial)(GameBuilderState.scan)
 
-      for {o <- outputs} info(s"Output item: $o")
+      for { o <- outputs } info(s"Output item: $o")
 
       inside(outputs(outputs.length - 3)) {
         case FoundGame(header, Left(flagGame)) =>
@@ -143,9 +167,13 @@ class GameBuilderParserSpec
             case FlagGameBuilder(_, scores, disconnectedScores, teamScores) =>
               teamScores should have size 2
               scores should have size 1
-              forExactly(1, disconnectedScores) {
-                disconnectedScore => inside(disconnectedScore) {
-                  case TeamModes.FlagStyle.IndividualScoreDisconnected(name, team, flag, score, frag) =>
+              forExactly(1, disconnectedScores) { disconnectedScore =>
+                inside(disconnectedScore) {
+                  case TeamModes.FlagStyle.IndividualScoreDisconnected(name,
+                                                                       team,
+                                                                       flag,
+                                                                       score,
+                                                                       frag) =>
                     name shouldBe "w00p|Sanzo"
                     team shouldBe "RVSF"
                     flag shouldBe 8
@@ -153,9 +181,12 @@ class GameBuilderParserSpec
                     frag shouldBe 35
                 }
               }
-              forExactly(1, teamScores) {
-                score => inside(score) {
-                  case TeamModes.FlagStyle.TeamScore(name, players, frags, flags) =>
+              forExactly(1, teamScores) { score =>
+                inside(score) {
+                  case TeamModes.FlagStyle.TeamScore(name,
+                                                     players,
+                                                     frags,
+                                                     flags) =>
                     name shouldBe "RVSF"
                     players shouldBe 1
                     frags shouldBe 0
@@ -163,9 +194,21 @@ class GameBuilderParserSpec
                 }
               }
 
-              forExactly(1, scores) {
-                score => inside(score) {
-                  case TeamModes.FlagStyle.IndividualScore(cn, name, team, flag, ascore, frag, death, tk, ping, role, host, user, group) =>
+              forExactly(1, scores) { score =>
+                inside(score) {
+                  case TeamModes.FlagStyle.IndividualScore(cn,
+                                                           name,
+                                                           team,
+                                                           flag,
+                                                           ascore,
+                                                           frag,
+                                                           death,
+                                                           tk,
+                                                           ping,
+                                                           role,
+                                                           host,
+                                                           user,
+                                                           group) =>
                     cn shouldBe 0
                     name shouldBe "Drakas"
                     team shouldBe "RVSF"
@@ -184,7 +227,6 @@ class GameBuilderParserSpec
           }
       }
     }
-
 
     "Not fail for this game" in {
       val inputSequence =
@@ -211,7 +253,6 @@ class GameBuilderParserSpec
 
       val foundGame = outputs.find(_.isInstanceOf[FoundGame]).value
     }
-
 
     "Capture RSPC/CSPC" in {
 
@@ -242,10 +283,11 @@ class GameBuilderParserSpec
           inside(flagGame) {
             case FlagGameBuilder(_, scores, disconnectedScores, teamScores) =>
               val teamPlayers = scores.groupBy(_.team).mapValues(_.map(_.name))
-              teamPlayers("RVSF") should contain only("w00p|Sanzouille", "w00p|RedBull")
-              teamPlayers("CLA") should contain only("w00p|Drakas", "w00p|LiFe.")
+              teamPlayers("RVSF") should contain only ("w00p|Sanzouille", "w00p|RedBull")
+              teamPlayers("CLA") should contain only ("w00p|Drakas", "w00p|LiFe.")
               teamPlayers should have size 2
-              val teamPlayersDisconnected = disconnectedScores.groupBy(_.team).mapValues(_.map(_.name))
+              val teamPlayersDisconnected =
+                disconnectedScores.groupBy(_.team).mapValues(_.map(_.name))
               teamPlayersDisconnected should have size 1
               teamPlayersDisconnected("CLA") should contain only "w00p|Dam."
           }

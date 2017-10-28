@@ -2,7 +2,6 @@ package controllers
 
 import java.nio.file.{Files, Path, Paths}
 import java.util.Base64
-import javax.inject.{Inject, Singleton}
 
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
@@ -19,12 +18,11 @@ import scala.async.Async._
 import scala.concurrent.ExecutionContext
 import com.actionfps.formats.json.Formats._
 
-@Singleton
 //noinspection TypeAnnotation
-class UserController @Inject()(configuration: Configuration,
-                               playersProvider: PlayersProvider,
-                               wSClient: WSClient,
-                               components: ControllerComponents)(
+class UserController(configuration: Configuration,
+                     playersProvider: PlayersProvider,
+                     wSClient: WSClient,
+                     components: ControllerComponents)(
     implicit executionContext: ExecutionContext)
     extends AbstractController(components) {
 

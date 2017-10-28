@@ -1,7 +1,6 @@
 package providers
 
 import java.io.StringReader
-import javax.inject.{Inject, Singleton}
 
 import com.actionfps.accumulation.Clan
 import play.api.Configuration
@@ -28,9 +27,8 @@ import lib.ClansProvider
   *
   * Provides reference data from CSV URLs.
   */
-@Singleton
-final class ReferenceProvider @Inject()(configuration: Configuration,
-                                        cacheApi: AsyncCacheApi)(
+final class ReferenceProvider(configuration: Configuration,
+                              cacheApi: AsyncCacheApi)(
     implicit wSClient: WSClient,
     executionContext: ExecutionContext)
     extends ProvidesServers

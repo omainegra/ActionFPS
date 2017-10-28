@@ -9,7 +9,8 @@ import fastparse.all._
   */
 object DemoWritten {
 
-  private val parser = P("demo written to file \"") ~ CharsWhile(_ != '"').! ~ "\" (" ~ CharsWhile(_ != ')').! ~ ")"
+  private val parser = P("demo written to file \"") ~ CharsWhile(_ != '"').! ~ "\" (" ~ CharsWhile(
+    _ != ')').! ~ ")"
 
   def unapply(input: String): Option[DemoWritten] = {
     val res = parser.parse(input)

@@ -12,9 +12,12 @@ import fastparse.parsers.Intrinsics.ElemIn
   */
 private[gameparser] trait SharedParsers {
   val digitParser = CharIn('0' to '9')
-  val mapNameParser: Parser[String, Char, String] = (P("ac_") ~ CharsWhile(c => c != ',' && c != ' ').rep(1)).!
-  val yearParser: Parser[Unit, Char, String] = digitParser ~ digitParser ~ digitParser ~ digitParser
-  val acceptedModeParser: Parser[GameMode, Char, String] = GameMode.gamemodes.map(gm => P(gm.name).map(_ => gm)).reduce(_ | _)
+  val mapNameParser: Parser[String, Char, String] =
+    (P("ac_") ~ CharsWhile(c => c != ',' && c != ' ').rep(1)).!
+  val yearParser
+    : Parser[Unit, Char, String] = digitParser ~ digitParser ~ digitParser ~ digitParser
+  val acceptedModeParser: Parser[GameMode, Char, String] =
+    GameMode.gamemodes.map(gm => P(gm.name).map(_ => gm)).reduce(_ | _)
   val upperCaseParser: ElemIn[Char, String] = CharIn('A' to 'Z')
   val lowerCaseParser = CharIn('a' to 'z')
   val timestampParser: Parser[Unit, Char, String] = {
@@ -25,6 +28,4 @@ private[gameparser] trait SharedParsers {
   }
 }
 
-private[gameparser] object SharedParsers extends SharedParsers {
-
-}
+private[gameparser] object SharedParsers extends SharedParsers {}

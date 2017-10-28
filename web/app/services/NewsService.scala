@@ -2,7 +2,6 @@ package services
 
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import javax.inject.{Inject, Singleton}
 
 import org.apache.http.client.cache.HttpCacheContext
 import org.apache.http.client.methods.HttpGet
@@ -24,8 +23,7 @@ import scala.xml.{Elem, Node}
   *      [[https://hc.apache.org/httpcomponents-client-ga/tutorial/html/caching.html]]
   *
   */
-@Singleton
-class NewsService @Inject()(implicit executionContext: ExecutionContext) {
+class NewsService(implicit executionContext: ExecutionContext) {
   private val client: CloseableHttpClient =
     CachingHttpClientBuilder.create().build()
   private val context = HttpCacheContext.create()

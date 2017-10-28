@@ -5,7 +5,6 @@ package controllers
   */
 import java.nio.file.{Path, Paths}
 import java.time.Instant
-import javax.inject._
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -21,12 +20,11 @@ import views.ladder.Table.PlayerNamer
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class LadderController @Inject()(journalPath: Path,
-                                 configuration: Configuration,
-                                 providesUsers: ProvidesUsers,
-                                 common: WebTemplateRender,
-                                 components: ControllerComponents)(
+class LadderController(journalPath: Path,
+                       configuration: Configuration,
+                       providesUsers: ProvidesUsers,
+                       common: WebTemplateRender,
+                       components: ControllerComponents)(
     implicit executionContext: ExecutionContext,
     actorSystem: ActorSystem)
     extends AbstractController(components) {

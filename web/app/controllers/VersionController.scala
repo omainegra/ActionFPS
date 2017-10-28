@@ -1,7 +1,6 @@
 package controllers
 
 import java.util.Base64
-import javax.inject._
 
 import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -11,8 +10,7 @@ import scala.concurrent.ExecutionContext
 /**
   * Created by William on 01/01/2016.
   */
-@Singleton
-class VersionController @Inject()(controllerComponents: ControllerComponents)(
+class VersionController(controllerComponents: ControllerComponents)(
     implicit executionContext: ExecutionContext)
     extends AbstractController(controllerComponents) {
 

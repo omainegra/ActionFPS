@@ -22,7 +22,8 @@ object HazelcastAgentCache {
         Try(theMap.get(keyName)) match {
           case Success(good) => Agent(good)
           case Failure(reason) =>
-            Logger.error(s"Failed to fetch cached stuff due to $reason", reason)
+            Logger.error(s"Failed to fetch cached stuff due to $reason",
+                         reason)
             val result = await(f)
             theMap.put(keyName, result.get())
             result

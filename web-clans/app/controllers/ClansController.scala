@@ -4,7 +4,6 @@ package controllers
   * Created by William on 01/01/2016.
   */
 import java.time.Instant
-import javax.inject._
 
 import com.actionfps.accumulation.Clan
 import com.actionfps.clans.{ClanNamer, Clanwar}
@@ -22,11 +21,10 @@ import scala.async.Async._
 import scala.concurrent.ExecutionContext
 import com.actionfps.formats.json.Formats._
 
-@Singleton
-class ClansController @Inject()(webTemplateRender: WebTemplateRender,
-                                clansProvider: ClansProvider,
-                                clanDataProvider: ClanDataProvider,
-                                components: ControllerComponents)(
+class ClansController(webTemplateRender: WebTemplateRender,
+                      clansProvider: ClansProvider,
+                      clanDataProvider: ClanDataProvider,
+                      components: ControllerComponents)(
     implicit configuration: Configuration,
     executionContext: ExecutionContext)
     extends AbstractController(components) {

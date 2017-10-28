@@ -2,7 +2,6 @@ package providers.games
 
 import java.nio.file.{Files, Path, Paths, StandardOpenOption}
 import java.time.Clock
-import javax.inject.{Inject, Singleton}
 
 import akka.NotUsed
 import akka.agent.Agent
@@ -19,7 +18,6 @@ import scala.async.Async._
 import scala.concurrent._
 import scala.concurrent.duration._
 
-@Singleton
 final class GamesProvider(gameJournalPath: Path)(
     implicit executionContext: ExecutionContext) {
 

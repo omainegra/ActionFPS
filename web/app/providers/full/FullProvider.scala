@@ -3,7 +3,6 @@ package providers.full
 import java.nio.file.Path
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import javax.inject.{Inject, Singleton}
 
 import af.FileOffsetFinder
 import akka.NotUsed

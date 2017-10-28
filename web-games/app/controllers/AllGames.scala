@@ -1,7 +1,5 @@
 package controllers
 
-import javax.inject._
-
 import akka.stream.scaladsl.Source
 import com.actionfps.gameparser.enrichers.JsonGame
 import org.apache.commons.csv.CSVFormat
@@ -19,9 +17,7 @@ import com.actionfps.formats.json.Formats._
 /**
   * Provide a batch list of all games in different formats.
   */
-@Singleton
-class AllGames @Inject()(providesGames: ProvidesGames,
-                         components: ControllerComponents)(
+class AllGames(providesGames: ProvidesGames, components: ControllerComponents)(
     implicit executionContext: ExecutionContext)
     extends AbstractController(components)
     with SimpleRouter {

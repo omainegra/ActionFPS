@@ -13,7 +13,11 @@ object JsonGame {
 //    if (g.duration == 60) g.copy(duration = 15) else g
 //  }
 
-  def build(id: String, foundGame: FoundGame, endDate: ZonedDateTime, serverId: String, duration: Int): JsonGame = {
+  def build(id: String,
+            foundGame: FoundGame,
+            endDate: ZonedDateTime,
+            serverId: String,
+            duration: Int): JsonGame = {
 
     Game(
       clanwar = None,
@@ -27,19 +31,26 @@ object JsonGame {
       state = foundGame.header.state,
       achievements = None,
       teams = {
-        val tt = foundGame.game.fold(_.teamScores.map(_.project), _.teamScores.map(_.project))
-        val tp = foundGame.game.fold(g => (g.scores ++ g.disconnectedScores).map(_.project),
+        val tt = foundGame.game.fold(_.teamScores.map(_.project),
+                                     _.teamScores.map(_.project))
+        val tp = foundGame.game.fold(
+          g => (g.scores ++ g.disconnectedScores).map(_.project),
           g => (g.scores ++ g.disconnectedScores).map(_.project))
 
-        for {team <- tt.sortBy(team => (team.flags, team.frags)).reverse}
-          yield GameTeam(
+        for { team <- tt.sortBy(team => (team.flags, team.frags)).reverse } yield
+          GameTeam(
             name = team.name,
             flags = team.flags,
             frags = team.frags,
             clan = None,
             players = {
-              for {player <- tp.filter(_.team == team.name).sortBy(p => (p.flag, p.frag)).reverse}
-                yield GamePlayer(
+              for {
+                player <- tp
+                  .filter(_.team == team.name)
+                  .sortBy(p => (p.flag, p.frag))
+                  .reverse
+              } yield
+                GamePlayer(
                   name = player.name,
                   host = player.host,
                   score = player.score,
@@ -58,18 +69,3 @@ object JsonGame {
     )
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

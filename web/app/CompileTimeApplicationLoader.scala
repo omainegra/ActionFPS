@@ -110,8 +110,9 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   private lazy val initialGameAxisAccumulator: Future[GameAxisAccumulator] = {
     import scala.async.Async._
     async {
-      GameAxisAccumulator.emptyWithUsers(users = await(referenceProvider.users),
-                                         clans = await(referenceProvider.clans))
+      GameAxisAccumulator.emptyWithUsers(
+        users = await(referenceProvider.users),
+        clans = await(referenceProvider.clans))
     }
   }
   private lazy val newClanwarsSource = fullProvider.newClanwars

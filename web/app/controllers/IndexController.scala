@@ -1,7 +1,6 @@
 package controllers
 
 import java.time.Instant
-import javax.inject._
 
 import com.actionfps.clans.ClanNamer
 import controllers.IndexController._
@@ -18,13 +17,12 @@ import views.rendergame.MixedGame
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class IndexController @Inject()(webTemplateRender: WebTemplateRender,
-                                newsService: NewsService,
-                                referenceProvider: ReferenceProvider,
-                                fullProvider: AxisAccumulatorInAgentFuture,
-                                ladderController: LadderController,
-                                components: ControllerComponents)(
+class IndexController(webTemplateRender: WebTemplateRender,
+                      newsService: NewsService,
+                      referenceProvider: ReferenceProvider,
+                      fullProvider: AxisAccumulatorInAgentFuture,
+                      ladderController: LadderController,
+                      components: ControllerComponents)(
     implicit executionContext: ExecutionContext)
     extends AbstractController(components) {
 

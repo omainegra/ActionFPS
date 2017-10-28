@@ -1,7 +1,5 @@
 package controllers
 
-import javax.inject._
-
 import lib.WebTemplateRender
 import play.api.Configuration
 import play.api.mvc._
@@ -12,11 +10,10 @@ import scala.concurrent.ExecutionContext
 /**
   * Created by William on 01/01/2016.
   */
-@Singleton
-class ServersController @Inject()(templateRender: WebTemplateRender,
-                                  configuration: Configuration,
-                                  providesServers: ProvidesServers,
-                                  components: ControllerComponents)(
+class ServersController(templateRender: WebTemplateRender,
+                        configuration: Configuration,
+                        providesServers: ProvidesServers,
+                        components: ControllerComponents)(
     implicit executionContext: ExecutionContext)
     extends AbstractController(components) {
 

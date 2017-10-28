@@ -19,7 +19,8 @@ object MultipleServerParser {
     case g: MultipleServerParserFoundGame => g.cg
   }
 
-  def scan(multipleServerParser: MultipleServerParser, line: String): MultipleServerParser = {
+  def scan(multipleServerParser: MultipleServerParser,
+           line: String): MultipleServerParser = {
     multipleServerParser.process(line)
   }
 }
@@ -28,21 +29,24 @@ sealed trait MultipleServerParser {
   def process(line: String): MultipleServerParser
 }
 
-case class MultipleServerParserFoundGame(cg: JsonGame, next: MultipleServerParserProcessing)
-  extends MultipleServerParser {
+case class MultipleServerParserFoundGame(cg: JsonGame,
+                                         next: MultipleServerParserProcessing)
+    extends MultipleServerParser {
   def process(line: String): MultipleServerParser = {
     next.process(line)
   }
 }
 
-case class MultipleServerParserFailedLine(line: String, next: MultipleServerParserProcessing)
-  extends MultipleServerParser {
+case class MultipleServerParserFailedLine(line: String,
+                                          next: MultipleServerParserProcessing)
+    extends MultipleServerParser {
   def process(line: String): MultipleServerParser = next
 }
 
-case class MultipleServerParserProcessing(serverStates: Map[String, ServerState],
-                                          serverTimeCorrectors: Map[String, TimeCorrector])
-  extends MultipleServerParser {
+case class MultipleServerParserProcessing(
+    serverStates: Map[String, ServerState],
+    serverTimeCorrectors: Map[String, TimeCorrector])
+    extends MultipleServerParser {
   def process(line: String): MultipleServerParser = {
     line match {
       case ExtractMessage(date, server, message) =>
@@ -54,7 +58,9 @@ case class MultipleServerParserProcessing(serverStates: Map[String, ServerState]
         correctorO match {
           case None => MultipleServerParserFailedLine(line = line, next = this)
           case Some(corrector) =>
-            serverStates.getOrElse(server, ServerState.empty).next(message) match {
+            serverStates
+              .getOrElse(server, ServerState.empty)
+              .next(message) match {
               case sfg: ServerFoundGame =>
                 val duration = if (sfg.duration == 60) 15 else sfg.duration
                 val jg = JsonGame.build(
@@ -68,14 +74,17 @@ case class MultipleServerParserProcessing(serverStates: Map[String, ServerState]
                 MultipleServerParserFoundGame(
                   cg = jg,
                   next = copy(
-                    serverStates = serverStates.updated(server, ServerState.empty),
-                    serverTimeCorrectors = serverTimeCorrectors.updated(server, corrector)
+                    serverStates =
+                      serverStates.updated(server, ServerState.empty),
+                    serverTimeCorrectors =
+                      serverTimeCorrectors.updated(server, corrector)
                   )
                 )
               case other =>
                 copy(
                   serverStates = serverStates.updated(server, other),
-                  serverTimeCorrectors = serverTimeCorrectors.updated(server, corrector)
+                  serverTimeCorrectors =
+                    serverTimeCorrectors.updated(server, corrector)
                 )
             }
         }
@@ -84,4 +93,3 @@ case class MultipleServerParserProcessing(serverStates: Map[String, ServerState]
     }
   }
 }
-

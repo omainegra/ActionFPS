@@ -2,9 +2,17 @@ package com.actionfps.api
 
 import java.time.ZonedDateTime
 
-case class Game(id: String, endTime: ZonedDateTime, map: String, mode: String, state: String,
-                teams: List[GameTeam], server: String, duration: Int, clangame: Option[Set[String]],
-                clanwar: Option[String], achievements: Option[List[GameAchievement]]) {
+case class Game(id: String,
+                endTime: ZonedDateTime,
+                map: String,
+                mode: String,
+                state: String,
+                teams: List[GameTeam],
+                server: String,
+                duration: Int,
+                clangame: Option[Set[String]],
+                clanwar: Option[String],
+                achievements: Option[List[GameAchievement]]) {
 
   def startTime: ZonedDateTime = endTime.minusMinutes(duration)
 
@@ -12,16 +20,20 @@ case class Game(id: String, endTime: ZonedDateTime, map: String, mode: String, s
 
   def teamSize: Int = teams.map(_.players.size).min
 
-  def hasUser(user: String): Boolean = teams.exists(_.players.exists(_.user.contains(user)))
+  def hasUser(user: String): Boolean =
+    teams.exists(_.players.exists(_.user.contains(user)))
 
   def flattenPlayers: Game = transformTeams(_.flattenPlayers)
 
-  def withoutHosts: Game = transformPlayers((_, player) => player.copy(host = None))
+  def withoutHosts: Game =
+    transformPlayers((_, player) => player.copy(host = None))
 
   def transformPlayers(f: (GameTeam, GamePlayer) => GamePlayer): Game =
-    copy(teams = teams.map(team => team.copy(players = team.players.map(player => f(team, player)))))
+    copy(teams = teams.map(team =>
+      team.copy(players = team.players.map(player => f(team, player)))))
 
-  def transformTeams(f: GameTeam => GameTeam): Game = copy(teams = teams.map(f))
+  def transformTeams(f: GameTeam => GameTeam): Game =
+    copy(teams = teams.map(f))
 
   def isTie: Boolean = winner.isEmpty
 
@@ -50,8 +62,3 @@ case class Game(id: String, endTime: ZonedDateTime, map: String, mode: String, s
     else None
 
 }
-
-
-
-
-

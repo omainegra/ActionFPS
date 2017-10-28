@@ -1,7 +1,5 @@
 package controllers
 
-import javax.inject._
-
 import com.actionfps.clans.ClanNamer
 import lib.WebTemplateRender
 import play.api.libs.json.Json
@@ -12,11 +10,10 @@ import scala.async.Async._
 import scala.concurrent.ExecutionContext
 import com.actionfps.formats.json.Formats._
 
-@Singleton
-class GamesController @Inject()(webTemplateRender: WebTemplateRender,
-                                providesClanNames: ProvidesClanNames,
-                                providesGames: ProvidesGames,
-                                components: ControllerComponents)(
+class GamesController(webTemplateRender: WebTemplateRender,
+                      providesClanNames: ProvidesClanNames,
+                      providesGames: ProvidesGames,
+                      components: ControllerComponents)(
     implicit executionContext: ExecutionContext)
     extends AbstractController(components) {
 

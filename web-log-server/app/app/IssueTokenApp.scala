@@ -18,7 +18,9 @@ object IssueTokenApp extends App {
 
   private val config = ConfigFactory.load()
   private val jwt = LogController.issueJwt(
-    key = config.getString("play.http.secret.key").ensuring(_ != "changeme", "using default secret key"),
+    key = config
+      .getString("play.http.secret.key")
+      .ensuring(_ != "changeme", "using default secret key"),
     logAccess = LogAccess(config.getString("levels").split(",").toSet),
     expireSeconds = config.getDuration("expires", TimeUnit.SECONDS)
   )

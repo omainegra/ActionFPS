@@ -1,7 +1,5 @@
 package controllers
 
-import javax.inject._
-
 import com.actionfps.servers.ServerRecord
 import play.api.Configuration
 import play.api.mvc._
@@ -13,10 +11,9 @@ import scala.concurrent.ExecutionContext
 /**
   * Created by William on 31/12/2015.
   */
-@Singleton
-class MasterServerController @Inject()(configuration: Configuration,
-                                       providesServers: ProvidesServers,
-                                       components: ControllerComponents)(
+class MasterServerController(configuration: Configuration,
+                             providesServers: ProvidesServers,
+                             components: ControllerComponents)(
     implicit executionContext: ExecutionContext)
     extends AbstractController(components) {
 

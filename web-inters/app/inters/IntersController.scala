@@ -1,7 +1,6 @@
 package inters
 
 import java.time.format.DateTimeFormatter
-import javax.inject._
 
 import com.actionfps.servers.ValidServers
 import lib.WebTemplateRender
@@ -16,11 +15,10 @@ import scala.concurrent.ExecutionContext
 /**
   * Created by William on 31/12/2015.
   */
-@Singleton
-class IntersController @Inject()(configuration: Configuration,
-                                 components: ControllerComponents,
-                                 intersService: IntersService,
-                                 webTemplateRender: WebTemplateRender)(
+class IntersController(configuration: Configuration,
+                       components: ControllerComponents,
+                       intersService: IntersService,
+                       webTemplateRender: WebTemplateRender)(
     implicit executionContext: ExecutionContext,
     validServers: ValidServers)
     extends AbstractController(components) {

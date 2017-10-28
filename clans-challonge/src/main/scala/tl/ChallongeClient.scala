@@ -1,7 +1,5 @@
 package tl
 
-import javax.inject.{Inject, Singleton}
-
 import play.api.Configuration
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 import tl.ChallongeClient._

@@ -148,7 +148,8 @@ case class GameAxisAccumulator(
       nickToUserAtTime = nickToUserAtTime,
       shiftedPlayersStats = newPs.onDisplay(jsonGame.endTime.toInstant),
       playersStatsOverTime =
-        playersStatsOverTime.updated(YearMonth.from(richGame.startTime), newPs),
+        playersStatsOverTime.updated(YearMonth.from(richGame.startTime),
+                                     newPs),
       users = users,
       clans = clans
     )

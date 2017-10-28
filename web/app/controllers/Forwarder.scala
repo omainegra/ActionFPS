@@ -2,7 +2,6 @@ package controllers
 
 import java.nio.file.{Files, Path, Paths}
 import java.util.stream.Collectors
-import javax.inject._
 
 import play.Environment
 import play.api.http.FileMimeTypes
@@ -15,8 +14,7 @@ import scala.concurrent.ExecutionContext
   *
   * Serve static assets from 'www' directory for development & test purposes.
   */
-class Forwarder @Inject()(environment: Environment,
-                          components: ControllerComponents)(
+class Forwarder(environment: Environment, components: ControllerComponents)(
     implicit executionContext: ExecutionContext,
     fileMimeTypes: FileMimeTypes)
     extends AbstractController(components) {

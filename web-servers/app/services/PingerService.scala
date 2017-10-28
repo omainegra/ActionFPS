@@ -3,8 +3,6 @@ package services
 /**
   * Created by William on 01/01/2016.
   */
-import javax.inject._
-
 import akka.NotUsed
 import akka.actor.ActorDSL._
 import akka.actor.{ActorSystem, Kill}
@@ -29,10 +27,9 @@ import scala.concurrent.{ExecutionContext, Future}
   *
   * @todo Clean it up, it's very ugly right now.
   */
-@Singleton
-class PingerService @Inject()(applicationLifecycle: ApplicationLifecycle,
-                              providesServers: ProvidesServers,
-                              providesUsers: ProvidesUsersList)(
+class PingerService(applicationLifecycle: ApplicationLifecycle,
+                    providesServers: ProvidesServers,
+                    providesUsers: ProvidesUsersList)(
     implicit actorSystem: ActorSystem,
     executionContext: ExecutionContext) {
 

@@ -4,7 +4,6 @@ package lib
   * Created by William on 01/01/2016.
   */
 import java.nio.file.{Files, Path, Paths}
-import javax.inject._
 
 import org.jsoup.Jsoup
 import play.api.mvc.Results._
@@ -16,7 +15,7 @@ import play.twirl.api.Html
   *
   * Here we use the DOM Templating technique of manipulating the HTML tree.
   */
-class WebTemplateRender @Inject()(controllerComponents: ControllerComponents)
+class WebTemplateRender(controllerComponents: ControllerComponents)
     extends AbstractController(controllerComponents) {
 
   /**

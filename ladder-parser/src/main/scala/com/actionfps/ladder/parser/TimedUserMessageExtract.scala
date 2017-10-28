@@ -42,7 +42,8 @@ object TimedUserMessageExtract {
   }
 
   object NickToUser {
-    def apply(f: String => Option[String]): NickToUser = (nickname: String) => f(nickname)
+    def apply(f: String => Option[String]): NickToUser =
+      (nickname: String) => f(nickname)
     def empty: NickToUser = Function.const(None)
   }
 }

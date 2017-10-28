@@ -19,7 +19,8 @@ import scala.concurrent.{ExecutionContext, Future}
 final case class AxisAccumulatorInAgentFuture(
     accumulatorFutureAgent: Future[Agent[GameAxisAccumulator]])(
     implicit executionContext: ExecutionContext)
-    extends ClanDataProvider with ProvidesGames {
+    extends ClanDataProvider
+    with ProvidesGames {
 
   def getRecent(n: Int): Future[List[JsonGame]] =
     accumulatorFutureAgent.map(_.get().recentGames(n))
