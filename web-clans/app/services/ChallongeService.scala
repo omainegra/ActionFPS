@@ -20,13 +20,10 @@ object ChallongeService {
     loserScore = 0
   )
 
-  case class NewClanwarCompleted(clanwarCompleted: CompleteClanwar)
-
   def sinkFlow(challongeClient: ChallongeClient)(
       implicit executionContext: ExecutionContext)
-    : Flow[NewClanwarCompleted, Option[Int], NotUsed] = {
-    Flow[NewClanwarCompleted]
-      .map(_.clanwarCompleted)
+    : Flow[CompleteClanwar, Option[Int], NotUsed] = {
+    Flow[CompleteClanwar]
       .filter { clanwar =>
         // don't allow old clanwars to be committed
         // todo add a journal for clanwar persistence

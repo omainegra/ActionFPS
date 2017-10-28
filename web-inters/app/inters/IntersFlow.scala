@@ -23,8 +23,6 @@ object IntersFlow {
     def empty: NicknameToUser = Function.const(None)
   }
 
-  val TimeLeeway: time.Duration = java.time.Duration.ofMinutes(3)
-
   val InterMessage = "!inter"
 
   case class UserMessageFromLine(nicknameToUser: NicknameToUser)(

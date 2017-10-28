@@ -2,12 +2,14 @@ package providers.full
 
 import java.time.YearMonth
 
+import akka.NotUsed
 import akka.agent.Agent
+import akka.stream.scaladsl.Source
 import com.actionfps.accumulation.GameAxisAccumulator
 import com.actionfps.accumulation.achievements.HallOfFame
 import com.actionfps.accumulation.user.FullProfile
 import com.actionfps.achievements.GameUserEvent
-import com.actionfps.clans.Clanwars
+import com.actionfps.clans.{Clanwars, CompleteClanwar}
 import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
 import com.actionfps.stats.Clanstats
@@ -33,6 +35,10 @@ abstract class FullProvider()(implicit executionContext: ExecutionContext)
   def clanwars: Future[Clanwars] = {
     accumulatorFutureAgent.map(_.get().clanwars)
   }
+
+  def newClanwars: Source[CompleteClanwar, Future[NotUsed]]
+
+  def newGames: Source[JsonGame, Future[NotUsed]]
 
   def playerRanks: Future[PlayersStats] = {
     accumulatorFutureAgent.map(_.get().shiftedPlayersStats)

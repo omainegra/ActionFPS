@@ -21,6 +21,7 @@ GET         /retrieve.do                    controllers.MasterServerController.m
 GET         /server-updates/                controllers.EventStreamController.serverUpdates
 GET         /recent-games/                  controllers.GamesController.recentGames
 GET         /new-games/                     controllers.EventStreamController.newGames
+GET         /new-clanwars/                     controllers.EventStreamController.newClanwars
 POST        /admin/reload-reference/        controllers.Admin.reloadReference()
 GET         /ladder/                        controllers.LadderController.ladder
 GET         /event-stream/                  controllers.EventStreamController.eventStream

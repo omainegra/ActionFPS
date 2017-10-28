@@ -3,8 +3,8 @@ import java.nio.file.{Path, Paths}
 import af.inters.{DiscordInters, OneSignalInters}
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Keep, Sink}
-import com.actionfps.accumulation.ReferenceMapValidator
 import com.actionfps.accumulation.user.GeoIpLookup
+import com.actionfps.accumulation.{GameAxisAccumulator, ReferenceMapValidator}
 import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
 import com.softwaremill.macwire._
 import controllers.{
@@ -38,7 +38,7 @@ import play.api.mvc.EssentialFilter
 import play.filters.HttpFiltersComponents
 import play.filters.cors.CORSComponents
 import play.filters.gzip.GzipFilterComponents
-import providers.{ReferenceProvider, SubscribingActorSource}
+import providers.ReferenceProvider
 import providers.full.{
   FullProvider,
   FullProviderImpl,
@@ -47,9 +47,10 @@ import providers.full.{
 }
 import providers.games.GamesProvider
 import router.Routes
-import services.ChallongeService.NewClanwarCompleted
 import services._
 import tl.ChallongeClient
+
+import scala.concurrent.Future
 
 final class CompileTimeApplicationLoader extends play.api.ApplicationLoader {
   def load(context: Context): play.api.Application =
@@ -80,7 +81,8 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   implicit lazy val referenceProvider: ReferenceProvider =
     new ReferenceProvider(configuration, defaultCacheApi)(wsClient,
                                                           executionContext)
-  lazy val gamesProvider: GamesProvider = wire[GamesProvider]
+  lazy val gamesProvider: GamesProvider = new GamesProvider(
+    Paths.get(configuration.get[String]("journal.games")))
   lazy val forwarder: Forwarder = wire[Forwarder]
   lazy val gamesController: GamesController = wire[GamesController]
   lazy val indexController: IndexController = wire[IndexController]
@@ -103,6 +105,15 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
     wire[MasterServerController]
   lazy val intersController: IntersController =
     wire[IntersController]
+  private lazy val initialGameAxisAccumulator: Future[GameAxisAccumulator] = {
+    import scala.async.Async._
+    async {
+      GameAxisAccumulator.emptyWithUsers(users = await(referenceProvider.users),
+                                         clans = await(referenceProvider.clans))
+    }
+  }
+  private lazy val newClanwarsSource = fullProvider.newClanwars
+  private lazy val newGamesSource = fullProvider.newGames
   lazy val fullProvider: FullProvider = {
     val fullProviderImpl = wire[FullProviderImpl]
     if (useCached)
@@ -124,7 +135,7 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
     .filter(_.get[Boolean]("enabled"))
     .map(ChallongeClient.apply)
     .foreach { challongeClient =>
-      SubscribingActorSource[NewClanwarCompleted](10)
+      newClanwarsSource
         .via(ChallongeService.sinkFlow(challongeClient))
         .toMat(Sink.ignore)(Keep.right)
         .run()
