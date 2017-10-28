@@ -5,11 +5,31 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Keep, Sink}
 import com.actionfps.accumulation.user.GeoIpLookup
 import com.actionfps.accumulation.{GameAxisAccumulator, ReferenceMapValidator}
+import com.actionfps.api.Game
 import com.actionfps.clans.Clanwars
 import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
 import com.actionfps.stats.Clanstats
 import com.softwaremill.macwire._
-import controllers.{Admin, AllGames, ClansController, DownloadsController, EventStreamController, Forwarder, GamesController, IndexController, LadderController, MasterServerController, PlayersController, PlayersProvider, RawLogController, ServersController, StaticPageRouter, UserController, VersionController}
+import controllers.{
+  Admin,
+  AllGames,
+  ClansController,
+  DownloadsController,
+  EventStreamController,
+  Forwarder,
+  GamesController,
+  IndexController,
+  LadderController,
+  MasterServerController,
+  PlayersController,
+  PlayersProvider,
+  ProvidesGames,
+  RawLogController,
+  ServersController,
+  StaticPageRouter,
+  UserController,
+  VersionController
+}
 import inters.IntersController
 import lib.{ClanDataProvider, WebTemplateRender}
 import play.api.ApplicationLoader.Context
@@ -23,7 +43,12 @@ import play.filters.HttpFiltersComponents
 import play.filters.cors.CORSComponents
 import play.filters.gzip.GzipFilterComponents
 import providers.ReferenceProvider
-import providers.full.{FullProvider, FullProviderImpl, HazelcastCachedProvider, PlayersProviderImpl}
+import providers.full.{
+  FullProvider,
+  FullProviderImpl,
+  HazelcastCachedProvider,
+  PlayersProviderImpl
+}
 import providers.games.GamesProvider
 import router.Routes
 import services._
@@ -36,6 +61,7 @@ final class CompileTimeApplicationLoader extends play.api.ApplicationLoader {
     new CompileTimeApplicationLoaderComponents(context).application
 }
 
+//noinspection ScalaUnusedSymbol
 final class CompileTimeApplicationLoaderComponents(context: Context)
     extends play.api.BuiltInComponentsFromContext(context)
     with HttpFiltersComponents
@@ -68,6 +94,14 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   private lazy val clanDataProvider: ClanDataProvider = new ClanDataProvider {
     override def clanwars: Future[Clanwars] = fullProvider.clanwars
     override def clanstats: Future[Clanstats] = fullProvider.clanstats
+  }
+  private lazy val providesGames: ProvidesGames = new ProvidesGames {
+    override def game(id: String): Future[Option[Game]] = fullProvider.game(id)
+
+    override def getRecent(n: Int): Future[List[Game]] =
+      fullProvider.getRecent(n)
+
+    override def allGames: Future[List[Game]] = fullProvider.allGames
   }
   implicit lazy val ipLookup: IpLookup = GeoIpLookup
   lazy val clansController: ClansController = wire[ClansController]
