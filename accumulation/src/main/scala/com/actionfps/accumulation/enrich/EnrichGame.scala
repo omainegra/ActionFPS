@@ -44,7 +44,7 @@ case class EnrichGame(jsonGame: JsonGame) {
 
 object EnrichGame {
   // optimisation
-  trait NickToUserAtTime {
+  trait NickToUserAtTime extends Serializable {
     def nickToUser(nickname: String, atTime: Instant): Option[User]
   }
 

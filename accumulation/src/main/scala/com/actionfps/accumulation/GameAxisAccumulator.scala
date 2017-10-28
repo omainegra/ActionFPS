@@ -56,6 +56,7 @@ case class GameAxisAccumulator(
     clanstats: Clanstats,
     achievementsIterator: AchievementsIterator,
     hof: HallOfFame,
+    // todo separate this away as it's not data actually
     nickToUserAtTime: NickToUserAtTime,
     playersStats: PlayersStats,
     shiftedPlayersStats: PlayersStats,
