@@ -14,13 +14,11 @@ import com.actionfps.gameparser.enrichers.JsonGame
 import com.actionfps.players.PlayersStats
 import com.actionfps.stats.Clanstats
 import controllers.ProvidesGames
-import lib.ClanDataProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
 abstract class FullProvider()(implicit executionContext: ExecutionContext)
-    extends ClanDataProvider
-    with ProvidesGames {
+    extends ProvidesGames {
 
   protected[providers] def accumulatorFutureAgent
     : Future[Agent[GameAxisAccumulator]]

@@ -5,29 +5,13 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Keep, Sink}
 import com.actionfps.accumulation.user.GeoIpLookup
 import com.actionfps.accumulation.{GameAxisAccumulator, ReferenceMapValidator}
+import com.actionfps.clans.Clanwars
 import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
+import com.actionfps.stats.Clanstats
 import com.softwaremill.macwire._
-import controllers.{
-  Admin,
-  AllGames,
-  ClansController,
-  DownloadsController,
-  EventStreamController,
-  Forwarder,
-  GamesController,
-  IndexController,
-  LadderController,
-  MasterServerController,
-  PlayersController,
-  PlayersProvider,
-  RawLogController,
-  ServersController,
-  StaticPageRouter,
-  UserController,
-  VersionController
-}
+import controllers.{Admin, AllGames, ClansController, DownloadsController, EventStreamController, Forwarder, GamesController, IndexController, LadderController, MasterServerController, PlayersController, PlayersProvider, RawLogController, ServersController, StaticPageRouter, UserController, VersionController}
 import inters.IntersController
-import lib.WebTemplateRender
+import lib.{ClanDataProvider, WebTemplateRender}
 import play.api.ApplicationLoader.Context
 import play.api.Configuration
 import play.api.cache.ehcache.EhCacheComponents
@@ -39,12 +23,7 @@ import play.filters.HttpFiltersComponents
 import play.filters.cors.CORSComponents
 import play.filters.gzip.GzipFilterComponents
 import providers.ReferenceProvider
-import providers.full.{
-  FullProvider,
-  FullProviderImpl,
-  HazelcastCachedProvider,
-  PlayersProviderImpl
-}
+import providers.full.{FullProvider, FullProviderImpl, HazelcastCachedProvider, PlayersProviderImpl}
 import providers.games.GamesProvider
 import router.Routes
 import services._
@@ -86,6 +65,10 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   lazy val forwarder: Forwarder = wire[Forwarder]
   lazy val gamesController: GamesController = wire[GamesController]
   lazy val indexController: IndexController = wire[IndexController]
+  private lazy val clanDataProvider: ClanDataProvider = new ClanDataProvider {
+    override def clanwars: Future[Clanwars] = fullProvider.clanwars
+    override def clanstats: Future[Clanstats] = fullProvider.clanstats
+  }
   implicit lazy val ipLookup: IpLookup = GeoIpLookup
   lazy val clansController: ClansController = wire[ClansController]
   lazy val playersController: PlayersController = wire[PlayersController]
