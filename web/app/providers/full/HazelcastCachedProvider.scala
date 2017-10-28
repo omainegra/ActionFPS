@@ -2,8 +2,11 @@ package providers.full
 
 import javax.inject.{Inject, Singleton}
 
+import akka.NotUsed
 import akka.agent.Agent
+import akka.stream.scaladsl.Source
 import com.actionfps.accumulation.GameAxisAccumulator
+import com.actionfps.clans.CompleteClanwar
 import com.hazelcast.client.HazelcastClient
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
@@ -51,4 +54,6 @@ class HazelcastCachedProvider @Inject()(fullProviderR: FullProviderImpl)(
       result
     }
   }
+
+  override def newClanwars: Source[CompleteClanwar, Future[NotUsed]] = fullProviderR.newClanwars
 }

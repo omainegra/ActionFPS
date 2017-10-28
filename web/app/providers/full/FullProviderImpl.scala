@@ -117,6 +117,10 @@ class FullProviderImpl @Inject()(
       case (o, _, n) => FullIteratorDetector(o, n).detectClanwar
     })
 
+  lazy val newClanwars: Source[CompleteClanwar, Future[NotUsed]] = {
+    Source.fromFutureSource(clanwarsSrcF)
+  }
+
   private val gamesSrcF: Future[Source[JsonGame, NotUsed]] =
     sourceF.map(_.mapConcat {
       case (o, _, n) => FullIteratorDetector(o, n).detectGame
@@ -127,16 +131,6 @@ class FullProviderImpl @Inject()(
       .map {
         case (o, _, n) =>
           FullIteratorDetector(o, n).detectGame.map(NewRichGameDetected)
-      }
-      .runForeach(actorSystem.eventStream.publish)
-  }
-
-  private val publishClansF = sourceF.flatMap { source =>
-    source
-      .map {
-        case (o, _, n) =>
-          FullIteratorDetector(o, n).detectClanwar
-            .map(services.ChallongeService.NewClanwarCompleted)
       }
       .runForeach(actorSystem.eventStream.publish)
   }
