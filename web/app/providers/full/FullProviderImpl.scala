@@ -126,14 +126,7 @@ class FullProviderImpl @Inject()(
       case (o, _, n) => FullIteratorDetector(o, n).detectGame
     })
 
-  private val publishGamesF = sourceF.flatMap { source =>
-    source
-      .map {
-        case (o, _, n) =>
-          FullIteratorDetector(o, n).detectGame.map(NewRichGameDetected)
-      }
-      .runForeach(actorSystem.eventStream.publish)
-  }
+  lazy val newGames: Source[JsonGame, Future[NotUsed]] = Source.fromFutureSource(gamesSrcF)
 
 }
 

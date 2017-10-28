@@ -7,6 +7,7 @@ import akka.agent.Agent
 import akka.stream.scaladsl.Source
 import com.actionfps.accumulation.GameAxisAccumulator
 import com.actionfps.clans.CompleteClanwar
+import com.actionfps.gameparser.enrichers.JsonGame
 import com.hazelcast.client.HazelcastClient
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
@@ -55,5 +56,9 @@ class HazelcastCachedProvider @Inject()(fullProviderR: FullProviderImpl)(
     }
   }
 
-  override def newClanwars: Source[CompleteClanwar, Future[NotUsed]] = fullProviderR.newClanwars
+  override def newClanwars: Source[CompleteClanwar, Future[NotUsed]] =
+    fullProviderR.newClanwars
+
+  override def newGames: Source[JsonGame, Future[NotUsed]] =
+    fullProviderR.newGames
 }

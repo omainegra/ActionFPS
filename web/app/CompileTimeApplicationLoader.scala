@@ -113,6 +113,7 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
     }
   }
   private lazy val newClanwarsSource = fullProvider.newClanwars
+  private lazy val newGamesSource = fullProvider.newGames
   lazy val fullProvider: FullProvider = {
     val fullProviderImpl = wire[FullProviderImpl]
     if (useCached)

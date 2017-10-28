@@ -6,6 +6,7 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
 import com.actionfps.clans.{ClanNamer, CompleteClanwar}
+import com.actionfps.gameparser.enrichers.JsonGame
 import controllers.EventStreamController._
 import lib.KeepAliveEvents
 import play.api.libs.EventSource.Event
@@ -21,6 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class EventStreamController @Inject()(
     clanwarsSource: Source[CompleteClanwar, Future[NotUsed]],
+    newGamesSource: Source[JsonGame, Future[NotUsed]],
     pingerService: PingerService,
     referenceProvider: ReferenceProvider,
     components: ControllerComponents)(implicit actorSystem: ActorSystem,
@@ -44,7 +46,7 @@ class EventStreamController @Inject()(
       Ok.chunked(
         content = {
           pingerService.liveGamesWithRetainedSource
-            .merge(NewGamesProvider.newGamesSource)
+            .merge(newGamesSource.map(NewGamesProvider.gameToEvent))
             .merge(await(clanwarsEventSource))
             .merge(KeepAliveEvents.source)
         }
@@ -62,7 +64,9 @@ class EventStreamController @Inject()(
 
   def newGames = Action {
     Ok.chunked(
-        content = NewGamesProvider.newGamesSource.merge(KeepAliveEvents.source)
+        content = newGamesSource
+          .map(NewGamesProvider.gameToEvent)
+          .merge(KeepAliveEvents.source)
       )
       .as("text/event-stream")
   }
