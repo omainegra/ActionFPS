@@ -1,12 +1,10 @@
 package services
 
 import java.nio.file.Path
-import java.time.Instant
 import javax.inject._
 import javax.management.ObjectName
 
-import it.FileTailSourceAdditions._
-import af.inters.IntersFlow.{NicknameToUser, ScanIterators, TimeLeeway}
+import af.inters.IntersFlow.{NicknameToUser, ScanIterators}
 import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.stream.alpakka.file.scaladsl.FileTailSource
@@ -15,9 +13,9 @@ import akka.stream.{ActorAttributes, ActorMaterializer, Supervision}
 import akka.{Done, NotUsed}
 import com.actionfps.inter.InterOut
 import com.actionfps.user.User
+import it.FileTailSourceAdditions._
 import monitoring.LinesMBeanMonitor
 import play.api.Logger
-import play.api.libs.ws.WSClient
 
 import scala.async.Async._
 import scala.concurrent.duration._
@@ -94,14 +92,6 @@ class IntersService(journalPath: Path)(
       logger.info(s"Found inter: ${i}")
     }
 
-  private def filterRecent(interOut: InterOut): Boolean = {
-    interOut.userMessage.instant.plus(TimeLeeway).isAfter(Instant.now())
-  }
-
-  private val pushToActorSystem = Flow[InterOut]
-    .filter(filterRecent)
-    .to(Sink.foreach(actorSystem.eventStream.publish))
-
   private val pushOutSink = Flow[InterOut]
     .withAttributes(ActorAttributes.supervisionStrategy {
       case NonFatal(e) =>
@@ -110,7 +100,6 @@ class IntersService(journalPath: Path)(
     })
     .alsoTo(pushToAgent)
     .alsoTo(pushToLog)
-    .alsoTo(pushToActorSystem)
 
   def beginPushing(): Unit = {
     logger.info(s"Tailing for inters from ${journalPath}...")
