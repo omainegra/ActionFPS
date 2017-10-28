@@ -71,6 +71,18 @@ class EventStreamController @Inject()(
       .as("text/event-stream")
   }
 
+  def newClanwars = Action.async {
+    async {
+      Ok.chunked(
+          content = newGamesSource
+            .map(NewGamesProvider.gameToEvent)
+            .merge(await(clanwarsEventSource))
+            .merge(KeepAliveEvents.source)
+        )
+        .as("text/event-stream")
+    }
+  }
+
 }
 
 object EventStreamController {
