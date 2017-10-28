@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>ActionFPS Development</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto Slab', serif;
+            line-height:1.4;
+            cursor: default;
+            max-width:60em;
+            margin-left:auto;
+            margin-right:auto;
+        }
+
+        nav ol li {
+            display:inline-block;
+        }
+
+        code {
+            background-color: aliceblue;
+        }
+        pre {
+            background-color: aliceblue;
+            padding: 0.2em 0.2em 0.2em 1em;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<main>
+    <h1><a href="/development/">ActionFPS Development Guide</a></h1>
+
+    <nav>
+        <ol>
+        <li><a href="#quickstart">Quickstart</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#api-endpoints">API endpoints</a></li>
+        <li><a href="#devops">DevOps</a></li>
+        </ol></nav>
+
+    <section id="quickstart">
+        <h2><a href="#quickstart">Quickstart</a></h2>
+    <h3>Prerequisites</h3>
+    <p>Make sure to install:</p>
+    <ul>
+        <li><a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">Oracle JDK 8</a> or <a href="http://openjdk.java.net/install/">OpenJDK 8</a>.</li>
+        <li><a href="http://www.scala-sbt.org">SBT</a>: (<a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Mac.html">Mac</a>,
+            <a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Windows.html">Windows</a>,
+            <a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Linux.html">Linux</a>).</li>
+    </ul>
+    <h3>Download reference data</h3>
+    <p>This includes sample log files</p>
+    <pre><code>$ make reference-data</code></pre>
+    <h3>Run an integration test</h3>
+    <p>This compiles and tests everything for you automatically, to ensure things are working</p>
+    <pre><code>$ sbt clean test it:test</code></pre>
+    <h3>Run development server</h3>
+    <p>This is for making any changes to the portal.</p>
+    <pre><code>$ sbt web/run</code></pre>
+    <p>Once you've started it, go to <a href="http://localhost:9000">http://localhost:9000</a>.</p>
+    <h3>Running with in-memory cache</h3>
+    <p>When developing the front-end, iterations may be slow.
+        This is because some results are recomputed with every change. If you'd like to cache them, use:</p>
+    <pre><code>$ sbt 'set inMemoryCache in web := true' web/run</code></pre>
+        <h3>Edit in an IDE</h3>
+        <p>Use IntelliJ Community Edition: <a href="https://www.jetbrains.com/idea/download/" target="_blank">https://www.jetbrains.com/idea/download/</a>. Simply import the directory as an &apos;SBT&apos; project.</p>
+    <h3>Benchmarking</h3>
+    <p>We use <a href="https://github.com/ktoso/sbt-jmh">sbt-jmh</a>.</p>
+    <pre><code>$ sbt 'benchmark/jmh:run -prof jmh.extras.JFR -t 1 -f 1 -wi 0 -i 1 .*FullIteratorBenchmark.*'
+...
+[info] Flight Recording output saved to:
+[info]   /home/.../some.jfr
+</code></pre>
+    <p>You can open up this file in <a href="https://www.youtube.com/watch?v=qytuEgVmhsI">Java Mission Control</a>
+        (<code>jmc</code>) to analyse performance.</p>
+    </section>
+
+    <section id="architecture">
+        <h2><a href="#architecture">Architecture</a></h2>
+    <p><a href="https://docs.google.com/drawings/d/1fGcN6fcKC_oCL1KtC_-pmWCT_1Da-ka0nijrzUuxiyw/pub?w=1984&amp;h=1701" target="_blank"><img src="https://docs.google.com/drawings/d/1fGcN6fcKC_oCL1KtC_-pmWCT_1Da-ka0nijrzUuxiyw/pub?w=661&amp;h=567" alt=""></a></p>
+    <h3 id="repositories">Repositories</h3>
+    <ul>
+        <li><a href="https://github.com/ScalaWilliam/ActionFPS" target="_blank">ActionFPS @ GitHub</a></li>
+        <li><a href="https://github.com/ActionFPS/binary-game-parser" target="_blank">ActionFPS/binary-game-parser</a></li>
+        <li><a href="https://github.com/ActionFPS/server-pinger" target="_blank">ActionFPS/server-pinger @ GitHub</a></li>
+        <li>syslog ingester for AC: <a href="https://github.com/ScalaWilliam/syslog-ac" target="_blank">https://github.com/ScalaWilliam/syslog-ac</a>
+            Will try to make it generic though.</li>
+    </ul>
+    <h3 id="technology-choices">Technology Choices</h3>
+    <ul>
+        <li><strong><a href="glossary.html#scala" class="glossary-term" title="A scalable programming language built on top of the Java platform.">Scala</a></strong> for data processing and Play framework: solid, stable toolkit for dealing with complex data.</li>
+        <li><strong>jsoup</strong> for rendering templates: dynamic, works well with HTML5 and XML.</li>
+    </ul>
+
+    </section>
+    <section id="api-endpoints">
+        <h2>API endpoints</h2>
+    <p>The API endpoints are intended to be stable.</p>
+    <p>We provide CSV where possible, and JSON otherwise.</p>
+    <p><strong>[cors]</strong> means that you can call this API endpoint from a browser AJAX client.
+        Where CORS is not allowed, we expect you to use <a href="glossary.html#server" class="glossary-term" title="A space where players can play games.">server</a>-side access instead. The list of these definitions is specified in <a href="https://github.com/ScalaWilliam/ActionFPS/blob/master/web/conf/application.conf#L42" target="_blank">application.conf</a> <code>play.filters.cors.pathPrefixes</code> section. </p>
+    <h2 id="recommended">Recommended</h2>
+    <ul>
+        <li><a href="https://actionfps.com/player/by-email/?email=your-email@gmail.com" target="_blank">https://actionfps.com/player/by-email/?email=your-email@gmail.com</a>
+            <strong>[cors]</strong>: map an e-mail to player. Can be used in conjunction with Google+ Sign In.</li>
+        <li><a href="https://actionfps.com/players/?format=json" target="_blank">https://actionfps.com/players/?format=json</a>
+            <strong>[cors]</strong>: list all players.</li>
+        <li><a href="https://actionfps.com/all/games.ndjson[?since=2017-01" target="_blank">https://actionfps.com/all/games.ndjson[?since=2017-01</a>...] (we just use string comparison)</li>
+        <li><a href="https://actionfps.com/all/games.json" target="_blank">https://actionfps.com/all/games.json</a></li>
+        <li><a href="https://actionfps.com/server-updates/" target="_blank">https://actionfps.com/server-updates/</a></li>
+        <li><a href="https://actionfps.com/new-games/" target="_blank">https://actionfps.com/new-games/</a></li>
+    </ul>
+    <h3 id="logs">Logs</h3>
+    <p>We offer access to raw logs from ActionFPS. </p>
+    <ul>
+        <li>Historical data: <code>curl -s &apos;https://actionfps.com/logs.tsv?from=2017-01-01T00:00:00Z&amp;to=2099-04-10T11:02:03Z&apos;</code> - get raw events for these time periods using the <a href="https://en.wikipedia.org/wiki/Tab-separated_values" target="_blank">tab-separated values (TSV)</a> format.</li>
+        <li>Live data from the end: <code>curl -s &apos;https://actionfps.com/logs&apos;</code> - get live events using <a href="https://www.w3.org/TR/eventsource/" target="_blank">EventSource standard</a>.</li>
+        <li>Live data from a specified time: <code>curl -H &apos;Last-Event-ID: 2017-04-30T01:02:03Z&apos; -i https://actionfps.com/logs</code> - get live events from this last event ID. This is part of EventSource standard and is supported by EventSource clients such as <a href="http://developer.lightbend.com/docs/alpakka/current/sse.html" target="_blank">Scala Alpakka one</a>, <a href="https://www.npmjs.com/package/eventsource" target="_blank">Node.js one</a>, as well as the JavaScript one. With this, you can resume from a broken stream of data.</li>
+    </ul>
+    <h4 id="filtering">Filtering</h4>
+    <p>We filter out some data for privacy reasons:</p>
+    <ul>
+        <li>IP Addresses are turned to <code>0.0.0.0</code>.</li>
+        <li>Person-to-person messages are not displayed.</li>
+    </ul>
+    <p>To have access to the true stream we use JWT.</p>
+    <h3 id="other">Other</h3>
+    <ul>
+        <li><a href="https://actionfps.com/game/?id=2015-04-04T14:09:12Z&amp;format=json" target="_blank">https://actionfps.com/game/?id=2015-04-04T14:09:12Z&amp;format=json</a>
+            <strong>[cors]</strong>: retrieve a single <a href="glossary.html#game" class="glossary-term" title="The fundamental unit of play in ActionFPS. Typically lasts 15 minutes.">game</a></li>
+        <li><a href="https://actionfps.com/clan/?id=woop&amp;format=json" target="_blank">https://actionfps.com/clan/?id=woop&amp;format=json</a>
+            <strong>[cors]</strong>: retrieve a single <a href="glossary.html#clan" class="glossary-term" title="A group of players who play together.">clan</a></li>
+        <li><a href="https://actionfps.com/all/games.tsv" target="_blank">https://actionfps.com/all/games.tsv</a></li>
+        <li><a href="https://actionfps.com/all/games.csv" target="_blank">https://actionfps.com/all/games.csv</a></li>
+        <li><a href="https://actionfps.com/clanwars/?format=json" target="_blank">https://actionfps.com/clanwars/?format=json</a></li>
+        <li><a href="https://actionfps.com/rankings/?format=json" target="_blank">https://actionfps.com/rankings/?format=json</a></li>
+        <li><a href="https://actionfps.com/clanwar/?id=2017-01-06T22:25:14Z&amp;format=json" target="_blank">https://actionfps.com/clanwar/?id=2017-01-06T22:25:14Z&amp;format=json</a>
+            <strong>[cors]</strong>: retrieve a single <a href="glossary.html#clanwar" class="glossary-term" title="Two or three games played in sequence between two clans on one server. Third game is usually a tie-breaker.">clanwar</a></li>
+        <li><a href="https://actionfps.com/players/?format=registrations-csv" target="_blank">https://actionfps.com/players/?format=registrations-csv</a></li>
+        <li><a href="https://actionfps.com/players/?format=nicknames-csv" target="_blank">https://actionfps.com/players/?format=nicknames-csv</a></li>
+        <li><a href="https://actionfps.com/players/?format=json" target="_blank">https://actionfps.com/players/?format=json</a></li>
+        <li><a href="https://actionfps.com/player/?id=sanzo&amp;format=json" target="_blank">https://actionfps.com/player/?id=sanzo&amp;format=json</a></li>
+        <li><a href="https://actionfps.com/playerranks/?format=json" target="_blank">https://actionfps.com/playerranks/?format=json</a></li>
+        <li><a href="https://actionfps.com/hof/?format=json" target="_blank">https://actionfps.com/hof/?format=json</a></li>
+        <li><a href="https://actionfps.com/servers/?format=json" target="_blank">https://actionfps.com/servers/?format=json</a>
+            <strong>[cors]</strong>: retrieve the full <a href="glossary.html#server" class="glossary-term" title="A space where players can play games.">server</a> list</li>
+        <li><a href="https://actionfps.com/ladder/?format=json" target="_blank">https://actionfps.com/ladder/?format=json</a></li>
+    </ul>
+    </section>
+    <section id="devops">
+    <h2>DevOps</h2>
+    <p>Continuous Deployment: master --&gt; <a href="https://git.watch/" target="_blank">https://git.watch/</a> --&gt; build &amp; restart. Simple monolithic deployment.</p>
+    </section>
+</main>
+</body>
+</html>

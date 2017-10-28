@@ -1,46 +1,16 @@
-# ActionFPS Portal [![Build Status](https://travis-ci.org/ScalaWilliam/ActionFPS.svg)](https://travis-ci.org/ScalaWilliam/ActionFPS)  [![Workflow](https://badge.waffle.io/ScalaWilliam/actionfps.png?label=ready&title=Ready)](https://waffle.io/ScalaWilliam/actionfps)
+# ActionFPS Portal 
 
-> [ActionFPS website](https://actionfps.com/)
+> Competitive ladder for [ActionFPS](https://actionfps.com/) & [AssaultCube](http://assault.cubers.net/) open-source first-person shooters. Inspired by [HI-SKILL Ladder](http://hi-skill.us/)
 
-## Quickstart
+## The game
+![video](https://cloud.githubusercontent.com/assets/7859727/22341064/cf58a7c4-e3ef-11e6-9350-bc6f8ae4647a.gif)
 
-_More detail: [ActionFPS Portal Development Guide](https://docs.actionfps.com/portal-development-guide.html)_
+## Development Documentation
+Read the full Development Documentation at: https://actionfps.com/development/.
+* [Quickstart](https://actionfps.com/development/#quickstart)
+* [Architecture](https://actionfps.com/development/#architecture)
+* [API endpoints](https://actionfps.com/development/#api-endpoints)
+* [DevOps](https://actionfps.com/development/#devops)
 
-### Prerequisites
-Make sure to install:
-- <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">Oracle JDK 8</a> or <a href="http://openjdk.java.net/install/">OpenJDK 8</a>.
-- <a href="www.scala-sbt.org">SBT</a>: (<a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Mac.html">Mac</a>,
-                                                        <a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Windows.html">Windows</a>,
-                                                        <a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Linux.html">Linux</a>).
-#### Get the reference data
-```
-$ make reference-data
-```
-
-### Development
-
-```
-$ sbt web/run
-```
-
-#### In-memory results cache
-When developing the front-end, iterations may be slow.
-This is because some results are recomputed. If you'd like to cache them, use:
-
-```
-$ sbt 'set inMemoryCache in web := true' web/run
-```
-
-#### Benchmarks
-
-We use [sbt-jmh](https://github.com/ktoso/sbt-jmh).
-
-```
-$ sbt 'benchmark/jmh:run -prof jmh.extras.JFR -t 1 -f 1 -wi 0 -i 1 .*FullIteratorBenchmark.*'
-... 
-[info] Flight Recording output saved to: 
-[info]   /home/.../some.jfr
-```
-
-You can open up this file in [Java Mission Control](https://www.youtube.com/watch?v=qytuEgVmhsI)
-(`jmc`) to analyse performance.
+# Copyright
+© 2014-2017 [William "ScalaWilliam" Narmontas](https://www.scalawilliam.com)

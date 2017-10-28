@@ -38,3 +38,4 @@ GET         /logs.tsv                       controllers.RawLogController.histori
 GET         /logs                           controllers.RawLogController.stream
 GET         /logs/stream/                   controllers.RawLogController.stream
 GET /inters/ inters.IntersController.index
+-> / controllers.DevelopmentController

@@ -13,6 +13,7 @@ import controllers.{
   Admin,
   AllGames,
   ClansController,
+  DevelopmentController,
   DownloadsController,
   EventStreamController,
   Forwarder,
@@ -92,6 +93,8 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   lazy val admin: Admin = wire[Admin]
   lazy val versionController: VersionController = wire[VersionController]
   lazy val userController: UserController = wire[UserController]
+  lazy val developmentController: DevelopmentController =
+    wire[DevelopmentController]
   lazy val latestReleaseService: LatestReleaseService =
     wire[LatestReleaseService]
   lazy val downloadsController: DownloadsController = wire[DownloadsController]
