@@ -20,6 +20,7 @@ import com.actionfps.gameparser.enrichers.Implicits._
 import com.actionfps.gameparser.enrichers.{IpLookup, JsonGame, MapValidator}
 import lib.ForJournal
 import play.api.Logger
+import providers.ReferenceProvider
 import providers.games.GamesProvider
 
 import scala.async.Async._
@@ -35,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class FullProvider(logSource: Path,
                    initialAccumulator: Future[GameAxisAccumulator],
+                   referenceProvider: ReferenceProvider,
                    gamesProvider: GamesProvider)(
     implicit executionContext: ExecutionContext,
     actorSystem: ActorSystem,
@@ -50,6 +52,20 @@ class FullProvider(logSource: Path,
     Agent {
       await(initialAccumulator).includeGames(
         await(gamesProvider.games).valuesIterator.toList.sortBy(_.id))
+    }
+  }
+
+  /**
+    * Update clans & users without recomputing all the data.
+    * Short-term hack to ensure new profiles get new data entered into them.
+    */
+  def ingestUpdatedReference(): Future[GameAxisAccumulator] = async {
+    val clans = await(referenceProvider.clans)
+    val users = await(referenceProvider.users)
+    await {
+      await { accumulatorFutureAgent }.alter(
+        _.copy(clans = clans.map(c => c.id -> c).toMap,
+               users = users.map(u => u.id -> u).toMap))
     }
   }
 

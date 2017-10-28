@@ -28,6 +28,7 @@ class Admin @Inject()(fullProvider: FullProvider,
     val apiKeyCO = configuration.getOptional[String]("af.admin-api-key")
     if (apiKeyO == apiKeyCO) {
       referenceProvider.unCache()
+      fullProvider.ingestUpdatedReference()
       Ok("Done reloading")
     } else {
       Forbidden("Wrong api key.")
