@@ -29,7 +29,7 @@ import controllers.{
   VersionController
 }
 import inters.IntersController
-import lib.WebTemplateRender
+import lib.{HazelcastAgentCache, WebTemplateRender}
 import play.api.ApplicationLoader.Context
 import play.api.Configuration
 import play.api.cache.ehcache.EhCacheComponents
@@ -40,12 +40,7 @@ import play.api.mvc.EssentialFilter
 import play.filters.HttpFiltersComponents
 import play.filters.cors.CORSComponents
 import play.filters.gzip.GzipFilterComponents
-import providers.{HazelcastAgentCache, ReferenceProvider}
-import providers.full.{
-  AxisAccumulatorInAgentFuture,
-  FullProvider,
-  PlayersProviderImpl
-}
+import providers._
 import providers.games.GamesProvider
 import router.Routes
 import services._
@@ -79,7 +74,7 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   lazy val webTemplateRender: WebTemplateRender = wire[WebTemplateRender]
   lazy val newsService: NewsService = wire[NewsService]
   lazy val allGames: AllGames = wire[AllGames]
-  lazy val playersProvider: PlayersProvider = wire[PlayersProviderImpl]
+  lazy val playersProvider: PlayersProvider = wire[GameAxisPlayersProvider]
   implicit lazy val referenceProvider: ReferenceProvider =
     new ReferenceProvider(configuration, defaultCacheApi)(wsClient,
                                                           executionContext)
@@ -110,14 +105,14 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   private lazy val initialGameAxisAccumulator: Future[GameAxisAccumulator] = {
     import scala.async.Async._
     async {
-      GameAxisAccumulator.emptyWithUsers(
-        users = await(referenceProvider.users),
-        clans = await(referenceProvider.clans))
+      GameAxisAccumulator.emptyWithUsers(users = await(referenceProvider.users),
+                                         clans = await(referenceProvider.clans))
     }
   }
   private lazy val newClanwarsSource = fullProvider.newClanwars
   private lazy val newGamesSource = fullProvider.newGames
-  lazy val fullProvider: FullProvider = wire[FullProvider]
+  lazy val fullProvider: GameAxisAccumulatorProvider =
+    wire[GameAxisAccumulatorProvider]
   lazy val fullAgent: Future[Agent[GameAxisAccumulator]] = {
     if (useCached) {
       val hz = HazelcastClient.newHazelcastClient()
@@ -126,7 +121,7 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
         keyName = "fullIterator")(fullProvider.accumulatorFutureAgent)
     } else fullProvider.accumulatorFutureAgent
   }
-  private lazy val providesGames = AxisAccumulatorInAgentFuture(fullAgent)
+  private lazy val providesGames = GameAxisAccumulatorInAgentFuture(fullAgent)
   private lazy val useCached =
     configuration
       .getOptional[String]("full.provider")

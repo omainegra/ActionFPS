@@ -17,6 +17,9 @@ import services.PingerService
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+  * Serve various EventSource streams.
+  */
 class EventStreamController(
     clanwarsSource: Source[CompleteClanwar, Future[NotUsed]],
     newGamesSource: Source[JsonGame, Future[NotUsed]],

@@ -1,4 +1,4 @@
-package providers.full
+package providers
 
 import java.time.YearMonth
 
@@ -16,7 +16,7 @@ import lib.ClanDataProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
-final case class AxisAccumulatorInAgentFuture(
+final case class GameAxisAccumulatorInAgentFuture(
     accumulatorFutureAgent: Future[Agent[GameAxisAccumulator]])(
     implicit executionContext: ExecutionContext)
     extends ClanDataProvider

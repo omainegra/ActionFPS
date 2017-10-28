@@ -5,19 +5,16 @@ package controllers
   */
 import play.api.Configuration
 import play.api.mvc.{AbstractController, ControllerComponents}
-import providers.ReferenceProvider
-import providers.full.FullProvider
+import providers.{GameAxisAccumulatorProvider, ReferenceProvider}
 
-class Admin(fullProvider: FullProvider,
+class Admin(fullProvider: GameAxisAccumulatorProvider,
             referenceProvider: ReferenceProvider,
             configuration: Configuration,
             components: ControllerComponents)
     extends AbstractController(components) {
 
   /**
-    * Reloads reference data and forces [[FullProvider]] to reevaluate usernames and clans for all games.
-    *
-    * @return
+    * Reloads reference data and forces [[GameAxisAccumulatorProvider]] to reevaluate usernames and clans for all games.
     */
   def reloadReference = Action { request =>
     val apiKeyO =

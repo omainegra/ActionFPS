@@ -7,8 +7,7 @@ import controllers.IndexController._
 import lib.{Clanner, WebTemplateRender}
 import play.api.Logger
 import play.api.mvc._
-import providers.ReferenceProvider
-import providers.full.AxisAccumulatorInAgentFuture
+import providers.{GameAxisAccumulatorInAgentFuture, ReferenceProvider}
 import services.NewsService
 import views.clanwar.Clanwar.ClanIdToClan
 import views.ladder.Table.PlayerNamer
@@ -20,7 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class IndexController(webTemplateRender: WebTemplateRender,
                       newsService: NewsService,
                       referenceProvider: ReferenceProvider,
-                      fullProvider: AxisAccumulatorInAgentFuture,
+                      fullProvider: GameAxisAccumulatorInAgentFuture,
                       ladderController: LadderController,
                       components: ControllerComponents)(
     implicit executionContext: ExecutionContext)

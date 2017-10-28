@@ -1,4 +1,4 @@
-package providers.full
+package providers
 
 import java.nio.file.Path
 import java.time.ZonedDateTime
@@ -19,7 +19,6 @@ import com.actionfps.gameparser.enrichers.Implicits._
 import com.actionfps.gameparser.enrichers.{IpLookup, JsonGame, MapValidator}
 import lib.ForJournal
 import play.api.Logger
-import providers.ReferenceProvider
 import providers.games.GamesProvider
 
 import scala.async.Async._
@@ -33,14 +32,14 @@ import scala.concurrent.{ExecutionContext, Future}
   *          Emits events on new games.
   * @todo Come up with a better name, perhaps separate many of the concerns as well.
   */
-class FullProvider(logSource: Path,
-                   initialAccumulator: Future[GameAxisAccumulator],
-                   referenceProvider: ReferenceProvider,
-                   gamesProvider: GamesProvider)(
-    implicit executionContext: ExecutionContext,
-    actorSystem: ActorSystem,
-    ipLookup: IpLookup,
-    mapValidator: MapValidator) {
+class GameAxisAccumulatorProvider(
+    logSource: Path,
+    initialAccumulator: Future[GameAxisAccumulator],
+    referenceProvider: ReferenceProvider,
+    gamesProvider: GamesProvider)(implicit executionContext: ExecutionContext,
+                                  actorSystem: ActorSystem,
+                                  ipLookup: IpLookup,
+                                  mapValidator: MapValidator) {
 
   private val logger = Logger(getClass)
 
