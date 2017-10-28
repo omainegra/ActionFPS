@@ -40,10 +40,7 @@ case class MixedGame(isNew: Boolean,
 
   def onServer: Option[String] = now.map(_.server.server)
 
-  def demoLink: Option[String] =
-    if (now.isEmpty && server.contains("aura"))
-      id.map(i => s"""http://woop.ac:81/find-demo.php?time=$i&map=$map""")
-    else None
+  def demoLink: Option[String] = None
 
   def url: Option[String] = id.map(i => s"/game/?id=$i")
 
