@@ -2,13 +2,12 @@ import java.nio.file.{Path, Paths}
 
 import af.inters.{DiscordInters, OneSignalInters}
 import akka.actor.ActorSystem
+import akka.agent.Agent
 import akka.stream.scaladsl.{Keep, Sink}
 import com.actionfps.accumulation.user.GeoIpLookup
 import com.actionfps.accumulation.{GameAxisAccumulator, ReferenceMapValidator}
-import com.actionfps.api.Game
-import com.actionfps.clans.Clanwars
 import com.actionfps.gameparser.enrichers.{IpLookup, MapValidator}
-import com.actionfps.stats.Clanstats
+import com.hazelcast.client.HazelcastClient
 import com.softwaremill.macwire._
 import controllers.{
   Admin,
@@ -23,7 +22,6 @@ import controllers.{
   MasterServerController,
   PlayersController,
   PlayersProvider,
-  ProvidesGames,
   RawLogController,
   ServersController,
   StaticPageRouter,
@@ -31,7 +29,7 @@ import controllers.{
   VersionController
 }
 import inters.IntersController
-import lib.{ClanDataProvider, WebTemplateRender}
+import lib.WebTemplateRender
 import play.api.ApplicationLoader.Context
 import play.api.Configuration
 import play.api.cache.ehcache.EhCacheComponents
@@ -42,11 +40,10 @@ import play.api.mvc.EssentialFilter
 import play.filters.HttpFiltersComponents
 import play.filters.cors.CORSComponents
 import play.filters.gzip.GzipFilterComponents
-import providers.ReferenceProvider
+import providers.{HazelcastAgentCache, ReferenceProvider}
 import providers.full.{
+  AxisAccumulatorInAgentFuture,
   FullProvider,
-  FullProviderImpl,
-  HazelcastCachedProvider,
   PlayersProviderImpl
 }
 import providers.games.GamesProvider
@@ -91,18 +88,6 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   lazy val forwarder: Forwarder = wire[Forwarder]
   lazy val gamesController: GamesController = wire[GamesController]
   lazy val indexController: IndexController = wire[IndexController]
-  private lazy val clanDataProvider: ClanDataProvider = new ClanDataProvider {
-    override def clanwars: Future[Clanwars] = fullProvider.clanwars
-    override def clanstats: Future[Clanstats] = fullProvider.clanstats
-  }
-  private lazy val providesGames: ProvidesGames = new ProvidesGames {
-    override def game(id: String): Future[Option[Game]] = fullProvider.game(id)
-
-    override def getRecent(n: Int): Future[List[Game]] =
-      fullProvider.getRecent(n)
-
-    override def allGames: Future[List[Game]] = fullProvider.allGames
-  }
   implicit lazy val ipLookup: IpLookup = GeoIpLookup
   lazy val clansController: ClansController = wire[ClansController]
   lazy val playersController: PlayersController = wire[PlayersController]
@@ -131,12 +116,16 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
   }
   private lazy val newClanwarsSource = fullProvider.newClanwars
   private lazy val newGamesSource = fullProvider.newGames
-  lazy val fullProvider: FullProvider = {
-    val fullProviderImpl = wire[FullProviderImpl]
-    if (useCached)
-      new HazelcastCachedProvider(fullProviderImpl)(executionContext)
-    else fullProviderImpl
+  lazy val fullProvider: FullProvider = wire[FullProvider]
+  lazy val fullAgent: Future[Agent[GameAxisAccumulator]] = {
+    if (useCached) {
+      val hz = HazelcastClient.newHazelcastClient()
+      HazelcastAgentCache.cachedAgent(hz)(
+        mapName = "stuff",
+        keyName = "fullIterator")(fullProvider.accumulatorFutureAgent)
+    } else fullProvider.accumulatorFutureAgent
   }
+  private lazy val providesGames = AxisAccumulatorInAgentFuture(fullAgent)
   private lazy val useCached =
     configuration
       .getOptional[String]("full.provider")

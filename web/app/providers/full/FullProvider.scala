@@ -1,67 +1,142 @@
 package providers.full
 
-import java.time.YearMonth
+import java.nio.file.Path
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import javax.inject.{Inject, Singleton}
 
+import af.FileOffsetFinder
 import akka.NotUsed
+import akka.actor.ActorSystem
 import akka.agent.Agent
-import akka.stream.scaladsl.Source
+import akka.stream.ActorMaterializer
+import akka.stream.alpakka.file.scaladsl.FileTailSource
+import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, Source}
+import akka.util.ByteString
 import com.actionfps.accumulation.GameAxisAccumulator
-import com.actionfps.accumulation.achievements.HallOfFame
-import com.actionfps.accumulation.user.FullProfile
-import com.actionfps.achievements.GameUserEvent
-import com.actionfps.clans.{Clanwars, CompleteClanwar}
-import com.actionfps.gameparser.enrichers.JsonGame
-import com.actionfps.players.PlayersStats
-import com.actionfps.stats.Clanstats
+import com.actionfps.accumulation.ServerValidator._
+import com.actionfps.clans.CompleteClanwar
+import com.actionfps.gameparser.enrichers.Implicits._
+import com.actionfps.gameparser.enrichers.{IpLookup, JsonGame, MapValidator}
+import lib.ForJournal
+import play.api.Logger
+import providers.games.GamesProvider
 
+import scala.async.Async._
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class FullProvider()(implicit executionContext: ExecutionContext) {
+/**
+  * Created by William on 01/01/2016.
+  *
+  * @usecase Combined Reference Data with Game Data.
+  *          Emits events on new games.
+  * @todo Come up with a better name, perhaps separate many of the concerns as well.
+  */
+class FullProvider(logSource: Path,
+                   initialAccumulator: Future[GameAxisAccumulator],
+                   gamesProvider: GamesProvider)(
+    implicit executionContext: ExecutionContext,
+    actorSystem: ActorSystem,
+    ipLookup: IpLookup,
+    mapValidator: MapValidator) {
 
-  protected[providers] def accumulatorFutureAgent
-    : Future[Agent[GameAxisAccumulator]]
+  private val logger = Logger(getClass)
 
-  def getRecent(n: Int): Future[List[JsonGame]] =
-    accumulatorFutureAgent.map(_.get().recentGames(n))
+  private implicit val actorMaterializer: ActorMaterializer =
+    ActorMaterializer()
 
-  def events: Future[List[GameUserEvent]] = {
-    accumulatorFutureAgent.map(_.get().events)
+  val accumulatorFutureAgent: Future[Agent[GameAxisAccumulator]] = async {
+    Agent {
+      await(initialAccumulator).includeGames(
+        await(gamesProvider.games).valuesIterator.toList.sortBy(_.id))
+    }
   }
 
-  def clanwars: Future[Clanwars] = {
-    accumulatorFutureAgent.map(_.get().clanwars)
+  private def readNewGames(
+      lastGameO: Option[JsonGame]): Source[JsonGame, NotUsed] = {
+    val fileOffset = lastGameO
+      .map { game =>
+        FileOffsetFinder(
+          DateTimeFormatter.ISO_INSTANT.format(
+            ZonedDateTime.parse(game.id).minusHours(1).toInstant))
+          .apply(logSource)
+      }
+      .getOrElse(0L)
+
+    FileTailSource
+      .apply(
+        path = logSource,
+        maxChunkSize = 8096,
+        pollingInterval = 1.second,
+        startingPosition = fileOffset
+      )
+      .via(akka.stream.scaladsl.Framing
+        .delimiter(ByteString.fromString("\n"), 8096, allowTruncation = false))
+      .map(_.decodeString("UTF-8"))
+      .via(GamesProvider.journalLinesToGames)
+      .filter(ForJournal.afterLastGameFilter(lastGameO))
+      .filter(_.validate.isRight)
+      .filter(_.validateServer)
+      .map(_.withGeo)
+      .map(_.flattenPlayers)
   }
 
-  def newClanwars: Source[CompleteClanwar, Future[NotUsed]]
+  private type ChangeTriplet =
+    (GameAxisAccumulator, JsonGame, GameAxisAccumulator)
 
-  def newGames: Source[JsonGame, Future[NotUsed]]
+  private def commitJournalAgent: Flow[JsonGame, ChangeTriplet, NotUsed] =
+    Flow[JsonGame]
+      .mapAsync(1) { game =>
+        async {
+          val originalIteratorAgent = await(accumulatorFutureAgent)
+          val originalIterator = originalIteratorAgent.get()
+          val newIterator =
+            await(originalIteratorAgent.alter(_.includeGames(List(game))))
+          await(gamesProvider.sinkGame(game))
+          (originalIterator, game, newIterator)
+        }
+      }
 
-  def playerRanks: Future[PlayersStats] = {
-    accumulatorFutureAgent.map(_.get().shiftedPlayersStats)
+  private val sourceF: Future[Source[ChangeTriplet, NotUsed]] =
+    gamesProvider.lastGame
+      .map { lastGame =>
+        logger.info(s"Full provider initialized. Log source ${logSource}")
+        logger.info(s"Will read from game ${lastGame.map(_.id)}")
+        readNewGames(lastGame)
+          .via(commitJournalAgent)
+          .toMat(BroadcastHub.sink)(Keep.right)
+          .run()
+      }
+
+  private val clanwarsSrcF: Future[Source[CompleteClanwar, NotUsed]] =
+    sourceF.map(_.mapConcat {
+      case (o, _, n) => FullIteratorDetector(o, n).detectClanwar
+    })
+
+  lazy val newClanwars: Source[CompleteClanwar, Future[NotUsed]] = {
+    Source.fromFutureSource(clanwarsSrcF)
   }
 
-  def playerRanksOverTime: Future[Map[YearMonth, PlayersStats]] = {
-    accumulatorFutureAgent.map(_.get().playersStatsOverTime)
+  private val gamesSrcF: Future[Source[JsonGame, NotUsed]] =
+    sourceF.map(_.mapConcat {
+      case (o, _, n) => FullIteratorDetector(o, n).detectGame
+    })
+
+  lazy val newGames: Source[JsonGame, Future[NotUsed]] =
+    Source.fromFutureSource(gamesSrcF)
+
+}
+
+case class FullIteratorDetector(original: GameAxisAccumulator,
+                                updated: GameAxisAccumulator) {
+
+  def detectClanwar: List[CompleteClanwar] = {
+    (updated.clanwars.complete -- original.clanwars.complete).toList
   }
 
-  def clanstats: Future[Clanstats] = {
-    accumulatorFutureAgent.map(_.get().clanstats)
-  }
-
-  def hof: Future[HallOfFame] = {
-    accumulatorFutureAgent.map(_.get().hof)
-  }
-
-  def allGames: Future[List[JsonGame]] = {
-    accumulatorFutureAgent.map(_.get().games.values.toList.sortBy(_.id))
-  }
-
-  def game(id: String): Future[Option[JsonGame]] = {
-    accumulatorFutureAgent.map(_.get().games.get(id))
-  }
-
-  def getPlayerProfileFor(id: String): Future[Option[FullProfile]] = {
-    accumulatorFutureAgent.map(_.get()).map(_.getProfileFor(id))
+  def detectGame: List[JsonGame] = {
+    (updated.games.keySet -- original.games.keySet).toList.map(updated.games)
   }
 
 }
