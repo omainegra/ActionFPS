@@ -467,7 +467,7 @@ generateDotStructure := {
   val xmlFile = generateXmlStructure.value
   val (name, ext) = IO.split(xmlFile.getName)
   val dotFile = target.value / s"${name}.dot"
-  val styleFile = baseDirectory.value / "struct.xsl"
+  val styleFile = baseDirectory.value / "project/struct.xsl"
   val args = Array(
     s"-s:${xmlFile}",
     s"-xsl:${styleFile}",
@@ -489,7 +489,7 @@ generateSvgStructure := {
       .render(Format.SVG_STANDALONE)
       .toFile(tmp)
 
-    val styleFile = baseDirectory.value / "add-underline.xsl"
+    val styleFile = baseDirectory.value / "project/add-underline.xsl"
     val args = Array(
       s"-s:${tmp}",
       s"-xsl:${styleFile}",
