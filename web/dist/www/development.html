@@ -14,21 +14,15 @@
 
           color: #454547;
     font-family: "Calibre", -apple-system, "Avenir Next", "Avenir", "Segoe UI", "Lucida Grande", "Helvetica Neue", "Helvetica", "Fira Sans", "Roboto", "Noto", "Droid Sans", "Cantarell", "Oxygen", "Ubuntu", "Franklin Gothic Medium", "Century Gothic", "Liberation Sans", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    line-height: 1.9rem
+    line-height: 1.6rem
 }
-
 h1,h2,h3,h4,h5,h6 {
-    color: #29292c;
-
-    line-height: 1.3;
-    margin: 0;
-    text-rendering: optimizeLegibility;
+  margin-top:1.6em;
 }
+      
 h2,h3,h4,h5,h6 {
-            font-weight: 500;
-      }
-
+  font-weight: 500;
+}
 
         nav ol li {
             display:inline-block;
@@ -41,20 +35,20 @@ h2,h3,h4,h5,h6 {
             background-color: aliceblue;
             padding: 0.2em 0.2em 0.2em 1em;
         }
-      code {
+   code {
     font-family: "Fira Mono", "Monaco", "Consolas", "Lucida Console", monospace;
-    font-size: 1rem;
     letter-spacing: -0.3px;
     padding: 0 3px;
-    white-space: normal
 }
+      pre >code {
+        font-size:0.9em;
+      }
       :not(pre)>code {
     margin-right: 0.05em;
     margin-left: 0.05em;
     padding-right: 5px;
     padding-left: 5px;
     background: #f7f7f7;
-    white-space: nowrap;
 }
 a {
   color: #454547;
@@ -74,6 +68,7 @@ a {
         <li><a href="#architecture">Architecture</a></li>
         <li><a href="#api-endpoints">API endpoints</a></li>
         <li><a href="#devops">DevOps</a></li>
+                  <li><a href="#authors">Authors</a></li>
         </ol></nav>
 
     <section id="quickstart">
@@ -131,8 +126,8 @@ a {
     </ul>
     <h3 id="technology-choices">Technology Choices</h3>
     <ul>
-        <li><strong><a href="glossary.html#scala" class="glossary-term" title="A scalable programming language built on top of the Java platform.">Scala</a></strong> for data processing and Play framework: solid, stable toolkit for dealing with complex data.</li>
-        <li><strong>jsoup</strong> for rendering templates: dynamic, works well with HTML5 and XML.</li>
+        <li><strong><a href="http://scala-lang.org" title="A scalable programming language built on top of the Java platform.">Scala</a></strong> for data processing and <a href="https://www.playframework.com">Play framework</a>: solid, stable toolkit for dealing with complex data.</li>
+      <li><strong><a href="https://jsoup.org/">jsoup</a></strong> for rendering templates: dynamic, works well with HTML5 and XML.</li>
     </ul>
 
     </section>
@@ -193,6 +188,16 @@ a {
     <section id="devops">
     <h2>DevOps</h2>
     <p>Continuous Deployment: master --&gt; <a href="https://git.watch/" target="_blank">https://git.watch/</a> --&gt; build &amp; restart. Simple monolithic deployment.</p>
+      
     </section>
+  <section id="authors">
+    <h2>Authors</h2>
+    <ul>
+    <li>Majority of development: <a href="https://www.scalawilliam.com/">William &quot;ScalaWilliam&quot; Narmontas</a></li>
+      <li>Ideas &amp; development: <a href="https://github.com/lucasgautheron">Lucas Gautheron</a></li>
+      <li>Ideas &amp; management: <a href="https://twitter.com/sanzouille">Quentin "Sanzouille"</a></li>
+      <li>Other contributors: <a href="https://github.com/ScalaWilliam/ActionFPS/graphs/contributors">GitHub contributors chart</a></li>
+    </ul>
+  </section>
 </main>
 </body></html>
