@@ -484,9 +484,19 @@ generateSvgStructure := {
   val (name, ext) = IO.split(dotFile.getName)
   val svgFile = target.value / s"${name}.svg"
 
-  Graphviz.fromFile(dotFile)
-    .render(Format.SVG_STANDALONE)
-    .toFile(svgFile)
+  IO.withTemporaryFile("intermediate", ".svg") { tmp =>
+    Graphviz.fromFile(dotFile)
+      .render(Format.SVG_STANDALONE)
+      .toFile(tmp)
+
+    val styleFile = baseDirectory.value / "add-underline.xsl"
+    val args = Array(
+      s"-s:${tmp}",
+      s"-xsl:${styleFile}",
+      s"-o:${svgFile}"
+    )
+    net.sf.saxon.Transform.main(args)
+  }
 
   svgFile
 }
