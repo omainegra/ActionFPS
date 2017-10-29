@@ -445,3 +445,33 @@ lazy val gameLogParser =
       libraryDependencies ++= Seq(jodaTime, jodaConvert, fastparse),
       libraryDependencies += scalatest % Test
     )
+
+
+import org.jetbrains.sbt.StructureKeys._
+sbtStructureOutputFile in Global := Some(target.value / "structure.xml")
+sbtStructureOptions in Global := "prettyPrint download"
+
+lazy val generateXmlStructure = taskKey[File]("Generates project structure XML file")
+lazy val generateDotStructure = taskKey[File]("Generates project structure DOT file")
+
+generateXmlStructure := {
+  val file = sbtStructureOutputFile.value.getOrElse {
+    sys.error(s"${sbtStructureOutputFile.key.label} is not set")
+  }
+  dumpStructure.value
+  file
+}
+
+generateDotStructure := {
+  val xmlFile = generateXmlStructure.value
+  val (name, ext) = IO.split(xmlFile.getName)
+  val dotFile = target.value / s"${name}.dot"
+  val styleFile = baseDirectory.value / "struct.xsl"
+  val args = Array(
+    s"-s:${xmlFile}",
+    s"-xsl:${styleFile}",
+    s"-o:${dotFile}"
+  )
+  net.sf.saxon.Transform.main(args)
+  dotFile
+}
