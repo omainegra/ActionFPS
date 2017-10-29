@@ -445,3 +445,58 @@ lazy val gameLogParser =
       libraryDependencies ++= Seq(jodaTime, jodaConvert, fastparse),
       libraryDependencies += scalatest % Test
     )
+
+
+import org.jetbrains.sbt.StructureKeys._
+sbtStructureOutputFile in Global := Some(target.value / "structure.xml")
+sbtStructureOptions in Global := "prettyPrint download"
+
+lazy val generateXmlStructure = taskKey[File]("Generates project structure XML file")
+lazy val generateDotStructure = taskKey[File]("Generates project structure DOT file")
+lazy val generateSvgStructure = taskKey[File]("Generates project structure SVG file")
+
+generateXmlStructure := {
+  val file = sbtStructureOutputFile.value.getOrElse {
+    sys.error(s"${sbtStructureOutputFile.key.label} is not set")
+  }
+  dumpStructure.value
+  file
+}
+
+generateDotStructure := {
+  val xmlFile = generateXmlStructure.value
+  val (name, ext) = IO.split(xmlFile.getName)
+  val dotFile = target.value / s"${name}.dot"
+  val styleFile = baseDirectory.value / "project/struct.xsl"
+  val args = Array(
+    s"-s:${xmlFile}",
+    s"-xsl:${styleFile}",
+    s"-o:${dotFile}"
+  )
+  net.sf.saxon.Transform.main(args)
+  dotFile
+}
+
+generateSvgStructure := {
+  import guru.nidi.graphviz.engine._
+
+  val dotFile = generateDotStructure.value
+  val (name, ext) = IO.split(dotFile.getName)
+  val svgFile = target.value / s"${name}.svg"
+
+  IO.withTemporaryFile("intermediate", ".svg") { tmp =>
+    Graphviz.fromFile(dotFile)
+      .render(Format.SVG_STANDALONE)
+      .toFile(tmp)
+
+    val styleFile = baseDirectory.value / "project/add-underline.xsl"
+    val args = Array(
+      s"-s:${tmp}",
+      s"-xsl:${styleFile}",
+      s"-o:${svgFile}"
+    )
+    net.sf.saxon.Transform.main(args)
+  }
+
+  svgFile
+}
