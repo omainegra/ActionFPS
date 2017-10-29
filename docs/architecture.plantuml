@@ -3,13 +3,15 @@ skinparam DefaultTextAlignment center
 
 title ActionFPS portal architecture
 
-package "Games, Clanwars, Achivements, Ranks" as p2 {
+package "log collection" as p1 {
     rectangle "syslog\nmultiple servers" <<"<&layers>">> as syslog
     rectangle "Log lines\n(Syslog server)" <<"<&layers>">> as loglines
     rectangle "flat file" as flatfile1
 
         syslog -> loglines
         loglines -> flatfile1
+}
+package "Games, Clanwars, Achivements, Ranks" as p2 {
 
     file "flat file" as flatFile2
     rectangle "Log\nlines" <<"<&layers>">> as logLines2
