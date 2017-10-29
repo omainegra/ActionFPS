@@ -147,11 +147,6 @@ final class CompileTimeApplicationLoaderComponents(context: Context)
         .onComplete(intersService.completionHandler)
     }
 
-  lazy val challongeClient: ChallongeClient = wire[ChallongeClient]
-  lazy val challongeEnabled: Boolean = configuration
-    .get[Seq[String]]("play.modules.enabled")
-    .contains("modules.ChallongeLoadModule")
-
   lazy val intersService: IntersService =
     new IntersService(
       journalPath = journalPath
