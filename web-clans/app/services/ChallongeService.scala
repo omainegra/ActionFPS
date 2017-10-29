@@ -28,6 +28,10 @@ object ChallongeService {
         cc
       }
       .mapConcat(cc => WinFlow.detectWinnerLoserClanwar(cc).toList)
+      .map { wc =>
+        Logger.info(s"Received clanwar: ${wc}")
+        wc
+      }
       .via(WinFlow(challongeClient).clanwarWon)
       .alsoTo(Sink.foreach(item => Logger.info(s"Sunk clanwar: ${item}")))
   }
