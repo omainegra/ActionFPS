@@ -1,14 +1,13 @@
 package services
 
 import java.nio.file.Path
-
 import javax.management.ObjectName
 
 import af.inters.IntersFlow.{NicknameToUser, ScanIterators}
 import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.stream.alpakka.file.scaladsl.FileTailSource
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.{ActorAttributes, ActorMaterializer, Supervision}
 import akka.{Done, NotUsed}
 import com.actionfps.inter.InterOut
@@ -83,28 +82,14 @@ class IntersService(journalPath: Path)(
       .mapConcat(_.interOut.toList)
   }
 
-  val pushToAgent: Sink[InterOut, Future[Done]] =
-    Sink.foreach[InterOut](interOut => agent.send(l => interOut :: l))
-
-  private val pushToLog =
-    Sink.foreach[InterOut] { i =>
-      logger.info(s"Found inter: ${i}")
-    }
-
-  private val pushOutSink = Flow[InterOut]
-    .withAttributes(ActorAttributes.supervisionStrategy {
-      case NonFatal(e) =>
-        logger.error(s"Failed an element due to ${e}", e)
-        Supervision.Resume
-    })
-    .alsoTo(pushToAgent)
-    .alsoTo(pushToLog)
-
   def beginPushing(): Unit = {
     logger.info(s"Tailing for inters from ${journalPath}...")
     intersSource("Main IntersService push")
-      .via(pushOutSink)
-      .runForeach(_ => ())
+      .runForeach(interOut => agent.send(l => interOut :: l))
+      .onComplete(completionHandler)
+
+    newIntersSource(s"Tailing inters to log from ${journalPath}...")
+      .runForeach(interOut => logger.info(s"Found inter: ${interOut}"))
       .onComplete(completionHandler)
   }
 
