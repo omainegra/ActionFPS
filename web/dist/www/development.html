@@ -1,7 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8"/>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    
     <title>ActionFPS Development</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
 
@@ -53,6 +54,11 @@
             <a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Windows.html">Windows</a>,
             <a href="http://www.scala-sbt.org/release/docs/Installing-sbt-on-Linux.html">Linux</a>).</li>
     </ul>
+      <h3>Clone the Git repository</h3>
+      <p>The Git repository is hosted on GitHub (<a href="https://github.com/ScalaWilliam/ActionFPS">ScalaWilliam/ActionFPS</a>).</p>
+      <pre><code>$ git clone https://github.com/ScalaWilliam/ActionFPS af; cd af</code></pre>
+      <p>Alternatively, if you have a GitHub account with SSH,</p>
+      <pre><code>$ git clone git@github.com:ScalaWilliam/ActionFPS.git af; cd af</code></pre>
     <h3>Download reference data</h3>
     <p>This includes sample log files</p>
     <pre><code>$ make reference-data</code></pre>
@@ -68,7 +74,7 @@
         This is because some results are recomputed with every change. If you'd like to cache them, use:</p>
     <pre><code>$ sbt 'set inMemoryCache in web := true' web/run</code></pre>
         <h3>Edit in an IDE</h3>
-        <p>Use IntelliJ Community Edition: <a href="https://www.jetbrains.com/idea/download/" target="_blank">https://www.jetbrains.com/idea/download/</a>. Simply import the directory as an &apos;SBT&apos; project.</p>
+        <p>Use IntelliJ Community Edition: <a href="https://www.jetbrains.com/idea/download/" target="_blank">https://www.jetbrains.com/idea/download/</a>. Simply import the directory as an 'SBT' project.</p>
     <h3>Benchmarking</h3>
     <p>We use <a href="https://github.com/ktoso/sbt-jmh">sbt-jmh</a>.</p>
     <pre><code>$ sbt 'benchmark/jmh:run -prof jmh.extras.JFR -t 1 -f 1 -wi 0 -i 1 .*FullIteratorBenchmark.*'
@@ -118,9 +124,9 @@
     <h3 id="logs">Logs</h3>
     <p>We offer access to raw logs from ActionFPS. </p>
     <ul>
-        <li>Historical data: <code>curl -s &apos;https://actionfps.com/logs.tsv?from=2017-01-01T00:00:00Z&amp;to=2099-04-10T11:02:03Z&apos;</code> - get raw events for these time periods using the <a href="https://en.wikipedia.org/wiki/Tab-separated_values" target="_blank">tab-separated values (TSV)</a> format.</li>
-        <li>Live data from the end: <code>curl -s &apos;https://actionfps.com/logs&apos;</code> - get live events using <a href="https://www.w3.org/TR/eventsource/" target="_blank">EventSource standard</a>.</li>
-        <li>Live data from a specified time: <code>curl -H &apos;Last-Event-ID: 2017-04-30T01:02:03Z&apos; -i https://actionfps.com/logs</code> - get live events from this last event ID. This is part of EventSource standard and is supported by EventSource clients such as <a href="http://developer.lightbend.com/docs/alpakka/current/sse.html" target="_blank">Scala Alpakka one</a>, <a href="https://www.npmjs.com/package/eventsource" target="_blank">Node.js one</a>, as well as the JavaScript one. With this, you can resume from a broken stream of data.</li>
+        <li>Historical data: <code>curl -s 'https://actionfps.com/logs.tsv?from=2017-01-01T00:00:00Z&amp;to=2099-04-10T11:02:03Z'</code> - get raw events for these time periods using the <a href="https://en.wikipedia.org/wiki/Tab-separated_values" target="_blank">tab-separated values (TSV)</a> format.</li>
+        <li>Live data from the end: <code>curl -s 'https://actionfps.com/logs'</code> - get live events using <a href="https://www.w3.org/TR/eventsource/" target="_blank">EventSource standard</a>.</li>
+        <li>Live data from a specified time: <code>curl -H 'Last-Event-ID: 2017-04-30T01:02:03Z' -i https://actionfps.com/logs</code> - get live events from this last event ID. This is part of EventSource standard and is supported by EventSource clients such as <a href="http://developer.lightbend.com/docs/alpakka/current/sse.html" target="_blank">Scala Alpakka one</a>, <a href="https://www.npmjs.com/package/eventsource" target="_blank">Node.js one</a>, as well as the JavaScript one. With this, you can resume from a broken stream of data.</li>
     </ul>
     <h4 id="filtering">Filtering</h4>
     <p>We filter out some data for privacy reasons:</p>
@@ -157,5 +163,4 @@
     <p>Continuous Deployment: master --&gt; <a href="https://git.watch/" target="_blank">https://git.watch/</a> --&gt; build &amp; restart. Simple monolithic deployment.</p>
     </section>
 </main>
-</body>
-</html>
+</body></html>
