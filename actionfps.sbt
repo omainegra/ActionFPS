@@ -453,6 +453,7 @@ sbtStructureOptions in Global := "prettyPrint download"
 
 lazy val generateXmlStructure = taskKey[File]("Generates project structure XML file")
 lazy val generateDotStructure = taskKey[File]("Generates project structure DOT file")
+lazy val generateSvgStructure = taskKey[File]("Generates project structure SVG file")
 
 generateXmlStructure := {
   val file = sbtStructureOutputFile.value.getOrElse {
@@ -474,4 +475,18 @@ generateDotStructure := {
   )
   net.sf.saxon.Transform.main(args)
   dotFile
+}
+
+generateSvgStructure := {
+  import guru.nidi.graphviz.engine._
+
+  val dotFile = generateDotStructure.value
+  val (name, ext) = IO.split(dotFile.getName)
+  val svgFile = target.value / s"${name}.svg"
+
+  Graphviz.fromFile(dotFile)
+    .render(Format.SVG_STANDALONE)
+    .toFile(svgFile)
+
+  svgFile
 }
