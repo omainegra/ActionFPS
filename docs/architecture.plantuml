@@ -1,12 +1,17 @@
 @startuml
 skinparam DefaultTextAlignment center
+skinparam arrowColor #000000
+skinparam rectangleBackgroundColor #CFE2F3
+skinparam fileBackgroundColor #CFE2F3
+skinparam databaseBackgroundColor #CFE2F3
+skinparam defaultFontSize 18
 
 title ActionFPS portal architecture
 
 package "log collection" as p1 {
     rectangle "syslog\nmultiple servers" <<"<&layers>">> as syslog
     rectangle "Log lines\n(Syslog server)" <<"<&layers>">> as loglines
-    rectangle "flat file" as flatfile1
+    file "flat file" as flatfile1
 
         syslog -> loglines
         loglines -> flatfile1
@@ -17,10 +22,10 @@ package "Games, Clanwars, Achivements, Ranks" as p2 {
     rectangle "Log\nlines" <<"<&layers>">> as logLines2
     rectangle "Game\nparser" <<"<&layers>">> as gameParser
     rectangle "Add countries" as addCountries
-    rectangle "join with users" as joinWithUsers
-    rectangle "Determine achievement" as determineAchievement
-    rectangle "join with clans" as joinWithClans
-    rectangle "Determine clanwar" as determineClanwar
+    rectangle "join with\nusers" as joinWithUsers
+    rectangle "Determine\nachievement" as determineAchievement
+    rectangle "join with\nclans" as joinWithClans
+    rectangle "Determine\nclanwar" as determineClanwar
     database "Rich game\nrepository" as richGameRepository
 
 
@@ -47,7 +52,7 @@ package "Games, Clanwars, Achivements, Ranks" as p2 {
         userRepository <-- users.csv
         userRepository <-- nicknames.csv
 
-    rectangle "User\nachievements" <<"<&layers>">> as userAchievements
+    rectangle "User\nachievements" <<"<&layers>">> as userAchievements #D9D2E9
     rectangle "Hall of fame" as hallOfFame
 
     determineAchievement --> userAchievements
@@ -56,11 +61,11 @@ package "Games, Clanwars, Achivements, Ranks" as p2 {
     rectangle "Generate\nclanwars" <<"<&layers>">> as generateClanwars
     database "Clanwar\nrepository" as clanwarRepository
     rectangle "Clan ranks" as clanRanks
-    rectangle "Challange Publish" as challangePublish
+    rectangle "Challange Publish" as challangePublish #D9EAD3
     rectangle "Player ranks" as playerRanks
-    rectangle "User statistics" <<"<&layers>">> as userStatistics
-    rectangle "Challange Publish" as challangePublish2
-    rectangle "EventSource\nendpoint for new\ngames" as eventSourceEndpoint
+    rectangle "User statistics" <<"<&layers>">> as userStatistics #D9D2E9
+    rectangle "Challange Publish" as challangePublish2 #D9EAD3
+    rectangle "EventSource\nendpoint for new\ngames" as eventSourceEndpoint #D9EAD3
 
 
         joinWithClans --> generateClanwars
@@ -79,12 +84,17 @@ package "Games, Clanwars, Achivements, Ranks" as p2 {
 
 @startuml
 skinparam DefaultTextAlignment center
+skinparam arrowColor #000000
+skinparam rectangleBackgroundColor #CFE2F3
+skinparam fileBackgroundColor #CFE2F3
+skinparam databaseBackgroundColor #CFE2F3
+skinparam defaultFontSize 18
 
 package "Pinger (Live games)" as p3 {
     rectangle "Game\nservers" <<"<&layers>">> as gameServers
     rectangle "UDP server\nstatus updates" <<"<&layers>">> as udpServer
     rectangle "Status parser" <<"<&layers>">> as statusParser
-    rectangle "EventSource\nendpoint for\nstatus updates" as eventSourceEndpoint2
+    rectangle "EventSource\nendpoint for\nstatus updates" as eventSourceEndpoint2 #D9EAD3
 
         gameServers -> udpServer
         udpServer -> statusParser
@@ -92,10 +102,10 @@ package "Pinger (Live games)" as p3 {
 }
 
 package "Ladder" as p4 {
-    rectangle "SSH log file" as sshLogFile
+    file "SSH log file" as sshLogFile
     rectangle "Log lines" <<"<&layers>">> as logLines3
     rectangle "join with users" as joinWithUsers2
-    rectangle "User ladder\nstatistics" <<"<&layers>">> as userLadderStatistics
+    rectangle "User ladder\nstatistics" <<"<&layers>">> as userLadderStatistics #D9D2E9
     database "User\nrepository"  as userRepository2
 
         sshLogFile -> logLines3
@@ -107,10 +117,10 @@ p3 -[hidden]-> p4
 
 package "Inters" as p5 {
     database "User\nrepository" as userRepository3
-    rectangle "flat file" as flatFile3
+    file "flat file" as flatFile3
     rectangle "Log\nlines" <<"<&layers>">> as logLines4
     rectangle "join with users" as joinWithUsers3
-    rectangle "EventSource\nendpoint" as eventSourceEndpoint3
+    rectangle "EventSource\nendpoint" as eventSourceEndpoint3 #D9EAD3
 
         userRepository3 --> joinWithUsers3
         flatFile3 -> logLines4
