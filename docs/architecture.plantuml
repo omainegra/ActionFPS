@@ -80,9 +80,6 @@ package "Games, Clanwars, Achivements, Ranks" as p2 {
         eventSourceEndpoint <-- richGameRepository
 }
 
-@enduml
-
-@startuml
 skinparam DefaultTextAlignment center
 skinparam arrowColor #000000
 skinparam rectangleBackgroundColor #CFE2F3
