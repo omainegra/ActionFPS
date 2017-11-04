@@ -8,7 +8,7 @@ skinparam defaultFontSize 18
 
 title ActionFPS portal architecture
 
-package "log collection" as p1 {
+package "log collection" as log {
     rectangle "syslog\nmultiple servers" <<"<&layers>">> as syslog
     rectangle "Log lines\n(Syslog server)" <<"<&layers>">> as loglines
     file "flat file" as flatfile1
@@ -16,7 +16,19 @@ package "log collection" as p1 {
         syslog -> loglines
         loglines -> flatfile1
 }
-package "Games, Clanwars, Achivements, Ranks" as p2 {
+
+package "Pinger (Live games)" as pinger {
+    rectangle "Game\nservers" <<"<&layers>">> as gameServers
+    rectangle "UDP server\nstatus updates" <<"<&layers>">> as udpServer
+    rectangle "Status parser" <<"<&layers>">> as statusParser
+    rectangle "EventSource\nendpoint for\nstatus updates" as eventSourceEndpoint2 #D9EAD3
+
+        gameServers -> udpServer
+        udpServer -> statusParser
+        statusParser -> eventSourceEndpoint2
+}
+
+package "Games, Clanwars, Achivements, Ranks" as big {
 
     file "flat file" as flatFile2
     rectangle "Log\nlines" <<"<&layers>">> as logLines2
@@ -87,18 +99,9 @@ skinparam fileBackgroundColor #CFE2F3
 skinparam databaseBackgroundColor #CFE2F3
 skinparam defaultFontSize 18
 
-package "Pinger (Live games)" as p3 {
-    rectangle "Game\nservers" <<"<&layers>">> as gameServers
-    rectangle "UDP server\nstatus updates" <<"<&layers>">> as udpServer
-    rectangle "Status parser" <<"<&layers>">> as statusParser
-    rectangle "EventSource\nendpoint for\nstatus updates" as eventSourceEndpoint2 #D9EAD3
+together {
 
-        gameServers -> udpServer
-        udpServer -> statusParser
-        statusParser -> eventSourceEndpoint2
-}
-
-package "Ladder" as p4 {
+package "Ladder" as ladder {
     file "SSH log file" as sshLogFile
     rectangle "Log lines" <<"<&layers>">> as logLines3
     rectangle "join with users" as joinWithUsers2
@@ -110,9 +113,8 @@ package "Ladder" as p4 {
         joinWithUsers2 -> userLadderStatistics
         joinWithUsers2 <-- userRepository2
 }
-p3 -[hidden]-> p4
 
-package "Inters" as p5 {
+package "Inters" as inters {
     database "User\nrepository" as userRepository3
     file "flat file" as flatFile3
     rectangle "Log\nlines" <<"<&layers>">> as logLines4
@@ -124,5 +126,8 @@ package "Inters" as p5 {
         logLines4 -> joinWithUsers3
         joinWithUsers3 -> eventSourceEndpoint3
 }
-p4 -[hidden]> p5
+
+ladder -[hidden]-- inters
+}
+
 @enduml
