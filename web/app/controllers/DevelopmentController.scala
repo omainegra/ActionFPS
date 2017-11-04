@@ -19,5 +19,17 @@ class DevelopmentController(components: ControllerComponents)(
         Ok.sendFile(
           WebTemplateRender.wwwLocation.resolve("development.html").toFile)
       }
+    case GET(p"/development/af-arch-plant.svg") =>
+      Action {
+        Ok.sendFile(
+          WebTemplateRender.wwwLocation.resolve("af-arch-plant.svg").toFile
+        )
+      }
+    case GET(p"/development/structure.svg") =>
+      Action {
+        Ok.sendFile(
+          WebTemplateRender.wwwLocation.resolve("structure.svg").toFile
+        )
+      }
   }
 }

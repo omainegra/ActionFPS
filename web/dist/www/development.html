@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta content="text/html; charset=UTF-8" http-equiv="content-type">
-    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
     <title>ActionFPS Development</title>
 
     <style>
@@ -55,6 +55,9 @@ a {
   color: #454547;
   text-decoration: underline;
 }
+        embed, object {
+            max-width:100%;
+        }
     </style>
 
 </head>
@@ -116,7 +119,19 @@ a {
 
     <section id="architecture">
         <h2><a href="#architecture">Architecture</a></h2>
-    <p><a href="https://docs.google.com/drawings/d/1fGcN6fcKC_oCL1KtC_-pmWCT_1Da-ka0nijrzUuxiyw/pub?w=1984&amp;h=1701" target="_blank"><img src="https://docs.google.com/drawings/d/1fGcN6fcKC_oCL1KtC_-pmWCT_1Da-ka0nijrzUuxiyw/pub?w=661&amp;h=567" alt=""></a></p>
+
+        <h3>Logical architecture</h3>
+        <p><embed id="logical-svg" type="image/svg+xml" src="af-arch-plant.svg"> </embed></p>
+
+        <h3>SBT project structure</h3>
+        <p><object id="sbt-svg" type="image/svg+xml" data="structure.svg"> </object></p>
+        <script>
+            ["#logical-svg", "#sbt-svg"].forEach(function(query){
+                document.querySelector(query).addEventListener('load', function() {
+                    svgPanZoom(document.querySelector(query));
+                })
+            });
+        </script>
     <h3 id="repositories">Repositories</h3>
     <ul>
         <li><a href="https://github.com/ScalaWilliam/ActionFPS" target="_blank">ActionFPS @ GitHub</a></li>
