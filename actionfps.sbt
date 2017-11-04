@@ -454,6 +454,7 @@ sbtStructureOptions in Global := "prettyPrint download"
 lazy val generateXmlStructure = taskKey[File]("Generates project structure XML file")
 lazy val generateDotStructure = taskKey[File]("Generates project structure DOT file")
 lazy val generateSvgStructure = taskKey[File]("Generates project structure SVG file")
+lazy val generateArchitectureDiagram = taskKey[File]("Generates project architecture SVG file")
 
 generateXmlStructure := {
   val file = sbtStructureOutputFile.value.getOrElse {
@@ -498,5 +499,20 @@ generateSvgStructure := {
     net.sf.saxon.Transform.main(args)
   }
 
+  svgFile
+}
+
+generateArchitectureDiagram := {
+  import net.sourceforge.plantuml.{ FileFormat, FileFormatOption, SourceStringReader }
+
+  val plantumlFile = baseDirectory.value / "docs/architecture.plantuml"
+  val svgFile      = baseDirectory.value / "web/dist/www/af-arch-plant.svg"
+
+  val reader = new SourceStringReader(IO.read(plantumlFile))
+  val fos = new java.io.FileOutputStream(svgFile)
+  val result = reader.generateImage(fos, new FileFormatOption(FileFormat.SVG))
+  // it may return null if rendering fails:
+  if (Option(result).isEmpty) sys.error(s"Couldn't generate SVG diagram from ${plantumlFile}")
+  fos.close()
   svgFile
 }
