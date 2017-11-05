@@ -150,7 +150,15 @@ lazy val web = project
     },
     version := "5.0",
     buildInfoPackage := "af",
-    buildInfoOptions += BuildInfoOption.ToJson
+    buildInfoOptions += BuildInfoOption.ToJson,
+    generateArchitectureDiagram := {
+      val inputFile = baseDirectory.value / "app/assets/architecture.plantuml"
+      val outputFile = baseDirectory.value / "dist/www/af-arch-plant.svg"
+      streams.value.log.info(s"Generating architecture diagram to ${outputFile}")
+      renderPlantUMLToSVG(inputFile, outputFile)
+    },
+    sourceGenerators in Assets +=
+      generateArchitectureDiagram.taskValue.map(Seq(_))
   )
 
 lazy val inMemoryCache = SettingKey[Boolean](
@@ -502,17 +510,17 @@ generateSvgStructure := {
   svgFile
 }
 
-generateArchitectureDiagram := {
+def renderPlantUMLToSVG(
+  inputFile: File,
+  outputFile: File
+): File = {
   import net.sourceforge.plantuml.{ FileFormat, FileFormatOption, SourceStringReader }
 
-  val plantumlFile = baseDirectory.value / "docs/architecture.plantuml"
-  val svgFile      = baseDirectory.value / "web/dist/www/af-arch-plant.svg"
-
-  val reader = new SourceStringReader(IO.read(plantumlFile))
-  val fos = new java.io.FileOutputStream(svgFile)
+  val reader = new SourceStringReader(IO.read(inputFile))
+  val fos = new java.io.FileOutputStream(outputFile)
   val result = reader.generateImage(fos, new FileFormatOption(FileFormat.SVG))
   // it may return null if rendering fails:
-  if (Option(result).isEmpty) sys.error(s"Couldn't generate SVG diagram from ${plantumlFile}")
+  if (Option(result).isEmpty) sys.error(s"Couldn't generate SVG diagram from ${inputFile}")
   fos.close()
-  svgFile
+  outputFile
 }
