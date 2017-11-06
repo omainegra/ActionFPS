@@ -150,7 +150,15 @@ lazy val web = project
     },
     version := "5.0",
     buildInfoPackage := "af",
-    buildInfoOptions += BuildInfoOption.ToJson
+    buildInfoOptions += BuildInfoOption.ToJson,
+    generateArchitectureDiagram := {
+      val inputFile = baseDirectory.value / "app/assets/architecture.plantuml"
+      val outputFile = baseDirectory.value / "dist/www/af-arch-plant.svg"
+      streams.value.log.info(s"Generating architecture diagram to ${outputFile}")
+      renderPlantUMLToSVG(inputFile, outputFile)
+    },
+    sourceGenerators in Assets +=
+      generateArchitectureDiagram.taskValue.map(Seq(_))
   )
 
 lazy val inMemoryCache = SettingKey[Boolean](
@@ -454,6 +462,7 @@ sbtStructureOptions in Global := "prettyPrint download"
 lazy val generateXmlStructure = taskKey[File]("Generates project structure XML file")
 lazy val generateDotStructure = taskKey[File]("Generates project structure DOT file")
 lazy val generateSvgStructure = taskKey[File]("Generates project structure SVG file")
+lazy val generateArchitectureDiagram = taskKey[File]("Generates project architecture SVG file")
 
 generateXmlStructure := {
   val file = sbtStructureOutputFile.value.getOrElse {
@@ -499,4 +508,25 @@ generateSvgStructure := {
   }
 
   svgFile
+}
+
+def renderPlantUMLToSVG(
+  inputFile: File,
+  outputFile: File
+): File = {
+  import scala.util._
+  import java.io.IOException
+  import net.sourceforge.plantuml.{ FileFormat, FileFormatOption, SourceStringReader }
+
+  val fos = new java.io.FileOutputStream(outputFile)
+  Try {
+    val reader = new SourceStringReader(IO.read(inputFile))
+    reader.generateImage(fos, new FileFormatOption(FileFormat.SVG))
+  } match {
+    case Failure(e) => sys.error(s"Couldn't generate SVG diagram from ${inputFile}:\n${e.getMessage}")
+    case Success(null) => sys.error(s"Couldn't generate SVG diagram from ${inputFile}: check the diagram source code")
+    case _ => ()
+  }
+  fos.close()
+  outputFile
 }
