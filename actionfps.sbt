@@ -514,13 +514,19 @@ def renderPlantUMLToSVG(
   inputFile: File,
   outputFile: File
 ): File = {
+  import scala.util._
+  import java.io.IOException
   import net.sourceforge.plantuml.{ FileFormat, FileFormatOption, SourceStringReader }
 
-  val reader = new SourceStringReader(IO.read(inputFile))
   val fos = new java.io.FileOutputStream(outputFile)
-  val result = reader.generateImage(fos, new FileFormatOption(FileFormat.SVG))
-  // it may return null if rendering fails:
-  if (Option(result).isEmpty) sys.error(s"Couldn't generate SVG diagram from ${inputFile}")
+  Try {
+    val reader = new SourceStringReader(IO.read(inputFile))
+    reader.generateImage(fos, new FileFormatOption(FileFormat.SVG))
+  } match {
+    case Failure(e: IOException) => sys.error(s"Couldn't generate SVG diagram from ${inputFile}:\n${e.getMessage}")
+    case Success(null) => sys.error(s"Couldn't generate SVG diagram from ${inputFile}: check the diagram source code")
+    case _ => ()
+  }
   fos.close()
   outputFile
 }
