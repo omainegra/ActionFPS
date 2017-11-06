@@ -523,7 +523,7 @@ def renderPlantUMLToSVG(
     val reader = new SourceStringReader(IO.read(inputFile))
     reader.generateImage(fos, new FileFormatOption(FileFormat.SVG))
   } match {
-    case Failure(e: IOException) => sys.error(s"Couldn't generate SVG diagram from ${inputFile}:\n${e.getMessage}")
+    case Failure(e) => sys.error(s"Couldn't generate SVG diagram from ${inputFile}:\n${e.getMessage}")
     case Success(null) => sys.error(s"Couldn't generate SVG diagram from ${inputFile}: check the diagram source code")
     case _ => ()
   }
