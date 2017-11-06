@@ -8,7 +8,7 @@ import play.api.routing.sird._
 
 import scala.concurrent.ExecutionContext
 
-class DevelopmentController(components: ControllerComponents)(
+class DevelopmentController(components: ControllerComponents, assets: Assets)(
     implicit executionContext: ExecutionContext)
     extends AbstractController(components)
     with SimpleRouter {
@@ -20,11 +20,7 @@ class DevelopmentController(components: ControllerComponents)(
           WebTemplateRender.wwwLocation.resolve("development.html").toFile)
       }
     case GET(p"/development/af-arch-plant.svg") =>
-      Action {
-        Ok.sendFile(
-          WebTemplateRender.wwwLocation.resolve("af-arch-plant.svg").toFile
-        )
-      }
+      assets.at("af-arch-plant.svg")
     case GET(p"/development/structure.svg") =>
       Action {
         Ok.sendFile(

@@ -152,9 +152,10 @@ lazy val web = project
     buildInfoPackage := "af",
     buildInfoOptions += BuildInfoOption.ToJson,
     generateArchitectureDiagram := {
-      val inputFile = baseDirectory.value / "app/assets/architecture.plantuml"
-      val outputFile = baseDirectory.value / "dist/www/af-arch-plant.svg"
-      streams.value.log.info(s"Generating architecture diagram to ${outputFile}")
+      val inputFile = (sourceDirectory in Assets).value / "plantuml" / "architecture.plantuml"
+      val outputFile = (WebKeys.webTarget in Assets).value / "af-arch-plant.svg"
+      streams.value.log
+        .info(s"Generating architecture diagram to ${outputFile}")
       renderPlantUMLToSVG(inputFile, outputFile)
     },
     sourceGenerators in Assets +=
@@ -454,15 +455,18 @@ lazy val gameLogParser =
       libraryDependencies += scalatest % Test
     )
 
-
 import org.jetbrains.sbt.StructureKeys._
 sbtStructureOutputFile in Global := Some(target.value / "structure.xml")
 sbtStructureOptions in Global := "prettyPrint download"
 
-lazy val generateXmlStructure = taskKey[File]("Generates project structure XML file")
-lazy val generateDotStructure = taskKey[File]("Generates project structure DOT file")
-lazy val generateSvgStructure = taskKey[File]("Generates project structure SVG file")
-lazy val generateArchitectureDiagram = taskKey[File]("Generates project architecture SVG file")
+lazy val generateXmlStructure =
+  taskKey[File]("Generates project structure XML file")
+lazy val generateDotStructure =
+  taskKey[File]("Generates project structure DOT file")
+lazy val generateSvgStructure =
+  taskKey[File]("Generates project structure SVG file")
+lazy val generateArchitectureDiagram =
+  taskKey[File]("Generates project architecture SVG file")
 
 generateXmlStructure := {
   val file = sbtStructureOutputFile.value.getOrElse {
@@ -494,7 +498,8 @@ generateSvgStructure := {
   val svgFile = target.value / s"${name}.svg"
 
   IO.withTemporaryFile("intermediate", ".svg") { tmp =>
-    Graphviz.fromFile(dotFile)
+    Graphviz
+      .fromFile(dotFile)
       .render(Format.SVG_STANDALONE)
       .toFile(tmp)
 
@@ -511,20 +516,28 @@ generateSvgStructure := {
 }
 
 def renderPlantUMLToSVG(
-  inputFile: File,
-  outputFile: File
+    inputFile: File,
+    outputFile: File
 ): File = {
   import scala.util._
   import java.io.IOException
-  import net.sourceforge.plantuml.{ FileFormat, FileFormatOption, SourceStringReader }
+  import net.sourceforge.plantuml.{
+    FileFormat,
+    FileFormatOption,
+    SourceStringReader
+  }
 
   val fos = new java.io.FileOutputStream(outputFile)
   Try {
     val reader = new SourceStringReader(IO.read(inputFile))
     reader.generateImage(fos, new FileFormatOption(FileFormat.SVG))
   } match {
-    case Failure(e) => sys.error(s"Couldn't generate SVG diagram from ${inputFile}:\n${e.getMessage}")
-    case Success(null) => sys.error(s"Couldn't generate SVG diagram from ${inputFile}: check the diagram source code")
+    case Failure(e) =>
+      sys.error(
+        s"Couldn't generate SVG diagram from ${inputFile}:\n${e.getMessage}")
+    case Success(null) =>
+      sys.error(
+        s"Couldn't generate SVG diagram from ${inputFile}: check the diagram source code")
     case _ => ()
   }
   fos.close()
