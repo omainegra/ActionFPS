@@ -6,6 +6,7 @@ object Dependencies {
   val sourcecode: ModuleID = "com.lihaoyi" %% "sourcecode" % "0.1.4"
   val async: ModuleID = "org.scala-lang.modules" %% "scala-async" % "0.9.7"
   val commonsCsv: ModuleID = "org.apache.commons" % "commons-csv" % "1.5"
+  val commonsIO: ModuleID = "commons-io" % "commons-io" % "2.5"
   val kantanCsv: ModuleID = "com.nrinaudo" %% "kantan.csv-generic" % "0.3.0"
   val jsoup: ModuleID = "org.jsoup" % "jsoup" % "1.10.3"
   val hazelcastClient: ModuleID = "com.hazelcast" % "hazelcast-client" % "3.9"
@@ -37,8 +38,6 @@ object Dependencies {
     "com.typesafe.akka" %% s"akka-$stuff" % "2.5.6"
 
   val akkaStreamTestkit: ModuleID = akka("stream-testkit")
-
-  val serverPinger: ModuleID = "com.actionfps" %% "server-pinger" % "5.5.2"
 
   val jodaTime: ModuleID = "joda-time" % "joda-time" % "2.9.9"
   val jodaConvert: ModuleID = "org.joda" % "joda-convert" % "1.9.2"

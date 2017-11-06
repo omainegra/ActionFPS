@@ -60,7 +60,8 @@ lazy val root =
     webServers,
     game,
     gameLogParserApp,
-    gameLogParser
+    gameLogParser,
+    serverPinger
   )
 
 lazy val webLogServer = project
@@ -371,13 +372,13 @@ lazy val webServers =
     .dependsOn(referenceServers)
     .aggregate(referenceServers)
     .dependsOn(webTemplate)
+    .dependsOn(serverPinger)
     .settings(
       libraryDependencies ++= Seq(
         playIteratees,
         playIterateesStreams,
         async,
-        akkaAgent,
-        serverPinger
+        akkaAgent
       )
     )
 
@@ -446,6 +447,16 @@ lazy val gameLogParser =
       libraryDependencies += scalatest % Test
     )
 
+lazy val serverPinger =
+  Project(id = "server-pinger", base = file("server-pinger"))
+    .settings(
+      libraryDependencies ++= Seq(jodaTime, jodaConvert, commonsIO, playJson, akkaActor),
+      libraryDependencies += scalatest % Test, {
+        lazy val FunTest = config("fun") extend (Test)
+        configs(FunTest)
+        inConfig(FunTest)(Defaults.testSettings)
+      }
+    )
 
 import org.jetbrains.sbt.StructureKeys._
 sbtStructureOutputFile in Global := Some(target.value / "structure.xml")
