@@ -460,12 +460,16 @@ lazy val ExtendedIntegrationTest = config("it") extend Test
 
 lazy val serverPinger =
   Project(id = "server-pinger", base = file("server-pinger"))
-      .configs(ExtendedIntegrationTest)
-      .settings(Defaults.itSettings: _*)
-      .settings(
-        libraryDependencies ++= Seq(jodaTime, jodaConvert, commonsIO, playJson, akkaActor),
-        libraryDependencies += scalatest % Test
-      )
+    .configs(ExtendedIntegrationTest)
+    .settings(Defaults.itSettings: _*)
+    .settings(
+      libraryDependencies ++= Seq(jodaTime,
+                                  jodaConvert,
+                                  commonsIO,
+                                  playJson,
+                                  akkaActor),
+      libraryDependencies += scalatest % Test
+    )
 
 import org.jetbrains.sbt.StructureKeys._
 sbtStructureOutputFile in Global := Some(target.value / "structure.xml")
